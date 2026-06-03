@@ -1,38 +1,19 @@
 <template>
-  <div class="playlist-detail-page">
-    <div class="playlist-header">
+  <div class="detail-page">
+    <header class="detail-header">
       <button class="back-btn" @click="router.push('/playlists')">
         <i class="ri-arrow-left-line"></i>
-        Back
+        <span>Back</span>
       </button>
 
-      <div class="playlist-heading">
+      <div class="detail-heading">
         <h1>{{ playlist?.name || 'Playlist' }}</h1>
         <p>
           {{ playlistBooks.length }} {{ playlistBooks.length === 1 ? 'book' : 'books' }}
           <span v-if="playlist?.description"> &bull; {{ playlist.description }}</span>
         </p>
       </div>
-
-      <div class="view-toggle" aria-label="Playlist view">
-        <button
-          class="toggle-button"
-          :class="{ active: viewMode === 'grid' }"
-          title="Grid view"
-          @click="viewMode = 'grid'"
-        >
-          <i class="ri-apps-2-line"></i>
-        </button>
-        <button
-          class="toggle-button"
-          :class="{ active: viewMode === 'list' }"
-          title="List view"
-          @click="viewMode = 'list'"
-        >
-          <i class="ri-list-unordered"></i>
-        </button>
-      </div>
-    </div>
+    </header>
 
     <EmptyState
       v-if="!playlistBooks.length"
@@ -41,68 +22,77 @@
       icon="ri-play-list-2-line"
     />
 
-    <div v-else-if="viewMode === 'grid'" class="playlist-grid">
-      <article
-        v-for="book in playlistBooks"
-        :key="book.id"
-        class="playlist-book-card"
-        @click="router.push(`/reader/${book.id}`)"
-      >
-        <img :src="resolveBookCover(book)" :alt="book.title" @error="(e) => coverFallback(e, book.title)" />
-        <div class="playlist-book-info">
-          <h2 :title="book.title">{{ truncateWords(book.title, 7) }}</h2>
-          <p>{{ book.author || 'Unknown author' }}</p>
-          <div class="playlist-book-meta">
-            <span>{{ book.progress || 0 }}%</span>
-            <span>{{ formatPersonalRating(book.rating) }}</span>
-          </div>
-        </div>
-      </article>
-    </div>
+    <section v-else class="detail-table" aria-label="Playlist books">
+      <div class="data-header">
+        <div class="col-book">Book</div>
+        <div class="col-status">Status</div>
+        <div class="col-progress">Progress</div>
+        <div class="col-rating">Personal Rating</div>
+        <div class="col-actions"></div>
+      </div>
 
-    <div v-else class="playlist-list">
       <article
         v-for="book in playlistBooks"
         :key="book.id"
-        class="playlist-list-row"
+        class="data-row"
         @click="router.push(`/reader/${book.id}`)"
       >
-        <img :src="resolveBookCover(book)" :alt="book.title" @error="(e) => coverFallback(e, book.title)" />
-        <div class="playlist-list-main">
-          <h2 :title="book.title">{{ truncateWords(book.title, 10) }}</h2>
-          <p>
-            {{ book.author || 'Unknown author' }}
-            <span v-if="book.publishYear"> &bull; {{ book.publishYear }}</span>
-          </p>
-        </div>
-        <div class="playlist-progress">
-          <div>
-            <span>{{ book.status || 'Unread' }}</span>
-            <strong>{{ book.progress || 0 }}%</strong>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" :style="{ width: `${book.progress || 0}%` }"></div>
+        <div class="col-book book-cell">
+          <img :src="resolveBookCover(book)" :alt="book.title" class="cell-cover" @error="(e) => coverFallback(e, book.title)" />
+          <div class="cell-book-info">
+            <div class="cell-title-row">
+              <h2 :title="book.title">{{ truncateWords(book.title, 9) }}</h2>
+              <span>{{ book.format ? book.format.toUpperCase() : 'BOOK' }}</span>
+            </div>
+            <p>{{ book.author || 'Unknown author' }}<template v-if="book.publishYear"> &bull; {{ book.publishYear }}</template></p>
+            <div class="cell-tags">
+              <span :class="{ muted: !book.series }">{{ book.series || 'Standalone' }}</span>
+              <span v-if="book.genre"><i class="ri-price-tag-3-line"></i>{{ book.genre }}</span>
+            </div>
           </div>
         </div>
-        <div class="playlist-rating">
+
+        <div class="col-status">
+          <span class="status-pill" :class="statusBadgeClass(book.status)">{{ book.status || 'Unread' }}</span>
+        </div>
+
+        <div class="col-progress">
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" :style="{ width: `${book.progress || 0}%` }"></div>
+            </div>
+            <span>{{ book.progress || 0 }}%</span>
+          </div>
+        </div>
+
+        <div class="col-rating">
           <i class="ri-star-fill"></i>
-          {{ formatPersonalRating(book.rating) }}
+          <span>{{ formatPersonalRating(book.rating) }}</span>
+        </div>
+
+        <div class="col-actions" @click.stop>
+          <button class="row-action-btn" title="Read aloud" @click="playTTS(book)">
+            <i class="ri-play-fill"></i>
+          </button>
+          <button class="row-action-btn" title="Open reader" @click="router.push(`/reader/${book.id}`)">
+            <i class="ri-book-open-line"></i>
+          </button>
         </div>
       </article>
-    </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
 import EmptyState from '~/components/EmptyState.vue'
 import { useBooks } from '~/composables/useBooks'
+import { useTTS } from '~/composables/useTTS'
 
 const route = useRoute()
 const router = useRouter()
 const { books, collections } = useBooks()
-const viewMode = ref('grid')
+const { play: playTTS } = useTTS()
 
 const playlist = computed(() => (
   collections.value.find((item) => String(item.id) === String(route.params.id))
@@ -126,17 +116,23 @@ const formatPersonalRating = (rating) => {
   return score > 0 ? `${score}/10` : '--/10'
 }
 
+const statusBadgeClass = (status) => {
+  if (status === 'Reading') return 'status-reading'
+  if (status === 'Read' || status === 'Completed') return 'status-read'
+  return 'status-unread'
+}
+
 const generateCoverPlaceholder = (title) => {
   const colors = getThemeCssVars([
     { name: '--color-book-cover-placeholder-one', fallback: '#8A2BE2' },
     { name: '--color-book-cover-placeholder-two', fallback: '#6A0DAD' },
-    { name: '--color-book-cover-placeholder-three', fallback: '#9370DB' },
-    { name: '--color-book-cover-placeholder-four', fallback: '#BA55D3' },
-    { name: '--color-book-cover-placeholder-five', fallback: '#DDA0DD' },
+    { name: '--color-book-cover-placeholder-three', fallback: '#2f7d62' },
+    { name: '--color-book-cover-placeholder-four', fallback: '#b45309' },
   ])
-  const hash = [...String(title || 'Book')].reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  const safeTitle = String(title || 'Book')
+  const hash = [...safeTitle].reduce((acc, c) => acc + c.charCodeAt(0), 0)
   const color = colors[hash % colors.length]
-  const initial = String(title || '?').trim()[0]?.toUpperCase() || '?'
+  const initial = safeTitle.trim()[0]?.toUpperCase() || '?'
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280"><rect width="200" height="280" fill="${color}"/><text x="100" y="145" font-family="serif" font-size="96" fill="rgba(255,255,255,0.48)" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
@@ -148,181 +144,207 @@ const coverFallback = (event, title) => {
 </script>
 
 <style scoped>
-.playlist-detail-page {
-  padding: 0;
-}
-
-.playlist-header {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.back-btn,
-.toggle-button {
-  border: 1px solid var(--color-border-subtle);
-  background: var(--color-surface-primary);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-height: 38px;
-  padding: 0 0.85rem;
-  border-radius: 8px;
-}
-
-.back-btn:hover,
-.toggle-button:hover {
-  border-color: var(--color-border-focus);
-  background: var(--color-surface-active);
-  color: var(--color-brand-primary-hover);
-}
-
-.playlist-heading h1 {
-  margin: 0;
-  color: var(--color-brand-primary);
-  font-size: 1.5rem;
-}
-
-.playlist-heading p {
-  margin: 0.35rem 0 0;
-  color: var(--color-text-muted);
-}
-
-.view-toggle {
-  display: flex;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.toggle-button {
-  width: 42px;
-  height: 38px;
-  border: none;
-  border-radius: 0;
-  font-size: 1.1rem;
-}
-
-.toggle-button.active {
-  background: var(--color-brand-primary);
-  color: var(--color-text-on-brand);
-}
-
-.playlist-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 1.25rem;
-}
-
-.playlist-book-card {
-  height: 205px;
-  display: grid;
-  grid-template-columns: 96px 1fr;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--color-border-card);
-  border-radius: 10px;
-  background: var(--color-surface-primary);
-  cursor: pointer;
-  box-shadow: var(--shadow-card-subtle);
-  transition: all 0.2s ease;
-}
-
-.playlist-book-card:hover,
-.playlist-list-row:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-border-focus);
-  background: var(--color-surface-secondary);
-}
-
-.playlist-book-card img {
-  width: 96px;
-  height: 144px;
-  border-radius: 6px;
-  object-fit: cover;
-  box-shadow: var(--shadow-cover);
-}
-
-.playlist-book-info {
-  display: flex;
-  flex-direction: column;
+.detail-page {
+  width: 100%;
   min-width: 0;
 }
 
-.playlist-book-info h2,
-.playlist-list-main h2 {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 1rem;
-  line-height: 1.25;
+.detail-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
 }
 
-.playlist-book-info p,
-.playlist-list-main p {
+.back-btn,
+.row-action-btn {
+  border: 1px solid var(--color-border-card);
+  background: var(--color-surface-card);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.back-btn {
+  min-height: 38px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.85rem;
+}
+
+.back-btn:hover,
+.row-action-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-brand-primary-hover);
+}
+
+.detail-heading h1 {
+  margin: 0;
+  color: var(--color-brand-primary);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.detail-heading p {
   margin: 0.35rem 0 0;
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
 }
 
-.playlist-book-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: auto;
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
-}
-
-.playlist-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.playlist-list-row {
-  display: grid;
-  grid-template-columns: 54px minmax(200px, 1fr) minmax(160px, 260px) 82px;
-  align-items: center;
-  gap: 1rem;
-  min-height: 92px;
-  padding: 0.8rem 1rem;
+.detail-table {
   border: 1px solid var(--color-border-card);
-  border-radius: 10px;
-  background: var(--color-surface-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  background: var(--color-surface-card);
+  overflow: hidden;
 }
 
-.playlist-list-row img {
-  width: 54px;
-  height: 76px;
+.data-header,
+.data-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 2.2fr) 130px minmax(160px, 1fr) 140px 90px;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.95rem 1.25rem;
+}
+
+.data-header {
+  border-bottom: 1px solid var(--color-border-card);
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.data-row {
+  border-bottom: 1px solid var(--color-border-card);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.data-row:last-child {
+  border-bottom: none;
+}
+
+.data-row:hover {
+  background: var(--color-surface-hover);
+}
+
+.book-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.cell-cover {
+  width: 48px;
+  height: 70px;
   border-radius: 5px;
   object-fit: cover;
   box-shadow: var(--shadow-control-subtle);
+  flex-shrink: 0;
 }
 
-.playlist-progress div:first-child {
+.cell-book-info {
+  min-width: 0;
+}
+
+.cell-title-row {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.cell-title-row h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-title-row span,
+.cell-tags span {
+  border: 1px solid var(--color-border-card);
+  border-radius: 5px;
+  padding: 0.15rem 0.45rem;
+  color: var(--color-brand-primary-hover);
+  background: var(--color-brand-primary-faint);
+  font-size: 0.66rem;
+  flex-shrink: 0;
+}
+
+.cell-book-info p {
+  margin: 0.2rem 0 0;
   color: var(--color-text-muted);
   font-size: 0.78rem;
-  margin-bottom: 0.4rem;
 }
 
-.playlist-progress strong {
+.cell-tags {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  min-width: 0;
+}
+
+.cell-tags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: 160px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: transparent;
   color: var(--color-text-secondary);
 }
 
-.progress-track {
+.cell-tags .muted {
+  color: var(--color-text-muted);
+}
+
+.col-status,
+.col-progress,
+.col-rating {
+  display: flex;
+  justify-content: center;
+}
+
+.status-pill {
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.status-reading {
+  background: rgba(245, 158, 11, 0.14);
+  color: rgb(180, 83, 9);
+}
+
+.status-read {
+  background: var(--color-surface-hover);
+  color: var(--color-brand-primary);
+}
+
+.status-unread {
+  background: rgba(100, 116, 139, 0.14);
+  color: rgb(71, 85, 105);
+}
+
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progress-bar {
+  width: 100px;
   height: 6px;
   border-radius: 999px;
   background: var(--color-border-subtle);
@@ -335,26 +357,51 @@ const coverFallback = (event, title) => {
   background: var(--gradient-library-progress);
 }
 
-.playlist-rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+.progress-wrap span,
+.col-rating {
   color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
-.playlist-rating i {
+.col-rating {
+  gap: 0.3rem;
+}
+
+.col-rating i {
   color: var(--color-status-star);
 }
 
-@media (max-width: 760px) {
-  .playlist-header,
-  .playlist-list-row {
+.col-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.2rem;
+}
+
+.row-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .data-header {
+    display: none;
+  }
+
+  .data-row,
+  .detail-header {
     grid-template-columns: 1fr;
   }
 
-  .view-toggle {
-    width: fit-content;
+  .col-status,
+  .col-progress,
+  .col-rating,
+  .col-actions {
+    justify-content: flex-start;
   }
 }
 </style>
