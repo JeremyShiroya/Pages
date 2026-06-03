@@ -6,58 +6,12 @@
       </h1>
     </div>
 
-    <section v-if="selectedSeries" class="series-detail">
-      <div class="detail-header">
-        <button type="button" class="back-btn" @click="selectedSeriesName = ''">
-          <i class="ri-arrow-left-line"></i>
-          <span>Back</span>
-        </button>
-        <div>
-          <h2>{{ selectedSeries.name }}</h2>
-          <p>{{ selectedSeriesBooks.length }} {{ selectedSeriesBooks.length === 1 ? 'book' : 'books' }}</p>
-        </div>
-      </div>
-
-      <div class="detail-table">
-        <div class="data-header">
-          <div>Book</div>
-          <div>Status</div>
-          <div>Progress</div>
-          <div>Rating</div>
-        </div>
-        <button
-          v-for="book in selectedSeriesBooks"
-          :key="book.id"
-          type="button"
-          class="data-row"
-          @click="router.push(`/reader/${book.id}`)"
-        >
-          <div class="book-cell">
-            <img :src="resolveBookCover(book)" :alt="book.title" @error="(event) => coverFallback(event, book.title)" />
-            <div>
-              <strong>{{ book.title }}</strong>
-              <span>{{ book.author || 'Unknown author' }}</span>
-            </div>
-          </div>
-          <span class="status-pill" :class="statusBadgeClass(book.status)">{{ book.status || 'Unread' }}</span>
-          <div class="progress-cell">
-            <div class="progress-track">
-              <div class="progress-fill" :style="{ width: `${book.progress || 0}%` }"></div>
-            </div>
-            <span>{{ book.progress || 0 }}%</span>
-          </div>
-          <span>{{ formatRating(book.rating) }}</span>
-        </button>
-      </div>
-    </section>
-
-    <div v-else-if="seriesList.length > 0" class="series-grid">
-      <button
+    <div v-if="seriesList.length > 0" class="series-grid">
+      <div
         v-for="series in seriesList"
-        :key="series.name"
-        type="button"
+        :key="series.id"
         class="series-card"
-        @click="openSeries(series.name)"
+        @click="openSeries(series)"
       >
         <div class="stacked-covers">
           <!-- Always render 3 layers -->
@@ -87,7 +41,7 @@
             </span>
           </div>
         </div>
-      </button>
+      </div>
     </div>
 
     <!-- Empty State -->
@@ -108,40 +62,17 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import { useBooks } from "~/composables/useBooks";
 import EmptyState from "./EmptyState.vue";
 
 const { seriesList } = useBooks();
 const router = useRouter();
-const selectedSeriesName = ref("");
 
-const selectedSeries = computed(() => (
-  seriesList.value.find(series => series.name === selectedSeriesName.value) || null
-));
+const seriesHref = (series) => `/serie/${series.id}`;
 
-const selectedSeriesBooks = computed(() => (
-  [...(selectedSeries.value?.books || [])].sort((a, b) => {
-    const aOrder = Number(a.seriesInstallment)
-    const bOrder = Number(b.seriesInstallment)
-    if (Number.isFinite(aOrder) && Number.isFinite(bOrder)) return aOrder - bOrder
-    return String(a.title || '').localeCompare(String(b.title || ''))
-  })
-));
-
-const openSeries = (name) => {
-  selectedSeriesName.value = name;
-};
-
-const statusBadgeClass = (status) => {
-  if (status === 'Reading') return 'status-reading'
-  if (status === 'Read' || status === 'Completed') return 'status-read'
-  return 'status-unread'
-};
-
-const formatRating = (rating) => {
-  const score = Number(rating || 0)
-  return score > 0 ? `${score}/10` : '--/10'
+const openSeries = (series) => {
+  router.push(seriesHref(series));
 };
 
 const generateCoverPlaceholder = (title) => {
@@ -178,6 +109,7 @@ const getStackStyle = (index) => {
     zIndex: style.z
   };
 };
+
 </script>
 
 <style scoped>
@@ -336,26 +268,72 @@ const getStackStyle = (index) => {
 .series-detail {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
-.detail-header {
+.detail-back-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  min-height: 38px;
 }
 
-.detail-header h2 {
+.detail-hero {
+  display: grid;
+  grid-template-columns: 285px minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+  min-height: 210px;
+  margin-bottom: 1.75rem;
+}
+
+.detail-cover-stack {
+  position: relative;
+  width: 285px;
+  height: 190px;
+}
+
+.detail-cover-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 104px;
+  height: 156px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.18);
+  transform-origin: center bottom;
+}
+
+.detail-cover-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.detail-copy {
+  min-width: 0;
+}
+
+.detail-kicker {
+  margin: 0 0 0.25rem;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.detail-copy h2 {
   margin: 0;
-  color: var(--color-brand-primary);
-  font-size: 1.5rem;
-  font-weight: 400;
+  color: var(--color-text-primary);
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-weight: 500;
+  line-height: 1.05;
 }
 
-.detail-header p {
-  margin: 0.25rem 0 0;
+.detail-copy p:not(.detail-kicker) {
+  margin: 0.35rem 0 0;
   color: var(--color-text-muted);
-  font-size: 0.88rem;
+  font-size: 0.95rem;
 }
 
 .back-btn {
@@ -381,7 +359,7 @@ const getStackStyle = (index) => {
 .data-header,
 .data-row {
   display: grid;
-  grid-template-columns: minmax(260px, 2fr) 130px minmax(160px, 1fr) 100px;
+  grid-template-columns: minmax(260px, 2.2fr) 130px minmax(160px, 1fr) 120px minmax(160px, 1.1fr) 150px;
   gap: 1rem;
   align-items: center;
   width: 100%;
@@ -389,22 +367,30 @@ const getStackStyle = (index) => {
 }
 
 .data-header {
+  background: transparent;
   border-bottom: 1px solid var(--color-border-card);
   color: var(--color-text-muted);
   font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .data-row {
-  border: 0;
   border-bottom: 1px solid var(--color-border-card);
   background: transparent;
   color: var(--color-text-secondary);
   text-align: left;
   cursor: pointer;
+  transition: background-color 0.15s;
 }
 
 .data-row:last-child {
   border-bottom: 0;
+}
+
+.data-row:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: -2px;
 }
 
 .data-row:hover {
@@ -418,71 +404,145 @@ const getStackStyle = (index) => {
   min-width: 0;
 }
 
-.book-cell img {
+.cell-cover {
   width: 48px;
   height: 70px;
   border-radius: 5px;
   object-fit: cover;
+  flex-shrink: 0;
   box-shadow: var(--shadow-control-subtle);
 }
 
-.book-cell div {
+.cell-book-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cell-book-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   min-width: 0;
 }
 
-.book-cell strong,
-.book-cell span {
-  display: block;
+.cell-book-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.book-cell strong {
-  color: var(--color-text-primary);
+.cell-format {
+  font-size: 0.65rem;
   font-weight: 500;
+  color: var(--color-brand-primary);
+  background: var(--color-brand-primary-faint);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
-.book-cell span {
-  color: var(--color-text-muted);
+.cell-book-author {
+  margin: 0;
   font-size: 0.78rem;
-  margin-top: 0.2rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-book-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.3rem;
+  min-width: 0;
+}
+
+.cell-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: 150px;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid var(--color-border-card);
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-chip.standalone {
+  color: var(--color-text-muted);
+}
+
+.cell-chip.genre {
+  background: var(--color-brand-primary-faint);
+  color: var(--color-brand-primary-hover);
+  border-color: transparent;
+}
+
+.data-header .col-status,
+.data-header .col-progress,
+.data-header .col-personal,
+.data-header .col-goodreads {
+  text-align: center;
+}
+
+.col-status,
+.col-progress,
+.col-personal,
+.col-goodreads {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
 }
 
 .status-pill {
-  width: fit-content;
+  display: inline-flex;
+  align-items: center;
   border-radius: 999px;
   padding: 0.25rem 0.8rem;
   font-size: 0.75rem;
+  font-weight: 500;
   white-space: nowrap;
 }
 
-.status-reading {
+.status-pill.status-reading {
   background: rgba(245, 158, 11, 0.14);
   color: rgb(180, 83, 9);
 }
 
-.status-read {
+.status-pill.status-read {
   background: var(--color-surface-hover);
   color: var(--color-brand-primary);
 }
 
-.status-unread {
+.status-pill.status-unread {
   background: rgba(100, 116, 139, 0.14);
   color: rgb(71, 85, 105);
 }
 
-.progress-cell {
+.progress-wrap {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.progress-track {
+.progress-bar {
   width: 100px;
   height: 6px;
   border-radius: 999px;
-  background: var(--color-border-subtle);
+  background: rgba(15, 23, 42, 0.08);
   overflow: hidden;
 }
 
@@ -490,15 +550,182 @@ const getStackStyle = (index) => {
   height: 100%;
   border-radius: inherit;
   background: var(--gradient-library-progress);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  min-width: 34px;
+  text-align: right;
+}
+
+.progress-complete-icon {
+  color: var(--color-brand-primary);
+  font-size: 1.1rem;
+}
+
+.progress-complete-text {
+  color: var(--color-brand-primary);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.rating-wrap,
+.goodreads-wrap {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.rating-wrap {
+  gap: 0.3rem;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.list-star {
+  color: #f6a400;
+}
+
+.goodreads-wrap {
+  position: relative;
+}
+
+.data-row .goodreads-wrap :deep(.goodreads-count) {
+  display: none;
+}
+
+.data-row .goodreads-wrap[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 0.4rem 0.65rem;
+  border-radius: 6px;
+  background: var(--color-text-primary);
+  color: var(--color-surface-primary);
+  box-shadow: var(--shadow-card-hover);
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.data-row .goodreads-wrap[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  border: 5px solid transparent;
+  border-top-color: var(--color-text-primary);
+  pointer-events: none;
+}
+
+.rating-empty {
+  color: var(--color-text-subtle);
+  font-size: 0.85rem;
+}
+
+.col-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.15rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.data-row:hover .col-actions,
+.data-row:focus-within .col-actions {
+  opacity: 1;
+}
+
+.row-action-btn {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.15s;
+}
+
+.row-action-btn:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-brand-primary-hover);
+}
+
+.row-action-btn.active i {
+  color: var(--color-status-danger-bright);
+}
+
+.row-action-btn.delete:hover {
+  background: var(--color-status-danger-soft);
+  color: var(--color-status-danger);
+}
+
+.row-action-btn.muted {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.row-action-btn.muted:hover {
+  background: transparent;
+  color: var(--color-text-subtle);
 }
 
 @media (max-width: 760px) {
+  .detail-hero {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    min-height: 0;
+    margin-bottom: 1rem;
+  }
+
+  .detail-cover-stack {
+    width: 245px;
+    height: 178px;
+    margin: 0 auto;
+    transform: scale(0.86);
+    transform-origin: center;
+  }
+
+  .detail-copy {
+    text-align: center;
+  }
+
+  .detail-copy h2 {
+    font-size: 2rem;
+  }
+
   .data-header {
     display: none;
   }
 
   .data-row {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .col-status,
+  .col-progress,
+  .col-personal,
+  .col-goodreads,
+  .col-actions {
+    justify-content: flex-start;
+  }
+
+  .col-actions {
+    opacity: 1;
   }
 }
 </style>
