@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T12:07:21.486398+00:00",
+  "generated_at": "2026-09-12T13:31:12.768145+00:00",
   "nodes": {
     "capacitor_config": {
       "code_fingerprint": "5f757563dfacb1a0f0c65362cca4a19820697328597ae6c6006820ff99fa4e40",
@@ -12,7 +12,7 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 0.999691251,
+      "score": 0.998347116,
       "source_file": "capacitor.config.ts",
       "status": "tentative",
       "uses": 1
@@ -33,7 +33,7 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 1.999473641,
+      "score": 1.996785249,
       "source_file": "composables/tts/desktopTtsDriver.test.js",
       "status": "preferred",
       "uses": 2
@@ -49,7 +49,7 @@
           "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
         }
       ],
-      "score": 0.978079653,
+      "score": 0.976764576,
       "source_file": "composables/tts/mobileTtsDriver.js",
       "status": "tentative",
       "uses": 1
@@ -65,7 +65,7 @@
           "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
         }
       ],
-      "score": 0.978079653,
+      "score": 0.976764576,
       "source_file": "composables/tts/mobileTtsDriver.js",
       "status": "tentative",
       "uses": 1
@@ -86,7 +86,7 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 1.999473641,
+      "score": 1.996785249,
       "source_file": "composables/tts/nativeSpeech.js",
       "status": "preferred",
       "uses": 2
@@ -102,13 +102,13 @@
           "q": "will it function/behave like an actual desktop app and not just a mock?"
         }
       ],
-      "score": 0.999782391,
+      "score": 0.998438133,
       "source_file": "composables/useDeviceAssets.js",
       "status": "tentative",
       "uses": 1
     },
     "composables_usedevicelibrarysync": {
-      "code_fingerprint": "4904e7257f6393a3e3501ce47ce1ac5bc2e8d3106589080edf3936d7aa0aeb8d",
+      "code_fingerprint": "15c780e2d5dcb6367835c79c3be65cf117072bb34f814eeecbfcb0d5ccd7d6ac",
       "label": "useDeviceLibrarySync.js",
       "last": "2026-09-12T11:53:47.654862+00:00",
       "provenance": [
@@ -118,7 +118,7 @@
           "q": "will it function/behave like an actual desktop app and not just a mock?"
         }
       ],
-      "score": 0.999782391,
+      "score": 0.998438133,
       "source_file": "composables/useDeviceLibrarySync.js",
       "status": "tentative",
       "uses": 1
@@ -134,7 +134,7 @@
           "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
         }
       ],
-      "score": 0.978079653,
+      "score": 0.976764576,
       "source_file": "composables/useTTS.js",
       "status": "tentative",
       "uses": 1
@@ -155,7 +155,7 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 1.999473641,
+      "score": 1.996785249,
       "source_file": "package.json",
       "status": "preferred",
       "uses": 2
@@ -171,7 +171,7 @@
           "q": "will it function/behave like an actual desktop app and not just a mock?"
         }
       ],
-      "score": 0.999782391,
+      "score": 0.998438133,
       "source_file": "plugins/media-session.client.js",
       "status": "tentative",
       "uses": 1

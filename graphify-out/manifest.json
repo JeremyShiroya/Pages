@@ -24,8 +24,8 @@
     "semantic_hash": "2a90228c3ef53618c1ddd159a9844052"
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1789148791.5241153,
-    "seen": 1789216826.4493878,
+    "mtime": 1789218861.5859456,
+    "seen": 1789219871.2947233,
     "ast_hash": "9d7ac48553a5fbe2dabfa1d735929c47",
     "semantic_hash": "9d7ac48553a5fbe2dabfa1d735929c47"
   },
@@ -36,10 +36,10 @@
     "semantic_hash": "fbaf7cc870c663eb52dcf218531c439d"
   },
   "android/app/src/main/java/com/bookish/app/ApkInstallerPlugin.java": {
-    "mtime": 1788994054.862128,
-    "seen": 1789126705.9271774,
-    "ast_hash": "b1907fdc2adf8957581ac9727ddf5b61",
-    "semantic_hash": "b1907fdc2adf8957581ac9727ddf5b61"
+    "mtime": 1789218395.6345994,
+    "seen": 1789219871.2947383,
+    "ast_hash": "b0469f21656b4add38fca101aaa9f7e4",
+    "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/DeviceBooksPlugin.java": {
     "mtime": 1784991629.876187,
@@ -84,8 +84,8 @@
     "semantic_hash": "682315a426653617c6a74fc12bef55b6"
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1789148791.5231137,
-    "seen": 1789216826.456806,
+    "mtime": 1789218861.5839431,
+    "seen": 1789219871.2948163,
     "ast_hash": "27774e912a23b4f9786f7934cdc87d9e",
     "semantic_hash": "27774e912a23b4f9786f7934cdc87d9e"
   },
@@ -120,10 +120,10 @@
     "semantic_hash": "10a8a9a6c3d912f08cdf367958fdf128"
   },
   "components/mobile/AddBookMobile.vue": {
-    "mtime": 1786056616.8820186,
-    "seen": 1789126705.927251,
-    "ast_hash": "0556a93f4589402d78d5398580b40743",
-    "semantic_hash": "0556a93f4589402d78d5398580b40743"
+    "mtime": 1789218233.1751041,
+    "seen": 1789219871.2948852,
+    "ast_hash": "201cd12a1db5fdbce6da5a2643a1d03c",
+    "semantic_hash": ""
   },
   "components/mobile/AnnotationListMobile.vue": {
     "mtime": 1784991630.116138,
@@ -138,10 +138,10 @@
     "semantic_hash": "34504ecd841ad79e5c7b1e1f1ba567fe"
   },
   "components/mobile/BooksMobile.vue": {
-    "mtime": 1788998325.1328025,
-    "seen": 1789126705.9272606,
-    "ast_hash": "78058c7785e1cb8e197ec6081b171681",
-    "semantic_hash": "78058c7785e1cb8e197ec6081b171681"
+    "mtime": 1789218269.321159,
+    "seen": 1789219871.2949035,
+    "ast_hash": "a4b3f6f57836d8d66a1e55759a2a96d6",
+    "semantic_hash": ""
   },
   "components/mobile/EditBookMobile.vue": {
     "mtime": 1786056650.5419495,
@@ -150,10 +150,10 @@
     "semantic_hash": "fb0c00f0b4742579f89a42d00fc24e4d"
   },
   "components/mobile/FavouritesMobile.vue": {
-    "mtime": 1786055162.3612704,
-    "seen": 1789126705.9272661,
-    "ast_hash": "f9d73ca36fde4b18fa195f538ec48b17",
-    "semantic_hash": "f9d73ca36fde4b18fa195f538ec48b17"
+    "mtime": 1789218276.967002,
+    "seen": 1789219871.2949178,
+    "ast_hash": "e12ab2cd08b7adccd1dbedfbc96e91c7",
+    "semantic_hash": ""
   },
   "components/mobile/HiddenBooksMobile.vue": {
     "mtime": 1785488883.9798687,
@@ -210,9 +210,9 @@
     "semantic_hash": "08d9ed05478623c19186d1cb0c36fff0"
   },
   "components/mobile/PreferencesMobile.vue": {
-    "mtime": 1789147214.8382168,
-    "seen": 1789216826.4696715,
-    "ast_hash": "a94cd4c706ea7a5c3ed41d4ab62217a4",
+    "mtime": 1789218388.4560006,
+    "seen": 1789219871.294983,
+    "ast_hash": "c741f3575a4b17692361bd6e4b49634b",
     "semantic_hash": ""
   },
   "components/mobile/ProfileMobile.vue": {
@@ -258,16 +258,16 @@
     "semantic_hash": "ca97db5ffdd298fbcc05992aaff403f6"
   },
   "components/mobile/SeriesMobile.vue": {
-    "mtime": 1786796387.935269,
-    "seen": 1789126705.9273155,
-    "ast_hash": "91d01840563cc5ea619d4c844d147203",
-    "semantic_hash": "91d01840563cc5ea619d4c844d147203"
+    "mtime": 1789218284.576693,
+    "seen": 1789219871.2950354,
+    "ast_hash": "7deeba369383c0bf22caa346e030a793",
+    "semantic_hash": ""
   },
   "components/mobile/SettingsMobile.vue": {
-    "mtime": 1785883843.788258,
-    "seen": 1789126705.9273179,
-    "ast_hash": "734c08c13c62e4713b4a23d208c1959a",
-    "semantic_hash": "734c08c13c62e4713b4a23d208c1959a"
+    "mtime": 1789218343.7987359,
+    "seen": 1789219871.2950404,
+    "ast_hash": "2261c0148105cf9497ca0846a4521df8",
+    "semantic_hash": ""
   },
   "components/mobile/SettingsStorageMobile.vue": {
     "mtime": 1788871219.4250445,
@@ -750,10 +750,10 @@
     "semantic_hash": "2d0ef2e56c02c314fa0cba896918339a"
   },
   "composables/useDeviceLibrarySync.js": {
-    "mtime": 1788995003.4677105,
-    "seen": 1789126705.9276001,
-    "ast_hash": "6d1ea131b353f11b5ab02d9d4ccc6dfe",
-    "semantic_hash": "6d1ea131b353f11b5ab02d9d4ccc6dfe"
+    "mtime": 1789218241.135141,
+    "seen": 1789219871.2957609,
+    "ast_hash": "1c35b9149894b994dda0e79beddac370",
+    "semantic_hash": ""
   },
   "composables/useDeviceMetadataSearch.js": {
     "mtime": 1785958489.7141147,
@@ -774,10 +774,10 @@
     "semantic_hash": "bcda2aeb69f1e12f6c7351a9b7fb65ca"
   },
   "composables/useEpubExtractor.js": {
-    "mtime": 1783055738.6715503,
-    "seen": 1789126705.927611,
-    "ast_hash": "d083d2f44fa6a2d138b47738b5ecfff1",
-    "semantic_hash": "d083d2f44fa6a2d138b47738b5ecfff1"
+    "mtime": 1789218225.6651661,
+    "seen": 1789219871.2957854,
+    "ast_hash": "e505f8543e49a23558f722b0a2039bdc",
+    "semantic_hash": ""
   },
   "composables/useEpubExtractor.test.js": {
     "mtime": 1779172554.76785,
@@ -1020,10 +1020,10 @@
     "semantic_hash": "098960cf871a9e42795388be5ac5f873"
   },
   "composables/useShareBook.js": {
-    "mtime": 1788907675.4424636,
-    "seen": 1789126705.9277282,
-    "ast_hash": "c2021ea29145d4780b01b049e358ebaa",
-    "semantic_hash": "c2021ea29145d4780b01b049e358ebaa"
+    "mtime": 1789218251.1370876,
+    "seen": 1789219871.2960684,
+    "ast_hash": "2603d97ad717d76cd0d1bc2b2ee2d341",
+    "semantic_hash": ""
   },
   "composables/useStreak.js": {
     "mtime": 1788895319.1908567,
@@ -1824,9 +1824,9 @@
     "semantic_hash": "e2f5c0d6795db1a3e11bbe7cd0d0a08e"
   },
   "tests/preferences.test.js": {
-    "mtime": 1789148570.6390233,
-    "seen": 1789216826.6624548,
-    "ast_hash": "f043abf9119deb66b16bddabc3b1790e",
+    "mtime": 1789218411.76528,
+    "seen": 1789219871.2969563,
+    "ast_hash": "f595cf0955ec4d5d07ea00083bb0dd85",
     "semantic_hash": ""
   },
   "tests/readerChromeAndListen.test.js": {
@@ -1992,9 +1992,9 @@
     "semantic_hash": "c863b54d822a06449a5ff5d39cc5477a"
   },
   "tests/settingsPages.test.js": {
-    "mtime": 1789130641.7896214,
-    "seen": 1789216826.681984,
-    "ast_hash": "0649dd754ba84c32ea2d8ba5fe207aae",
+    "mtime": 1789218403.2071252,
+    "seen": 1789219871.297132,
+    "ast_hash": "be15279a6db3eaaa00c4587160670380",
     "semantic_hash": ""
   },
   "tests/shareApp.test.js": {
@@ -2004,10 +2004,10 @@
     "semantic_hash": "038fb2ab183713197738367375d45c70"
   },
   "tests/shareBook.test.js": {
-    "mtime": 1788907687.9395456,
-    "seen": 1789126705.9281461,
-    "ast_hash": "87c9d2eeadddc0d6fa4392a2a83e6d50",
-    "semantic_hash": "87c9d2eeadddc0d6fa4392a2a83e6d50"
+    "mtime": 1789218506.503434,
+    "seen": 1789219871.2971432,
+    "ast_hash": "9ead97cb0430460a8d5a0b3701c4dde5",
+    "semantic_hash": ""
   },
   "tests/streakCalendar.test.js": {
     "mtime": 1788895452.628911,
@@ -3069,6 +3069,24 @@
     "mtime": 1776000711.13842,
     "seen": 1789216826.6924567,
     "ast_hash": "3b78aaeb450b8192e09d7c437c41e59d",
+    "semantic_hash": ""
+  },
+  "server/database/migrations/0000_add-pages-column.sql": {
+    "mtime": 1778139591.9198406,
+    "seen": 1789219871.296478,
+    "ast_hash": "fae8f00f3932a1e5e3f11be8ea24f3ea",
+    "semantic_hash": ""
+  },
+  "server/database/migrations/0001_naive_stark_industries.sql": {
+    "mtime": 1778224044.757941,
+    "seen": 1789219871.2964835,
+    "ast_hash": "bcb6d05640ed56e698637c15d100f6e7",
+    "semantic_hash": ""
+  },
+  "server/database/migrations/0002_drop_content_column.sql": {
+    "mtime": 1778991194.1574428,
+    "seen": 1789219871.2964888,
+    "ast_hash": "812224c49041ad46b8e8d1e772855b69",
     "semantic_hash": ""
   }
 }
