@@ -1,10 +1,14 @@
 <template>
   <ResponsiveViewSwitch>
-    <template #mobile>
+    <template #phone>
       <component :is="mobileDetailComponent" />
     </template>
 
-    <template #desktop>
+    <template #tabletPortrait>
+      <BookDetailTabletPortrait />
+    </template>
+
+    <template #tabletLandscape>
       <div class="book-detail">
         <div class="back-row">
           <button type="button" class="back-btn" @click="router.back()">
@@ -76,6 +80,7 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ResponsiveViewSwitch from "~/components/shared/ResponsiveViewSwitch.vue";
 import BookDetailMobile from "~/components/mobile/BookDetailMobile.vue";
+import BookDetailTabletPortrait from "~/components/tablet/portrait/BookDetailTabletPortrait.vue";
 import { useBooks } from "~/composables/useBooks";
 
 const mobileDetailComponent = BookDetailMobile;

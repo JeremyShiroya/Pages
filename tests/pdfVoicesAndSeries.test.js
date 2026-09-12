@@ -99,9 +99,7 @@ describe('device voices', () => {
     expect(offered.map((v) => v.lang)).toEqual(['en-AU', 'en_GB', 'en-US', 'en-US'])
   })
 
-  test('every variant survives — they are no longer collapsed by name', () => {
-    // Deduping by display name left one voice per locale, which is why only a
-    // single (seemingly always female) option ever appeared.
+  test('distinct male and female variants survive without duplicate aliases', () => {
     const offered = offeredDeviceVoices(voices)
     const usVoices = offered.filter((v) => v.lang === 'en-US')
     expect(usVoices).toHaveLength(2)
@@ -118,9 +116,9 @@ describe('device voices', () => {
   test('gender is labelled only when the OS voice name actually says so', () => {
     expect(describeDeviceVoice({ name: 'English Male 2', lang: 'en-GB' }, 0)).toContain('Male')
     expect(describeDeviceVoice({ name: 'Sonia', lang: 'en-GB' }, 0)).toContain('Female')
-    // Google's older variant codes carry no documented gender, so none is claimed.
+    // Google's older variant codes are mapped to their installed voice family.
     const unlabelled = describeDeviceVoice({ name: 'en-us-x-tpf-local', lang: 'en-US' }, 0)
-    expect(unlabelled).toBe('English (US) · Voice 1')
+    expect(unlabelled).toBe('English (US) · Female 1')
   })
 
   // What the Capacitor plugin ACTUALLY returns on Android:
@@ -147,7 +145,7 @@ describe('device voices', () => {
       .toBe('English (US) · Female 1')
   })
 
-  test('every real Android voice survives, male ones included', () => {
+  test('duplicate Android aliases collapse to one clearly labelled voice per gender', () => {
     // The regression: all four locales' voices shared the name "English United
     // States", so deduping on `name` left one voice per locale.
     const offered = offeredDeviceVoices([
@@ -156,9 +154,10 @@ describe('device voices', () => {
       androidVoice('en-us-x-iom#male_1-local', 'en-US'),
       androidVoice('en-us-x-tpd#male_2-local', 'en-US'),
     ])
-    expect(offered).toHaveLength(4)
-    expect(offered.filter((v) => v.name.includes('Male'))).toHaveLength(2)
-    expect(offered.filter((v) => v.name.includes('Female'))).toHaveLength(2)
+    expect(offered).toHaveLength(2)
+    expect(offered.filter((v) => v.name.includes('Male'))).toHaveLength(1)
+    expect(offered.filter((v) => v.name.includes('Female'))).toHaveLength(1)
+    expect(offered.map((v) => v.gender)).toEqual(['Female', 'Male'])
   })
 
   test('the network twin of a local voice is dropped', () => {
@@ -179,15 +178,13 @@ describe('device voices', () => {
     expect(dupes[offered[0].index].voiceURI).toBe('en-us-x-sfg#female_1-local')
   })
 
-  test('voices are never collapsed when the platform gives nothing to tell them apart', () => {
-    // No voiceURI anywhere: the only key is the shared display name, so deduping
-    // would hide every voice but one. Listing duplicates beats hiding real ones.
+  test('identical platform entries are collapsed even without a voiceURI', () => {
     const offered = offeredDeviceVoices([
       { name: 'English United States', lang: 'en-US' },
       { name: 'English United States', lang: 'en-US' },
       { name: 'English United States', lang: 'en-US' },
     ])
-    expect(offered).toHaveLength(3)
+    expect(offered).toHaveLength(1)
   })
 
   test('no two offered voices share a label', () => {

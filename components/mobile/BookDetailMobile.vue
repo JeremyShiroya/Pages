@@ -2,7 +2,43 @@
   <div class="book-detail-page">
     <!-- No title: the hero below already names the book, and a long title
          crowded the bar. Back button only. -->
-    <MobileSettingsNav :show-title="false" back-to="/books" aria-label="Book navigation" />
+    <MobileSettingsNav :show-title="false" back-to="/books" aria-label="Book navigation">
+      <template v-if="minimalActions && book" #actions>
+        <div ref="detailMenuElement" class="detail-more-wrap" @click.stop>
+          <button
+            type="button"
+            class="detail-more-button"
+            aria-label="Book options"
+            :aria-expanded="detailMenuOpen"
+            @click="detailMenuOpen = !detailMenuOpen"
+          >
+            <i class="ri-more-2-fill"></i>
+          </button>
+          <div v-if="detailMenuOpen" class="detail-more-menu" role="menu">
+            <button type="button" role="menuitem" @click="runDetailAction('favourite')">
+              <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+              <span>{{ book.isFavourite ? 'Remove favourite' : 'Favourite' }}</span>
+            </button>
+            <button type="button" role="menuitem" @click="runDetailAction('playlist')">
+              <i :class="playlistCount > 0 ? 'ri-play-list-2-fill' : 'ri-play-list-2-line'"></i>
+              <span>Add to playlist</span>
+            </button>
+            <button type="button" role="menuitem" @click="runDetailAction('edit')">
+              <i class="ri-edit-line"></i><span>Edit book</span>
+            </button>
+            <button type="button" role="menuitem" @click="runDetailAction('hide')">
+              <i class="ri-eye-off-line"></i><span>Hide book</span>
+            </button>
+            <button type="button" role="menuitem" @click="runDetailAction('share')">
+              <i class="ri-share-line"></i><span>Share book</span>
+            </button>
+            <button type="button" class="danger" role="menuitem" @click="runDetailAction('delete')">
+              <i class="ri-delete-bin-line"></i><span>Delete book</span>
+            </button>
+          </div>
+        </div>
+      </template>
+    </MobileSettingsNav>
 
     <div v-if="loading && !book" class="state-panel">
       <i class="ri-loader-4-line spinner"></i>
@@ -50,7 +86,7 @@
             class="detail-rating"
           />
 
-          <div class="quick-actions">
+          <div v-if="!minimalActions" class="quick-actions">
             <button
               type="button"
               class="icon-action"
@@ -76,6 +112,9 @@
             </button>
             <button type="button" class="icon-action" title="Hide" @click="handleHide">
               <i class="ri-eye-off-line"></i>
+            </button>
+            <button type="button" class="icon-action" title="Share" @click="handleShare">
+              <i class="ri-share-line"></i>
             </button>
             <button type="button" class="icon-action danger" title="Delete" @click="showDeleteModal = true">
               <i class="ri-delete-bin-line"></i>
@@ -142,11 +181,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { loadAnnotations, useAnnotations } from "~/composables/useAnnotations";
 import { useBooks } from "~/composables/useBooks";
+import { useBookishSettings } from "~/composables/useBookishSettings";
 import { useToast } from "~/composables/useToast";
+import { useShareBook } from "~/composables/useShareBook";
 import { prewarmReaderContent } from "~/composables/useReaderPrewarm";
 import { useTTS } from "~/composables/useTTS";
 import AddToPlaylistModal from "~/components/shared/AddToPlaylistModal.vue";
@@ -159,9 +200,14 @@ const router = useRouter();
 const { books, collections, loading, toggleFavourite, hideBook, deleteBook } = useBooks();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 const { addToast } = useToast();
+const { shareBook } = useShareBook();
+const { settings } = useBookishSettings();
 
 const showPlaylistModal = ref(false);
 const showDeleteModal = ref(false);
+const detailMenuOpen = ref(false);
+const detailMenuElement = ref(null);
+const minimalActions = computed(() => settings.value.bookActionDisplay === 'minimal');
 
 const handleHide = async () => {
   if (!book.value) return;
@@ -179,6 +225,34 @@ const handleDelete = async () => {
   addToast(`"${title}" was deleted.`, 'success');
   router.push('/books');
 };
+
+const handleShare = async () => {
+  const result = await shareBook(book.value);
+  if (!result.ok && !result.cancelled) addToast(result.reason, 'error');
+};
+
+const runDetailAction = async (action) => {
+  detailMenuOpen.value = false;
+  if (action === 'favourite') return toggleFavourite(book.value.id);
+  if (action === 'playlist') {
+    showPlaylistModal.value = true;
+    return;
+  }
+  if (action === 'edit') return router.push(`/edit/${book.value.id}`);
+  if (action === 'hide') return handleHide();
+  if (action === 'share') return handleShare();
+  if (action === 'delete') showDeleteModal.value = true;
+};
+
+const closeDetailMenuOutside = (event) => {
+  if (detailMenuOpen.value && !detailMenuElement.value?.contains(event.target)) {
+    detailMenuOpen.value = false;
+  }
+};
+
+watch(minimalActions, (enabled) => {
+  if (!enabled) detailMenuOpen.value = false;
+});
 
 const book = computed(() => books.value.find((b) => String(b.id) === String(route.params.id)));
 
@@ -200,7 +274,11 @@ const forThisBook = (list) => list.filter((a) => String(a.bookId) === String(rou
 const highlightCount = computed(() => forThisBook(highlights.value).length);
 const noteCount = computed(() => forThisBook(notes.value).length);
 
-onMounted(() => { if (route.params.id) loadAnnotations(route.params.id); });
+onMounted(() => {
+  if (route.params.id) loadAnnotations(route.params.id);
+  document.addEventListener('pointerdown', closeDetailMenuOutside);
+});
+onUnmounted(() => document.removeEventListener('pointerdown', closeDetailMenuOutside));
 
 const generateCoverPlaceholder = (title) => {
   const colors = ["#8A2BE2", "#6A0DAD", "#2f7d62", "#b45309"];
@@ -400,6 +478,67 @@ watch(
   flex-wrap: wrap;
   gap: 0.45rem;
   margin-top: 0.4rem;
+}
+
+.detail-more-wrap {
+  position: relative;
+}
+
+.detail-more-button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.detail-more-button:active {
+  background: transparent;
+}
+
+.detail-more-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  right: 0;
+  display: grid;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+  background-color: var(--color-surface-primary, #ffffff);
+  box-shadow: var(--shadow-card-hover, 0 12px 28px rgba(15, 23, 42, 0.18));
+  color: var(--color-text-primary);
+}
+
+.detail-more-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.7rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.detail-more-menu button:active {
+  background: var(--color-surface-secondary);
+}
+
+.detail-more-menu button.danger {
+  color: var(--color-status-danger);
 }
 
 .icon-action {

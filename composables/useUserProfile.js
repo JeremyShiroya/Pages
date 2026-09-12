@@ -5,7 +5,7 @@ export const DEFAULT_USER_PROFILE = Object.freeze({
   id: 'local',
   displayName: 'Reader',
   avatarType: 'image',
-  avatarValue: '/Images/User%20Avatars/default-user.jpeg',
+  avatarValue: '/images/User%20Avatars/default-user.jpeg',
 })
 
 export const BOOKISH_PROFILE_UPDATED_EVENT = 'bookish:profile-updated'
@@ -28,7 +28,7 @@ export const USER_AVATAR_OPTIONS = Object.freeze([
 ].map((filename) => ({
   id: filename,
   label: filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
-  src: `/Images/User%20Avatars/${encodeURIComponent(filename)}`,
+  src: `/images/User%20Avatars/${encodeURIComponent(filename)}`,
 })))
 
 export const PROFILE_AVATAR_PRESETS = Object.freeze([
@@ -42,7 +42,8 @@ export const PROFILE_AVATAR_PRESETS = Object.freeze([
 
 const profileState = ref({ ...DEFAULT_USER_PROFILE })
 let loadedFromStorage = false
-const USER_AVATAR_PATH_PREFIX = '/Images/User%20Avatars/'
+const USER_AVATAR_PATH_PREFIX = '/images/User%20Avatars/'
+const LEGACY_USER_AVATAR_PATH_PREFIX = '/Images/User%20Avatars/'
 
 function notifyProfileUpdated(profile) {
   if (!import.meta.client || typeof window === 'undefined') return
@@ -55,8 +56,11 @@ function normalizeProfile(value) {
     .trim()
     .slice(0, 32)
   const rawAvatarValue = String(source.avatarValue ?? DEFAULT_USER_PROFILE.avatarValue).trim()
-  const avatarValue = rawAvatarValue.startsWith(USER_AVATAR_PATH_PREFIX)
-    ? rawAvatarValue
+  const normalizedAvatarValue = rawAvatarValue.startsWith(LEGACY_USER_AVATAR_PATH_PREFIX)
+    ? `${USER_AVATAR_PATH_PREFIX}${rawAvatarValue.slice(LEGACY_USER_AVATAR_PATH_PREFIX.length)}`
+    : rawAvatarValue
+  const avatarValue = normalizedAvatarValue.startsWith(USER_AVATAR_PATH_PREFIX)
+    ? normalizedAvatarValue
     : DEFAULT_USER_PROFILE.avatarValue
 
   return {

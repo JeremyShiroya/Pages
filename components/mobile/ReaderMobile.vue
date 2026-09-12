@@ -66,7 +66,7 @@
     <div
       v-if="readerMode === 'listen'"
       class="reader-listen-view"
-      :class="{ 'bg-blur': listenBlurEnabled }"
+      :class="{ 'bg-blur': listenBlurEnabled, 'text-hidden': !listenTextVisible }"
     >
       <template v-if="book">
         <div v-if="listenBlurEnabled" class="listen-bg" aria-hidden="true">
@@ -152,7 +152,17 @@
           </button>
         </div>
 
-        <div class="listen-text">
+        <button
+          type="button"
+          class="listen-text-toggle"
+          :aria-expanded="listenTextVisible"
+          :aria-label="listenTextVisible ? 'Hide page content' : 'Show page content'"
+          @click="listenTextVisible = !listenTextVisible"
+        >
+          <i :class="listenTextVisible ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+        </button>
+
+        <div v-show="listenTextVisible" class="listen-text">
           <p v-if="listenChunks.length" class="listen-text-inner" :style="listenTextStyle">
             <span
               v-for="(chunk, index) in listenChunks"
@@ -952,6 +962,7 @@ const mediaOpen = ref(false);
 const displayOpen = ref(false);
 const voicePickerOpen = ref(false);
 const narratorOpen = ref(false);
+const listenTextVisible = ref(true);
 const retryingOnlineVoices = ref(false);
 const tocModalOpen = ref(false);
 
@@ -994,7 +1005,8 @@ const stepFontSize = (delta) => {
   });
 };
 
-// Original View page zoom. 1.0 is fit-to-width, so the range only goes up.
+// Original View page zoom. 1.0 is fit-to-width; magnified pages stay inside a
+// fixed page viewport, matching document readers such as WPS.
 const pdfZoomMin = PDF_ZOOM_MIN;
 const pdfZoomMax = PDF_ZOOM_MAX;
 
@@ -2397,11 +2409,11 @@ onUnmounted(() => {
 
 <style scoped>
 .reader-mobile-page {
-  --mobile-reader-bg: #e8e8f2;
-  --mobile-reader-text: #222431;
-  --mobile-reader-muted: #6f7282;
+  --mobile-reader-bg: var(--color-reader-light-background);
+  --mobile-reader-text: var(--color-reader-light-text);
+  --mobile-reader-muted: var(--color-reader-light-muted);
   /* Raised surfaces (pill, play button) follow the reader theme. */
-  --mobile-reader-surface: #ffffff;
+  --mobile-reader-surface: var(--color-reader-light-page);
   --dock-swap-duration: 0.32s;
   --dock-swap-ease: cubic-bezier(0.33, 1, 0.68, 1);
   /* Read mode never renders the app's tab bar — in scroll mode or page mode
@@ -2700,6 +2712,35 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
+.listen-text-toggle {
+  display: grid;
+  width: 42px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  margin: -12px 0 6px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--mobile-reader-muted) 42%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mobile-reader-surface) 78%, var(--mobile-reader-text) 22%);
+  color: var(--mobile-reader-text);
+  cursor: pointer;
+  font-size: 21px;
+}
+
+.reader-listen-view.text-hidden {
+  justify-content: center;
+  padding-bottom: calc(38px + env(safe-area-inset-bottom));
+}
+
+.reader-listen-view.text-hidden .listen-page-nav {
+  margin-bottom: 14px;
+}
+
+.reader-listen-view.text-hidden .listen-text-toggle {
+  margin-bottom: 0;
+}
+
 .listen-text {
   flex: 1;
   width: 100%;
@@ -2781,6 +2822,7 @@ onUnmounted(() => {
 
 .reader-listen-view.bg-blur .listen-page-current,
 .reader-listen-view.bg-blur .listen-controls button,
+.reader-listen-view.bg-blur .listen-text-toggle,
 .reader-listen-view.bg-blur .listen-text-inner {
   color: #fff;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
@@ -2835,6 +2877,15 @@ onUnmounted(() => {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.reader-mobile-page.listen-blur .listen-text-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: none;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
 }
 
 /* The sentence being narrated is highlighted just like in Read mode. */
@@ -3000,10 +3051,6 @@ onUnmounted(() => {
   gap: 2rem;
   overflow-x: hidden;
   padding: 0 0 2rem;
-}
-
-.reader-mobile-pdf :deep(.pdf-page-wrap) {
-  max-width: 100%;
 }
 
 .reader-mobile-chapters {

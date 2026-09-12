@@ -61,6 +61,7 @@ const nativeAiConfig = () => {
 }
 
 const CACHE_PREFIX = 'bookish:series-suggestions:'
+import { isSeriesRepairProtected } from '~/composables/seriesMutationGuard'
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 30 // 30 days
 // Failed lookups get a short TTL: cache them so an offline session doesn't
 // hammer the network, but retry soon — a blank slot must not stick for a month.
@@ -957,6 +958,7 @@ export const reconcileSeriesWithLibrary = async ({
       && installmentMatchesBook(entry, book)
     ))
     if (!match) continue
+    if (isSeriesRepairProtected(match)) continue
 
     linkedBookIds.add(match.id)
 
@@ -983,7 +985,7 @@ export const reconcileSeriesWithLibrary = async ({
       // Metadata top-up failed; the tag alone still moves it into the series.
     }
 
-    await updateBook(record)
+    await updateBook(record, { automaticSeriesRepair: true, allowMetadata: true, source: 'series-suggestions' })
     linked += 1
   }
 
@@ -1029,6 +1031,7 @@ export const realignEntireLibrarySeries = async ({ books = [], seriesList = [], 
 
   for (const book of unmappedBooks) {
     try {
+      if (isSeriesRepairProtected(book)) continue
       const hardcoverRoster = await fetchHardcoverSeriesRoster(book.title, book.title)
       if (hardcoverRoster?.series && hardcoverRoster?.books?.length) {
         const matchingEntry = hardcoverRoster.books.find((entry) => installmentMatchesBook(entry, book))
@@ -1041,7 +1044,7 @@ export const realignEntireLibrarySeries = async ({ books = [], seriesList = [], 
           seriesInstallment: installment,
           seriesTotal: total,
           seriesChecked: false,
-        })
+        }, { automaticSeriesRepair: true, source: 'series-realignment' })
         updatedCount += 1
       }
     } catch {}

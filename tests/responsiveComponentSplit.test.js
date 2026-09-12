@@ -7,20 +7,74 @@ const read = (path) => readFileSync(resolve(root, path), 'utf8')
 const exists = (path) => existsSync(resolve(root, path))
 
 describe('responsive mobile component split', () => {
-  test('major responsive surfaces have separate mobile and desktop components', () => {
+  test('portrait tablets use mobile UI and landscape tablets use the wide UI', async () => {
+    const { MOBILE_VIEW_MEDIA_QUERY } = await import('../composables/useResponsiveView.js')
+
+    expect(MOBILE_VIEW_MEDIA_QUERY).toContain('(max-width: 768px)')
+    expect(MOBILE_VIEW_MEDIA_QUERY).toContain('(orientation: portrait)')
+    expect(MOBILE_VIEW_MEDIA_QUERY).toContain('(min-width: 769px)')
+    expect(MOBILE_VIEW_MEDIA_QUERY).toContain('(max-width: 1024px)')
+
+    for (const shellPath of [
+      'assets/css/main.css',
+      'layouts/default.vue',
+      'layouts/reader.vue',
+      'components/mobile/MobileBottomNav.vue',
+      'components/mobile/MobileSettingsNav.vue',
+    ]) {
+      expect(read(shellPath), shellPath).toContain('(orientation: portrait) and (min-width: 769px) and (max-width: 1024px)')
+    }
+  })
+
+  test('installed devices select stable phone/tablet architectures', () => {
+    const detector = read('composables/useDeviceArchitecture.js')
+    const viewSwitch = read('components/shared/ResponsiveViewSwitch.vue')
+
+    expect(detector).toContain("INSTALLED_DEVICE_CLASS_KEY")
+    expect(detector).toContain("classifyDevice(physicalScreenSize())")
+    expect(detector).toContain("window.localStorage?.setItem")
+    expect(detector).toContain("presentationForOrientation")
+    expect(viewSwitch).toContain('name="phone"')
+    expect(viewSwitch).toContain('name="tabletPortrait"')
+    expect(viewSwitch).toContain('name="tabletLandscape"')
+    expect(exists('architectures/mobile/deviceArchitecture.js')).toBe(true)
+    expect(exists('architectures/tablet/deviceArchitecture.js')).toBe(true)
+    expect(exists('architectures/mobile/readerDomState.js')).toBe(true)
+    expect(exists('architectures/tablet/readerDomState.js')).toBe(true)
+    expect(exists('components/tablet/portrait/ReaderTabletPortrait.vue')).toBe(true)
+  })
+
+  test('tablet narration uses the playing chunk and rebuilds DOM-local highlights', () => {
+    const readerPage = read('pages/reader/[id].vue')
+    const jumpStart = readerPage.indexOf('async function jumpToNarration()')
+    const jumpEnd = readerPage.indexOf('function observeChapters', jumpStart)
+    const jump = readerPage.slice(jumpStart, jumpEnd)
+
+    expect(jump).toContain('currentNarrationChunkIndex.value')
+    expect(jump).toContain('await scrollToChunk(target)')
+    expect(jump).toContain('_highlightChunk(target, { forceScroll: true })')
+    expect(jump).not.toContain('ttsChunkIdx.value')
+    expect(readerPage).toContain('chaptersContainerRef.value?.querySelector?.(`#ch-${sectionIndex}`)')
+    expect(readerPage).toContain('createMobileReaderDomState()')
+    expect(readerPage).toContain('createTabletReaderDomState()')
+    expect(readerPage).toContain('Never let a span map from the previous surface survive a switch.')
+  })
+
+  test('major responsive surfaces have separate mobile and landscape-tablet components', () => {
     const surfaces = [
-      ['Home', 'components/shared/HomeComp.vue', 'components/mobile/HomeMobile.vue', 'components/desktop/HomeDesktop.vue'],
-      ['Settings', 'components/shared/SettingsComp.vue', 'components/mobile/SettingsMobile.vue', 'components/desktop/SettingsDesktop.vue'],
-      ['Books', 'components/shared/BooksComp.vue', 'components/mobile/BooksMobile.vue', 'components/desktop/BooksDesktop.vue'],
-      ['Series', 'components/shared/SeriesComp.vue', 'components/mobile/SeriesMobile.vue', 'components/desktop/SeriesDesktop.vue'],
-      ['Playlists', 'components/shared/PlaylistComp.vue', 'components/mobile/PlaylistsMobile.vue', 'components/desktop/PlaylistsDesktop.vue'],
-      ['Favourites', 'components/shared/FavouritesComp.vue', 'components/mobile/FavouritesMobile.vue', 'components/desktop/FavouritesDesktop.vue'],
-      ['Profile', 'pages/profile.vue', 'components/mobile/ProfileMobile.vue', 'components/desktop/ProfileDesktop.vue'],
+      ['Home', 'components/shared/HomeComp.vue', 'components/mobile/HomeMobile.vue', 'components/tablet/HomeDesktop.vue'],
+      ['Settings', 'components/shared/SettingsComp.vue', 'components/mobile/SettingsMobile.vue', 'components/tablet/SettingsDesktop.vue'],
+      ['Books', 'components/shared/BooksComp.vue', 'components/mobile/BooksMobile.vue', 'components/tablet/BooksDesktop.vue'],
+      ['Series', 'components/shared/SeriesComp.vue', 'components/mobile/SeriesMobile.vue', 'components/tablet/SeriesDesktop.vue'],
+      ['Playlists', 'components/shared/PlaylistComp.vue', 'components/mobile/PlaylistsMobile.vue', 'components/tablet/PlaylistsDesktop.vue'],
+      ['Favourites', 'components/shared/FavouritesComp.vue', 'components/mobile/FavouritesMobile.vue', 'components/tablet/FavouritesDesktop.vue'],
+      ['Profile', 'pages/profile.vue', 'components/mobile/ProfileMobile.vue', 'components/tablet/ProfileDesktop.vue'],
     ]
 
     expect(exists('components/shared/ResponsiveViewSwitch.vue')).toBe(true)
     expect(exists('components/mobile')).toBe(true)
-    expect(exists('components/desktop')).toBe(true)
+    expect(exists('components/tablet')).toBe(true)
+    expect(exists('components/desktop')).toBe(false)
     expect(exists('components/shared')).toBe(true)
 
     for (const [name, wrapperPath, mobilePath, desktopPath] of surfaces) {
@@ -230,10 +284,11 @@ describe('responsive mobile component split', () => {
     const layout = read('layouts/reader.vue')
 
     expect(layout).toContain('<ResponsiveViewSwitch')
-    expect(layout).toContain('<template #mobile>')
+    expect(layout).toContain('<template #phone>')
+    expect(layout).toContain('<template #tabletPortrait>')
     expect(layout).toContain('class="reader-mobile-layout"')
-    expect(layout).toMatch(/<template #desktop>[\s\S]*<Sidebar/)
-    expect(layout).toMatch(/<template #desktop>[\s\S]*<PlayingBar/)
+    expect(layout).toMatch(/<template #tabletLandscape>[\s\S]*<Sidebar/)
+    expect(layout).toMatch(/<template #tabletLandscape>[\s\S]*<PlayingBar/)
     expect(layout).toMatch(/@media \(max-width:\s*768px\)[\s\S]*:deep\(\.sidebar\)/)
     expect(layout).toMatch(/@media \(max-width:\s*768px\)[\s\S]*:deep\(\.playing-bar\)/)
     expect(layout).toMatch(/@media \(max-width:\s*768px\)[\s\S]*margin-left:\s*0/)

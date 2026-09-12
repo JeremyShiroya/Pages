@@ -71,7 +71,7 @@ describe('mobile UX batch', () => {
     expect(bar).toContain('<Teleport to="body">')
     expect(bar).toContain('bar-backdrop')
     expect(bar).not.toContain('--color-surface-inverse')
-    expect(bar).toContain("matchMedia('(max-width: 768px)')")
+    expect(bar).toContain('useResponsiveView()')
   })
 
   test('add FAB lifts above the mini player and sits above it in z-order', () => {

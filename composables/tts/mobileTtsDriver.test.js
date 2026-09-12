@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const synthesizeEdgeSpeechInBrowser = vi.fn()
 const nativeSpeechSupported = vi.fn(() => true)
+const $fetch = vi.fn()
+
+vi.stubGlobal('$fetch', (...args) => $fetch(...args))
 
 vi.mock('~/composables/useEdgeSpeechClient', () => ({
   synthesizeEdgeSpeechInBrowser: (...args) => synthesizeEdgeSpeechInBrowser(...args),
@@ -15,7 +18,12 @@ const { synthesizeMobileSpeech, resetMobileTtsDriver, mobileTtsEdgeDisabled } =
   await import('~/composables/tts/mobileTtsDriver')
 
 const EDGE_AUDIO = { audio: 'data:audio/mp3;base64,AAA', boundaries: [] }
-const speak = () => synthesizeMobileSpeech({ text: 'A sentence.', voice: 'en-US-ChristopherNeural', speed: 1 })
+const speak = (options = {}) => synthesizeMobileSpeech({
+  text: 'A sentence.',
+  voice: 'en-US-ChristopherNeural',
+  speed: 1,
+  ...options,
+})
 
 const setHidden = (hidden) => {
   Object.defineProperty(document, 'visibilityState', {
@@ -28,6 +36,7 @@ describe('mobileTtsDriver Edge resilience', () => {
   beforeEach(() => {
     resetMobileTtsDriver()
     synthesizeEdgeSpeechInBrowser.mockReset()
+    $fetch.mockReset()
     nativeSpeechSupported.mockReturnValue(true)
     setHidden(false)
   })
@@ -58,6 +67,33 @@ describe('mobileTtsDriver Edge resilience', () => {
     const result = await speak()
     expect(result).toMatchObject({ native: true })
     expect(mobileTtsEdgeDisabled()).toBe(true)
+  })
+
+  it('does not mistake a configured server HTML response for synthesized audio', async () => {
+    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('handshake failed'))
+    $fetch.mockResolvedValue('<!DOCTYPE html><html><body>Pages</body></html>')
+    const options = {
+      apiBaseUrl: 'https://pages.example',
+      apiUrl: (path) => `https://pages.example${path}`,
+    }
+
+    await expect(speak(options)).rejects.toThrow('handshake failed')
+    await expect(speak(options)).rejects.toThrow('handshake failed')
+    await expect(speak(options)).resolves.toMatchObject({ native: true })
+    expect($fetch).toHaveBeenCalledWith(
+      'https://pages.example/api/tts',
+      expect.objectContaining({ method: 'POST' }),
+    )
+  })
+
+  it('accepts usable audio from the configured server fallback', async () => {
+    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('handshake failed'))
+    $fetch.mockResolvedValue(EDGE_AUDIO)
+
+    await expect(speak({
+      apiBaseUrl: 'https://pages.example',
+      apiUrl: (path) => `https://pages.example${path}`,
+    })).resolves.toEqual(EDGE_AUDIO)
   })
 
   it('a success resets the failure streak', async () => {

@@ -24,9 +24,12 @@
       </EmptyState>
 
       <div v-else-if="books.length > 0">
-        <div class="view-container" :class="{ 'is-card': viewMode === 'table' }">
+        <div
+          class="view-container"
+          :class="{ 'is-card': viewMode === 'table', 'is-selecting': selectionMode }"
+        >
           <!-- Controls Row (chips + filters on left, add book + view toggle on right) -->
-          <div class="controls-row in-container">
+          <div class="controls-row in-container" :class="{ 'selection-toolbar': selectionMode }">
             <div class="controls-left">
               <!-- Reading-status filter dropdown -->
               <div class="filter-dropdown" ref="filterRef">
@@ -176,7 +179,7 @@
           </div>
 
           <!-- Library metrics text summary below filter controls -->
-          <div class="library-metrics-summary">
+          <div v-if="!selectionMode" class="library-metrics-summary">
             <span>{{ libraryMetricsText }}</span>
           </div>
 
@@ -188,6 +191,7 @@
             :key="book.id"
             :book="book"
             :active="isBookActive(book)"
+            shareable
             :selectable="selectionMode"
             :selected="isSelected(book.id)"
             @toggle-select="toggleSelected"
@@ -201,6 +205,7 @@
             @playlist="selectedPlaylistBook = book"
             @edit="router.push(`/edit/${book.id}`)"
             @hide="handleHideBook"
+            @share="handleShareBook"
             @delete="openDeleteModal(book)"
           />
         </div>
@@ -214,8 +219,10 @@
             class="mobile-list-book-card"
             :book="book"
             :active="isBookActive(book)"
+            shareable
             :selectable="selectionMode"
             :selected="isSelected(book.id)"
+            :collapse-actions="settings.bookActionDisplay === 'minimal'"
             @toggle-select="toggleSelected"
             @pointerdown="(event) => onPointerDown(event, book)"
             @pointermove="onPointerMove"
@@ -227,6 +234,7 @@
             @playlist="selectedPlaylistBook = book"
             @edit="router.push(`/edit/${book.id}`)"
             @hide="handleHideBook"
+            @share="handleShareBook"
             @delete="openDeleteModal(book)"
           />
         </div>
@@ -309,6 +317,7 @@ import {
 } from "~/composables/useBookishSettings";
 import { useLibraryFilters } from "~/composables/useLibraryFilters";
 import { useToast } from "~/composables/useToast";
+import { useShareBook } from "~/composables/useShareBook";
 import { useLongPress, useMultiSelect } from "~/composables/useMultiSelect";
 
 // Reactive data
@@ -327,6 +336,7 @@ const {
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS()
 const { settings, updateSettings } = useBookishSettings();
 const { addToast } = useToast();
+const { shareBook } = useShareBook();
 
 const isBookActive = (book) =>
   ttsBook.value?.id === book.id && ttsStatus.value !== 'idle'
@@ -338,6 +348,11 @@ const miniPlayerVisible = computed(() => !!ttsBook.value && ttsStatus.value !== 
 const handleHideBook = async (book) => {
   await hideBook(book.id)
   addToast(`"${book.title}" is now hidden from your library.`, 'info')
+}
+
+const handleShareBook = async (book) => {
+  const result = await shareBook(book)
+  if (!result.ok && !result.cancelled) addToast(result.reason, 'error')
 }
 
 const handlePlay = (book) => {
@@ -659,7 +674,7 @@ onUnmounted(() => {
 
 <style scoped>
 .books-container {
-  padding: calc(4.85rem + env(safe-area-inset-top)) 0rem calc(var(--mobile-bottom-nav-height, 72px) + env(safe-area-inset-bottom));
+  padding: calc(70px + env(safe-area-inset-top)) 0rem calc(var(--mobile-bottom-nav-height, 72px) + env(safe-area-inset-bottom));
   margin: 0 auto;
 }
 
@@ -1392,6 +1407,10 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
+.view-container.is-card.is-selecting {
+  overflow: visible;
+}
+
 /* Controls row inside the container */
 .controls-row.in-container {
   display: flex;
@@ -1751,12 +1770,12 @@ onUnmounted(() => {
 }
 
   .books-container {
-    padding: calc(4.85rem + env(safe-area-inset-top)) 0 calc(var(--mobile-bottom-nav-height, 72px) + env(safe-area-inset-bottom));
+    padding: calc(70px + env(safe-area-inset-top)) 0 calc(var(--mobile-bottom-nav-height, 72px) + env(safe-area-inset-bottom));
   }
 
 
   .books-content {
-    padding-top: 0.05rem;
+    padding-top: 0;
   }
 
 
@@ -1766,6 +1785,27 @@ onUnmounted(() => {
     flex-wrap: nowrap;
     gap: 12px;
     padding: 0 var(--mobile-page-padding-inline) 16px;
+  }
+
+  .controls-row.in-container.selection-toolbar {
+    position: fixed;
+    top: calc(70px + env(safe-area-inset-top));
+    right: 0;
+    left: 0;
+    z-index: 1090;
+    min-height: 54px;
+    padding: 10px var(--mobile-page-padding-inline);
+    background: var(--color-background-app);
+    border: 0;
+    box-shadow: none;
+  }
+
+  .view-container.is-card .controls-row.in-container.selection-toolbar {
+    background: var(--color-background-app);
+  }
+
+  .view-container.is-selecting {
+    padding-top: 54px;
   }
 
   /* One row: Filter dropdown on the left, view toggle pinned right. */

@@ -59,7 +59,9 @@ export type AiSeriesOptions = {
 // recently issued key, which made this feature look like it had no knowledge
 // when it was never reaching a model at all.
 const DEFAULT_GEMINI_MODEL = 'gemini-flash-latest'
-const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile'
+import { DEFAULT_GROQ_MODEL, resolveGroqModel } from './groqModel'
+// Groq's Qwen3.6-27B retirement does not affect the default. Keep an explicit
+// model so provider-side aliases cannot silently change the production path.
 
 // How many anchors must come back right before we believe anything else the
 // model said. Series orderings are memorised as a unit: a model that misplaces
@@ -100,7 +102,7 @@ export function resolveAiSeriesConfigs(env: Record<string, string | undefined> =
     ? { provider: 'gemini', apiKey: geminiKey, model: compact(env.GEMINI_MODEL) || DEFAULT_GEMINI_MODEL }
     : null
   const groq: AiSeriesConfig | null = groqKey
-    ? { provider: 'groq', apiKey: groqKey, model: compact(env.GROQ_MODEL) || DEFAULT_GROQ_MODEL }
+    ? { provider: 'groq', apiKey: groqKey, model: resolveGroqModel(env.GROQ_MODEL) }
     : null
 
   // An explicit choice leads; the other still stands by.

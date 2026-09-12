@@ -2,6 +2,7 @@ import { reactive, readonly } from 'vue'
 import { fetchBookMetadataResults } from '~/composables/useBookMetadataSearch'
 import { mergeMetadataIntoBook } from '~/composables/useDeviceLibrarySync'
 import { reconcileAndRepairBookSeries } from '~/composables/useSeriesRepair'
+import { isSeriesRepairProtected } from '~/composables/seriesMutationGuard'
 
 // Library-wide metadata backfill & Series Reconciliation used by Settings → Storage.
 
@@ -112,7 +113,12 @@ export function applyMetadataResult(book, meta, { didLookup = true, isLightPass 
 export async function unmarkFalseStandalones(books, updateBook) {
   const falseStandalones = (books || []).filter((book) => !String(book?.series ?? '').trim())
   for (const book of falseStandalones) {
-    await updateBook({ ...book, seriesChecked: false, metaCheckedAt: 0 })
+    if (isSeriesRepairProtected(book)) continue
+    await updateBook({ ...book, seriesChecked: false, metaCheckedAt: 0 }, {
+      automaticSeriesRepair: true,
+      allowMetadata: true,
+      source: 'standalone-recheck',
+    })
   }
 }
 
@@ -157,6 +163,7 @@ export async function backfillLibraryMetadata({ books, updateBook, onProgress, s
         previousState: repairResult.previousState,
         proposedState: repairResult.proposedState,
         confidence: repairResult.confidence,
+        confidenceByField: repairResult.confidenceByField,
         evidenceSources: repairResult.evidenceSources,
         decision: repairResult.decision,
         reason: repairResult.reason,

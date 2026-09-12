@@ -3,6 +3,105 @@
     <MobileSettingsNav title="Preferences" back-to="/settings" aria-label="Settings navigation" />
 
     <div class="preferences-body">
+      <section class="pref-group">
+        <h2 class="pref-group-title">Appearance</h2>
+
+        <div class="pref-block">
+          <div class="pref-copy">
+            <span class="pref-label">Light mode</span>
+            <span class="pref-hint">Choose a bright white canvas or the original muted grey.</span>
+          </div>
+          <div class="option-grid" role="group" aria-label="Light mode background">
+            <button
+              v-for="opt in appBackgroundOptions"
+              :key="opt.value"
+              type="button"
+              class="option palette-option"
+              :class="{ active: settings.appBackground === opt.value }"
+              :aria-pressed="settings.appBackground === opt.value"
+              @click="set('appBackground', opt.value)"
+            >
+              <span class="preview palette-preview" :class="`palette-preview--${opt.preview}`" aria-hidden="true">
+                <span class="palette-sidebar">
+                  <i></i><i></i><i></i>
+                </span>
+                <span class="palette-content">
+                  <i class="palette-heading"></i>
+                  <span class="palette-cards"><i></i><i></i></span>
+                  <i class="palette-line"></i>
+                </span>
+              </span>
+              <span class="option-label">
+                {{ opt.label }}
+                <i v-if="settings.appBackground === opt.value" class="ri-check-line"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pref-block">
+          <div class="pref-copy">
+            <span class="pref-label">Dark mode</span>
+            <span class="pref-hint">Choose pure black or the current muted charcoal.</span>
+          </div>
+          <div class="option-grid" role="group" aria-label="Dark mode background">
+            <button
+              v-for="opt in darkAppBackgroundOptions"
+              :key="opt.value"
+              type="button"
+              class="option palette-option"
+              :class="{ active: settings.darkAppBackground === opt.value }"
+              :aria-pressed="settings.darkAppBackground === opt.value"
+              @click="set('darkAppBackground', opt.value)"
+            >
+              <span class="preview palette-preview" :class="`palette-preview--${opt.preview}`" aria-hidden="true">
+                <span class="palette-sidebar">
+                  <i></i><i></i><i></i>
+                </span>
+                <span class="palette-content">
+                  <i class="palette-heading"></i>
+                  <span class="palette-cards"><i></i><i></i></span>
+                  <i class="palette-line"></i>
+                </span>
+              </span>
+              <span class="option-label">
+                {{ opt.label }}
+                <i v-if="settings.darkAppBackground === opt.value" class="ri-check-line"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="pref-group">
+        <h2 class="pref-group-title">Book actions</h2>
+
+        <div class="pref-block">
+          <div class="pref-copy">
+            <span class="pref-label">Action display</span>
+            <span class="pref-hint">Choose a cleaner More menu or keep every action visible.</span>
+          </div>
+          <div class="option-grid">
+            <button
+              v-for="opt in bookActionDisplayOptions"
+              :key="opt.value"
+              type="button"
+              class="option"
+              :class="{ active: settings.bookActionDisplay === opt.value }"
+              @click="set('bookActionDisplay', opt.value)"
+            >
+              <span class="preview">
+                <BookActionsPreview :mode="opt.value" />
+              </span>
+              <span class="option-label">
+                {{ opt.label }}
+                <i v-if="settings.bookActionDisplay === opt.value" class="ri-check-line"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Series cards -->
       <section class="pref-group">
         <h2 class="pref-group-title">Series cards</h2>
@@ -304,6 +403,7 @@ import { useBooks } from '~/composables/useBooks'
 import { formatLabel, formatsRemovedBy, useFormatEnablement } from '~/composables/useFormatEnablement'
 import { useToast } from '~/composables/useToast'
 import MobileSettingsNav from './MobileSettingsNav.vue'
+import BookActionsPreview from '../shared/previews/BookActionsPreview.vue'
 import ReadingPreview from '../shared/previews/ReadingPreview.vue'
 // Playlist cards offer the same two layouts as series cards, so they share the
 // same preview mockup.
@@ -313,6 +413,21 @@ const { settings, updateSettings } = useBookishSettings()
 const { addToast } = useToast()
 
 const set = (key, value) => updateSettings({ [key]: value })
+
+const appBackgroundOptions = [
+  { value: 'white', label: 'Bright', preview: 'bright' },
+  { value: 'muted', label: 'Muted', preview: 'light-muted' },
+]
+
+const darkAppBackgroundOptions = [
+  { value: 'dark', label: 'Dark', preview: 'dark' },
+  { value: 'muted', label: 'Muted', preview: 'dark-muted' },
+]
+
+const bookActionDisplayOptions = [
+  { value: 'minimal', label: 'Minimal' },
+  { value: 'visible', label: 'Always visible' },
+]
 
 // Hide content swaps the in-memory library for an empty one (or back), so
 // the change is visible the moment you leave settings — no restart needed.
@@ -416,17 +531,21 @@ const confirmFormatMode = async () => {
 
 .preferences-body {
   display: grid;
-  gap: 26px;
+  gap: 18px;
   padding: 10px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
 }
 
 .pref-group {
   display: grid;
   gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 16px;
+  background: var(--color-surface-card);
 }
 
 .pref-group-title {
-  margin: 0 2px;
+  margin: 0;
   color: var(--color-text-muted);
   font-size: 13px;
   font-weight: 600;
@@ -438,6 +557,12 @@ const confirmFormatMode = async () => {
 .pref-block {
   display: grid;
   gap: 10px;
+}
+
+.pref-block + .pref-block,
+.pref-row + .pref-row {
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .pref-copy {
@@ -489,6 +614,106 @@ const confirmFormatMode = async () => {
   border-radius: 9px;
 }
 
+.palette-preview {
+  --palette-app: #ffffff;
+  --palette-sidebar: #ffffff;
+  --palette-surface: #f8fafc;
+  --palette-border: #e2e8f0;
+  --palette-ink: #64748b;
+  display: grid;
+  grid-template-columns: 30% 1fr;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid var(--palette-border);
+  background: var(--palette-app);
+}
+
+.palette-preview--light-muted {
+  --palette-app: #dfe0eb;
+  --palette-sidebar: #dfe0eb;
+  --palette-surface: #ffffff;
+  --palette-border: #cdcfde;
+  --palette-ink: #64748b;
+}
+
+.palette-preview--dark {
+  --palette-app: #000000;
+  --palette-sidebar: #000000;
+  --palette-surface: #0a0a0a;
+  --palette-border: #262626;
+  --palette-ink: #a1a1aa;
+}
+
+.palette-preview--dark-muted {
+  --palette-app: #111018;
+  --palette-sidebar: #171621;
+  --palette-surface: #1f1d29;
+  --palette-border: #3f3b50;
+  --palette-ink: #a8b1c2;
+}
+
+.palette-sidebar,
+.palette-content {
+  min-width: 0;
+  border: 1px solid var(--palette-border);
+  border-radius: 6px;
+  background: var(--palette-sidebar);
+}
+
+.palette-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  padding: 10px 6px;
+}
+
+.palette-sidebar i,
+.palette-heading,
+.palette-line {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--palette-ink);
+  opacity: 0.62;
+}
+
+.palette-sidebar i:first-child {
+  width: 76%;
+  background: #8a2be2;
+  opacity: 1;
+}
+
+.palette-content {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 10px 8px;
+  background: var(--palette-surface);
+}
+
+.palette-heading {
+  width: 52%;
+  height: 6px;
+}
+
+.palette-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.palette-cards i {
+  display: block;
+  height: 26px;
+  border: 1px solid var(--palette-border);
+  border-radius: 5px;
+  background: var(--palette-app);
+}
+
+.palette-line {
+  width: 72%;
+}
+
 .option-label {
   display: flex;
   align-items: center;
@@ -513,12 +738,7 @@ const confirmFormatMode = async () => {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 14px 4px;
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-
-.pref-group .pref-row:last-child {
-  border-bottom: 0;
+  padding: 0 2px;
 }
 
 .segmented {

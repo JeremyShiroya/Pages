@@ -77,7 +77,8 @@ const isActive = (item) => {
   font-size: var(--mobile-active-icon-size);
 }
 
-@media (width <= 768px) {
+@media (width <= 768px),
+  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
   .mobile-bottom-nav {
     display: grid;
   }

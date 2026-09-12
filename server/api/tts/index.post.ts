@@ -11,11 +11,11 @@ const RATE_MAP: Record<string, string> = {
 }
 
 const ALLOWED_VOICES = new Set([
-  'en-US-ChristopherNeural',
-  'en-US-JennyNeural',
-  'en-US-AriaNeural',
-  'en-US-GuyNeural',
-  'en-US-DavisNeural',
+  'en-CA-LiamNeural',
+  'en-US-EmmaNeural',
+  'en-US-AvaNeural',
+  'en-US-BrianNeural',
+  'en-US-AndrewNeural',
   'en-GB-SoniaNeural',
   'en-GB-RyanNeural',
   'en-AU-NatashaNeural',
@@ -32,7 +32,7 @@ function escapeXml(text: string): string {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { text, voice = 'en-US-ChristopherNeural', speed = 1.0 } = body ?? {}
+  const { text, voice = 'en-CA-LiamNeural', speed = 1.0 } = body ?? {}
 
   if (!text?.trim()) {
     throw createError({ statusCode: 400, message: 'text is required' })

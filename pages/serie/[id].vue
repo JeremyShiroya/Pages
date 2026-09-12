@@ -1,10 +1,14 @@
 <template>
   <ResponsiveViewSwitch>
-    <template #mobile>
+    <template #phone>
       <component :is="mobileDetailComponent" />
     </template>
 
-    <template #desktop>
+    <template #tabletPortrait>
+      <SeriesDetailTabletPortrait />
+    </template>
+
+    <template #tabletLandscape>
       <BookGroupDetail
         back-to="/series"
         :books="seriesBooks"
@@ -23,6 +27,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import SeriesDetailMobile from '~/components/mobile/SeriesDetailMobile.vue';
+import SeriesDetailTabletPortrait from '~/components/tablet/portrait/SeriesDetailTabletPortrait.vue';
 import BookGroupDetail from '~/components/shared/BookGroupDetail.vue';
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue';
 import { fetchBookMetadataResults } from '~/composables/useBookMetadataSearch';

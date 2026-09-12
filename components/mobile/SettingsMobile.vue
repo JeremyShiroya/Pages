@@ -3,9 +3,23 @@
     <MobileSettingsNav title="Settings" back-to="/" aria-label="Settings navigation" />
 
     <div class="profile-container">
-      <section class="section">
+      <div
+        class="profile-link"
+        role="button"
+        tabindex="0"
+        aria-label="Open profile"
+        @click="navigate('/profile')"
+        @keydown.enter="navigate('/profile')"
+      >
+        <img :src="profileAvatarSrc" :alt="`${profile.displayName} avatar`" />
+        <strong>{{ profile.displayName || 'Reader' }}</strong>
+        <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+      </div>
+
+      <section v-for="group in settingsGroups" :key="group.label" class="section">
+        <h2 class="section-title">{{ group.label }}</h2>
         <div
-          v-for="row in mobileSettingsRows"
+          v-for="row in group.rows"
           :key="row.label"
           class="setting-item"
           @click="handleSettingsRow(row)"
@@ -36,27 +50,33 @@
           <i v-else class="ri-arrow-right-s-line right-icon"></i>
         </div>
 
-        <div class="about-item" style="cursor: pointer; user-select: none;" @click="handleVersionClick">
-          <span>Version {{ appVersion }}</span>
-        </div>
       </section>
+
+      <div class="about-item" style="cursor: pointer; user-select: none;" @click="handleVersionClick">
+        <span>Version {{ appVersion }}</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
 import { useBookishSettings } from '~/composables/useBookishSettings'
 import { useShareApp } from '~/composables/useShareApp'
 import { useToast } from '~/composables/useToast'
+import { BOOKISH_PROFILE_UPDATED_EVENT, useUserProfile } from '~/composables/useUserProfile'
 
 const runtimeConfig = useRuntimeConfig()
 const { settings, updateSettings } = useBookishSettings()
 const { canShareApp, shareApp } = useShareApp()
 const { addToast } = useToast()
+const { profile, activeAvatarPreset, loadProfile } = useUserProfile()
 const router = useRouter()
 const appVersion = computed(() => runtimeConfig.public.appVersion || '0.0.0')
+const profileAvatarSrc = computed(() => profile.value.avatarType === 'image'
+  ? profile.value.avatarValue
+  : activeAvatarPreset.value.src)
 
 const versionClickCount = ref(0)
 let versionClickTimer = null
@@ -87,6 +107,16 @@ const mobileSettingsRows = computed(() => [
   { label: 'Privacy Policy', icon: 'ri-lock-line', to: '/settings/privacy' },
   ...(settings.value.developerMode ? [{ label: 'Developer Mode', icon: 'ri-code-s-slash-line', type: 'developerMode' }] : []),
 ])
+
+const settingsGroups = computed(() => {
+  const rows = mobileSettingsRows.value
+  return [
+    { label: 'Appearance', rows: rows.filter(row => ['Theme', 'Preferences'].includes(row.label)) },
+    { label: 'Library', rows: rows.filter(row => ['Storage'].includes(row.label)) },
+    { label: 'Pages', rows: rows.filter(row => ['Share Pages', 'About', 'Privacy Policy'].includes(row.label)) },
+    { label: 'Developer', rows: rows.filter(row => ['Connection test', 'Developer Mode'].includes(row.label)) },
+  ].filter(group => group.rows.length)
+})
 
 const navigate = (path) => {
   router.push(path)
@@ -121,6 +151,15 @@ const handleSettingsRow = async (row) => {
 }
 
 const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
+
+onMounted(() => {
+  loadProfile()
+  window.addEventListener(BOOKISH_PROFILE_UPDATED_EVENT, loadProfile)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener(BOOKISH_PROFILE_UPDATED_EVENT, loadProfile)
+})
 </script>
 
 <style scoped>
@@ -134,11 +173,65 @@ const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
 
 .profile-container {
   flex: 1;
-  padding: 10px 0 100px;
+  padding: 10px 16px 100px;
 }
 
 .section {
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 16px;
+  background: var(--color-surface-card);
+}
+
+.section-title {
+  margin: 0;
+  padding: 11px 14px 7px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.profile-link {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
   margin-bottom: 24px;
+  padding: 10px 14px 10px 10px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 16px;
+  background: var(--color-surface-card);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.profile-link:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 3px;
+}
+
+.profile-link img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-link strong {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-link i {
+  color: var(--color-text-muted);
+  font-size: 20px;
 }
 
 .setting-item {
@@ -146,9 +239,10 @@ const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
   width: 100%;
   align-items: center;
   grid-template-columns: minmax(0, 1fr) auto;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   padding: 14px 0;
-  background-color: var(--color-background-app);
+  border-top: 1px solid var(--color-border-subtle);
+  background-color: transparent;
   cursor: pointer;
 }
 
@@ -162,7 +256,7 @@ const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
   grid-template-columns: 20px minmax(0, 1fr);
   column-gap: 12px;
   min-width: 0;
-  padding-left: 16px;
+  padding-left: 14px;
 }
 
 .setting-info span {

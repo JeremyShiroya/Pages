@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   BOOKISH_SETTINGS_KEY,
   DEFAULT_BOOKISH_SETTINGS,
+  applyBookishTheme,
   normalizeBookishSettings,
   readBookishSettings,
   writeBookishSettings,
@@ -27,6 +28,35 @@ describe('useBookishSettings storage helpers', () => {
     expect(normalizeBookishSettings({ hideContent: true }).hideContent).toBe(true)
     expect(normalizeBookishSettings({ hideContent: 'yes' }).hideContent).toBe(false)
     expect(normalizeBookishSettings({}).hideContent).toBe(false)
+  })
+
+  it('defaults book actions to visible and validates the minimal alternative', () => {
+    expect(normalizeBookishSettings({}).bookActionDisplay).toBe('visible')
+    expect(normalizeBookishSettings({ bookActionDisplay: 'visible' }).bookActionDisplay).toBe('visible')
+    expect(normalizeBookishSettings({ bookActionDisplay: 'minimal' }).bookActionDisplay).toBe('minimal')
+    expect(normalizeBookishSettings({ bookActionDisplay: 'invalid' }).bookActionDisplay).toBe('visible')
+  })
+
+  it('defaults to white and validates the original muted app background', () => {
+    expect(normalizeBookishSettings({}).appBackground).toBe('white')
+    expect(normalizeBookishSettings({ appBackground: 'muted' }).appBackground).toBe('muted')
+    expect(normalizeBookishSettings({ appBackground: 'invalid' }).appBackground).toBe('white')
+  })
+
+  it('defaults dark mode to muted and validates the pure-black alternative', () => {
+    expect(normalizeBookishSettings({}).darkAppBackground).toBe('muted')
+    expect(normalizeBookishSettings({ darkAppBackground: 'dark' }).darkAppBackground).toBe('dark')
+    expect(normalizeBookishSettings({ darkAppBackground: 'invalid' }).darkAppBackground).toBe('muted')
+  })
+
+  it('applies the saved app background palette with the color theme', () => {
+    applyBookishTheme('light', 'muted', 'dark')
+    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.appBackground).toBe('muted')
+    expect(document.documentElement.dataset.darkAppBackground).toBe('dark')
+
+    applyBookishTheme('light', 'white')
+    expect(document.documentElement.dataset.appBackground).toBe('white')
   })
 
   it('persists partial updates with defaults for missing values', () => {

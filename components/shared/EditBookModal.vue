@@ -490,7 +490,8 @@ const getRatingLabel = (rating) => {
   box-shadow: 0 6px 8px -1px var(--shadow-brand-glow);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px),
+  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
   .modal-container {
     margin: 0;
     border-radius: 0;

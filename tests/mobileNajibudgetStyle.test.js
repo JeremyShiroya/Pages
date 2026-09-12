@@ -32,7 +32,7 @@ describe('mobile Najibudget style transfer', () => {
     expect(topNav).toContain('var(--mobile-top-avatar-size)')
     expect(topNav).toContain('var(--mobile-icon-size)')
     expect(bottomNav).toContain('height: var(--mobile-bottom-nav-height)')
-    expect(bottomNav).toContain('@media (width <= 768px)')
+    expect(bottomNav).toContain('(orientation: portrait)')
     expect(bottomNav).toContain('font-size: var(--mobile-caption-size)')
     expect(home).toContain('font-size: var(--mobile-section-title-size)')
     expect(home).toContain('padding: 0 var(--mobile-page-padding-inline)')

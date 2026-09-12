@@ -1,10 +1,14 @@
 <template>
   <ResponsiveViewSwitch>
-    <template #mobile>
+    <template #phone>
       <component :is="mobileDetailComponent" />
     </template>
 
-    <template #desktop>
+    <template #tabletPortrait>
+      <PlaylistDetailTabletPortrait />
+    </template>
+
+    <template #tabletLandscape>
       <BookGroupDetail
         back-to="/playlists"
         :books="playlistBooks"
@@ -30,6 +34,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import PlaylistDetailMobile from '~/components/mobile/PlaylistDetailMobile.vue';
+import PlaylistDetailTabletPortrait from '~/components/tablet/portrait/PlaylistDetailTabletPortrait.vue';
 import BookGroupDetail from '~/components/shared/BookGroupDetail.vue';
 import PlaylistEditModal from '~/components/shared/PlaylistEditModal.vue';
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue';

@@ -13,6 +13,8 @@ const read = (path) => readFileSync(resolve(root, path), 'utf8')
 
 describe('appearance preferences', () => {
   test('new preference keys have sane defaults', () => {
+    expect(DEFAULT_BOOKISH_SETTINGS.appBackground).toBe('white')
+    expect(DEFAULT_BOOKISH_SETTINGS.darkAppBackground).toBe('muted')
     expect(DEFAULT_BOOKISH_SETTINGS.seriesCardBackground).toBe('blur')
     expect(DEFAULT_BOOKISH_SETTINGS.seriesCardLayout).toBe('fan')
     expect(DEFAULT_BOOKISH_SETTINGS.favouritesCardBackground).toBe('blur')
@@ -20,6 +22,7 @@ describe('appearance preferences', () => {
     // Playlist cards default to the same look as series cards.
     expect(DEFAULT_BOOKISH_SETTINGS.playlistCardBackground).toBe('blur')
     expect(DEFAULT_BOOKISH_SETTINGS.playlistCardLayout).toBe('fan')
+    expect(DEFAULT_BOOKISH_SETTINGS.bookActionDisplay).toBe('visible')
     expect(DEFAULT_BOOKISH_SETTINGS.readerHighlight).toBe(true)
     expect(DEFAULT_BOOKISH_SETTINGS.listenCoverBlur).toBe(true)
     expect(DEFAULT_BOOKISH_SETTINGS.showStreak).toBe(true)
@@ -48,6 +51,7 @@ describe('appearance preferences', () => {
       seriesCardLayout: 'cover',
       favouritesCardBackground: 'blank',
       favouritesCardLayout: 'list',
+      bookActionDisplay: 'visible',
       readerHighlight: false,
       showStreak: false,
       formatFilter: 'epub',
@@ -56,6 +60,7 @@ describe('appearance preferences', () => {
     expect(ok.seriesCardLayout).toBe('cover')
     expect(ok.favouritesCardBackground).toBe('blank')
     expect(ok.favouritesCardLayout).toBe('list')
+    expect(ok.bookActionDisplay).toBe('visible')
     expect(ok.readerHighlight).toBe(false)
     expect(ok.showStreak).toBe(false)
     expect(ok.formatFilter).toBe('epub')
@@ -65,12 +70,14 @@ describe('appearance preferences', () => {
       favouritesCardLayout: 'nope',
       playlistCardLayout: 'spiral',
       playlistCardBackground: 'rainbow',
+      bookActionDisplay: 'floating',
       formatFilter: 'mobi',
     })
     expect(junk.seriesCardLayout).toBe('fan')
     expect(junk.favouritesCardLayout).toBe('list')
     expect(junk.playlistCardLayout).toBe('fan')
     expect(junk.playlistCardBackground).toBe('blur')
+    expect(junk.bookActionDisplay).toBe('visible')
     expect(junk.formatFilter).toBe('all')
   })
 
@@ -83,9 +90,26 @@ describe('appearance preferences', () => {
     expect(settings).not.toMatch(/Preferences[^}]*comingSoon/)
 
     const prefs = read('components/mobile/PreferencesMobile.vue')
-    for (const key of ['seriesCardBackground', 'seriesCardLayout', 'playlistCardBackground', 'playlistCardLayout', 'readerHighlight', 'listenCoverBlur', 'showStreak', 'seriesSuggestions']) {
+    for (const key of ['appBackground', 'darkAppBackground', 'bookActionDisplay', 'seriesCardBackground', 'seriesCardLayout', 'playlistCardBackground', 'playlistCardLayout', 'readerHighlight', 'listenCoverBlur', 'showStreak', 'seriesSuggestions']) {
       expect(prefs, key).toContain(key)
     }
+
+    expect(prefs).toContain("{ value: 'white', label: 'Bright', preview: 'bright' }")
+    expect(prefs).toContain("{ value: 'dark', label: 'Dark', preview: 'dark' }")
+    expect(prefs).toContain('palette-preview--dark-muted')
+    expect(prefs).toMatch(/\.pref-group\s*\{[^}]*border:[^}]*border-radius:[^}]*background:/s)
+
+    const theme = read('assets/css/main.css')
+    expect(theme).toContain('--color-reader-light-background: var(--color-background-app)')
+    expect(theme).toContain('--color-reader-dark-background: var(--color-background-app)')
+    expect(theme).toContain('--color-raised-surface-border: transparent')
+    expect(theme).toContain('--color-raised-surface-border: var(--color-border-card)')
+
+    const reader = read('components/mobile/ReaderMobile.vue')
+    expect(reader).toContain('--mobile-reader-bg: var(--color-reader-light-background)')
+
+    const streak = read('components/mobile/StreakCalendarMobile.vue')
+    expect(streak).toContain('border: 1px solid var(--color-raised-surface-border)')
 
     // TWO format rows, and they do different things. "Book format" hides
     // (the app still handles both); "Formats Pages reads" removes (purges the
@@ -104,6 +128,7 @@ describe('appearance preferences', () => {
     // Every Reading option is illustrated, like the card sections above it.
     expect(prefs).toContain('ReadingPreview')
     expect(existsSync(resolve(root, 'components/shared/previews/ReadingPreview.vue'))).toBe(true)
+    expect(existsSync(resolve(root, 'components/shared/previews/BookActionsPreview.vue'))).toBe(true)
   })
 
   test('components consume the appearance preferences', () => {
@@ -130,6 +155,12 @@ describe('appearance preferences', () => {
     const card = read('components/shared/LibraryBookCard.vue')
     expect(card).toContain('cardBackground')
     expect(card).toContain('no-backdrop')
+    expect(card).toContain('collapseActions')
+    expect(card).toContain('card-more-menu')
+
+    const bookDetail = read('components/mobile/BookDetailMobile.vue')
+    expect(bookDetail).toContain('minimalActions')
+    expect(bookDetail).toContain('detail-more-menu')
 
     const topNav = read('components/mobile/MobileTopNav.vue')
     expect(topNav).toContain('v-if="showStreak"')
@@ -139,6 +170,7 @@ describe('appearance preferences', () => {
     const books = read('components/mobile/BooksMobile.vue')
     expect(books).toContain('settings.value.enabledFormats')
     expect(books).toContain('formatFilters.length > 1')
+    expect(books).toContain(':collapse-actions="settings.bookActionDisplay === \'minimal\'"')
 
     const reader = read('pages/reader/[id].vue')
     expect(reader).toContain('highlightEnabled')

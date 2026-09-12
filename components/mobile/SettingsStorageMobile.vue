@@ -86,7 +86,7 @@
           Fetch metadata for my library
         </button>
         <p v-if="backfill.finished" class="backfill-summary">
-          Processed {{ backfill.total }} book{{ backfill.total === 1 ? '' : 's' }} ({{ backfill.repairedCount || 0 }} series repaired, {{ backfill.protectedCount || 0 }} protected).
+          Processed {{ backfill.total }} book{{ backfill.total === 1 ? '' : 's' }} ({{ backfill.repairedCount || 0 }} series repaired, {{ backfill.protectedCount || 0 }} protected, {{ backfill.lowConfidenceCount || 0 }} uncertain).
           <button
             v-if="backfill.diagnostics?.length"
             class="link-btn"
@@ -192,7 +192,12 @@
             <li v-for="diag in backfill.diagnostics" :key="diag.bookId">
               <strong>{{ diag.title }} — <span :class="diag.decision.toLowerCase()">{{ diag.decision }}</span></strong>
               <span>{{ diag.reason }}</span>
-              <span v-if="diag.confidence">Confidence: {{ (diag.confidence * 100).toFixed(0) }}% | Sources: {{ diag.evidenceSources.join(', ') || 'None' }}</span>
+               <span v-if="diag.confidence">Confidence: {{ (diag.confidence * 100).toFixed(0) }}% | Sources: {{ diag.evidenceSources.join(', ') || 'None' }}</span>
+               <span v-if="diag.confidenceByField" class="diagnostic-confidence">
+                 Membership {{ (diag.confidenceByField.membership * 100).toFixed(0) }}% ·
+                 Position {{ (diag.confidenceByField.ordinal * 100).toFixed(0) }}% ·
+                 Total {{ (diag.confidenceByField.total * 100).toFixed(0) }}%
+               </span>
             </li>
           </ul>
         </section>

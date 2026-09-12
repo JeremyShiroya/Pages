@@ -41,7 +41,7 @@
   --mobile-card-radius: 20px;
   --mobile-control-radius: 12px;
   --mobile-panel-radius: 16px;
-  --mobile-divider-color: #e8e8e8;
+  --mobile-divider-color: #e2e8f0;
   --mobile-muted-text: #999999;
   --mobile-card-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.1);
 
@@ -64,9 +64,9 @@
   --color-book-cover-placeholder-text-soft: rgba(255, 255, 255, 0.25);
 
   /* App backgrounds */
-  --color-background-app: #dfe0eb;
-  --color-background-page: #f8fafc;
-  --color-background-sidebar: #dfe0eb;
+  --color-background-app: #ffffff;
+  --color-background-page: #ffffff;
+  --color-background-sidebar: #ffffff;
   --color-background-reader: #eceae4;
   --color-background-overlay: rgba(15, 23, 42, 0.55);
   --color-background-overlay-strong: rgba(15, 23, 42, 0.68);
@@ -75,18 +75,18 @@
 
   /* Surfaces */
   --color-surface-primary: #ffffff;
-  --color-surface-secondary: rgba(138, 43, 226, 0.05);
-  --color-surface-tertiary: rgba(138, 43, 226, 0.08);
-  --color-surface-muted: rgba(138, 43, 226, 0.06);
-  --color-surface-hover: rgba(147, 112, 219, 0.18);
-  --color-table-row-hover: #d3d5e3;
-  --color-surface-active: rgba(147, 112, 219, 0.24);
+  --color-surface-secondary: #f8fafc;
+  --color-surface-tertiary: #f3f0ff;
+  --color-surface-muted: #f1f5f9;
+  --color-surface-hover: #f3f0ff;
+  --color-table-row-hover: #f1f5f9;
+  --color-surface-active: #ede9fe;
   --color-surface-modal: #ffffff;
-  --color-surface-input: rgba(255, 255, 255, 0.45);
-  --color-surface-input-focus: rgba(255, 255, 255, 0.8);
+  --color-surface-input: #f8fafc;
+  --color-surface-input-focus: #ffffff;
   --color-surface-glass: rgba(255, 255, 255, 0.95);
-  /* Card surface — used by panels/list cards that should blend into the app background */
-  --color-surface-card: transparent;
+  /* White cards stay distinct from the white app canvas through shared borders. */
+  --color-surface-card: #ffffff;
   --color-surface-on-image: rgba(255, 255, 255, 0.12);
   --color-surface-on-image-soft: rgba(255, 255, 255, 0.05);
   --color-surface-on-image-hover: rgba(255, 255, 255, 0.22);
@@ -108,13 +108,14 @@
   --color-text-logo: #000000;
 
   /* Borders */
-  --color-border-subtle: #cdcfde;
-  --color-border-strong: #b9bccd;
-  --color-border-card: #cdcfde;
+  --color-border-subtle: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-border-card: #e2e8f0;
   --color-border-focus: #8a2be2;
   --color-border-focus-ring: rgba(138, 43, 226, 0.18);
   --color-border-on-image: rgba(255, 255, 255, 0.16);
   --color-border-on-image-strong: rgba(255, 255, 255, 0.34);
+  --color-raised-surface-border: var(--color-border-card);
 
   /* Semantic colors */
   --color-status-success: #2f7d62;
@@ -133,20 +134,20 @@
   --color-status-rating-empty: #d1d5db;
 
   /* Reader */
-  --color-reader-page: #ffffff;
-  --color-reader-toolbar: #ffffff;
-  --color-reader-border: #e0ddd7;
+  --color-reader-page: var(--color-surface-primary);
+  --color-reader-toolbar: var(--color-surface-primary);
+  --color-reader-border: var(--color-border-card);
   --color-reader-highlight: #9370db3f;
   --color-reader-highlight-border: #8a2be2;
   --color-reader-word-highlight: #9370db7f;
-  --color-reader-light-background: #eceae4;
-  --color-reader-light-page: #ffffff;
-  --color-reader-light-toolbar: #ffffff;
-  --color-reader-light-border: #e0ddd7;
+  --color-reader-light-background: var(--color-background-app);
+  --color-reader-light-page: var(--color-surface-primary);
+  --color-reader-light-toolbar: var(--color-surface-primary);
+  --color-reader-light-border: var(--color-border-card);
   --color-reader-light-text: #1a1a1a;
   --color-reader-light-muted: #6b7280;
-  --color-reader-light-button-hover: #f3f4f6;
-  --color-reader-light-toc-active: #f3f0ff;
+  --color-reader-light-button-hover: var(--color-surface-hover);
+  --color-reader-light-toc-active: var(--color-surface-active);
   --color-reader-dark-background: #18171c;
   --color-reader-dark-page: #27262d;
   --color-reader-dark-toolbar: #1e1d24;
@@ -236,6 +237,27 @@
   --primary-shadow: rgba(138, 43, 226, 0.3);
 }
 
+/* The original muted light palette remains available as a user preference. */
+:root[data-theme="light"][data-app-background="muted"] {
+  --mobile-divider-color: #e8e8e8;
+  --color-background-app: #dfe0eb;
+  --color-background-page: #f8fafc;
+  --color-background-sidebar: #dfe0eb;
+  --color-surface-secondary: rgba(138, 43, 226, 0.05);
+  --color-surface-tertiary: rgba(138, 43, 226, 0.08);
+  --color-surface-muted: rgba(138, 43, 226, 0.06);
+  --color-surface-hover: rgba(147, 112, 219, 0.18);
+  --color-table-row-hover: #d3d5e3;
+  --color-surface-active: rgba(147, 112, 219, 0.24);
+  --color-surface-input: rgba(255, 255, 255, 0.45);
+  --color-surface-input-focus: rgba(255, 255, 255, 0.8);
+  --color-surface-card: transparent;
+  --color-border-subtle: #cdcfde;
+  --color-border-strong: #b9bccd;
+  --color-border-card: #cdcfde;
+  --color-raised-surface-border: transparent;
+}
+
 :root[data-theme="dark"] {
   color-scheme: dark;
 
@@ -308,6 +330,7 @@
   --color-border-focus-ring: rgba(168, 85, 247, 0.2);
   --color-border-on-image: rgba(255, 255, 255, 0.16);
   --color-border-on-image-strong: rgba(255, 255, 255, 0.36);
+  --color-raised-surface-border: transparent;
 
   /* Semantic colors */
   --color-status-success: #7dd3a8;
@@ -326,9 +349,9 @@
   --color-status-rating-empty: #575164;
 
   /* Reader */
-  --color-reader-page: #27262d;
-  --color-reader-toolbar: #1e1d24;
-  --color-reader-border: #3a3940;
+  --color-reader-page: var(--color-surface-primary);
+  --color-reader-toolbar: var(--color-surface-primary);
+  --color-reader-border: var(--color-border-card);
   --color-reader-highlight: #9370db3f;
   --color-reader-highlight-border: #8a2be2;
   --color-reader-word-highlight: #9370db7f;
@@ -340,14 +363,14 @@
   --color-reader-light-muted: #6b7280;
   --color-reader-light-button-hover: #f3f4f6;
   --color-reader-light-toc-active: #f3f0ff;
-  --color-reader-dark-background: #18171c;
-  --color-reader-dark-page: #27262d;
-  --color-reader-dark-toolbar: #1e1d24;
-  --color-reader-dark-border: #3a3940;
+  --color-reader-dark-background: var(--color-background-app);
+  --color-reader-dark-page: var(--color-surface-primary);
+  --color-reader-dark-toolbar: var(--color-surface-primary);
+  --color-reader-dark-border: var(--color-border-card);
   --color-reader-dark-text: #e4e4e7;
   --color-reader-dark-muted: #a1a1aa;
-  --color-reader-dark-button-hover: #2e2d36;
-  --color-reader-dark-toc-active: #2d1f42;
+  --color-reader-dark-button-hover: var(--color-surface-hover);
+  --color-reader-dark-toc-active: var(--color-surface-active);
 
   /* Gradients */
   --gradient-brand-soft: linear-gradient(
@@ -390,6 +413,30 @@
   --color-skeleton-shimmer: rgba(168, 85, 247, 0.18);
   --color-skeleton-inverse-base: rgba(255, 255, 255, 0.08);
   --color-skeleton-inverse-shimmer: rgba(255, 255, 255, 0.16);
+}
+
+/* Pure-black dark palette; the existing charcoal palette above is dark Muted. */
+:root[data-theme="dark"][data-dark-app-background="dark"] {
+  --mobile-divider-color: #262626;
+  --color-background-app: #000000;
+  --color-background-page: #050505;
+  --color-background-sidebar: #000000;
+  --color-surface-primary: #0a0a0a;
+  --color-surface-secondary: #111111;
+  --color-surface-tertiary: #171717;
+  --color-surface-muted: #0f0f0f;
+  --color-surface-hover: #1a1a1a;
+  --color-table-row-hover: #151515;
+  --color-surface-active: #24152f;
+  --color-surface-modal: #0a0a0a;
+  --color-surface-input: #111111;
+  --color-surface-input-focus: #171717;
+  --color-surface-glass: rgba(0, 0, 0, 0.95);
+  --color-surface-card: #0a0a0a;
+  --color-border-subtle: #262626;
+  --color-border-strong: #404040;
+  --color-border-card: #262626;
+  --color-raised-surface-border: var(--color-border-card);
 }
 
 html,
@@ -514,7 +561,8 @@ textarea {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px),
+  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
   body,
   button,
   input,

@@ -1,22 +1,43 @@
 <template>
-  <div class="app-layout">
-    <Sidebar />
-    <main class="main-content">
-      <div class="page-container" :class="{ 'mobile-sub-page': isMobileSubPage }">
-        <slot />
+  <ResponsiveViewSwitch>
+    <template #phone>
+      <div class="app-layout compact-layout phone-layout">
+        <main class="main-content">
+          <div class="page-container" :class="{ 'mobile-sub-page': isMobileSubPage }"><slot /></div>
+          <MobilePlayingBar />
+        </main>
       </div>
-      <PlayingBar />
-      <MobilePlayingBar />
-    </main>
-  </div>
+    </template>
+
+    <template #tabletPortrait>
+      <div class="app-layout compact-layout tablet-portrait-layout">
+        <main class="main-content">
+          <div class="page-container" :class="{ 'mobile-sub-page': isMobileSubPage }"><slot /></div>
+          <TabletPlayingBar />
+        </main>
+      </div>
+    </template>
+
+    <template #tabletLandscape>
+      <div class="app-layout tablet-landscape-layout">
+        <Sidebar />
+        <main class="main-content">
+          <div class="page-container"><slot /></div>
+          <PlayingBar />
+        </main>
+      </div>
+    </template>
+  </ResponsiveViewSwitch>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import Sidebar from '~/components/desktop/Sidebar.vue'
+import Sidebar from '~/components/tablet/Sidebar.vue'
 import MobilePlayingBar from '~/components/mobile/MobilePlayingBar.vue'
+import TabletPlayingBar from '~/components/tablet/portrait/TabletPlayingBar.vue'
 import PlayingBar from '~/components/shared/PlayingBar.vue'
+import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
 
 // The five tab-root pages carry their own fixed top/bottom nav bars, which
 // already reserve the phone's status- and navigation-bar areas. Every OTHER
@@ -46,7 +67,16 @@ const isMobileSubPage = computed(() => !TAB_ROOT_PATHS.has(route.path))
   padding-bottom: 120px; /* Account for PlayingBar (90px) + 30px breathing room */
 }
 
-@media (max-width: 768px) {
+.compact-layout .main-content {
+  margin-left: 0;
+}
+
+.compact-layout .page-container {
+  padding: 0;
+}
+
+@media (max-width: 768px),
+  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
   .main-content {
     margin-left: 0;
   }

@@ -2,10 +2,13 @@
   <main class="settings-detail-page">
     <MobileSettingsNav title="Storage" back-to="/settings" aria-label="Settings navigation" />
     <ResponsiveViewSwitch>
-      <template #mobile>
+      <template #phone>
         <SettingsStorageMobile />
       </template>
-      <template #desktop>
+      <template #tabletPortrait>
+        <SettingsStorageTabletPortrait />
+      </template>
+      <template #tabletLandscape>
         <SettingsStoragePanel />
       </template>
     </ResponsiveViewSwitch>
@@ -15,6 +18,7 @@
 <script setup>
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
 import SettingsStorageMobile from '~/components/mobile/SettingsStorageMobile.vue'
+import SettingsStorageTabletPortrait from '~/components/tablet/portrait/SettingsStorageTabletPortrait.vue'
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
 import SettingsStoragePanel from '~/components/shared/SettingsStoragePanel.vue'
 </script>

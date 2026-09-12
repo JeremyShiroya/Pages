@@ -1,0 +1,181 @@
+{
+  "generated_at": "2026-09-12T12:07:21.486398+00:00",
+  "nodes": {
+    "capacitor_config": {
+      "code_fingerprint": "5f757563dfacb1a0f0c65362cca4a19820697328597ae6c6006820ff99fa4e40",
+      "label": "capacitor.config.ts",
+      "last": "2026-09-12T11:48:06.751126+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-12T11:48:06.751126+00:00",
+          "outcome": "useful",
+          "q": "is electron the best for this project? for performance and speed without eating resources?"
+        }
+      ],
+      "score": 0.999691251,
+      "source_file": "capacitor.config.ts",
+      "status": "tentative",
+      "uses": 1
+    },
+    "composables_tts_desktopttsdriver_test": {
+      "code_fingerprint": "787e1166125eecd5bd181bca97fe1331ae9541af2f566d171a347b8d3e29a436",
+      "label": "desktopTtsDriver.test.js",
+      "last": "2026-09-12T11:53:47.654862+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-12T11:53:47.654862+00:00",
+          "outcome": "useful",
+          "q": "will it function/behave like an actual desktop app and not just a mock?"
+        },
+        {
+          "date": "2026-09-12T11:48:06.751126+00:00",
+          "outcome": "useful",
+          "q": "is electron the best for this project? for performance and speed without eating resources?"
+        }
+      ],
+      "score": 1.999473641,
+      "source_file": "composables/tts/desktopTtsDriver.test.js",
+      "status": "preferred",
+      "uses": 2
+    },
+    "composables_tts_mobilettsdriver": {
+      "code_fingerprint": "b6ef65d626fc3b745e82e7d0ad068f24f59e12a726f013a7e11527fff79fffaa",
+      "label": "mobileTtsDriver.js",
+      "last": "2026-09-11T13:05:59.345212+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-11T13:05:59.345212+00:00",
+          "outcome": "useful",
+          "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
+        }
+      ],
+      "score": 0.978079653,
+      "source_file": "composables/tts/mobileTtsDriver.js",
+      "status": "tentative",
+      "uses": 1
+    },
+    "composables_tts_mobilettsdriver_synthesizemobilespeech": {
+      "code_fingerprint": "b6ef65d626fc3b745e82e7d0ad068f24f59e12a726f013a7e11527fff79fffaa",
+      "label": "synthesizeMobileSpeech()",
+      "last": "2026-09-11T13:05:59.345212+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-11T13:05:59.345212+00:00",
+          "outcome": "useful",
+          "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
+        }
+      ],
+      "score": 0.978079653,
+      "source_file": "composables/tts/mobileTtsDriver.js",
+      "status": "tentative",
+      "uses": 1
+    },
+    "composables_tts_nativespeech": {
+      "code_fingerprint": "7bfc7a5459f5363f554317e9432bd77c3b48d458cedea209b0636960b2237805",
+      "label": "nativeSpeech.js",
+      "last": "2026-09-12T11:53:47.654862+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-12T11:53:47.654862+00:00",
+          "outcome": "useful",
+          "q": "will it function/behave like an actual desktop app and not just a mock?"
+        },
+        {
+          "date": "2026-09-12T11:48:06.751126+00:00",
+          "outcome": "useful",
+          "q": "is electron the best for this project? for performance and speed without eating resources?"
+        }
+      ],
+      "score": 1.999473641,
+      "source_file": "composables/tts/nativeSpeech.js",
+      "status": "preferred",
+      "uses": 2
+    },
+    "composables_usedeviceassets": {
+      "code_fingerprint": "d0504bd7c6b4f959d31bd80b6c8a936b5d280eea4d81dbfdcb33c3e10ca3bd20",
+      "label": "useDeviceAssets.js",
+      "last": "2026-09-12T11:53:47.654862+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-12T11:53:47.654862+00:00",
+          "outcome": "useful",
+          "q": "will it function/behave like an actual desktop app and not just a mock?"
+        }
+      ],
+      "score": 0.999782391,
+      "source_file": "composables/useDeviceAssets.js",
+      "status": "tentative",
+      "uses": 1
+    },
+    "composables_usedevicelibrarysync": {
+      "code_fingerprint": "4904e7257f6393a3e3501ce47ce1ac5bc2e8d3106589080edf3936d7aa0aeb8d",
+      "label": "useDeviceLibrarySync.js",
+      "last": "2026-09-12T11:53:47.654862+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-12T11:53:47.654862+00:00",
+          "outcome": "useful",
+          "q": "will it function/behave like an actual desktop app and not just a mock?"
+        }
+      ],
+      "score": 0.999782391,
+      "source_file": "composables/useDeviceLibrarySync.js",
+      "status": "tentative",
+      "uses": 1
+    },
+    "composables_usetts": {
+      "code_fingerprint": "89cf6179c536462e6ad16de76051a77cc071d62e02051ad021d7d1ffeca5ddb0",
+      "label": "useTTS.js",
+      "last": "2026-09-11T13:05:59.345212+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-11T13:05:59.345212+00:00",
+          "outcome": "useful",
+          "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
+        }
+      ],
+      "score": 0.978079653,
+      "source_file": "composables/useTTS.js",
+      "status": "tentative",
+      "uses": 1
+    },
+    "package": {
+      "code_fingerprint": "ade4280222f394feb30df522416db85c1e36922d161f379ab6d5624be6dc0e1e",
+      "label": "package.json",
+      "last": "2026-09-12T11:53:47.654862+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-12T11:53:47.654862+00:00",
+          "outcome": "useful",
+          "q": "will it function/behave like an actual desktop app and not just a mock?"
+        },
+        {
+          "date": "2026-09-12T11:48:06.751126+00:00",
+          "outcome": "useful",
+          "q": "is electron the best for this project? for performance and speed without eating resources?"
+        }
+      ],
+      "score": 1.999473641,
+      "source_file": "package.json",
+      "status": "preferred",
+      "uses": 2
+    },
+    "plugins_media_session_client": {
+      "code_fingerprint": "450a179e508b7dd97470a5205dcd1be262ea2d83d2e30a3c0ab6168f8936ec26",
+      "label": "media-session.client.js",
+      "last": "2026-09-12T11:53:47.654862+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-12T11:53:47.654862+00:00",
+          "outcome": "useful",
+          "q": "will it function/behave like an actual desktop app and not just a mock?"
+        }
+      ],
+      "score": 0.999782391,
+      "source_file": "plugins/media-session.client.js",
+      "status": "tentative",
+      "uses": 1
+    }
+  },
+  "version": 1
+}

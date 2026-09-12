@@ -8,6 +8,7 @@ import { getGoodreadsRating } from '~/composables/useGoodreadsRating';
 import { useLibraryStore } from '~/composables/useLibraryStore';
 import { useApiEndpoint } from '~/composables/useApiEndpoint';
 import { readBookishSettings } from '~/composables/useBookishSettings';
+import { appendSeriesRepairAudit, validateAutomaticSeriesMutation } from '~/composables/seriesMutationGuard';
 
 const coverCacheInFlight = new Set();
 
@@ -384,7 +385,7 @@ export const useBooks = () => {
     }
   };
 
-  const updateBook = async (updatedBook) => {
+  const updateBook = async (updatedBook, options = {}) => {
     const index = books.value.findIndex(b => b.id === updatedBook.id);
     const normalizedUpdatedBook = {
       ...updatedBook,
@@ -393,13 +394,30 @@ export const useBooks = () => {
     let previousBook = null;
     if (index !== -1) {
       previousBook = { ...books.value[index] };
-      books.value[index] = { ...books.value[index], ...normalizedUpdatedBook };
+      const candidateBook = { ...books.value[index], ...normalizedUpdatedBook };
+      if (options.automaticSeriesRepair) {
+        const validation = validateAutomaticSeriesMutation(previousBook, candidateBook, {
+          allowMetadata: options.allowMetadata === true,
+        });
+        if (!validation.valid) {
+          throw new Error(validation.reason);
+        }
+      }
+      books.value[index] = candidateBook;
     }
     try {
       const store = useLibraryStore();
       // Always write the full merged record so the store has a complete snapshot.
       const result = await store.updateBook(index !== -1 ? books.value[index] : normalizedUpdatedBook);
       if (index !== -1) books.value[index] = result;
+      if (options.automaticSeriesRepair) {
+        appendSeriesRepairAudit({
+          bookId: normalizedUpdatedBook.id,
+          before: previousBook,
+          after: result,
+          source: options.source || 'automatic',
+        });
+      }
       return result;
     } catch (err) {
       console.error('Failed to update book:', err);

@@ -56,9 +56,9 @@ describe('app versioning is derived, not hand-written', () => {
   })
 
   test('settings screens read the version from runtime config', () => {
-    for (const path of ['components/mobile/SettingsMobile.vue', 'components/desktop/SettingsDesktop.vue']) {
+    for (const path of ['components/mobile/SettingsMobile.vue', 'components/tablet/SettingsDesktop.vue']) {
       expect(read(path), path).toContain('runtimeConfig.public.appVersion')
     }
-    expect(read('components/desktop/SettingsDesktop.vue')).toContain('runtimeConfig.public.buildNumber')
+    expect(read('components/tablet/SettingsDesktop.vue')).toContain('runtimeConfig.public.buildNumber')
   })
 })

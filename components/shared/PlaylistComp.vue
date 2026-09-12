@@ -1,16 +1,20 @@
 <template>
   <ResponsiveViewSwitch>
-    <template #mobile>
+    <template #phone>
       <PlaylistsMobile />
     </template>
-    <template #desktop>
+    <template #tabletPortrait>
+      <PlaylistsTabletPortrait />
+    </template>
+    <template #tabletLandscape>
       <PlaylistsDesktop />
     </template>
   </ResponsiveViewSwitch>
 </template>
 
 <script setup>
-import PlaylistsDesktop from '../desktop/PlaylistsDesktop.vue'
+import PlaylistsDesktop from '../tablet/PlaylistsDesktop.vue'
 import PlaylistsMobile from '../mobile/PlaylistsMobile.vue'
+import PlaylistsTabletPortrait from '../tablet/portrait/PlaylistsTabletPortrait.vue'
 import ResponsiveViewSwitch from './ResponsiveViewSwitch.vue'
 </script>

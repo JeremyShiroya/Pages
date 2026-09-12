@@ -55,6 +55,11 @@ describe('desktopTtsDriver device-voice fallback', () => {
     await expect(speak()).resolves.toMatchObject({ native: true })
   })
 
+  it('falls back when the endpoint returns an empty audio data URL', async () => {
+    $fetch.mockResolvedValue({ audio: 'data:audio/mp3;base64,', boundaries: [] })
+    await expect(speak()).resolves.toMatchObject({ native: true, text: 'A sentence.' })
+  })
+
   it('surfaces the failure when there is no device voice to fall back to', async () => {
     nativeSpeechSupported.mockReturnValue(false)
     $fetch.mockResolvedValue('<!DOCTYPE html>')

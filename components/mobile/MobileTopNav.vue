@@ -11,15 +11,15 @@
       </div>
       <div class="greeting-copy">
         <span>Hello {{ firstName }},</span>
-        <strong>Welcome Back!</strong>
+        <strong>{{ isFirstBoot ? 'Welcome,' : 'Welcome Back!' }}</strong>
       </div>
     </button>
 
     <div class="nav-actions">
-      <div v-if="showStreak" class="streak-pill" title="Reading streak">
-        <i class="ri-flashlight-fill"></i>
+      <button v-if="showStreak" type="button" class="streak-pill" title="Open streak calendar" aria-label="Open streak calendar" @click="openStreak">
+        <i class="ri-fire-fill"></i>
         <span>{{ streakCount }}</span>
-      </div>
+      </button>
       <button
         class="mobile-menu-button"
         type="button"
@@ -34,19 +34,23 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted } from "vue";
-import { useBookishSettings } from "~/composables/useBookishSettings";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { BOOKISH_SETTINGS_KEY, useBookishSettings } from "~/composables/useBookishSettings";
 import { useStreak } from "~/composables/useStreak";
 import {
   BOOKISH_PROFILE_UPDATED_EVENT,
   useUserProfile,
 } from "~/composables/useUserProfile";
 
+let currentRuntimeIsFirstBoot = null;
+
 const router = useRouter();
 const { streakCount } = useStreak();
 const { settings } = useBookishSettings();
 const showStreak = computed(() => settings.value.showStreak !== false);
 const { profile, activeAvatarPreset, loadProfile } = useUserProfile();
+const isFirstBoot = ref(true);
+const LAUNCHED_KEY = 'bookish:has-launched';
 
 const profileAvatarSrc = computed(() => {
   return profile.value.avatarType === "image"
@@ -65,11 +69,22 @@ const openSettings = () => {
   router.push("/settings");
 };
 
+const openStreak = () => {
+  router.push('/streak');
+};
+
 const refreshProfile = () => {
   loadProfile();
 };
 
 onMounted(() => {
+  if (currentRuntimeIsFirstBoot === null) {
+    const hasPreviousLaunch = localStorage.getItem(LAUNCHED_KEY) === 'true'
+      || localStorage.getItem(BOOKISH_SETTINGS_KEY) !== null;
+    currentRuntimeIsFirstBoot = !hasPreviousLaunch;
+    localStorage.setItem(LAUNCHED_KEY, 'true');
+  }
+  isFirstBoot.value = currentRuntimeIsFirstBoot;
   refreshProfile();
   window.addEventListener(BOOKISH_PROFILE_UPDATED_EVENT, refreshProfile);
 });
@@ -170,11 +185,13 @@ onBeforeUnmount(() => {
   min-width: 52px;
   min-height: 34px;
   padding: 0 12px;
+  border: 0;
   border-radius: 999px;
   background: var(--color-brand-primary-muted);
   color: var(--color-brand-primary);
   font-size: var(--mobile-subtext-size);
   line-height: 1;
+  cursor: pointer;
 }
 
 .streak-pill i {

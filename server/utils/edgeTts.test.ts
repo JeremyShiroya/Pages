@@ -77,6 +77,23 @@ class BufferMetadataEdgeTts {
   }
 }
 
+class EmptyAudioEdgeTts {
+  closed = false
+
+  async setMetadata() {}
+
+  rawToStream() {
+    return {
+      audioStream: Readable.from([]),
+      metadataStream: null,
+    }
+  }
+
+  close() {
+    this.closed = true
+  }
+}
+
 describe('Edge TTS synthesis', () => {
   test('parses word boundaries from raw JSON metadata buffers', async () => {
     const result = await synthesizeEdgeSpeech({
@@ -120,5 +137,25 @@ describe('Edge TTS synthesis', () => {
         charIndex: 0,
       },
     ])
+  })
+
+  test('rejects an empty audio stream instead of returning an unplayable data URL', async () => {
+    const created: EmptyAudioEdgeTts[] = []
+
+    await expect(synthesizeEdgeSpeech({
+      ssml: '<speak>Hello world</speak>',
+      text: 'Hello world',
+      voice: 'en-US-ChristopherNeural',
+      attempts: 2,
+      retryDelayMs: 0,
+      createTts: () => {
+        const instance = new EmptyAudioEdgeTts()
+        created.push(instance)
+        return instance
+      },
+    })).rejects.toThrow('empty audio stream')
+
+    expect(created).toHaveLength(2)
+    expect(created.every((instance) => instance.closed)).toBe(true)
   })
 })

@@ -33,7 +33,8 @@ type AiProviderConfig = {
 
 // Evergreen alias — a pinned version retires and 404s on new keys.
 const DEFAULT_GEMINI_MODEL = 'gemini-flash-latest'
-const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile'
+import { DEFAULT_GROQ_MODEL, resolveGroqModel } from './groqModel'
+// Explicitly avoid the retired Qwen3.6-27B alias; production defaults to Llama.
 
 function compact(value: unknown) {
   return String(value ?? '').replace(/\s+/g, ' ').trim()
@@ -58,7 +59,7 @@ function resolveConfig(env: Record<string, string | undefined>): AiProviderConfi
     return {
       provider: 'groq',
       apiKey: groqKey,
-      model: compact(env.GROQ_MODEL) || DEFAULT_GROQ_MODEL,
+      model: resolveGroqModel(env.GROQ_MODEL),
     }
   }
 
@@ -74,7 +75,7 @@ function resolveConfig(env: Record<string, string | undefined>): AiProviderConfi
     return {
       provider: 'groq',
       apiKey: groqKey,
-      model: compact(env.GROQ_MODEL) || DEFAULT_GROQ_MODEL,
+      model: resolveGroqModel(env.GROQ_MODEL),
     }
   }
 

@@ -13,9 +13,9 @@ export const PDF_VIEW_MODE_OPTIONS = Object.freeze(['original', 'reflow'])
 // Original View only: 'scroll' is the continuous strip of pages, 'page' snaps
 // one whole PDF page to the screen at a time.
 export const PDF_PAGE_MODE_OPTIONS = Object.freeze(['scroll', 'page'])
-// Fit-to-width is 1.0. Below 1 there is no reason to go on a phone — the page
-// is already only as wide as the screen — so the range starts there.
-export const PDF_ZOOM_MIN = 1.0
+// Fit-to-width is 1.0; readers can zoom out to see the full page with breathing
+// room, or zoom in and pan without the canvas being clipped.
+export const PDF_ZOOM_MIN = 0.5
 export const PDF_ZOOM_MAX = 3.0
 export const PDF_ZOOM_STEP = 0.25
 export const READER_BACKGROUND_OPTIONS = Object.freeze(['default', 'sepia'])

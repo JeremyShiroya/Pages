@@ -9,7 +9,7 @@ const vueFiles = (dir) => readdirSync(resolve(root, dir))
   .filter((entry) => entry.endsWith('.vue'))
   .map((entry) => `${dir}/${entry}`)
 
-describe('mobile and desktop component split purity', () => {
+describe('mobile and tablet component split purity', () => {
   test('mobile components do not carry desktop branches or desktop selectors', () => {
     for (const file of vueFiles('components/mobile')) {
       const source = read(file)
@@ -18,8 +18,8 @@ describe('mobile and desktop component split purity', () => {
     }
   })
 
-  test('desktop components do not carry mobile branches or mobile selectors', () => {
-    for (const file of vueFiles('components/desktop')) {
+  test('landscape tablet components do not carry mobile branches or mobile selectors', () => {
+    for (const file of vueFiles('components/tablet')) {
       const source = read(file)
       expect(source, file).not.toMatch(/mobile-|mobile[A-Z]|Mobile|--mobile-|@media \(max-width:\s*(?:768|760|480|430|375|360)px\)/)
     }

@@ -12,18 +12,21 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   librarySortDirection: 'asc',
   libraryGridItemsPerPage: 12,
   libraryTableItemsPerPage: 10,
-  ttsVoice: 'en-US-ChristopherNeural',
+  ttsVoice: 'en-CA-LiamNeural',
   ttsSpeed: 1.0,
   ttsVolume: 1.0,
   metadataAutoFill: true,
   trackSplitting: false,
   // ── Appearance preferences (Settings → Preferences) ──────────────────────
+  appBackground: 'white',          // 'white' | 'muted' (#dfe0eb canvas)
+  darkAppBackground: 'muted',      // 'dark' (#000) | 'muted' (charcoal canvas)
   seriesCardBackground: 'blur',    // 'blank' | 'blur'
   seriesCardLayout: 'fan',         // 'fan' (books centered) | 'cover'
   favouritesCardBackground: 'blur',// 'blur' | 'blank'
   favouritesCardLayout: 'list',    // 'grid' | 'list' (set from the Favourites controls row)
   playlistCardBackground: 'blur',  // 'blur' | 'blank' — matches series default
   playlistCardLayout: 'fan',       // 'fan' | 'cover' — matches series default
+  bookActionDisplay: 'visible',    // 'minimal' puts actions in a More menu; 'visible' keeps the icon row
   readerHighlight: true,           // highlight the section being read
   listenCoverBlur: true,           // blurred cover backdrop in Listen mode
   showStreak: true,                // reading-streak pill in the top nav
@@ -81,9 +84,12 @@ export const enabledAcceptAttribute = (enabledFormats) => (
 )
 
 export const CARD_BACKGROUND_OPTIONS = Object.freeze(['blank', 'blur'])
+export const APP_BACKGROUND_OPTIONS = Object.freeze(['white', 'muted'])
+export const DARK_APP_BACKGROUND_OPTIONS = Object.freeze(['dark', 'muted'])
 export const SERIES_CARD_LAYOUT_OPTIONS = Object.freeze(['fan', 'cover'])
 export const PLAYLIST_CARD_LAYOUT_OPTIONS = Object.freeze(['fan', 'cover'])
 export const FAVOURITES_CARD_LAYOUT_OPTIONS = Object.freeze(['grid', 'list'])
+export const BOOK_ACTION_DISPLAY_OPTIONS = Object.freeze(['minimal', 'visible'])
 export const FORMAT_FILTER_OPTIONS = Object.freeze(['all', 'pdf', 'epub'])
 
 // The pills every library Filter panel renders under its "Format" heading.
@@ -104,15 +110,24 @@ export const LIBRARY_GRID_ITEMS_PER_PAGE_OPTIONS = Object.freeze([6, 8, 10, 12])
 export const LIBRARY_TABLE_ITEMS_PER_PAGE_OPTIONS = Object.freeze([8, 10, 20, 30, 50, 100])
 
 const TTS_VOICE_IDS = new Set([
-  'en-US-ChristopherNeural',
-  'en-US-JennyNeural',
-  'en-US-AriaNeural',
-  'en-US-GuyNeural',
-  'en-US-DavisNeural',
+  'en-CA-LiamNeural',
+  'en-US-EmmaNeural',
+  'en-US-AvaNeural',
+  'en-US-BrianNeural',
+  'en-US-AndrewNeural',
   'en-GB-SoniaNeural',
   'en-GB-RyanNeural',
   'en-AU-NatashaNeural',
 ])
+
+const LEGACY_TTS_VOICE_REPLACEMENTS = Object.freeze({
+  'en-US-ChristopherNeural': 'en-CA-LiamNeural',
+  'en-US-GuyNeural': 'en-US-BrianNeural',
+  'en-US-AriaNeural': 'en-US-AvaNeural',
+  'en-US-AnaNeural': 'en-US-AvaNeural',
+  'en-US-JennyNeural': 'en-US-EmmaNeural',
+  'en-US-DavisNeural': 'en-US-AndrewNeural',
+})
 
 const settingsState = ref({ ...DEFAULT_BOOKISH_SETTINGS })
 let loadedFromStorage = false
@@ -125,7 +140,8 @@ const numberOrDefault = (value, fallback, min, max) => {
 }
 
 const voiceOrDefault = (value) => {
-  const voice = typeof value === 'string' ? value.trim() : ''
+  const savedVoice = typeof value === 'string' ? value.trim() : ''
+  const voice = LEGACY_TTS_VOICE_REPLACEMENTS[savedVoice] || savedVoice
   return TTS_VOICE_IDS.has(voice) ? voice : DEFAULT_BOOKISH_SETTINGS.ttsVoice
 }
 
@@ -187,6 +203,12 @@ export function normalizeBookishSettings(value) {
     trackSplitting: source.trackSplitting === undefined
       ? DEFAULT_BOOKISH_SETTINGS.trackSplitting
       : source.trackSplitting === true,
+    appBackground: APP_BACKGROUND_OPTIONS.includes(source.appBackground)
+      ? source.appBackground
+      : DEFAULT_BOOKISH_SETTINGS.appBackground,
+    darkAppBackground: DARK_APP_BACKGROUND_OPTIONS.includes(source.darkAppBackground)
+      ? source.darkAppBackground
+      : DEFAULT_BOOKISH_SETTINGS.darkAppBackground,
     seriesCardBackground: CARD_BACKGROUND_OPTIONS.includes(source.seriesCardBackground)
       ? source.seriesCardBackground
       : DEFAULT_BOOKISH_SETTINGS.seriesCardBackground,
@@ -205,6 +227,9 @@ export function normalizeBookishSettings(value) {
     playlistCardLayout: PLAYLIST_CARD_LAYOUT_OPTIONS.includes(source.playlistCardLayout)
       ? source.playlistCardLayout
       : DEFAULT_BOOKISH_SETTINGS.playlistCardLayout,
+    bookActionDisplay: BOOK_ACTION_DISPLAY_OPTIONS.includes(source.bookActionDisplay)
+      ? source.bookActionDisplay
+      : DEFAULT_BOOKISH_SETTINGS.bookActionDisplay,
     readerHighlight: source.readerHighlight === undefined
       ? DEFAULT_BOOKISH_SETTINGS.readerHighlight
       : source.readerHighlight !== false,
@@ -234,11 +259,23 @@ export function normalizeBookishSettings(value) {
   }
 }
 
-export function applyBookishTheme(theme) {
+export function applyBookishTheme(
+  theme,
+  appBackground = DEFAULT_BOOKISH_SETTINGS.appBackground,
+  darkAppBackground = DEFAULT_BOOKISH_SETTINGS.darkAppBackground,
+) {
   if (typeof document === 'undefined') return
 
   const normalizedTheme = theme === 'dark' ? 'dark' : 'light'
+  const normalizedBackground = APP_BACKGROUND_OPTIONS.includes(appBackground)
+    ? appBackground
+    : DEFAULT_BOOKISH_SETTINGS.appBackground
+  const normalizedDarkBackground = DARK_APP_BACKGROUND_OPTIONS.includes(darkAppBackground)
+    ? darkAppBackground
+    : DEFAULT_BOOKISH_SETTINGS.darkAppBackground
   document.documentElement.dataset.theme = normalizedTheme
+  document.documentElement.dataset.appBackground = normalizedBackground
+  document.documentElement.dataset.darkAppBackground = normalizedDarkBackground
   document.documentElement.style.colorScheme = normalizedTheme
   syncSystemBarAppearance(normalizedTheme === 'dark')
 }
@@ -341,7 +378,11 @@ export function resetBookishSettingsForTests() {
 export const useBookishSettings = () => {
   const loadSettings = () => {
     settingsState.value = readBookishSettings()
-    applyBookishTheme(settingsState.value.readerTheme)
+    applyBookishTheme(
+      settingsState.value.readerTheme,
+      settingsState.value.appBackground,
+      settingsState.value.darkAppBackground,
+    )
     loadedFromStorage = true
     return settingsState.value
   }
@@ -355,7 +396,11 @@ export const useBookishSettings = () => {
       ...settingsState.value,
       ...patch,
     })
-    applyBookishTheme(settingsState.value.readerTheme)
+    applyBookishTheme(
+      settingsState.value.readerTheme,
+      settingsState.value.appBackground,
+      settingsState.value.darkAppBackground,
+    )
     loadedFromStorage = true
     return settingsState.value
   }

@@ -19,7 +19,6 @@
         <div class="profile-title">
           <p>Your reading profile</p>
           <h2>{{ profileDraftName || 'Reader' }}</h2>
-          <span>Local to this browser</span>
         </div>
       </div>
 
@@ -114,7 +113,7 @@ const {
 
 const avatarModalOpen = ref(false)
 const profileDraftName = ref('Reader')
-const selectedAvatar = ref('/Images/User%20Avatars/default-user.jpeg')
+const selectedAvatar = ref('/images/User%20Avatars/default-user.jpeg')
 
 const profileAvatarSrc = computed(() => {
   return selectedAvatar.value || activeAvatarPreset.value.src
@@ -126,7 +125,7 @@ const firstName = computed(() => {
 
 const syncProfileDraft = (nextProfile = profile.value) => {
   profileDraftName.value = nextProfile.displayName || 'Reader'
-  selectedAvatar.value = nextProfile.avatarValue || '/Images/User%20Avatars/default-user.jpeg'
+  selectedAvatar.value = nextProfile.avatarValue || '/images/User%20Avatars/default-user.jpeg'
 }
 
 const persistProfile = async (patch, toastMessage) => {
@@ -237,7 +236,6 @@ onMounted(async () => {
 
 .profile-title p,
 .profile-title h2,
-.profile-title span,
 .appearance-panel h2,
 .appearance-panel p,
 .avatar-modal h2,
@@ -257,7 +255,6 @@ onMounted(async () => {
   line-height: 1.02;
 }
 
-.profile-title span,
 .appearance-panel p,
 .avatar-modal p {
   display: block;

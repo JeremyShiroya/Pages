@@ -1,7 +1,8 @@
 <template>
   <article
+    ref="cardElement"
     class="library-book-card"
-    :class="{ 'no-backdrop': cardBackground === 'blank', selectable, selected }"
+    :class="{ 'no-backdrop': cardBackground === 'blank', selectable, selected, 'compact-actions': collapseActions && !restoreOnly }"
     @click="onCardClick"
   >
 
@@ -9,6 +10,51 @@
       <div class="card-background" :style="{ backgroundImage: `url(${coverUrl})` }"></div>
       <div class="card-overlay"></div>
     </template>
+
+    <div v-if="showActionMenu" class="card-more-wrap">
+      <button
+        ref="moreButtonElement"
+        type="button"
+        class="card-more-button"
+        aria-label="Book options"
+        :aria-expanded="menuOpen"
+        @click.stop="toggleMenu"
+      >
+        <i class="ri-more-2-fill"></i>
+      </button>
+    </div>
+    <Teleport to="body">
+      <div
+        v-if="menuOpen"
+        ref="menuElement"
+        class="card-more-menu"
+        role="menu"
+        :style="menuStyle"
+        @pointerdown.stop
+        @click.stop
+      >
+        <button type="button" role="menuitem" @click="runMenuAction('favourite')">
+          <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+          <span>{{ book.isFavourite ? 'Remove favourite' : 'Favourite' }}</span>
+        </button>
+        <button type="button" role="menuitem" @click="runMenuAction('playlist')">
+          <i :class="inPlaylist ? 'ri-play-list-2-fill' : 'ri-play-list-2-line'"></i>
+          <span>Add to playlist</span>
+        </button>
+        <button type="button" role="menuitem" @click="runMenuAction('edit')">
+          <i class="ri-edit-line"></i><span>Edit book</span>
+        </button>
+        <button type="button" role="menuitem" @click="runMenuAction('hide')">
+          <i class="ri-eye-off-line"></i><span>Hide book</span>
+        </button>
+        <button v-if="shareable" type="button" role="menuitem" @click="runMenuAction('share')">
+          <i class="ri-share-line"></i><span>Share book</span>
+        </button>
+        <button type="button" class="danger" role="menuitem" @click="runMenuAction('delete')">
+          <i class="ri-delete-bin-line"></i><span>Delete book</span>
+        </button>
+      </div>
+    </Teleport>
 
     <div class="card-cover">
       <img :src="coverUrl" :alt="book.title" @error="handleCoverError" />
@@ -74,7 +120,7 @@
         </button>
       </div>
 
-      <div v-else class="card-actions">
+      <div v-else-if="!collapseActions" class="card-actions">
         <button
           type="button"
           class="action-button"
@@ -99,6 +145,9 @@
         <button type="button" class="action-button" title="Hide book" @click.stop="emit('hide', book)">
           <i class="ri-eye-off-line"></i>
         </button>
+        <button v-if="shareable" type="button" class="action-button" title="Share book" @click.stop="emit('share', book)">
+          <i class="ri-share-line"></i>
+        </button>
         <button type="button" class="action-button delete" title="Delete book" @click.stop="emit('delete', book)">
           <i class="ri-delete-bin-line"></i>
         </button>
@@ -108,7 +157,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import GoodreadsIcon from './GoodreadsIcon.vue'
 import GoodreadsRatingDisplay from './GoodreadsRatingDisplay.vue'
 import { getGoodreadsRating } from '~/composables/useGoodreadsRating'
@@ -148,10 +197,19 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Books list view can collapse the five secondary actions into a More menu.
+  collapseActions: {
+    type: Boolean,
+    default: false,
+  },
+  shareable: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
-  'open', 'play', 'favourite', 'playlist', 'edit', 'hide', 'delete', 'restore', 'toggle-select',
+  'open', 'play', 'favourite', 'playlist', 'edit', 'hide', 'share', 'delete', 'restore', 'toggle-select',
 ])
 
 // While selecting, a tap anywhere on the card picks it rather than opening it.
@@ -165,6 +223,63 @@ const onCardClick = () => {
 // adding/removing in the sheet updates every card at once.
 const { bookInAnyPlaylist } = useBooks()
 const inPlaylist = computed(() => bookInAnyPlaylist(props.book.id))
+const cardElement = ref(null)
+const moreButtonElement = ref(null)
+const menuElement = ref(null)
+const menuOpen = ref(false)
+const menuStyle = ref({})
+const showActionMenu = computed(() => props.collapseActions && !props.restoreOnly && !props.selectable)
+
+const toggleMenu = () => {
+  if (menuOpen.value) {
+    menuOpen.value = false
+    return
+  }
+  const rect = moreButtonElement.value?.getBoundingClientRect()
+  if (!rect) return
+  const menuHeight = 250
+  const safeBottom = 88
+  const belowTop = rect.bottom + 7
+  const availableBelow = window.innerHeight - safeBottom - belowTop
+  const top = availableBelow >= menuHeight
+    ? belowTop
+    : Math.max(12, rect.top - menuHeight - 7)
+  menuStyle.value = {
+    top: `${top}px`,
+    right: `${Math.max(12, window.innerWidth - rect.right)}px`,
+  }
+  menuOpen.value = true
+}
+
+const runMenuAction = (action) => {
+  menuOpen.value = false
+  emit(action, props.book)
+}
+
+const closeMenuOutside = (event) => {
+  if (
+    menuOpen.value
+    && !cardElement.value?.contains(event.target)
+    && !menuElement.value?.contains(event.target)
+  ) menuOpen.value = false
+}
+
+const closeMenu = () => { menuOpen.value = false }
+
+watch(showActionMenu, (visible) => {
+  if (!visible) menuOpen.value = false
+})
+
+onMounted(() => {
+  document.addEventListener('pointerdown', closeMenuOutside)
+  window.addEventListener('scroll', closeMenu, true)
+  window.addEventListener('resize', closeMenu)
+})
+onUnmounted(() => {
+  document.removeEventListener('pointerdown', closeMenuOutside)
+  window.removeEventListener('scroll', closeMenu, true)
+  window.removeEventListener('resize', closeMenu)
+})
 const progress = computed(() => Math.max(0, Math.min(100, Number(props.book.progress) || 0)))
 
 const generateCoverPlaceholder = (title) => {
@@ -480,6 +595,70 @@ const formatPersonalRating = (rating) => {
   border-top: 1px solid var(--color-border-on-image);
 }
 
+.card-more-wrap {
+  position: absolute;
+  z-index: 6;
+  top: 12px;
+  right: 12px;
+}
+
+.card-more-button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.library-book-card:not(.no-backdrop) .card-more-button {
+  color: #fff;
+}
+
+.card-more-menu {
+  position: fixed;
+  z-index: 1000;
+  top: calc(100% + 7px);
+  right: 0;
+  display: grid;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+  background-color: var(--color-surface-primary, #ffffff);
+  box-shadow: var(--shadow-card-hover, 0 12px 28px rgba(15, 23, 42, 0.18));
+  color: var(--color-text-primary);
+}
+
+.card-more-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.7rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.card-more-menu button:active {
+  background: var(--color-surface-secondary);
+}
+
+.card-more-menu button.danger {
+  color: var(--color-status-danger);
+}
+
 .action-button {
   display: grid;
   place-items: center;
@@ -547,7 +726,8 @@ const formatPersonalRating = (rating) => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px),
+  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
   .library-book-card {
     display: block;
     min-height: 0;
@@ -631,6 +811,10 @@ const formatPersonalRating = (rating) => {
     border-radius: var(--mobile-card-radius);
     color: var(--color-text-on-brand);
     box-shadow: var(--shadow-card);
+  }
+
+  .library-book-card.mobile-list-book-card.compact-actions {
+    min-height: 192px;
   }
 
   .library-book-card.mobile-list-book-card:hover {

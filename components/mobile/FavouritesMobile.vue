@@ -64,6 +64,7 @@
         >
           <template #action>
             <NuxtLink to="/books" class="explore-btn">
+              <i class="ri-add-line"></i>
               Explore Library
             </NuxtLink>
           </template>

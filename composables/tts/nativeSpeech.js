@@ -1,6 +1,7 @@
-// Native (on-device) speech — the offline/fallback pipeline for the MOBILE TTS
-// driver. It drives the phone's built-in voices via the OS text-to-speech
-// engine, so narration keeps working with no network and no cloud endpoint.
+// On-device speech — the offline/fallback pipeline used by both mobile and web.
+// Native Capacitor builds use the OS text-to-speech plugin; regular browsers use
+// the Web Speech API directly. This keeps narration working when the cloud TTS
+// endpoint is unavailable in either runtime.
 //
 // The Android System WebView does NOT implement the Web Speech API
 // (window.speechSynthesis is undefined), so this uses the native
@@ -14,12 +15,22 @@
 import { Capacitor } from '@capacitor/core'
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 
-export function nativeSpeechSupported() {
+function capacitorSpeechSupported() {
   try {
-    return Capacitor.isPluginAvailable('TextToSpeech')
+    return Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('TextToSpeech')
   } catch {
     return false
   }
+}
+
+export function browserSpeechSupported() {
+  return typeof window !== 'undefined'
+    && typeof window.speechSynthesis?.speak === 'function'
+    && typeof window.SpeechSynthesisUtterance === 'function'
+}
+
+export function nativeSpeechSupported() {
+  return capacitorSpeechSupported() || browserSpeechSupported()
 }
 
 let _voicesCache = null
@@ -27,6 +38,19 @@ let _voicesCache = null
 // The plugin's getSupportedVoices() returns the OS voice list. Cache it — the
 // list is stable for the app session.
 export async function loadNativeVoices() {
+  if (!capacitorSpeechSupported()) {
+    if (!browserSpeechSupported()) return []
+    // Browser voice lists can be empty until the `voiceschanged` event fires,
+    // so do not cache them. A later chunk can then pick up the populated list.
+    return window.speechSynthesis.getVoices().map((voice) => ({
+      name: voice.name,
+      voiceURI: voice.voiceURI,
+      lang: voice.lang,
+      localService: voice.localService,
+      _browserVoice: voice,
+    }))
+  }
+
   if (_voicesCache) return _voicesCache
   try {
     const result = await TextToSpeech.getSupportedVoices()
@@ -78,8 +102,8 @@ const voiceKey = (voice) => String(voice?.voiceURI || voice?.name || '')
 // most OEM engines carry no token, so the word hints are the second pass and
 // anything still unknown is offered unlabelled rather than guessed at.
 const GENDER_TOKEN = /#(female|male)_?(\d*)/i
-const FEMALE_NAME_HINT = /female|woman|zira|jenny|aria|sonia|natasha|samantha|karen|moira|tessa|fiona/i
-const MALE_NAME_HINT = /male|man|david|guy|ryan|christopher|davis|daniel|alex|fred|oliver|arthur|william/i
+const FEMALE_NAME_HINT = /female|woman|zira|jenny|aria|sonia|natasha|samantha|karen|moira|tessa|fiona|-x-(?:sfg|tpf|gba|aua)/i
+const MALE_NAME_HINT = /male|man|david|guy|ryan|christopher|davis|daniel|alex|fred|oliver|arthur|william|-x-(?:iom|tpd|gbb|aub)/i
 
 // 'Female' | 'Male' | '' — plus the ordinal the OS itself assigned, when it
 // names one. Order matters: FEMALE_NAME_HINT would match the "male" inside
@@ -154,10 +178,26 @@ export function offeredDeviceVoices(voices) {
       byIdentity.set(key, { voice, index })
     })
 
+    // Android frequently exposes multiple IDs for the same acoustic voice. For
+    // an offline picker, one local female and one local male voice per locale is
+    // useful; repeated aliases are not. Unknown voices are deduped by their
+    // normalized platform name.
+    const bySound = new Map()
+    for (const entry of byIdentity.values()) {
+      const { gender } = deviceVoiceGender(entry.voice)
+      const key = gender
+        ? `${target}|${gender.toLowerCase()}`
+        : `${target}|${voiceKey(entry.voice).replace(VOICE_INSTALL_SUFFIX, '').toLowerCase()}`
+      const existing = bySound.get(key)
+      if (!existing || (isNetworkVoice(existing.voice) && !isNetworkVoice(entry.voice))) {
+        bySound.set(key, entry)
+      }
+    }
+
     // Female before male before unlabelled, so the list reads as a roster rather
     // than as whatever order the OS happened to enumerate in.
     const rank = { Female: 0, Male: 1, '': 2 }
-    const entries = [...byIdentity.values()].sort((a, b) => (
+    const entries = [...bySound.values()].sort((a, b) => (
       rank[deviceVoiceGender(a.voice).gender] - rank[deviceVoiceGender(b.voice).gender]
     ))
 
@@ -177,7 +217,7 @@ export function offeredDeviceVoices(voices) {
           .replace('Voice', gender || 'Voice')
       }
       usedLabels.add(name)
-      out.push({ index, name, lang: voice?.lang })
+      out.push({ index, name, lang: voice?.lang, gender: gender || 'Unspecified' })
     }
   }
 
@@ -185,11 +225,11 @@ export function offeredDeviceVoices(voices) {
 }
 
 const FEMALE_EDGE_VOICES = new Set([
-  'en-US-JennyNeural', 'en-US-AriaNeural', 'en-GB-SoniaNeural', 'en-AU-NatashaNeural',
+  'en-US-EmmaNeural', 'en-US-AvaNeural', 'en-GB-SoniaNeural', 'en-AU-NatashaNeural',
 ])
 
 function langForEdgeVoice(edgeVoiceId) {
-  const match = /^([a-z]{2}-[A-Z]{2})/.exec(String(edgeVoiceId || 'en-US-ChristopherNeural'))
+  const match = /^([a-z]{2}-[A-Z]{2})/.exec(String(edgeVoiceId || 'en-CA-LiamNeural'))
   return match ? match[1] : 'en-US'
 }
 
@@ -235,10 +275,89 @@ function estimateDurationMs(text, rate) {
   return (words / wordsPerMin) * 60_000
 }
 
+// Build the same <audio>-like surface using the browser's Web Speech API. A
+// pause cancels the current utterance and play() starts that chunk again, which
+// matches the native plugin behavior below and the expectations of useTTS.
+function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVoiceIndex }) {
+  const synth = window.speechSynthesis
+  const lang = langForEdgeVoice(voice)
+  const explicit = Number.isInteger(nativeVoiceIndex) && nativeVoiceIndex >= 0 && nativeVoiceIndex < voices.length
+  const voiceIndex = explicit ? nativeVoiceIndex : pickNativeVoiceIndex(voices, voice)
+  const utteranceText = String(text || '')
+
+  let activeUtterance = null
+  let ended = false
+  let paused = false
+  let stopped = false
+
+  const player = {
+    onended: null,
+    onerror: null,
+    volume,
+    currentTime: 0,
+    _started: false,
+    _native: true,
+
+    play() {
+      paused = false
+      stopped = false
+      ended = false
+      player._started = true
+
+      const utterance = new window.SpeechSynthesisUtterance(utteranceText)
+      activeUtterance = utterance
+      utterance.lang = lang
+      utterance.rate = clampRate(speed)
+      utterance.pitch = 1
+      utterance.volume = clamp01(player.volume)
+
+      if (voiceIndex >= 0) {
+        const selected = voices[voiceIndex]
+        utterance.voice = selected?._browserVoice || synth.getVoices()[voiceIndex] || null
+      }
+
+      utterance.onend = () => {
+        if (utterance !== activeUtterance || stopped || paused || ended) return
+        ended = true
+        activeUtterance = null
+        player.onended?.()
+      }
+      utterance.onerror = (event) => {
+        if (utterance !== activeUtterance || stopped || paused || ended) return
+        ended = true
+        activeUtterance = null
+        player.onerror?.(event?.error || event)
+      }
+
+      synth.speak(utterance)
+      return Promise.resolve()
+    },
+
+    pause() {
+      paused = true
+      activeUtterance = null
+      synth.cancel()
+    },
+
+    stop() {
+      stopped = true
+      ended = true
+      activeUtterance = null
+      synth.cancel()
+    },
+  }
+
+  return player
+}
+
 // Build an <audio>-lookalike backed by the native TTS plugin. The plugin's
 // speak() resolves when the utterance FINISHES, which we translate into the
 // engine's `onended` so it advances to the next chunk.
 export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, voices = [], nativeVoiceIndex = -1 }) {
+  if (!capacitorSpeechSupported() && browserSpeechSupported()) {
+    return createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVoiceIndex })
+  }
+
   const lang = langForEdgeVoice(voice)
   // An explicit device-voice choice (the offline narrator picker) wins; other-
   // wise map the selected Edge voice onto the closest device voice.

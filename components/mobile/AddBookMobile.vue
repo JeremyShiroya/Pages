@@ -580,6 +580,7 @@ const handleDocumentChange = async (event) => {
       const { extractEpub } = await import('~/composables/useEpubExtractor.js')
       const result = await extractEpub(file)
       extractedContent.value = result.content
+      extractedSource.value = result.source ?? await file.arrayBuffer()
       extractedTocTitles.value = result.tocTitles ?? []
       newBook.value.pages = result.pages || 0
       // Auto-populate cover from the EPUB's embedded cover image if the user

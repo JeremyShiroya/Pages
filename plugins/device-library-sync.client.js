@@ -8,9 +8,8 @@ export const DEVICE_RESCAN_INTERVAL_MS = 3 * 60 * 1000
 
 // Kicks off the ReadERA-style device scan on every native app open, shortly
 // after startup so the first paint isn't competing with storage work. The
-// first scan narrates with toasts as before; after that a silent rescan runs
-// every few minutes so books added to the device mid-session are picked up
-// without any chatter. The series-suggestion sweep rides the same lifecycle.
+// Scans are intentionally quiet. Automatic work should not cover the reading
+// UI with progress/success toasts; permission prompts still appear when needed.
 export default defineNuxtPlugin((nuxtApp) => {
   if (!isNativeCapacitorPlatform()) return
 
@@ -22,11 +21,11 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     // setTimeout drops the Nuxt context, and the sync uses useState-backed
     // composables — restore the context or every composable call throws.
-    let hasRanInitialNarratedScan = false
+    let hasRanInitialScan = false
 
     setTimeout(() => {
-      nuxtApp.runWithContext(() => syncDeviceLibrary()).then(() => {
-        hasRanInitialNarratedScan = true
+      nuxtApp.runWithContext(() => syncDeviceLibrary({ announce: false })).then(() => {
+        hasRanInitialScan = true
       })
     }, 1500)
 
@@ -35,8 +34,11 @@ export default defineNuxtPlugin((nuxtApp) => {
       App.addListener('appStateChange', ({ isActive }) => {
         if (isActive) {
           setTimeout(() => {
-            nuxtApp.runWithContext(() => syncDeviceLibrary({ silent: hasRanInitialNarratedScan })).then(() => {
-              hasRanInitialNarratedScan = true
+            nuxtApp.runWithContext(() => syncDeviceLibrary({
+              silent: hasRanInitialScan,
+              announce: false,
+            })).then(() => {
+              hasRanInitialScan = true
             })
           }, 350)
         }

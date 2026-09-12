@@ -1,6 +1,6 @@
 <template>
   <ResponsiveViewSwitch>
-    <template #mobile>
+    <template #phone>
       <component
         :is="mobileReaderComponent"
         :reader-refs="mobileReaderRefs"
@@ -48,7 +48,55 @@
       />
     </template>
 
-    <template #desktop>
+    <template #tabletPortrait>
+      <component
+        :is="tabletPortraitReaderComponent"
+        :reader-refs="mobileReaderRefs"
+        :reader-theme="readerTheme"
+        :book="book"
+        :loading="loading"
+        :content-loading="contentLoading"
+        :is-pdf-renderable="isPdfRenderable"
+        :is-pdf-book="!readsAsEpub"
+        :pdf-reflow-available="pdfReflowAvailable"
+        :pdf-source="pdfSource"
+        :zoom-level="zoomLevel"
+        :pdf-manifest="pdfManifest"
+        :active-tts-chunk-index="activeTtsChunkIndex"
+        :active-word-range="activeWordRange"
+        :has-cover="hasCover"
+        :chapter-list="mobileChapterList"
+        :current-chapter-idx="currentChapterIdx"
+        :current-pdf-page="currentPdfPage"
+        :total-pages="totalPages"
+        :toc-position="tocPosition"
+        :current-chapter-title="currentChapterTitle"
+        :sanitize-html="sanitizeHtml"
+        :resolve-chunk-at-point="resolveChunkAtPoint"
+        :prewarm-chunk="prewarmChunkAudio"
+        :readable-chunks="allReadableChunks"
+        :section-counts="epubSectionCounts"
+        :full-sections="chapterList"
+        :toc-items="displayTocItems"
+        :open-to-chunk="pagedStartChunk"
+        :pdf-figures-loading="pdfFiguresLoading"
+        :pdf-figures-progress="pdfFiguresProgress"
+        @back="router.back()"
+        @open-toc="tocOpen = true"
+        @page-change="handlePdfPageChange"
+        @pdf-loaded="handlePdfLoaded"
+        @read-current-position="playFromCurrentPosition"
+        @read-from-chunk="playFromChunk"
+        @previous-chapter="goToAdjacentChapter(-1)"
+        @next-chapter="goToAdjacentChapter(1)"
+        @mount-section="mountSection"
+        @position-change="handleMobilePosition"
+        @go-to-section="goToSectionFromMobile"
+        @jump-to-toc="goToTocItem"
+      />
+    </template>
+
+    <template #tabletLandscape>
       <div ref="readerPageRef" class="reader-page" :class="readerTheme">
     <header class="reader-topbar">
       <div class="tb-section tb-left">
@@ -248,6 +296,8 @@
 definePageMeta({ layout: 'reader' })
 
 import { computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch } from 'vue'
+import { createMobileReaderDomState } from '~/architectures/mobile/readerDomState'
+import { createTabletReaderDomState } from '~/architectures/tablet/readerDomState'
 import { useBooks } from '~/composables/useBooks'
 import { isRenderableSection, buildReadableChunks, useTTS } from '~/composables/useTTS'
 import { useBookStorage } from '~/composables/useBookStorage'
@@ -270,6 +320,7 @@ import {
 import { PDF_MANIFEST_VERSION, firstChunkForPage, pageForChunk } from '~/composables/usePdfManifest'
 import { reflowPdfManifest } from '~/composables/usePdfReflow'
 import { useMobileReaderPrefs } from '~/composables/useMobileReaderPrefs'
+import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import { pdfProgressForPage } from '~/composables/useReaderPosition'
 import {
   READING_POSITION_SAVE_DELAY_MS,
@@ -279,11 +330,14 @@ import {
   statusForProgress,
 } from '~/composables/useReadingPosition'
 import ReaderMobile from '~/components/mobile/ReaderMobile.vue'
+import ReaderTabletPortrait from '~/components/tablet/portrait/ReaderTabletPortrait.vue'
 import PdfViewer from '~/components/shared/PdfViewer.vue'
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
 import SkeletonLoader from '~/components/shared/SkeletonLoader.vue'
 
 const mobileReaderComponent = ReaderMobile
+const tabletPortraitReaderComponent = ReaderTabletPortrait
+const { presentation: devicePresentation } = useDeviceArchitecture()
 const route = useRoute()
 const router = useRouter()
 const { books, initialized, fetchAllData, fetchBookById, updateBook } = useBooks()
@@ -492,12 +546,10 @@ const epubStyle = computed(() => {
   return match?.[1] ?? ''
 })
 
-// Publisher EPUB CSS is desktop-only. On mobile it fought the reader's own
-// typography (absolute margins/widths pushed words off the page edge), so the
-// mobile readers use their display preferences instead.
-const isMobileViewport = ref(false)
-let _viewportQuery = null
-const _syncViewport = () => { isMobileViewport.value = Boolean(_viewportQuery?.matches) }
+// Publisher EPUB CSS belongs only to the tablet's wide reading surface. Phone
+// and tablet portrait are distinct architectures but intentionally share the
+// compact presentation rules.
+const isMobileViewport = computed(() => devicePresentation.value !== 'tablet-landscape')
 
 // Which reading surface is live. The page needs this (not just ReaderMobile) so
 // it can hand the reading position across when the two are swapped.
@@ -785,11 +837,14 @@ const tocEmptyMessage = computed(() => {
 // disables both the EPUB sentence band and the PDF chunk overlay at once.
 const highlightEnabled = computed(() => settings.value.readerHighlight !== false)
 
-const activeTtsChunkIndex = computed(() => {
-  if (!highlightEnabled.value) return -1
+const currentNarrationChunkIndex = computed(() => {
   if (ttsBook.value?.id !== book.value?.id || ttsStatus.value === 'idle') return -1
   return ttsPlayingChunkIdx.value
 })
+
+const activeTtsChunkIndex = computed(() => (
+  highlightEnabled.value ? currentNarrationChunkIndex.value : -1
+))
 
 const activeWordRange = computed(() => {
   if (activeTtsChunkIndex.value < 0) return null
@@ -945,14 +1000,15 @@ function chunkIndexForCurrentPosition() {
   // full _chunkEls array from 0 caused off-screen chapters above the viewport
   // (negative getBoundingClientRect().top) to satisfy the `<= anchorY` check,
   // returning a chunk from Chapter 0 and wiping the user's progress.
-  if (import.meta.client && _chunkEls.length && Number.isFinite(anchorSection)) {
+  const chunkEls = _readerDom().chunkEls
+  if (import.meta.client && chunkEls.length && Number.isFinite(anchorSection)) {
     const counts = epubSectionCounts.value
     const rangeStart = sectionStartChunk(anchorSection)
     const rangeEnd = rangeStart + (counts[anchorSection] || 0)
     let best = -1
     let firstConnected = -1
-    for (let i = rangeStart; i < rangeEnd && i < _chunkEls.length; i += 1) {
-      const el = _chunkEls[i]
+    for (let i = rangeStart; i < rangeEnd && i < chunkEls.length; i += 1) {
+      const el = chunkEls[i]
       if (!el?.isConnected) continue
       if (firstConnected === -1) firstConnected = i
       const top = el.getBoundingClientRect().top
@@ -1078,7 +1134,7 @@ function resolveChunkAtPoint(x, y) {
     return chunk?.id ?? -1
   }
 
-  if (!_chunkEls.length) _buildChunkMap()
+  if (!_readerDom().chunkEls.length) _buildChunkMap()
 
   const spanAtPoint = () => {
     const range = document.caretRangeFromPoint?.(x, y)
@@ -1126,13 +1182,16 @@ async function playFromChunk(chunkIdx) {
   await confirmReadFromHere()
 }
 
-function jumpToNarration() {
+async function jumpToNarration() {
   if (!isCurrentBookNarrating.value) return
+  const target = currentNarrationChunkIndex.value
+  if (target < 0) return
   if (isPdfRenderable.value) {
-    pdfViewerRef.value?.scrollToChunk?.(activeTtsChunkIndex.value)
+    pdfViewerRef.value?.scrollToChunk?.(target)
     return
   }
-  _highlightChunk(ttsChunkIdx.value)
+  await scrollToChunk(target)
+  _highlightChunk(target, { forceScroll: true })
 }
 
 function observeChapters() {
@@ -1218,16 +1277,18 @@ function sanitizeHtml(html) {
 }
 
 let _observer = null
-let _chunkEls = []
-let _activeEl = null
+const _mobileReaderDom = createMobileReaderDomState()
+const _tabletReaderDom = createTabletReaderDomState()
+const _readerDom = () => (
+  devicePresentation.value === 'tablet-landscape' ? _tabletReaderDom : _mobileReaderDom
+)
 let _ttsWordHighlight = null
-let _activeWordMap = null
-let _activeWordMapIdx = -1
 
 function clearHtmlHighlight() {
-  if (_activeEl) {
-    _activeEl.classList.remove('tts-active')
-    _activeEl = null
+  const state = _readerDom()
+  if (state.activeEl) {
+    state.activeEl.classList.remove('tts-active')
+    state.activeEl = null
   }
 }
 
@@ -1278,8 +1339,10 @@ function _buildChunkMap() {
 
   clearHtmlHighlight()
   unwrapTtsSpans(container)
-  _chunkEls = []
-  _activeWordMapIdx = -1
+  const state = _readerDom()
+  state.chunkEls = []
+  state.activeWordMap = null
+  state.activeWordMapIdx = -1
   _chunkMapCursor = 0
   _stepChunkMap()
 }
@@ -1308,25 +1371,31 @@ function _stepChunkMap() {
 // book's map to get them — unwrapping and re-wrapping every section of the
 // document, synchronously — was a multi-second freeze on long books, and it
 // recurred every time the reader moved into freshly mounted territory.
+function _sectionElement(sectionIndex) {
+  return chaptersContainerRef.value?.querySelector?.(`#ch-${sectionIndex}`) || null
+}
+
 function _mapOneSection(sectionIndex) {
   const { chunks, sectionCounts } = readableChunkData.value
   const count = sectionCounts[sectionIndex] || 0
   if (count <= 0) return
 
-  const sectionEl = document.getElementById(`ch-${sectionIndex}`)
+  const sectionEl = _sectionElement(sectionIndex)
   if (!sectionEl) return
 
   // mapSectionChunks isn't idempotent — wrapping an already-wrapped section
   // would nest spans — so clear this section's spans first. Scoped to the one
   // section, this is cheap.
   unwrapTtsSpans(sectionEl)
-  _activeWordMapIdx = -1
+  const state = _readerDom()
+  state.activeWordMap = null
+  state.activeWordMapIdx = -1
 
   let offset = 0
   for (let s = 0; s < sectionIndex; s++) offset += sectionCounts[s] || 0
 
   mapSectionChunks(sectionEl, chunks.slice(offset, offset + count), offset, (chunkIdx, span) => {
-    _chunkEls[chunkIdx] = span
+    state.chunkEls[chunkIdx] = span
   })
 }
 
@@ -1337,18 +1406,19 @@ function _isNearViewport(el) {
   return rect.bottom > -margin && rect.top < window.innerHeight + margin
 }
 
-function _highlightChunk(index) {
-  const previousEl = _activeEl
+function _highlightChunk(index, { forceScroll = false } = {}) {
+  const state = _readerDom()
+  const previousEl = state.activeEl
   clearHtmlHighlight()
   if (!readsAsEpub.value || index < 0) return
 
-  let el = _chunkEls[index]
+  let el = state.chunkEls[index]
   if (!el) {
     // Map only the section that owns this chunk — its spans are missing
     // because the section mounted after the map was built, not because the
     // whole map is stale.
     _mapOneSection(sectionForChunk(index))
-    el = _chunkEls[index]
+    el = state.chunkEls[index]
   }
   if (!el) return
 
@@ -1356,12 +1426,12 @@ function _highlightChunk(index) {
   // "Jump to narration" works with highlighting disabled.
   if (highlightEnabled.value) {
     el.classList.add('tts-active')
-    _activeEl = el
+    state.activeEl = el
   }
 
   // Follow narration only while the reader is near it. If the user scrolled
   // away, don't yank the viewport back — they can use "Jump to narration".
-  const shouldFollow = !previousEl || _isNearViewport(previousEl) || _isNearViewport(el)
+  const shouldFollow = forceScroll || !previousEl || _isNearViewport(previousEl) || _isNearViewport(el)
   if (shouldFollow) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
 }
 
@@ -1384,15 +1454,16 @@ function _updateEpubWordHighlight() {
   const range = activeWordRange.value
   if (chunkIdx < 0 || !range) return
 
-  const el = _chunkEls[chunkIdx]
+  const state = _readerDom()
+  const el = state.chunkEls[chunkIdx]
   if (!el?.isConnected) return
 
-  if (_activeWordMapIdx !== chunkIdx || !_activeWordMap) {
-    _activeWordMap = buildTextIndex(el)
-    _activeWordMapIdx = chunkIdx
+  if (state.activeWordMapIdx !== chunkIdx || !state.activeWordMap) {
+    state.activeWordMap = buildTextIndex(el)
+    state.activeWordMapIdx = chunkIdx
   }
 
-  const map = _activeWordMap.map
+  const map = state.activeWordMap.map
   const startPt = resolveRangePoint(map, range.start, 1)
   const endPt = resolveRangePoint(map, range.end - 1, -1)
   if (!startPt || !endPt) return
@@ -1715,7 +1786,7 @@ async function loadBook(id) {
       _scrollRestoringPosition = true
       await scrollToChunk(targetChunk)
       await new Promise(resolve => setTimeout(resolve, 50))
-      const targetElRefined = _chunkEls[targetChunk]
+      const targetElRefined = _readerDom().chunkEls[targetChunk]
       if (targetElRefined?.isConnected) {
         targetElRefined.scrollIntoView({ behavior: 'instant', block: 'start' })
       }
@@ -1757,19 +1828,19 @@ function scrollToChunk(chunkIndex) {
 
     const executeScroll = () => {
       _mapOneSection(section)
-      const el = _chunkEls[target]
+      const el = _readerDom().chunkEls[target]
       if (el?.isConnected) {
         el.scrollIntoView({ behavior: 'instant', block: 'start' })
         resolve(true)
       } else {
-        const chEl = document.getElementById(`ch-${section}`)
+        const chEl = _sectionElement(section)
         if (chEl) chEl.scrollIntoView({ behavior: 'instant', block: 'start' })
         resolve(false)
       }
     }
 
     nextTick(() => {
-      if (document.getElementById(`ch-${section}`)) {
+      if (_sectionElement(section)) {
         executeScroll()
       } else {
         setTimeout(executeScroll, 50)
@@ -1792,10 +1863,20 @@ watch(rawContent, async () => {
 // those spans, so without this they had nothing to attach to until the book was
 // reopened.
 watch(chaptersContainerRef, async (el) => {
+  // Phone scroll mode, tablet portrait and tablet landscape are separate DOM
+  // surfaces. Never let a span map from the previous surface survive a switch.
+  clearHtmlHighlight()
+  const state = _readerDom()
+  state.chunkEls = []
+  state.activeWordMap = null
+  state.activeWordMapIdx = -1
+  _ttsWordHighlight?.clear()
   if (!el || !readsAsEpub.value) return
   await nextTick()
-  _scheduleChunkMapBuild()
+  _buildChunkMap()
   observeChapters()
+  const target = currentNarrationChunkIndex.value
+  if (target >= 0) _highlightChunk(target)
 })
 
 watch(activeTtsChunkIndex, async (index) => {
@@ -1813,7 +1894,7 @@ watch(activeTtsChunkIndex, async (index) => {
     await nextTick()
     await nextTick()
     _buildChunkMap()
-  } else if (!_chunkEls[index]) {
+  } else if (!_readerDom().chunkEls[index]) {
     _buildChunkMap()
   }
   _highlightChunk(index)
@@ -1918,9 +1999,6 @@ onMounted(async () => {
   window.addEventListener('keydown', onKeydown)
   window.addEventListener('resize', updateBookEdge)
   window.addEventListener('scroll', onReaderScroll, { passive: true })
-  _viewportQuery = window.matchMedia('(max-width: 768px)')
-  _syncViewport()
-  _viewportQuery.addEventListener('change', _syncViewport)
   await loadBook(route.params.id)
 
   // ?chunk=N — "Open in book" from the highlights/notes screens. Chunks are
@@ -1946,8 +2024,6 @@ onUnmounted(async () => {
   window.removeEventListener('keydown', onKeydown)
   window.removeEventListener('resize', updateBookEdge)
   window.removeEventListener('scroll', onReaderScroll)
-  _viewportQuery?.removeEventListener('change', _syncViewport)
-  _viewportQuery = null
   if (_scrollRaf !== null) cancelAnimationFrame(_scrollRaf)
   if (_observer) _observer.disconnect()
   _cancelScheduledChunkMapBuild()

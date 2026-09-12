@@ -1,9 +1,13 @@
 package com.bookish.app;
 
 import android.content.Intent;
+import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Base64;
 
 import androidx.core.content.FileProvider;
 
@@ -14,6 +18,8 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 /**
  * Handles APK files the app deals with directly: the update it downloads for
@@ -213,6 +219,187 @@ public class ApkInstallerPlugin extends Plugin {
         }
     }
 
+    /**
+     * Share any file owned by Pages through Android's real system share sheet.
+     *
+     * The Web Share API is inconsistent inside Android WebView, especially for
+     * file payloads. The app already has a FileProvider for updates/app sharing,
+     * so book files use the same native route and grant read access only to the
+     * chosen recipient.
+     */
+    @PluginMethod
+    public void shareFile(PluginCall call) {
+        final String path = call.getString("path");
+        if (path == null || path.trim().isEmpty()) {
+            call.reject("No file path was provided.");
+            return;
+        }
+
+        final File sourceFile = resolveFile(path);
+        if (!sourceFile.exists()) {
+            call.reject("The book file could not be found on this device.");
+            return;
+        }
+        if (sourceFile.length() <= 0) {
+            call.reject("The book file is empty.");
+            return;
+        }
+
+        try {
+            // FileProvider exposes the underlying filename to recipients. Copy
+            // to a small share cache so a legacy internal name such as
+            // "123.pdf" is delivered as the real title and extension.
+            File dir = new File(getContext().getCacheDir(), "shared-books");
+            if (!dir.exists() && !dir.mkdirs()) {
+                call.reject("Could not prepare the book file for sharing.");
+                return;
+            }
+            String requestedName = call.getString("fileName", sourceFile.getName());
+            File file = new File(dir, safeSharedFileName(requestedName));
+            if (!sourceFile.getCanonicalFile().equals(file.getCanonicalFile())) {
+                copy(sourceFile, file);
+            }
+
+            Uri uri = FileProvider.getUriForFile(
+                getContext(),
+                getContext().getPackageName() + ".fileprovider",
+                file
+            );
+
+            String mimeType = call.getString("mimeType", "application/octet-stream");
+            Intent send = new Intent(Intent.ACTION_SEND)
+                .setType(mimeType)
+                .putExtra(Intent.EXTRA_STREAM, uri)
+                .putExtra(Intent.EXTRA_SUBJECT, call.getString("subject", "Book"))
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            final String text = call.getString("text", "");
+            if (!text.isEmpty()) send.putExtra(Intent.EXTRA_TEXT, text);
+
+            Intent chooser = Intent.createChooser(send, call.getString("title", "Share book"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            getContext().startActivity(chooser);
+
+            JSObject result = new JSObject();
+            result.put("shared", true);
+            result.put("bytes", file.length());
+            call.resolve(result);
+        } catch (Exception error) {
+            call.reject("The book could not be shared.", error);
+        }
+    }
+
+    /** Saves a generated PNG into Pictures/Pages so it is indexed by Gallery. */
+    @PluginMethod
+    public void saveImage(PluginCall call) {
+        final byte[] image = decodeImage(call);
+        if (image == null) return;
+        final String fileName = safePngName(call.getString("fileName", "pages-streak.png"));
+
+        try {
+            Uri uri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Pages");
+                values.put(MediaStore.Images.Media.IS_PENDING, 1);
+                uri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                if (uri == null) throw new java.io.IOException("Gallery did not provide a destination.");
+                try (OutputStream out = getContext().getContentResolver().openOutputStream(uri)) {
+                    if (out == null) throw new java.io.IOException("Gallery image could not be opened.");
+                    out.write(image);
+                }
+                values.clear();
+                values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                getContext().getContentResolver().update(uri, values, null, null);
+            } else {
+                File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Pages");
+                if (!dir.exists() && !dir.mkdirs()) throw new java.io.IOException("Pictures/Pages could not be created.");
+                File target = new File(dir, fileName);
+                try (OutputStream out = new FileOutputStream(target)) { out.write(image); }
+                android.media.MediaScannerConnection.scanFile(
+                    getContext(), new String[] { target.getAbsolutePath() }, new String[] { "image/png" }, null
+                );
+                uri = Uri.fromFile(target);
+            }
+
+            JSObject result = new JSObject();
+            result.put("saved", true);
+            result.put("uri", uri.toString());
+            result.put("bytes", image.length);
+            call.resolve(result);
+        } catch (Exception error) {
+            call.reject("The streak image could not be saved to your gallery.", error);
+        }
+    }
+
+    /** Shares a generated image through Android's native chooser. */
+    @PluginMethod
+    public void shareImage(PluginCall call) {
+        final byte[] image = decodeImage(call);
+        if (image == null) return;
+        final String fileName = safePngName(call.getString("fileName", "pages-streak.png"));
+
+        try {
+            File dir = new File(getContext().getCacheDir(), "shared-images");
+            if (!dir.exists() && !dir.mkdirs()) throw new java.io.IOException("Share cache could not be created.");
+            File target = new File(dir, fileName);
+            try (OutputStream out = new FileOutputStream(target)) { out.write(image); }
+
+            Uri uri = FileProvider.getUriForFile(
+                getContext(), getContext().getPackageName() + ".fileprovider", target
+            );
+            Intent send = new Intent(Intent.ACTION_SEND)
+                .setType("image/png")
+                .putExtra(Intent.EXTRA_STREAM, uri)
+                .putExtra(Intent.EXTRA_SUBJECT, call.getString("subject", "My Pages reading streak"))
+                .putExtra(Intent.EXTRA_TEXT, call.getString("text", ""))
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent chooser = Intent.createChooser(send, call.getString("title", "Share reading streak"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            getContext().startActivity(chooser);
+
+            JSObject result = new JSObject();
+            result.put("shared", true);
+            result.put("bytes", image.length);
+            call.resolve(result);
+        } catch (Exception error) {
+            call.reject("The streak image could not be shared.", error);
+        }
+    }
+
+    /**
+     * Native text-only fallback. This still opens Android's share sheet for
+     * books whose original EPUB/PDF bytes are not available to the app.
+     */
+    @PluginMethod
+    public void shareText(PluginCall call) {
+        try {
+            String text = call.getString("text", "");
+            if (text == null || text.trim().isEmpty()) {
+                call.reject("No share text was provided.");
+                return;
+            }
+
+            Intent send = new Intent(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(Intent.EXTRA_SUBJECT, call.getString("subject", "Book"))
+                .putExtra(Intent.EXTRA_TEXT, text);
+
+            Intent chooser = Intent.createChooser(send, call.getString("title", "Share book"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            getContext().startActivity(chooser);
+            call.resolve();
+        } catch (Exception error) {
+            call.reject("The book could not be shared.", error);
+        }
+    }
+
     private void copy(File from, File to) throws java.io.IOException {
         try (java.io.InputStream in = new java.io.FileInputStream(from);
              java.io.OutputStream out = new java.io.FileOutputStream(to)) {
@@ -221,6 +408,31 @@ public class ApkInstallerPlugin extends Plugin {
             while ((read = in.read(buffer)) != -1) out.write(buffer, 0, read);
             out.flush();
         }
+    }
+
+    private byte[] decodeImage(PluginCall call) {
+        String data = call.getString("data");
+        if (data == null || data.trim().isEmpty()) {
+            call.reject("No image data was provided.");
+            return null;
+        }
+        try {
+            return Base64.decode(data, Base64.DEFAULT);
+        } catch (IllegalArgumentException error) {
+            call.reject("The generated image data was invalid.", error);
+            return null;
+        }
+    }
+
+    private String safePngName(String name) {
+        String clean = name == null ? "pages-streak.png" : name.replaceAll("[^a-zA-Z0-9._-]", "-");
+        if (clean.isEmpty()) clean = "pages-streak.png";
+        return clean.toLowerCase().endsWith(".png") ? clean : clean + ".png";
+    }
+
+    private String safeSharedFileName(String name) {
+        String clean = name == null ? "book" : name.replaceAll("[^a-zA-Z0-9._ -]", "-").trim();
+        return clean.isEmpty() ? "book" : clean;
     }
 
     private boolean hasInstallPermission() {

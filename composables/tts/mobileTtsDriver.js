@@ -13,6 +13,13 @@
 import { synthesizeEdgeSpeechInBrowser } from '~/composables/useEdgeSpeechClient'
 import { nativeSpeechSupported } from '~/composables/tts/nativeSpeech'
 
+// A configured native backend can still be a static Pages host that answers
+// `/api/tts` with index.html and HTTP 200. Only accept the fallback when it
+// contains real audio; otherwise continue toward the device voice.
+const hasUsableAudio = (result) => (
+  typeof result?.audio === 'string' && result.audio.startsWith('data:audio')
+)
+
 // Edge is only abandoned after this many CONSECUTIVE failures. A single failure
 // used to switch the narrator's voice mid-book for the rest of the session —
 // most often because the app was backgrounded and Android throttled the socket,
@@ -89,9 +96,12 @@ export async function synthesizeMobileSpeech({ text, voice, speed, apiUrl, apiBa
       if (apiBaseUrl) {
         try {
           const result = await $fetch(apiUrl('/api/tts'), { method: 'POST', body: { text, voice, speed } })
-          _consecutiveEdgeFailures = 0
-          _lastCountedFailureSeq = -1
-          return result
+          if (hasUsableAudio(result)) {
+            _consecutiveEdgeFailures = 0
+            _lastCountedFailureSeq = -1
+            return result
+          }
+          console.warn('[TTS] Configured server returned no usable audio; continuing to device voice fallback.')
         } catch {
           // fall through
         }

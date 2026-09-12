@@ -18,7 +18,9 @@ import { nativeSpeechSupported } from '~/composables/tts/nativeSpeech'
 // a cheerful 200), so $fetch resolves instead of throwing and the failure would
 // otherwise sail through as a silent chunk.
 function hasUsableAudio(result) {
-  return typeof result?.audio === 'string' && result.audio.startsWith('data:audio')
+  if (typeof result?.audio !== 'string' || !result.audio.startsWith('data:audio')) return false
+  const separator = result.audio.indexOf(',')
+  return separator >= 0 && result.audio.slice(separator + 1).trim().length > 0
 }
 
 // Returns { audio, boundaries } for <audio> playback, or a { native: true }

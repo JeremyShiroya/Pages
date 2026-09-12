@@ -301,6 +301,7 @@ export async function importDocumentFile(documentFile, extension, { addBook, sav
   if (extension === 'epub') {
     const { extractEpub } = await import('~/composables/useEpubExtractor.js')
     extracted = await extractEpub(documentFile)
+    source = extracted.source ?? await documentFile.arrayBuffer()
   } else {
     const { extractPdf } = await import('~/composables/usePdfExtractor.js')
     extracted = await extractPdf(documentFile)
@@ -391,13 +392,14 @@ async function backfillBookMetadata(importedBooks, { updateBook, addToast }) {
 
 // `silent: true` is the repeating background rescan: no toasts, and never any
 // permission prompting — if access isn't already granted it just waits for the
-// next foreground scan. Only the FIRST scan of an app session narrates.
-export async function syncDeviceLibrary({ silent = false } = {}) {
+// next foreground scan. `announce: false` also quiets permission-capable scans.
+export async function syncDeviceLibrary({ silent = false, announce = !silent } = {}) {
   if (!import.meta.client || !isNativeCapacitorPlatform() || _syncInFlight) return
   _syncInFlight = true
 
   const { addToast: realToast } = useToast()
-  const addToast = silent ? () => {} : realToast
+  const sessionToast = silent ? () => {} : realToast
+  const addToast = announce ? sessionToast : () => {}
   const { addBook, updateBook, fetchAllData, initialized } = useBooks()
   const { saveBookContent } = useBookStorage()
   const { ask } = useDevicePermissionPrompt()

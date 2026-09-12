@@ -1,5 +1,5 @@
 <template>
-  <div class="pdf-viewer" :class="{ 'is-paged': pageMode === 'page' }" ref="viewerRef">
+  <div class="pdf-viewer" :class="{ 'is-paged': pageMode === 'page', 'is-zoomed': zoom > 1 }" ref="viewerRef">
     <div v-if="pdfError" class="pdf-error">
       <i class="ri-file-damage-line"></i>
       <p>Could not render PDF.</p>
@@ -17,37 +17,42 @@
         :ref="el => setPageWrap(el, page.number)"
         class="pdf-page-wrap"
         :data-page="page.number"
-        :style="{ width: `${page.width}px`, height: `${page.height}px` }"
+        :style="{ width: `${page.frameWidth}px`, height: `${page.height}px` }"
       >
-        <canvas
-          :ref="el => setPageCanvas(el, page.number)"
-          class="pdf-canvas"
-        ></canvas>
-        <div class="pdf-highlight-layer" aria-hidden="true">
-          <span
-            v-for="(highlight, index) in highlightsByPage[page.number] || []"
-            :key="index"
-            class="pdf-highlight"
-            :style="{
-              left: `${highlight.left}px`,
-              top: `${highlight.top}px`,
-              width: `${highlight.width}px`,
-              height: `${highlight.height}px`,
-            }"
-          ></span>
-        </div>
-        <div class="pdf-word-highlight-layer" aria-hidden="true">
-          <span
-            v-for="(highlight, index) in wordHighlightsByPage[page.number] || []"
-            :key="index"
-            class="pdf-word-highlight"
-            :style="{
-              left: `${highlight.left}px`,
-              top: `${highlight.top}px`,
-              width: `${highlight.width}px`,
-              height: `${highlight.height}px`,
-            }"
-          ></span>
+        <div
+          class="pdf-page-content"
+          :style="{ width: `${page.width}px`, height: `${page.height}px` }"
+        >
+          <canvas
+            :ref="el => setPageCanvas(el, page.number)"
+            class="pdf-canvas"
+          ></canvas>
+          <div class="pdf-highlight-layer" aria-hidden="true">
+            <span
+              v-for="(highlight, index) in highlightsByPage[page.number] || []"
+              :key="index"
+              class="pdf-highlight"
+              :style="{
+                left: `${highlight.left}px`,
+                top: `${highlight.top}px`,
+                width: `${highlight.width}px`,
+                height: `${highlight.height}px`,
+              }"
+            ></span>
+          </div>
+          <div class="pdf-word-highlight-layer" aria-hidden="true">
+            <span
+              v-for="(highlight, index) in wordHighlightsByPage[page.number] || []"
+              :key="index"
+              class="pdf-word-highlight"
+              :style="{
+                left: `${highlight.left}px`,
+                top: `${highlight.top}px`,
+                width: `${highlight.width}px`,
+                height: `${highlight.height}px`,
+              }"
+            ></span>
+          </div>
         </div>
       </div>
     </template>
@@ -247,6 +252,7 @@ const buildPages = async () => {
     pageRecords.push({
       number: pageNumber,
       width: viewport.width,
+      frameWidth: Math.min(viewport.width, availableWidth),
       height: viewport.height,
     })
   }
@@ -254,6 +260,9 @@ const buildPages = async () => {
   pages.value = pageRecords
   ready.value = true
   await nextTick()
+  for (const wrap of pageWraps.values()) {
+    wrap.scrollLeft = Math.max(0, (wrap.scrollWidth - wrap.clientWidth) / 2)
+  }
   setupPageObserver()
 
   renderedPages.clear()
@@ -278,7 +287,12 @@ const relayout = async () => {
     const page = pageNumber === 1 ? firstPage : await pdfDocument.getPage(pageNumber)
     const viewport = page.getViewport({ scale: baseScale * props.zoom })
     viewportTransforms.set(pageNumber, viewport.transform.slice())
-    pageRecords.push({ number: pageNumber, width: viewport.width, height: viewport.height })
+    pageRecords.push({
+      number: pageNumber,
+      width: viewport.width,
+      frameWidth: Math.min(viewport.width, availableWidth),
+      height: viewport.height,
+    })
   }
   if (generation !== renderGeneration) return
 
@@ -294,6 +308,9 @@ const relayout = async () => {
 
   pages.value = pageRecords
   await nextTick()
+  for (const wrap of pageWraps.values()) {
+    wrap.scrollLeft = Math.max(0, (wrap.scrollWidth - wrap.clientWidth) / 2)
+  }
   await renderWindow(_visiblePages.size ? [..._visiblePages] : [1])
   refreshHighlights()
 }
@@ -445,7 +462,9 @@ watch(() => props.activeWord, updateWordHighlights)
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  overflow-x: auto;
+  overflow-x: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
   padding: 0 0.5rem 2rem;
 }
 
@@ -454,8 +473,20 @@ watch(() => props.activeWord, updateWordHighlights)
   flex: 0 0 auto;
   background: var(--color-surface-primary);
   border-radius: 3px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  touch-action: pan-x pan-y;
   box-shadow: var(--shadow-reader-page);
+}
+
+.pdf-page-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.pdf-page-content {
+  position: relative;
 }
 
 /* Page mode: one PDF page per screen.

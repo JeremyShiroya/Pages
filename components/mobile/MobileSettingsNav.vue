@@ -85,7 +85,8 @@ const goBack = () => {
   display: none;
 }
 
-@media (width <= 768px) {
+@media (width <= 768px),
+  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
   .nav {
     /* Detail pages run their blurred cover art up behind this bar, so it has to
        stack above that backdrop to stay readable. */

@@ -363,6 +363,10 @@ export async function extractEpub(file) {
 
     return {
       content,
+      // Keep the original archive as well as the extracted reading HTML. The
+      // archive is what Share needs; rebuilding an EPUB from the rendered
+      // chapters would lose its manifest, metadata and embedded resources.
+      source: ab,
       pages,
       cover,
       tocTitles: sections.map(section => section.title),

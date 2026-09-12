@@ -23,11 +23,11 @@ const WORDS_PER_MIN = 145
 export const BOOKISH_TTS_SESSION_KEY = 'bookish:tts-session'
 
 const EDGE_VOICES = [
-  { id: 'en-US-ChristopherNeural', name: 'Christopher (US)' },
-  { id: 'en-US-JennyNeural',       name: 'Jenny (US)' },
-  { id: 'en-US-AriaNeural',        name: 'Aria (US)' },
-  { id: 'en-US-GuyNeural',         name: 'Guy (US)' },
-  { id: 'en-US-DavisNeural',       name: 'Davis (US)' },
+  { id: 'en-CA-LiamNeural',         name: 'Liam (Canada)' },
+  { id: 'en-US-EmmaNeural',         name: 'Emma (US)' },
+  { id: 'en-US-AvaNeural',          name: 'Ava (US)' },
+  { id: 'en-US-BrianNeural',        name: 'Brian (US)' },
+  { id: 'en-US-AndrewNeural',       name: 'Andrew (US)' },
   { id: 'en-GB-SoniaNeural',       name: 'Sonia (UK)' },
   { id: 'en-GB-RyanNeural',        name: 'Ryan (UK)' },
   { id: 'en-AU-NatashaNeural',     name: 'Natasha (AU)' },
@@ -35,6 +35,14 @@ const EDGE_VOICES = [
 
 const DEFAULT_TTS_VOICE = EDGE_VOICES[0].id
 const KOKORO_VOICE_PREFIX = 'kokoro:'
+const LEGACY_EDGE_VOICE_REPLACEMENTS = Object.freeze({
+  'en-US-ChristopherNeural': 'en-CA-LiamNeural',
+  'en-US-GuyNeural': 'en-US-BrianNeural',
+  'en-US-AriaNeural': 'en-US-AvaNeural',
+  'en-US-AnaNeural': 'en-US-AvaNeural',
+  'en-US-JennyNeural': 'en-US-EmmaNeural',
+  'en-US-DavisNeural': 'en-US-AndrewNeural',
+})
 
 let _audioCache = new Map()
 let _prewarmCache = new Map()
@@ -42,7 +50,8 @@ const PREWARM_CACHE_LIMIT = 4
 
 const isKokoroVoice = (voiceId) => String(voiceId || '').startsWith(KOKORO_VOICE_PREFIX)
 const normalizeAvailableVoice = (voiceId) => {
-  const nextVoice = String(voiceId || '').trim()
+  const savedVoice = String(voiceId || '').trim()
+  const nextVoice = LEGACY_EDGE_VOICE_REPLACEMENTS[savedVoice] || savedVoice
   if (isKokoroVoice(nextVoice)) return DEFAULT_TTS_VOICE
   return EDGE_VOICES.some(voice => voice.id === nextVoice) ? nextVoice : DEFAULT_TTS_VOICE
 }

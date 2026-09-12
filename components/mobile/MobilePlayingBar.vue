@@ -50,9 +50,10 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTTS } from '~/composables/useTTS'
+import { useResponsiveView } from '~/composables/useResponsiveView'
 
 const route = useRoute()
 const router = useRouter()
@@ -67,18 +68,8 @@ const {
   stop: stopTTS,
 } = useTTS()
 
-// Teleported to <body>, so it can't rely on a layout media query. Gate on the
-// viewport here instead — the bar is phone-only chrome.
-const isMobile = ref(false)
-let _mq = null
-const syncViewport = () => { isMobile.value = !!_mq?.matches }
-
-onMounted(() => {
-  _mq = window.matchMedia('(max-width: 768px)')
-  syncViewport()
-  _mq.addEventListener('change', syncViewport)
-})
-onUnmounted(() => _mq?.removeEventListener('change', syncViewport))
+// Teleported to <body>, so it shares the same viewport gate as the main switch.
+const { isMobileView } = useResponsiveView()
 
 // The mini player only belongs on the main tab roots — never on detail pages
 // (book/series/playlist), settings, add/edit, or the reader. All of those are
@@ -88,7 +79,7 @@ const NAV_ROUTES = new Set(['/', '/books', '/series', '/favourites', '/playlists
 const hasBottomNav = computed(() => NAV_ROUTES.has(route.path))
 
 const visible = computed(() => (
-  isMobile.value
+  isMobileView.value
   && !!ttsBook.value
   && ttsStatus.value !== 'idle'
   && NAV_ROUTES.has(route.path)

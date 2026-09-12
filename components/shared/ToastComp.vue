@@ -119,7 +119,8 @@ const { toasts, removeToast } = useToast();
   transform: translateY(-18px) scale(0.96);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px),
+  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
   .toast-container {
     top: calc(env(safe-area-inset-top) + 12px);
     right: 1rem;

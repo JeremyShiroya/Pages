@@ -38,7 +38,7 @@ export function isRetriableEdgeTtsError(error: unknown) {
   const message = String((error as any)?.message || error || '')
 
   return (
-    ['ETIMEDOUT', 'EACCES', 'ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'EAI_AGAIN'].includes(code)
+    ['ETIMEDOUT', 'EACCES', 'ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'EAI_AGAIN', 'ETTSEMPTY'].includes(code)
     || /websocket|timed?\s*out|socket hang up|network|failed to connect/i.test(message)
   )
 }
@@ -119,8 +119,15 @@ async function synthesizeOnce(options: SynthesizeEdgeSpeechOptions) {
       }
     }
 
+    const audio = Buffer.concat(audioBuffers)
+    if (!audio.length) {
+      const error = new Error('Edge TTS returned an empty audio stream') as Error & { code?: string }
+      error.code = 'ETTSEMPTY'
+      throw error
+    }
+
     return {
-      audio: `data:audio/mp3;base64,${Buffer.concat(audioBuffers).toString('base64')}`,
+      audio: `data:audio/mp3;base64,${audio.toString('base64')}`,
       boundaries,
     }
   } finally {

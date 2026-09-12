@@ -23,8 +23,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         try {
           const list = books.value || []
           if (list.length > 0) {
-            await unmarkFalseStandalones(list, updateBook)
-            await realignEntireLibrarySeries({ books: list, seriesList: seriesList?.value || [], updateBook })
+            if (settings.value.metadataAutoFill && settings.value.seriesSuggestions) {
+              await unmarkFalseStandalones(list, updateBook)
+              await realignEntireLibrarySeries({ books: list, seriesList: seriesList?.value || [], updateBook })
+            }
             localStorage.setItem?.(REALIGN_KEY, 'true')
           }
         } catch {}
@@ -58,7 +60,9 @@ export default defineNuxtPlugin((nuxtApp) => {
           try {
             const list = books.value || []
             if (list.length > 0) {
-              await realignEntireLibrarySeries({ books: list, seriesList: seriesList?.value || [], updateBook })
+              if (settings.value.metadataAutoFill && settings.value.seriesSuggestions) {
+                await realignEntireLibrarySeries({ books: list, seriesList: seriesList?.value || [], updateBook })
+              }
             }
           } catch {}
           wakeAutoMetadata()

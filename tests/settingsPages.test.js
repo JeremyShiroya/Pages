@@ -47,6 +47,19 @@ describe('settings pages wiring', () => {
     expect(settings).not.toContain('mobile-settings-list')
   })
 
+  test('settings starts with a local profile shortcut and groups related rows', () => {
+    const settings = read('components/mobile/SettingsMobile.vue')
+
+    expect(settings).toContain('class="profile-link"')
+    expect(settings).toContain("navigate('/profile')")
+    expect(settings).toContain('profile.displayName')
+    expect(settings).toContain('profileAvatarSrc')
+    expect(settings).toContain('settingsGroups')
+    for (const group of ['Appearance', 'Library', 'Pages']) {
+      expect(settings).toContain(`label: '${group}'`)
+    }
+  })
+
   test('settings version comes from runtime config instead of hardcoded text', () => {
     const settings = read('components/mobile/SettingsMobile.vue')
 
@@ -130,7 +143,7 @@ describe('connection test page', () => {
     expect(existsSync(resolve(process.cwd(), 'pages/settings/connection.vue'))).toBe(true)
     expect(readFile('components/mobile/SettingsMobile.vue')).toContain("to: '/settings/connection'")
     // Desktop settings shows the same panel rather than hiding the feature.
-    expect(readFile('components/desktop/SettingsDesktop.vue')).toContain('ConnectionTestPanel')
+    expect(readFile('components/tablet/SettingsDesktop.vue')).toContain('ConnectionTestPanel')
   })
 
   test('every online capability is covered by a check', () => {
