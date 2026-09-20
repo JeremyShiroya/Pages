@@ -71,7 +71,7 @@ export const searchHardcover = async (title: string, author?: string): Promise<M
     const books = json.data?.books || [];
 
     return books.map((book: any): MetadataSource => {
-      const authorName = book.contributions?.map((c: any) => c.author?.name).filter(Boolean).join(', ') || author || null;
+      const authorName = book.contributions?.map((c: any) => c.author?.name).filter(Boolean).join(', ') || null;
       const seriesObj = book.book_series?.[0];
       const seriesName = seriesObj?.series?.name || null;
       const seriesPosition = seriesObj?.position ? String(seriesObj.position) : null;

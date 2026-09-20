@@ -100,6 +100,23 @@ describe('responsive mobile component split', () => {
     expect(rootVueFiles).toEqual([])
   })
 
+  test('landscape home follows the dashboard layout and has a persistent collapsible sidebar', () => {
+    const home = read('components/tablet/HomeDesktop.vue')
+    const sidebar = read('components/tablet/Sidebar.vue')
+    const layout = read('layouts/default.vue')
+
+    expect(home).toContain('class="home-columns"')
+    expect(home).toContain('class="home-section currently-reading"')
+    expect(home).toContain('class="recent-list"')
+    expect(home).toContain('class="series-column"')
+    expect(home).toMatch(/\.home-columns\s*\{[^}]*grid-template-columns:/s)
+    expect(sidebar).toContain("useSidebarState")
+    expect(sidebar).toContain("collapsed ? 'Expand sidebar' : 'Collapse sidebar'")
+    expect(sidebar).toMatch(/\.sidebar\.collapsed\s*\{[^}]*width:\s*76px/s)
+    expect(layout).toContain("'sidebar-collapsed': sidebarCollapsed")
+    expect(layout).toMatch(/\.tablet-landscape-layout\.sidebar-collapsed \.main-content\s*\{[^}]*margin-left:\s*76px/s)
+  })
+
   test('detail routes have dedicated mobile components instead of embedded mobile branches', () => {
     const detailSurfaces = [
       ['Book detail', 'pages/book/[id].vue', 'components/mobile/BookDetailMobile.vue'],
@@ -147,7 +164,7 @@ describe('responsive mobile component split', () => {
     expect(readerMobile).toContain('ri-equalizer-line')
     expect(readerMobile).toContain('reader-display-sheet')
     expect(readerMobile).toContain('ReaderPagedEpub')
-    expect(readerMobile).toContain('listen-chunk.active')
+    expect(readerMobile).toContain('listenSentenceWords')
     expect(readerMobile).toContain('reader-chapter-dock')
     expect(existsSync(resolve(root, 'components/mobile/ReaderPagedEpub.vue'))).toBe(true)
     expect(readerMobile).toContain('chapter-pill')

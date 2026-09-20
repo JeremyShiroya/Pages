@@ -9,8 +9,8 @@
 // enough of the HTMLAudioElement surface the TTS engine uses (`play()`→Promise,
 // `pause()`, `stop()`, `volume`, `currentTime`, `onended`, `onerror`) so the
 // shared engine drives device voices through the exact same code path it uses
-// for <audio> playback. There are no word boundaries here, so highlighting is
-// skipped in this mode.
+// for <audio> playback. Its monotonic currentTime lets the shared engine drive
+// estimated word boundaries when the native plugin cannot report exact ones.
 
 import { Capacitor } from '@capacitor/core'
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
@@ -289,12 +289,15 @@ function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVo
   let ended = false
   let paused = false
   let stopped = false
+  let startedAt = 0
 
   const player = {
     onended: null,
     onerror: null,
     volume,
-    currentTime: 0,
+    get currentTime() {
+      return startedAt ? Math.max(0, (Date.now() - startedAt) / 1000) : 0
+    },
     _started: false,
     _native: true,
 
@@ -303,6 +306,7 @@ function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVo
       stopped = false
       ended = false
       player._started = true
+      startedAt = Date.now()
 
       const utterance = new window.SpeechSynthesisUtterance(utteranceText)
       activeUtterance = utterance
@@ -335,6 +339,7 @@ function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVo
 
     pause() {
       paused = true
+      startedAt = 0
       activeUtterance = null
       synth.cancel()
     },
@@ -342,6 +347,7 @@ function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVo
     stop() {
       stopped = true
       ended = true
+      startedAt = 0
       activeUtterance = null
       synth.cancel()
     },
@@ -371,6 +377,7 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
   let ended = false
   let paused = false
   let stopped = false
+  let startedAt = 0
   const clearWatchdog = () => { if (watchdog) { clearTimeout(watchdog); watchdog = null } }
 
   const armWatchdog = () => {
@@ -388,7 +395,9 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
     onended: null,
     onerror: null,
     volume,
-    currentTime: 0, // no timing signal; keeps the (skipped) word-highlight loop inert
+    get currentTime() {
+      return startedAt ? Math.max(0, (Date.now() - startedAt) / 1000) : 0
+    },
     _started: false,
     _native: true,
 
@@ -400,6 +409,7 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
         stopped = false
         ended = false
         player._started = true
+        startedAt = Date.now()
 
         const options = {
           text: utterance,
@@ -432,6 +442,7 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
 
     pause() {
       paused = true
+      startedAt = 0
       clearWatchdog()
       TextToSpeech.stop().catch(() => {})
     },
@@ -439,6 +450,7 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
     stop() {
       stopped = true
       ended = true
+      startedAt = 0
       clearWatchdog()
       TextToSpeech.stop().catch(() => {})
     },

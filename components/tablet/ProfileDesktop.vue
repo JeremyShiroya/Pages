@@ -181,7 +181,7 @@ onMounted(async () => {
 .profile-page {
   width: 100%;
   min-height: calc(100vh - 88px - env(safe-area-inset-bottom));
-  background: var(--color-background-app);
+  background: var(--color-settings-background);
   color: var(--color-text-primary);
 }
 
@@ -264,7 +264,7 @@ onMounted(async () => {
 .profile-avatar-ring img {
   width: 100%;
   height: 100%;
-  border: 4px solid var(--color-background-app);
+  border: 4px solid var(--color-settings-background);
   border-radius: 50%;
   object-fit: cover;
   background: var(--color-surface-primary);
@@ -279,7 +279,7 @@ onMounted(async () => {
   height: 34px;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--color-background-app);
+  border: 2px solid var(--color-settings-background);
   border-radius: 50%;
   background: var(--color-brand-primary);
   color: var(--color-text-on-brand);
@@ -477,7 +477,7 @@ onMounted(async () => {
   max-height: min(78vh, 620px);
   overflow: auto;
   border-radius: 18px 18px 0 0;
-  background: var(--color-background-app);
+  background: var(--color-settings-background);
   padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
   box-shadow: var(--shadow-modal);
 }

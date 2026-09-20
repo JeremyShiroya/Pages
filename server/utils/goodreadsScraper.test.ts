@@ -35,6 +35,26 @@ describe('goodreadsScraper parsing helpers', () => {
     });
   });
 
+  it('does not treat the contributors accessibility heading as a series', () => {
+    const html = `
+      <html>
+        <body>
+          <h1 data-testid="bookTitle">An Older Book</h1>
+          <h3 aria-label="List of Contributors"></h3>
+          <span class="ContributorLink__name">A. Writer</span>
+        </body>
+      </html>
+    `;
+
+    expect(parseGoodreadsBookHtml(html)).toMatchObject({
+      title: 'An Older Book',
+      author: 'A. Writer',
+      series: null,
+      seriesInstallment: null,
+      seriesTotal: null,
+    });
+  });
+
   it('extracts the primary-work count from a Goodreads series page', () => {
     expect(parseGoodreadsSeriesTotal(`
       <html>

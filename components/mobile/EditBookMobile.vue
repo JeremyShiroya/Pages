@@ -293,10 +293,15 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="web-review-label">Goodreads Rating & Reviews</label>
+          <div v-if="settings.ratingSource === 'personal'" class="form-group">
+            <label>Personal Rating</label>
+            <PersonalRatingInput v-model="editBook.rating" />
+          </div>
+
+          <div v-else-if="settings.ratingSource !== 'none'" class="form-group">
+            <label class="web-review-label">{{ settings.ratingSource === 'storygraph' ? 'StoryGraph' : 'Goodreads' }} Rating</label>
             <div class="readonly-review">
-              <GoodreadsRatingDisplay :web-review="editBook.webReview" show-empty />
+              <BookRatingDisplay :book="editBook" show-empty />
             </div>
           </div>
 
@@ -321,14 +326,19 @@ import { useToast } from '~/composables/useToast'
 import { fetchBookMetadataResults } from '~/composables/useBookMetadataSearch'
 import { fetchCoverImageResults } from '~/composables/useCoverSearch'
 import { propagateSeriesTotal } from '~/composables/useSeriesProgress'
+import { hasManualSeriesDecisionChanged, protectManualSeriesDecision } from '~/composables/seriesMutationGuard'
 import { useCoverImageCache } from '~/composables/useCoverImageCache'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
 import BookishSelect from '~/components/shared/BookishSelect.vue'
 import CoverImageModal from '~/components/shared/CoverImageModal.vue'
 import GoodreadsRatingDisplay from '~/components/shared/GoodreadsRatingDisplay.vue'
+import BookRatingDisplay from '~/components/shared/BookRatingDisplay.vue'
+import PersonalRatingInput from '~/components/shared/PersonalRatingInput.vue'
+import { useBookishSettings } from '~/composables/useBookishSettings'
 import MultiStepLoader from '~/components/shared/MultiStepLoader.vue'
 import SkeletonLoader from '~/components/shared/SkeletonLoader.vue'
 import MobileSettingsNav from './MobileSettingsNav.vue'
+import { useBookEditReturn } from '~/composables/useBookEditNavigation'
 
 const props = defineProps({
   bookId: {
@@ -338,10 +348,12 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const { returnFromEditor } = useBookEditReturn()
 const { fetchBookById, updateBook, books } = useBooks()
 const { addToast } = useToast()
 const { cacheCoverImage } = useCoverImageCache()
 const { apiUrl } = useApiEndpoint()
+const { settings } = useBookishSettings()
 
 const editBook = ref({
   title: '',
@@ -355,6 +367,7 @@ const editBook = ref({
   webReview: '',
   format: '',
   pages: 0,
+  rating: 0,
   progress: 0,
   status: 'Unread',
   isFavourite: false,
@@ -363,6 +376,7 @@ const editBook = ref({
 
 const isLoading = ref(true)
 const isUpdating = ref(false)
+const originalSeriesState = ref(null)
 const coverPreview = ref(null)
 // When checked, applying a metadata result leaves the existing cover alone.
 const keepCurrentCover = ref(false)
@@ -441,7 +455,7 @@ const triggerCoverInput = () => {
 }
 
 const goBack = () => {
-  router.push('/books')
+  returnFromEditor()
 }
 
 onMounted(async () => {
@@ -461,6 +475,11 @@ onMounted(async () => {
       }
     }
     bookKind.value = editBook.value.series || editBook.value.seriesInstallment ? 'series' : 'standalone'
+    originalSeriesState.value = {
+      series: editBook.value.series,
+      seriesInstallment: editBook.value.seriesInstallment,
+      seriesTotal: editBook.value.seriesTotal,
+    }
   } catch (err) {
     console.error('Error loading book:', err)
     addToast('Failed to load book details', 'error')
@@ -683,7 +702,7 @@ const handleUpdateBook = async () => {
   isUpdating.value = true;
   const cachedCover = await cacheCoverImage(editBook.value.cover);
 
-  const bookToUpdate = {
+  let bookToUpdate = {
     ...editBook.value,
     progress: reconcileStatusProgress(editBook.value.status, editBook.value.progress),
     cover: cachedCover || editBook.value.cover,
@@ -693,6 +712,10 @@ const handleUpdateBook = async () => {
     bookToUpdate.series = null
     bookToUpdate.seriesInstallment = null
     bookToUpdate.seriesTotal = null
+  }
+
+  if (hasManualSeriesDecisionChanged(originalSeriesState.value, bookToUpdate)) {
+    bookToUpdate = protectManualSeriesDecision(bookToUpdate)
   }
   
   try {
@@ -706,7 +729,7 @@ const handleUpdateBook = async () => {
       });
     }
     addToast('Book updated successfully', 'success');
-    router.push('/books');
+    returnFromEditor();
   } catch (error) {
     console.error('Update error:', error);
     addToast('Failed to update book', 'error');

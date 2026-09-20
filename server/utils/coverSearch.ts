@@ -1,198 +1,127 @@
-import { searchGoodreads, scrapeGoodreadsBook, normalizeGoodreadsImage } from './goodreadsScraper';
-import { searchGoogleBooks } from './googleBooksApi';
-import { searchOpenLibrary } from './openLibraryApi';
-import { searchKobo, scrapeKoboBook } from './koboScraper';
-import { searchHardcover } from './hardcoverApi';
-import { searchInternetArchive } from './internetArchiveApi';
-import { searchWikidata } from './wikidataApi';
-import { addUniqueImage, isUsefulCoverUrl, rankCoverResult, searchGoogleImages } from './imageSearch';
-import { resolvePublisherDomain } from './publisherSites';
+import { searchGoodreads, scrapeGoodreadsBook, normalizeGoodreadsImage } from './goodreadsScraper'
+import { searchGoogleBooks } from './googleBooksApi'
+import { searchOpenLibrary } from './openLibraryApi'
+import { searchKobo, scrapeKoboBook } from './koboScraper'
+import { searchHardcover } from './hardcoverApi'
+import { searchAppleBooksCovers } from './appleBooksApi'
+import { addUniqueImage, isUsefulCoverUrl } from './imageSearch'
+import { matchesRequestedBook } from '../../utils/bookCoverMatch'
 
-// Core cover search shared by the /api/books/search-covers endpoint and the
-// on-device search in native builds (plain fetch + cheerio, no Node APIs).
-
-export type CoverImage = {
-  url: string;
-  source: string;          // machine-readable: goodreads | googleBooks | openLibrary | kobo | hardcover | internetArchive | wikidata | googleImages | publisher
-  label: string;           // human-readable e.g. "Goodreads", "Web image search · amazon.com"
-};
+// Shared by the server endpoint and the on-device native search. Only catalog
+// records with matching title AND author are eligible; search rank is not proof.
+export type CoverImage = { url: string; source: string; label: string }
 
 const SOURCE_LABELS: Record<string, string> = {
   goodreads: 'Goodreads',
   googleBooks: 'Google Books',
   openLibrary: 'Open Library',
-  internetArchive: 'Internet Archive',
   kobo: 'Kobo',
   hardcover: 'Hardcover',
-  wikidata: 'Wikidata',
-  googleImages: 'Web image search',
-  publisher: "Publisher's site",
-};
-
-function hostnameOf(url?: string | null) {
-  if (!url) return null;
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return null;
-  }
+  appleBooks: 'Apple Books',
 }
 
-/**
- * Adds a candidate cover URL to the running list, tagged with its source.
- * Uses the existing addUniqueImage helper for URL-level deduping (so behaviour
- * matches what the picker has historically seen), and records the source for the
- * first occurrence in a parallel map keyed by the normalised URL.
- */
-function addCover(
-  urls: string[],
-  seen: Set<string>,
-  sourceByUrl: Map<string, { source: string; label: string }>,
-  url: string | null | undefined,
+function addCover(images: CoverImage[], seen: Set<string>, url: string | null | undefined, source: string) {
+  if (!url) return
+  let candidate = normalizeGoodreadsImage(url) || url
+  // Open Library returns a 1px blank image for missing covers by default.
+  if (candidate.includes('covers.openlibrary.org/')) {
+    try {
+      const parsed = new URL(candidate)
+      parsed.searchParams.set('default', 'false')
+      candidate = parsed.toString()
+    } catch { return }
+  }
+  const urls: string[] = []
+  addUniqueImage(urls, seen, candidate, isUsefulCoverUrl)
+  if (urls.length) images.push({ url: urls[0], source, label: SOURCE_LABELS[source] })
+}
+
+function addMatching(
+  images: CoverImage[], seen: Set<string>,
+  wantedTitle: string, wantedAuthor: string | undefined,
+  item: { title?: string | null; author?: string | null; cover?: string | null } | null,
   source: string,
-  contextUrl?: string | null,
 ) {
-  const beforeLen = urls.length;
-  addUniqueImage(urls, seen, normalizeGoodreadsImage(url) || url, isUsefulCoverUrl);
-  if (urls.length === beforeLen) return; // duplicate / rejected
-  const finalUrl = urls[urls.length - 1];
-  if (sourceByUrl.has(finalUrl)) return; // first source wins
-  const baseLabel = SOURCE_LABELS[source] || source;
-  const host = hostnameOf(contextUrl);
-  const label = host && (source === 'googleImages' || source === 'publisher')
-    ? `${baseLabel} · ${host}`
-    : baseLabel;
-  sourceByUrl.set(finalUrl, { source, label });
+  if (!item || !matchesRequestedBook(wantedTitle, wantedAuthor, item.title, item.author)) return
+  addCover(images, seen, item.cover, source)
 }
 
-function quoteTerm(value?: string | null) {
-  const cleaned = String(value || '').replace(/"/g, '').trim();
-  return cleaned ? `"${cleaned}"` : '';
-}
-
-function buildCoverQueries(title: string, author?: string) {
-  const exact = [quoteTerm(title), quoteTerm(author)].filter(Boolean).join(' ');
-  const loose = [title, author].filter(Boolean).join(' ');
-  return [
-    `${exact} book cover`,
-    `${exact} cover art edition`,
-    `${loose} paperback hardcover cover`,
-    `site:goodreads.com/book/show ${exact} cover`,
-    `site:amazon.com ${exact} book cover`,
-    `site:penguinrandomhouse.com ${exact} book cover`,
-  ].filter((query, index, queries) => query.trim() && queries.indexOf(query) === index);
-}
-
-function buildPublisherQueries(title: string, author: string | undefined, publisher: string) {
-  const exact = [quoteTerm(title), quoteTerm(author)].filter(Boolean).join(' ');
-  const domain = resolvePublisherDomain(publisher);
-  const queries: string[] = [];
-  if (domain) {
-    queries.push(`site:${domain} ${exact} cover`);
-    queries.push(`site:${domain} ${exact}`);
+async function matchingOpenLibraryEditions(
+  works: Array<{ id: string; title: string; author: string }>,
+  title: string,
+  author?: string,
+) {
+  const work = works.find((item) =>
+    /^\/works\/OL\d+W$/.test(item.id)
+    && matchesRequestedBook(title, author, item.title, item.author))
+  if (!work) return [] as Array<{ title: string; author: string; cover: string }>
+  try {
+    const response = await fetch(`https://openlibrary.org${work.id}/editions.json?limit=40`, {
+      signal: AbortSignal.timeout(8000),
+    })
+    if (!response.ok) return []
+    const data = await response.json()
+    return (Array.isArray(data.entries) ? data.entries : [])
+      .filter((entry: any) => entry.title && Array.isArray(entry.covers) && entry.covers.length)
+      .map((entry: any) => ({
+        title: String(entry.title),
+        author: work.author,
+        cover: `https://covers.openlibrary.org/b/id/${Number(entry.covers[0])}-L.jpg`,
+      }))
+      .filter((entry: { title: string; author: string; cover: string }) =>
+        matchesRequestedBook(title, author, entry.title, entry.author))
+      .slice(0, 10)
+  } catch {
+    return []
   }
-  queries.push(`${quoteTerm(publisher)} ${exact} book cover`);
-  return queries.filter((query, index, list) => query.trim() && list.indexOf(query) === index);
 }
 
-async function searchGoogleCoverImages(title: string, author?: string) {
-  const queries = buildCoverQueries(title, author).slice(0, author ? 6 : 4);
-  const results = await Promise.allSettled(
-    queries.map((query) => searchGoogleImages(query, { num: 10 })),
-  );
-  return results
-    .flatMap((result) => result.status === 'fulfilled' ? result.value : [])
-    .sort((a, b) => rankCoverResult(b, title, author) - rankCoverResult(a, title, author));
-}
-
-async function searchPublisherCoverImages(title: string, author: string | undefined, publisher: string) {
-  const queries = buildPublisherQueries(title, author, publisher);
-  if (!queries.length) return [];
-  const results = await Promise.allSettled(
-    queries.map((query) => searchGoogleImages(query, { num: 10 })),
-  );
-  return results
-    .flatMap((result) => result.status === 'fulfilled' ? result.value : [])
-    .sort((a, b) => rankCoverResult(b, title, author) - rankCoverResult(a, title, author));
-}
-
-export async function searchBookCovers(title: string, author?: string, publisher?: string) {
-  const [
-    hardcoverResult,
-    goodreadsResult,
-    gbResult,
-    olResult,
-    iaResult,
-    wikidataResult,
-    koboResult,
-    googleImageResult,
-    publisherImageResult,
-  ] = await Promise.allSettled([
-    searchHardcover(title, author),
-    searchGoodreads(title, author),
+export async function searchBookCovers(title: string, author?: string, _publisher?: string) {
+  const [googleResult, openLibraryResult, goodreadsResult, koboResult, hardcoverResult, appleResult] = await Promise.allSettled([
     searchGoogleBooks(title, author),
     searchOpenLibrary(title, author),
-    searchInternetArchive(title, author),
-    searchWikidata(title, author),
+    searchGoodreads(title, author),
     searchKobo(title, author),
-    searchGoogleCoverImages(title, author),
-    publisher
-      ? searchPublisherCoverImages(title, author, publisher)
-      : Promise.resolve([]),
-  ]);
+    searchHardcover(title, author),
+    searchAppleBooksCovers(title, author),
+  ])
+  const google = googleResult.status === 'fulfilled' ? googleResult.value : []
+  const openLibrary = openLibraryResult.status === 'fulfilled' ? openLibraryResult.value : []
+  const goodreads = goodreadsResult.status === 'fulfilled' ? goodreadsResult.value : []
+  const koboUrls = koboResult.status === 'fulfilled' ? koboResult.value : []
+  const hardcover = hardcoverResult.status === 'fulfilled' ? hardcoverResult.value : []
+  const apple = appleResult.status === 'fulfilled' ? appleResult.value : []
 
-  const hardcover = hardcoverResult.status === 'fulfilled' ? hardcoverResult.value : [];
-  const goodreads = goodreadsResult.status === 'fulfilled' ? goodreadsResult.value : [];
-  const google = gbResult.status === 'fulfilled' ? gbResult.value : [];
-  const openLibrary = olResult.status === 'fulfilled' ? olResult.value : [];
-  const internetArchive = iaResult.status === 'fulfilled' ? iaResult.value : [];
-  const wikidata = wikidataResult.status === 'fulfilled' ? wikidataResult.value : [];
-  const koboUrls = koboResult.status === 'fulfilled' ? koboResult.value : [];
-  const googleImages = googleImageResult.status === 'fulfilled' ? googleImageResult.value : [];
-  const publisherImages = publisherImageResult.status === 'fulfilled' ? publisherImageResult.value : [];
-
-  const [goodreadsDetails, koboDetails] = await Promise.allSettled([
-    Promise.allSettled(goodreads.slice(0, 8).map((item) => scrapeGoodreadsBook(item.url, item))),
+  // Scrape only matching Goodreads results. A broad search can return books by
+  // a different author whose title shares words with the query.
+  const goodreadsCandidates = goodreads.filter((item) =>
+    matchesRequestedBook(title, author, item.title, item.author)).slice(0, 6)
+  const [goodreadsDetails, koboDetails, openLibraryEditions] = await Promise.allSettled([
+    Promise.allSettled(goodreadsCandidates.map((item) => scrapeGoodreadsBook(item.url, item))),
     Promise.allSettled(koboUrls.slice(0, 5).map((url) => scrapeKoboBook(url))),
-  ]);
+    matchingOpenLibraryEditions(openLibrary, title, author),
+  ])
 
-  const urls: string[] = [];
-  const seen = new Set<string>();
-  const sourceByUrl = new Map<string, { source: string; label: string }>();
-
-  hardcover.forEach((item) => addCover(urls, seen, sourceByUrl, item.cover, 'hardcover'));
-  goodreads.forEach((item) => addCover(urls, seen, sourceByUrl, item.cover, 'goodreads'));
+  const images: CoverImage[] = []
+  const seen = new Set<string>()
+  for (const item of goodreadsCandidates) addMatching(images, seen, title, author, item, 'goodreads')
   if (goodreadsDetails.status === 'fulfilled') {
     goodreadsDetails.value.forEach((entry) => {
-      if (entry.status === 'fulfilled') addCover(urls, seen, sourceByUrl, entry.value?.cover, 'goodreads');
-    });
+      if (entry.status === 'fulfilled') addMatching(images, seen, title, author, entry.value, 'goodreads')
+    })
   }
-
+  for (const item of google) addMatching(images, seen, title, author, item, 'googleBooks')
+  for (const item of openLibrary) addMatching(images, seen, title, author, item, 'openLibrary')
+  if (openLibraryEditions.status === 'fulfilled') {
+    for (const item of openLibraryEditions.value) addMatching(images, seen, title, author, item, 'openLibrary')
+  }
   if (koboDetails.status === 'fulfilled') {
     koboDetails.value.forEach((entry) => {
-      if (entry.status === 'fulfilled') addCover(urls, seen, sourceByUrl, entry.value?.cover, 'kobo');
-    });
+      if (entry.status === 'fulfilled') addMatching(images, seen, title, author, entry.value, 'kobo')
+    })
   }
+  for (const item of hardcover) addMatching(images, seen, title, author, item, 'hardcover')
+  for (const item of apple) addMatching(images, seen, title, author, item, 'appleBooks')
 
-  googleImages.forEach((item) => {
-    addCover(urls, seen, sourceByUrl, item.url, 'googleImages', item.context);
-    addCover(urls, seen, sourceByUrl, item.thumbnail, 'googleImages', item.context);
-  });
-
-  google.forEach((item) => addCover(urls, seen, sourceByUrl, item.cover, 'googleBooks'));
-  openLibrary.forEach((item) => addCover(urls, seen, sourceByUrl, item.cover, 'openLibrary'));
-  internetArchive.forEach((item) => addCover(urls, seen, sourceByUrl, item.cover, 'internetArchive'));
-  wikidata.forEach((item) => addCover(urls, seen, sourceByUrl, item.cover, 'wikidata'));
-
-  publisherImages.forEach((item) => {
-    addCover(urls, seen, sourceByUrl, item.url, 'publisher', item.context);
-    addCover(urls, seen, sourceByUrl, item.thumbnail, 'publisher', item.context);
-  });
-
-  const images: CoverImage[] = urls.slice(0, 24).map((url) => {
-    const info = sourceByUrl.get(url) || { source: 'unknown', label: 'Unknown source' };
-    return { url, source: info.source, label: info.label };
-  });
-
-  return { images };
+  return { images: images.slice(0, 24) }
 }

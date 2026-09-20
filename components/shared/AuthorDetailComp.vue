@@ -125,7 +125,7 @@
               @play="handlePlay"
               @favourite="toggleFavourite(book.id)"
               @playlist="selectedPlaylistBook = book"
-              @edit="router.push(`/edit/${book.id}`)"
+              @edit="router.push(bookEditLocation(book.id, route.fullPath))"
               @delete="deleteAuthorBook(book)"
             />
           </div>
@@ -196,11 +196,13 @@ import { useBooks } from '~/composables/useBooks'
 import { useLibraryStore } from '~/composables/useLibraryStore'
 import { fetchAuthorImageResults } from '~/composables/useAuthorImageSearch'
 import { buildAuthorCollectionStats, groupAuthorWorks } from '~/composables/useAuthorDetails'
+import { AUTHOR_DETAILS_VERSION, newestAuthorRecordFirst } from '~/utils/authorIntelligence'
 import AuthorImageModal from './AuthorImageModal.vue'
 import LibraryBookCard from './LibraryBookCard.vue'
 import AddToPlaylistModal from './AddToPlaylistModal.vue'
 import SeriesComp from './SeriesComp.vue'
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
+import { bookEditLocation } from '~/composables/useBookEditNavigation'
 
 const route = useRoute()
 const router = useRouter()
@@ -232,7 +234,7 @@ const bookToDelete = ref(null)
 // a partial/older record can miss a field — so read each field from the first
 // book that actually has it rather than trusting books[0] alone.
 const authorDetails = computed(() => {
-  const books = author.value?.books || []
+  const books = [...(author.value?.books || [])].sort(newestAuthorRecordFirst)
   if (!books.length) return {}
   const pick = (key) => {
     for (const book of books) {
@@ -306,7 +308,7 @@ watchEffect(() => {
 const detailsFetchedFor = ref(null)
 watch(author, async (current) => {
   if (!current?.name || detailsFetchedFor.value === current.name) return
-  const needsFetch = !current.bio || !hasAnyDetail.value || authorDetails.value.version !== 5
+  const needsFetch = !current.bio || !hasAnyDetail.value || authorDetails.value.version !== AUTHOR_DETAILS_VERSION
   if (!needsFetch) return
   detailsFetchedFor.value = current.name
   bioLoading.value = true

@@ -31,10 +31,14 @@ describe('useBookishSettings storage helpers', () => {
   })
 
   it('defaults book actions to visible and validates the minimal alternative', () => {
-    expect(normalizeBookishSettings({}).bookActionDisplay).toBe('visible')
+    expect(normalizeBookishSettings({}).bookActionDisplay).toBe('minimal')
     expect(normalizeBookishSettings({ bookActionDisplay: 'visible' }).bookActionDisplay).toBe('visible')
     expect(normalizeBookishSettings({ bookActionDisplay: 'minimal' }).bookActionDisplay).toBe('minimal')
-    expect(normalizeBookishSettings({ bookActionDisplay: 'invalid' }).bookActionDisplay).toBe('visible')
+    expect(normalizeBookishSettings({ bookActionDisplay: 'invalid' }).bookActionDisplay).toBe('minimal')
+    expect(normalizeBookishSettings({ bookProgressDisplay: 'ring' })).not.toHaveProperty('bookProgressDisplay')
+    expect(normalizeBookishSettings({ ratingSource: 'storygraph' }).ratingSource).toBe('storygraph')
+    expect(normalizeBookishSettings({ ratingSource: 'none' }).ratingSource).toBe('none')
+    expect(normalizeBookishSettings({ personalRatingScale: 5 }).personalRatingScale).toBe(5)
   })
 
   it('defaults to white and validates the original muted app background', () => {

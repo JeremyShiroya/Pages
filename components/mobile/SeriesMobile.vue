@@ -40,10 +40,10 @@
       description="Books belonging to a series will be shown here"
     >
       <template #action>
-        <NuxtLink to="/books" class="add-btn">
+        <button type="button" class="add-btn" @click="router.push('/books')">
           <i class="ri-add-line"></i>
           Explore Library
-        </NuxtLink>
+        </button>
       </template>
     </EmptyState>
 
@@ -203,10 +203,37 @@ const openSeries = (series) => {
   gap: 1.25rem;
 }
 
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  background: var(--gradient-brand-primary);
+  color: var(--color-text-on-brand);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-brand-button-hover);
+}
+
+@media (max-width: 640px) {
   .series-grid {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 0 var(--mobile-page-padding-inline);
   }
+
+  .add-btn {
+    min-height: var(--mobile-touch-target);
+    border-radius: var(--mobile-control-radius);
+    font-size: var(--mobile-subtext-size);
+  }
+}
 
 </style>

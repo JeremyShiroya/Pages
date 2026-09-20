@@ -1,5 +1,9 @@
 <template>
-  <div class="group-detail-page">
+  <div
+    class="group-detail-page"
+    data-system-bar-color="transparent"
+    :data-system-bar-icons="settings.readerTheme === 'dark' ? 'light' : 'dark'"
+  >
     <!-- The hero names the series; the bar carries the back button and, opposite
          it, an overflow menu for the missing-book actions. -->
     <MobileSettingsNav :show-title="false" back-to="/series" aria-label="Series navigation">
@@ -53,7 +57,16 @@
         </div>
       </header>
 
+      <SelectionActionsBar
+        v-if="selectionMode"
+        class="group-selection-actions"
+        :count="selectedCount"
+        :actions="bulkActions"
+        @action="runBulkAction"
+        @clear="clearSelection"
+      />
       <LibraryControlsRow
+        v-else
         :status="filters.status"
         :format="filters.format"
         v-model:view="viewMode"
@@ -65,47 +78,33 @@
         <template v-for="entry in seriesEntries" :key="entry.key">
           <LibraryBookCard
             v-if="entry.kind === 'book'"
-            :show-personal-rating="false"
             :book="entry.book"
             :active="isBookActive(entry.book)"
             :class="{ 'mobile-list-book-card': viewMode === 'list' }"
-            @open="router.push(`/book/${entry.book.id}`)"
+            collapse-actions
+            :selectable="selectionMode"
+            :selected="isSelected(entry.book.id)"
+            @toggle-select="toggleSelected"
+            @pointerdown="(event) => onPointerDown(event, entry.book)"
+            @pointermove="onPointerMove"
+            @pointerup="onPointerUp"
+            @pointercancel="onPointerUp"
+            @open="openBook"
             @play="handlePlay"
             @favourite="toggleFavourite(entry.book.id)"
             @playlist="selectedPlaylistBook = entry.book"
-            @edit="router.push(`/edit/${entry.book.id}`)"
+            @edit="router.push(bookEditLocation(entry.book.id, route.fullPath))"
             @hide="handleHideBook"
             @delete="handleDeleteBook(entry.book)"
           />
 
-          <!-- An installment the library doesn't have yet. Shows the real cover
-               and title once metadata resolves, muted so it reads as a gap on
-               the shelf; a numbered placeholder until then. -->
-          <article
+          <LibraryBookCard
             v-else
-            class="missing-book-card"
-            :class="{ 'missing-book-card-list': viewMode === 'list' }"
-          >
-            <div class="missing-cover">
-              <img
-                v-if="entry.cover"
-                :src="entry.cover"
-                :alt="entry.title || `Book ${entry.installment}`"
-                loading="lazy"
-              />
-              <template v-else>
-                <i class="ri-add-line" aria-hidden="true"></i>
-              </template>
-              <span class="missing-number">{{ entry.installment }}</span>
-            </div>
-            <div class="missing-info">
-              <h3>{{ entry.title || `Book ${entry.installment}` }}</h3>
-              <p v-if="entry.author">
-                {{ entry.author }}<template v-if="entry.year"> • {{ entry.year }}</template>
-              </p>
-              <p>Not in your library</p>
-            </div>
-          </article>
+            :book="entry.book"
+            :class="{ 'mobile-list-book-card': viewMode === 'list' }"
+            collapse-actions
+            unavailable
+          />
         </template>
       </div>
 
@@ -125,9 +124,10 @@
     />
 
     <AddToPlaylistModal
-      v-if="selectedPlaylistBook"
+      v-if="selectedPlaylistBook || bulkPlaylistBooks"
       :book="selectedPlaylistBook"
-      @close="selectedPlaylistBook = null"
+      :books="bulkPlaylistBooks"
+      @close="selectedPlaylistBook = null; bulkPlaylistBooks = null"
     />
 
     <DeleteConfirmModal
@@ -135,6 +135,14 @@
       :book="bookToDelete"
       @close="showDeleteModal = false; bookToDelete = null"
       @confirm="confirmDeleteBook"
+    />
+
+    <DeleteConfirmModal
+      v-if="bulkDeleteBooks?.length"
+      :book="bulkDeleteBooks[0]"
+      :count="bulkDeleteBooks.length"
+      @close="bulkDeleteBooks = null"
+      @confirm="confirmBulkDelete"
     />
 
     <!-- Visible progress for the first sweep: fill each missing installment's
@@ -177,6 +185,7 @@ import DeleteConfirmModal from '~/components/shared/DeleteConfirmModal.vue';
 import EmptyState from '~/components/shared/EmptyState.vue';
 import LibraryBookCard from '~/components/shared/LibraryBookCard.vue';
 import LibraryControlsRow from '~/components/shared/LibraryControlsRow.vue';
+import SelectionActionsBar from '~/components/shared/SelectionActionsBar.vue';
 import { fetchBookMetadataResults } from '~/composables/useBookMetadataSearch';
 import { useBookishSettings } from '~/composables/useBookishSettings';
 import { useLibraryFilters } from '~/composables/useLibraryFilters';
@@ -185,6 +194,8 @@ import { ensureSeriesTotal, formatSeriesCollectionProgress, propagateSeriesTotal
 import { useSeriesSuggestions } from '~/composables/useSeriesSuggestions';
 import { useTTS } from '~/composables/useTTS';
 import { useToast } from '~/composables/useToast';
+import { bookEditLocation } from '~/composables/useBookEditNavigation';
+import { useLongPress, useMultiSelect } from '~/composables/useMultiSelect';
 import MobileSettingsNav from './MobileSettingsNav.vue';
 
 const route = useRoute();
@@ -199,7 +210,65 @@ const viewMode = ref('grid');
 const selectedPlaylistBook = ref(null);
 const showDeleteModal = ref(false);
 const bookToDelete = ref(null);
+const bulkPlaylistBooks = ref(null);
+const bulkDeleteBooks = ref(null);
 const seriesTotalRefreshKey = ref('');
+
+const {
+  selectionMode,
+  selectedCount,
+  isSelected,
+  toggle: toggleSelect,
+  start: startSelection,
+  clear: clearSelection,
+  retain: retainSelection,
+} = useMultiSelect();
+
+const { onPointerDown, onPointerMove, onPointerUp, consumedTap } = useLongPress((book) => {
+  startSelection(book.id);
+});
+
+const toggleSelected = (book) => toggleSelect(book.id);
+const openBook = (book) => {
+  if (consumedTap()) return;
+  if (selectionMode.value) return toggleSelect(book.id);
+  router.push(`/book/${book.id}`);
+};
+
+const selectedBooks = computed(() => seriesBooks.value.filter((book) => isSelected(book.id)));
+const bulkActions = [
+  { key: 'favourite', icon: 'ri-heart-line', label: 'Favourite' },
+  { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
+  { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
+  { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },
+];
+
+const runBulkAction = async (key) => {
+  const chosen = selectedBooks.value;
+  if (!chosen.length) return;
+  if (key === 'playlist') return (bulkPlaylistBooks.value = chosen);
+  if (key === 'delete') return (bulkDeleteBooks.value = chosen);
+  if (key === 'favourite') {
+    const makeFavourite = chosen.some((book) => !book.isFavourite);
+    for (const book of chosen) if (!!book.isFavourite !== makeFavourite) await toggleFavourite(book.id);
+    addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} ${makeFavourite ? 'added to' : 'removed from'} favourites.`, 'success');
+    clearSelection();
+    return;
+  }
+  if (key === 'hide') {
+    for (const book of chosen) await hideBook(book.id);
+    addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} hidden.`, 'info');
+    clearSelection();
+  }
+};
+
+const confirmBulkDelete = async () => {
+  const chosen = bulkDeleteBooks.value || [];
+  bulkDeleteBooks.value = null;
+  for (const book of chosen) await deleteBook(book.id);
+  addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} permanently deleted.`, 'success');
+  clearSelection();
+};
 
 const seriesName = computed(() => {
   try {
@@ -226,6 +295,8 @@ const seriesBooks = computed(() => (
       return String(a.title || '').localeCompare(String(b.title || ''));
     })
 ));
+
+watch(seriesBooks, (currentBooks) => retainSelection(currentBooks.map((book) => book.id)));
 
 const derivedSeriesTotal = computed(() => {
   const totals = seriesBooks.value
@@ -346,6 +417,14 @@ const seriesEntries = computed(() => {
       author: meta?.author || null,
       year: meta?.year || null,
       cover: meta?.cover || null,
+      book: {
+        id: `missing-${installment}`,
+        title: meta?.title || `Book ${installment}`,
+        author: meta?.author || '',
+        publishYear: meta?.year || null,
+        cover: meta?.cover || null,
+        series: seriesNavTitle.value,
+      },
     });
   }
 
@@ -573,6 +652,17 @@ watch(seriesBooks, async (books) => {
 <style scoped>
 .group-detail-page {
   width: 100%;
+  min-height: 100dvh;
+  background: var(--color-background-app);
+}
+
+.group-selection-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 14px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--color-settings-group, var(--color-surface-card));
 }
 
 /* Overflow menu — identical to the playlist detail's, so the two detail pages
@@ -710,8 +800,8 @@ watch(seriesBooks, async (books) => {
   display: grid;
   gap: 0.9rem;
   overflow: hidden;
-  margin: calc(-1 * var(--detail-nav-height)) calc(-1 * var(--mobile-page-padding-inline)) 1.1rem;
-  padding: calc(var(--detail-nav-height) + 1.4rem) var(--mobile-page-padding-inline) 1.3rem;
+  margin: calc(0px - var(--detail-nav-height) - env(safe-area-inset-top)) calc(-1 * var(--mobile-page-padding-inline)) 1.1rem;
+  padding: calc(var(--detail-nav-height) + env(safe-area-inset-top) + 1.4rem) var(--mobile-page-padding-inline) 1.3rem;
   border-radius: 0 0 24px 24px;
   text-align: center;
 }

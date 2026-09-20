@@ -22,7 +22,10 @@ describe('appearance preferences', () => {
     // Playlist cards default to the same look as series cards.
     expect(DEFAULT_BOOKISH_SETTINGS.playlistCardBackground).toBe('blur')
     expect(DEFAULT_BOOKISH_SETTINGS.playlistCardLayout).toBe('fan')
-    expect(DEFAULT_BOOKISH_SETTINGS.bookActionDisplay).toBe('visible')
+    expect(DEFAULT_BOOKISH_SETTINGS.bookActionDisplay).toBe('minimal')
+    expect(DEFAULT_BOOKISH_SETTINGS).not.toHaveProperty('bookProgressDisplay')
+    expect(DEFAULT_BOOKISH_SETTINGS.ratingSource).toBe('goodreads')
+    expect(DEFAULT_BOOKISH_SETTINGS.personalRatingScale).toBe(10)
     expect(DEFAULT_BOOKISH_SETTINGS.readerHighlight).toBe(true)
     expect(DEFAULT_BOOKISH_SETTINGS.listenCoverBlur).toBe(true)
     expect(DEFAULT_BOOKISH_SETTINGS.showStreak).toBe(true)
@@ -77,7 +80,7 @@ describe('appearance preferences', () => {
     expect(junk.favouritesCardLayout).toBe('list')
     expect(junk.playlistCardLayout).toBe('fan')
     expect(junk.playlistCardBackground).toBe('blur')
-    expect(junk.bookActionDisplay).toBe('visible')
+    expect(junk.bookActionDisplay).toBe('minimal')
     expect(junk.formatFilter).toBe('all')
   })
 
@@ -168,9 +171,12 @@ describe('appearance preferences', () => {
     // Format pills are drawn from the formats the app still handles, so a
     // PDF-only (or EPUB-only) app offers nothing to choose between.
     const books = read('components/mobile/BooksMobile.vue')
+    const prefs = read('components/mobile/PreferencesMobile.vue')
     expect(books).toContain('settings.value.enabledFormats')
     expect(books).toContain('formatFilters.length > 1')
-    expect(books).toContain(':collapse-actions="settings.bookActionDisplay === \'minimal\'"')
+    expect(books).toContain(':collapse-actions="collapseBookActions"')
+    expect(books).toContain('isPhone.value || settings.value.bookActionDisplay === "minimal"')
+    expect(prefs).toContain('<section v-if="isTablet" class="pref-group">')
 
     const reader = read('pages/reader/[id].vue')
     expect(reader).toContain('highlightEnabled')

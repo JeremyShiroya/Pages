@@ -102,7 +102,8 @@ onBeforeUnmount(() => {
   left: 0;
   z-index: 1100;
   display: none;
-  min-height: 70px;
+  height: calc(70px + env(safe-area-inset-top));
+  box-sizing: border-box;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;

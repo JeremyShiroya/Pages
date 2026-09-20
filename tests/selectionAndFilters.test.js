@@ -178,18 +178,13 @@ describe('resume-where prompt', () => {
 describe('listen view tracks narration on open', () => {
   const reader = read('components/mobile/ReaderMobile.vue')
 
-  test('the offset is recomputed when Listen opens', () => {
-    // Opening Listen changes none of the offset watcher's sources, so without
-    // this the panel appeared parked at the top of the page mid-narration.
-    expect(reader).toContain('syncListenOffset')
-    expect(reader).toMatch(/watch\(readerMode, \(mode\) => \{\s*if \(mode === "listen"\) syncListenOffset/)
+  test('opening Listen samples the live reading position', () => {
+    expect(reader).toMatch(/watch\(readerMode, \(mode\) => \{\s*if \(mode === "listen"\) sampleScrollChunk/)
   })
 
-  test('clearing the element refs happens in the same watcher that measures them', () => {
-    // A separate watcher wiped the refs after this one had yielded on
-    // nextTick — the offset fell back to 0, hence "waits, then jumps".
-    expect(reader).not.toMatch(/watch\(listenChunks, \(\) => \{\s*listenChunkEls = \[\];\s*\}\)/)
-    expect(reader).toContain('resetEls')
+  test('the spoken sentence is selected directly instead of translated in a page-sized strip', () => {
+    expect(reader).toContain('listenDisplayChunkIndex')
+    expect(reader).not.toContain('listenTextOffset')
   })
 })
 

@@ -134,6 +134,8 @@ export function isUsefulCoverUrl(url?: string | null) {
   if (!normalized) return false;
   const lower = normalized.toLowerCase();
   return (
+    lower.startsWith('https://')
+    &&
     (
       hasImageExtension(lower)
       || lower.includes('books.google.com/books/content')
@@ -142,7 +144,7 @@ export function isUsefulCoverUrl(url?: string | null) {
       || lower.includes('kbimages')
       || isKnownBookCoverCdnUrl(lower)
     )
-    && !/(nophoto|no_cover|nocover|placeholder|default|sprite|icon|logo|avatar|profile|author)/i.test(lower)
+    && !/(nophoto|no_cover|nocover|placeholder|default-image|image-not-available|not-available|sprite|icon|logo|avatar|profile|author)/i.test(lower)
   );
 }
 

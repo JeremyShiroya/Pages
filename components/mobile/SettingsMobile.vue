@@ -167,7 +167,7 @@ onBeforeUnmount(() => {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  background-color: var(--color-background-app);
+  background-color: var(--color-settings-background);
   font-family: var(--mobile-font-family);
 }
 
@@ -177,16 +177,20 @@ onBeforeUnmount(() => {
 }
 
 .section {
-  overflow: hidden;
-  margin-bottom: 20px;
-  border: 1px solid var(--color-border-subtle);
+  position: relative;
+  overflow: visible;
+  margin: 30px 0 22px;
+  border: 0;
   border-radius: 16px;
-  background: var(--color-surface-card);
+  background: var(--color-settings-group);
 }
 
 .section-title {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 4px;
   margin: 0;
-  padding: 11px 14px 7px;
+  padding: 0;
   color: var(--color-text-muted);
   font-size: 12px;
   font-weight: 650;
@@ -202,9 +206,9 @@ onBeforeUnmount(() => {
   min-height: 68px;
   margin-bottom: 24px;
   padding: 10px 14px 10px 10px;
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: 16px;
-  background: var(--color-surface-card);
+  background: var(--color-settings-group);
   color: var(--color-text-primary);
   cursor: pointer;
 }
@@ -241,7 +245,7 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(0, 1fr) auto;
   margin-bottom: 0;
   padding: 14px 0;
-  border-top: 1px solid var(--color-border-subtle);
+  border: 0;
   background-color: transparent;
   cursor: pointer;
 }
@@ -319,7 +323,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  background-color: var(--color-background-app);
+  background-color: transparent;
   color: var(--color-text-muted);
   font-size: 16px;
 }

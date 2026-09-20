@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { buildMetadataResults } from './metadataAggregator';
 
 describe('books metadata enrichment', () => {
+  it('tolerates unavailable optional providers', () => {
+    expect(buildMetadataResults('Offline Book', 'Example Author', {
+      googleBooksSources: [],
+      openLibrarySources: [],
+      koboSources: [],
+      goodreadsSources: [],
+    } as any)).toEqual([])
+  })
+
   it('keeps exact Open Library matches even when scraping providers return nothing', () => {
     const results = buildMetadataResults('Broken', 'Karin Slaughter', {
       goodreadsSources: [],

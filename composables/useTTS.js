@@ -590,6 +590,21 @@ export const useTTS = () => {
     return (words / WORDS_PER_MIN) * 60 / ttsSpeed.value
   }
 
+  // Native Android TTS does not expose word-boundary callbacks. Give its
+  // audio-like clock evenly spaced boundaries so the Listen screen can still
+  // reveal words in time with the selected speaking rate. Edge voices replace
+  // these with their exact server-provided boundaries.
+  const _estimatedWordBoundaries = (text) => {
+    const source = String(text || '')
+    const secondsPerWord = 60 / (WORDS_PER_MIN * ttsSpeed.value)
+    return [...source.matchAll(/\S+/g)].map((match, index) => ({
+      word: match[0],
+      charIndex: match.index ?? 0,
+      offset: index * secondsPerWord,
+      duration: secondsPerWord,
+    }))
+  }
+
   const _persistSession = () => {
     if (!ttsBook.value?.id) return
 
@@ -950,7 +965,7 @@ export const useTTS = () => {
         voices,
         nativeVoiceIndex: ttsNativeVoiceIdx.value,
       })
-      chunkData.boundaries = []
+      chunkData.boundaries = _estimatedWordBoundaries(requestedChunkText)
     } else {
       ttsUsingDeviceVoice.value = false
       audio = new Audio(chunkData.audio)

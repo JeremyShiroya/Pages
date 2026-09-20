@@ -75,14 +75,15 @@
           </div>
 
           <div class="progress-row">
-            <i class="ri-checkbox-circle-fill"></i>
-            <span>{{ progress }}%</span>
+            <BookProgressDisplay :progress="progress" compact />
           </div>
 
-          <GoodreadsRatingDisplay
-            :web-review="book.webReview"
+          <BookRatingDisplay
+            :book="book"
             compact
             stacked
+            show-source
+            show-empty
             class="detail-rating"
           />
 
@@ -107,7 +108,7 @@
             >
               <i :class="playlistCount > 0 ? 'ri-play-list-2-fill' : 'ri-play-list-2-line'"></i>
             </button>
-            <button type="button" class="icon-action" title="Edit" @click="router.push(`/edit/${book.id}`)">
+            <button type="button" class="icon-action" title="Edit" @click="router.push(bookEditLocation(book.id, route.fullPath))">
               <i class="ri-edit-line"></i>
             </button>
             <button type="button" class="icon-action" title="Hide" @click="handleHide">
@@ -189,10 +190,12 @@ import { useBookishSettings } from "~/composables/useBookishSettings";
 import { useToast } from "~/composables/useToast";
 import { useShareBook } from "~/composables/useShareBook";
 import { prewarmReaderContent } from "~/composables/useReaderPrewarm";
+import { bookEditLocation } from "~/composables/useBookEditNavigation";
 import { useTTS } from "~/composables/useTTS";
 import AddToPlaylistModal from "~/components/shared/AddToPlaylistModal.vue";
 import DeleteConfirmModal from "~/components/shared/DeleteConfirmModal.vue";
-import GoodreadsRatingDisplay from "~/components/shared/GoodreadsRatingDisplay.vue";
+import BookProgressDisplay from "~/components/shared/BookProgressDisplay.vue";
+import BookRatingDisplay from "~/components/shared/BookRatingDisplay.vue";
 import MobileSettingsNav from "./MobileSettingsNav.vue";
 
 const route = useRoute();
@@ -238,7 +241,7 @@ const runDetailAction = async (action) => {
     showPlaylistModal.value = true;
     return;
   }
-  if (action === 'edit') return router.push(`/edit/${book.value.id}`);
+  if (action === 'edit') return router.push(bookEditLocation(book.value.id, route.fullPath));
   if (action === 'hide') return handleHide();
   if (action === 'share') return handleShare();
   if (action === 'delete') showDeleteModal.value = true;

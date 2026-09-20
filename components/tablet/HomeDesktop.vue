@@ -1,590 +1,112 @@
 <template>
-  <div class="home-container">
-    <div v-if="loading && !initialized" class="home-loading">
-      <HomeSkeleton />
-    </div>
+  <main class="tablet-home">
+    <header class="home-toolbar">
+      <label class="home-search">
+        <i class="ri-search-line" aria-hidden="true"></i>
+        <input v-model.trim="query" type="search" placeholder="Search books, series, authors…" aria-label="Search library" />
+      </label>
+      <NuxtLink to="/profile" class="profile-link" aria-label="Open profile"><img :src="profileAvatar" alt="" /></NuxtLink>
+    </header>
 
-    <EmptyState
-      v-else-if="error && books.length === 0"
-      title="Library could not load"
-      :description="error"
-      icon="ri-error-warning-line"
-    >
-      <template #action>
-        <button class="add-btn retry-btn" @click="retryLoadLibrary">
-          <i class="ri-refresh-line"></i>
-          Retry
-        </button>
-      </template>
+    <HomeSkeleton v-if="loading && !initialized" />
+    <EmptyState v-else-if="error && books.length === 0" title="Library could not load" :description="error" icon="ri-error-warning-line">
+      <template #action><button class="retry-btn" @click="fetchAllData(true)">Retry</button></template>
+    </EmptyState>
+    <EmptyState v-else-if="initialized && books.length === 0" illustration="library" title="Your library awaits" description="Add your first book and Pages will keep your reading, listening and progress right here.">
+      <template #action><NuxtLink to="/add" class="primary-link">Add your first book</NuxtLink></template>
     </EmptyState>
 
-    <!-- A brand-new library gets one welcoming hero instead of an empty
-         state per section. -->
-    <EmptyState
-      v-else-if="initialized && books.length === 0"
-      illustration="library"
-      title="Your library awaits"
-      description="Add your first book and Pages will keep your reading, listening and progress right here."
-    >
-      <template #action>
-        <NuxtLink to="/add" class="add-btn">
-          <i class="ri-add-line"></i>
-          Add your first book
-        </NuxtLink>
-      </template>
-    </EmptyState>
-
-    <template v-else-if="initialized">
-      <div class="desktop-home">
-        <section v-if="recentlyAddedBooks.length > 0" class="home-section">
-          <div class="section-header">
-            <h2 class="section-title">Recently Added</h2>
-            <NuxtLink to="/books" class="show-all-btn">
-              See all <i class="ri-arrow-right-s-line"></i>
-            </NuxtLink>
-          </div>
-          <div class="recent-grid">
-            <div
-              v-for="book in recentlyAddedBooks.slice(0, 3)"
-              :key="book.id"
-              class="recent-card"
-              @click="router.push(`/book/${book.id}`)"
-            >
-              <div class="recent-card-bg-container">
-                <div
-                  class="recent-bg"
-                  :style="{ backgroundImage: `url(${book.cover})` }"
-                ></div>
-                <div class="recent-bg-overlay"></div>
+    <div v-else class="home-columns">
+      <div class="home-library-column">
+        <section v-if="currentBook" class="home-section currently-reading">
+          <h1>Currently Reading</h1>
+          <article class="current-card" @click="openBook(currentBook)">
+            <div class="current-backdrop" :style="coverBackground(currentBook)"></div><div class="current-shade"></div>
+            <img :src="currentBook.cover" :alt="currentBook.title" class="current-cover" />
+            <div class="current-copy">
+              <h2>{{ currentBook.title }}</h2><p class="current-author">{{ currentBook.author }}</p>
+              <p class="current-blurb">{{ truncate(currentBook.blurb, 245) }}</p>
+              <BookProgressDisplay :progress="currentBook.progress" compact />
+              <div class="current-actions">
+                <button type="button" @click.stop="handlePlay(currentBook)"><i :class="isBookPlaying(currentBook) ? 'ri-pause-fill' : 'ri-play-fill'"></i>{{ isBookPlaying(currentBook) ? 'Pause' : 'Listen' }}</button>
+                <button type="button" @click.stop="openReader(currentBook)"><i class="ri-book-open-line"></i>Read</button>
               </div>
-              <img :src="book.cover" :alt="book.title" class="recent-cover" />
-              <div class="recent-info">
-                <h4 class="recent-title">{{ book.title }}</h4>
-                <p class="recent-meta">
-                  {{ book.pages || "-" }} Pages - {{ book.format || "EPUB" }}
-                </p>
-              </div>
-              <button
-                class="recent-go-btn"
-                title="Listen"
-                @click.stop="handlePlay(book)"
-              >
-                <i class="ri-play-line"></i>
-              </button>
             </div>
-          </div>
+          </article>
         </section>
 
-        <div class="main-content-row">
-          <!-- Sections with nothing to show stay hidden; the page simply
-               displays whatever content exists. -->
-          <section v-if="popularBooks.length > 0" class="popular-column">
-            <div class="section-header">
-              <h2 class="section-title">Popular Books</h2>
-            </div>
-            <div class="popular-grid">
-              <div
-                v-for="book in popularBooks"
-                :key="book.id"
-                class="popular-card"
-                @click="router.push(`/book/${book.id}`)"
-              >
-                <img :src="book.cover" :alt="book.title" class="popular-cover" />
-                <div class="popular-info">
-                  <h4 class="popular-title">{{ book.title }}</h4>
-                  <p class="popular-author">{{ book.author }}</p>
-                  <div class="popular-rating" v-if="getGoodreadsRating(book)">
-                    <GoodreadsRatingDisplay :web-review="book.webReview" compact />
-                  </div>
-                  <p class="popular-blurb">{{ truncate(book.blurb, 90) }}</p>
-                </div>
-                <button
-                  class="popular-play-btn"
-                  title="Listen"
-                  @click.stop="handlePlay(book)"
-                >
-                  <i class="ri-play-fill"></i>
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <section v-if="recentAuthors.length > 0" class="your-authors-column">
-            <div class="section-header">
-              <h2 class="section-title">Your Authors</h2>
-            </div>
-            <div class="authors-list-card">
-              <div
-                v-for="author in recentAuthors"
-                :key="author.id"
-                class="author-list-item"
-                @click="router.push(`/author/${author.id}`)"
-              >
-                <div class="author-list-avatar">
-                  <img
-                    v-if="author.image"
-                    :src="author.image"
-                    :alt="author.name"
-                  />
-                  <div v-else class="author-initial">
-                    {{ author.name.charAt(0) }}
-                  </div>
-                </div>
-                <div class="author-list-info">
-                  <p class="author-list-name">{{ author.name }}</p>
-                  <p class="author-list-count">
-                    {{ getAuthorBookCount(author.name) }} Books
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
+        <section class="home-section recently-added">
+          <div class="section-heading"><h1>Recently Added</h1><NuxtLink to="/books">See all</NuxtLink></div>
+          <div v-if="visibleRecentBooks.length" class="recent-list">
+            <article v-for="book in visibleRecentBooks" :key="book.id" class="recent-book" @click="openBook(book)">
+              <img :src="book.cover" :alt="book.title" />
+              <div><h2>{{ book.title }}</h2><p class="recent-author">{{ book.author }}</p><p class="recent-blurb">{{ truncate(book.blurb, 135) }}</p></div>
+            </article>
+          </div>
+          <p v-else class="no-results">No books match “{{ query }}”.</p>
+        </section>
       </div>
-    </template>
-  </div>
+
+      <aside class="series-column">
+        <div class="section-heading"><h1>Series</h1><NuxtLink to="/series">See all</NuxtLink></div>
+        <div class="series-stack">
+          <article v-for="group in visibleSeries" :key="group.id" class="series-card" @click="openSeries(group)">
+            <div class="series-backdrop" :style="coverBackground(group.books[0])"></div><div class="series-shade"></div>
+            <div class="series-copy"><h2>{{ group.name }}</h2><p>{{ group.books.length }}/{{ group.seriesTotal || group.books.length }} Books</p></div>
+            <div class="series-covers"><img v-for="book in group.books.slice(0, 3)" :key="book.id" :src="book.cover" :alt="book.title" /></div>
+          </article>
+          <p v-if="!visibleSeries.length" class="no-results">No series match “{{ query }}”.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
 </template>
 
 <script setup>
-import { useRouter } from "vue-router";
-import { useBooks } from "~/composables/useBooks";
-import { getGoodreadsRating } from "~/composables/useGoodreadsRating";
-import { useTTS } from "~/composables/useTTS";
-import EmptyState from "../shared/EmptyState.vue";
-import GoodreadsRatingDisplay from "../shared/GoodreadsRatingDisplay.vue";
-import HomeSkeleton from "../shared/HomeSkeleton.vue";
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useBooks } from '~/composables/useBooks'
+import { useTTS } from '~/composables/useTTS'
+import { useUserProfile } from '~/composables/useUserProfile'
+import BookProgressDisplay from '../shared/BookProgressDisplay.vue'
+import EmptyState from '../shared/EmptyState.vue'
+import HomeSkeleton from '../shared/HomeSkeleton.vue'
 
-const {
-  books,
-  recentlyAddedBooks,
-  recentAuthors,
-  popularBooks,
-  loading,
-  initialized,
-  error,
-  fetchAllData,
-} = useBooks();
-const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
-const router = useRouter();
-
-const handlePlay = (book) => {
-  if (ttsBook.value?.id === book.id && ttsStatus.value !== "idle") {
-    toggleTTS();
-    return;
-  }
-  playTTS(book);
-};
-
-const getAuthorBookCount = (authorName) => {
-  return books.value.filter((b) => b.author === authorName).length;
-};
-
-const retryLoadLibrary = () => {
-  fetchAllData(true);
-};
-
-const truncate = (text, length) => {
-  if (!text) return "";
-  if (text.length <= length) return text;
-  return text.substring(0, length).trim() + "...";
-};
+const router = useRouter()
+const query = ref('')
+const { books, recentlyAddedBooks, recentlyReadBooks, seriesList, loading, initialized, error, fetchAllData } = useBooks()
+const { play, togglePlay, ttsBook, ttsStatus } = useTTS()
+const { profile, activeAvatarPreset, loadProfile } = useUserProfile()
+const profileAvatar = computed(() => profile.value.avatarValue || activeAvatarPreset.value.src)
+const normalizedQuery = computed(() => query.value.toLocaleLowerCase())
+const matches = (...values) => !normalizedQuery.value || values.some(value => String(value || '').toLocaleLowerCase().includes(normalizedQuery.value))
+const currentBook = computed(() => recentlyReadBooks.value.find(book => matches(book.title, book.author)) || null)
+const visibleRecentBooks = computed(() => recentlyAddedBooks.value.filter(book => matches(book.title, book.author, book.series)).slice(0, 6))
+const visibleSeries = computed(() => seriesList.value.filter(group => matches(group.name, group.author)).slice(0, 3))
+const truncate = (value, length) => { const text = String(value || ''); return text.length > length ? `${text.slice(0, length).trim()}…` : text }
+const coverBackground = book => ({ backgroundImage: book?.cover ? `url(${book.cover})` : 'none' })
+const openBook = book => router.push(`/book/${book.id}`)
+const openReader = book => router.push(`/reader/${book.id}?mode=read`)
+const openSeries = group => router.push(`/serie/${group.id}`)
+const isBookPlaying = book => ttsBook.value?.id === book.id && ttsStatus.value !== 'idle' && ttsStatus.value !== 'paused'
+const handlePlay = (book) => { if (ttsBook.value?.id === book.id && ttsStatus.value !== 'idle') togglePlay(); else play(book) }
+onMounted(loadProfile)
 </script>
 
 <style scoped>
-.home-container {
-  padding: 0rem;
-  margin: 0 auto;
-}
-
-.desktop-home {
-  display: block;
-}
-
-.home-section {
-  margin-bottom: 2.5rem;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: var(--color-brand-primary);
-  margin: 0;
-}
-
-.show-all-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  text-decoration: none;
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.show-all-btn:hover {
-  color: var(--color-text-primary);
-}
-
-.recent-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2rem;
-  padding: 2.5rem 0.5rem 0.5rem;
-}
-
-.recent-grid::-webkit-scrollbar {
-  display: none;
-}
-
-.recent-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  height: 130px;
-  border-radius: 16px;
-  cursor: pointer;
-  scroll-snap-align: start;
-  transition: transform 0.3s ease;
-  color: var(--color-text-on-brand);
-  text-decoration: none;
-  background: transparent;
-  z-index: 1;
-  overflow: visible;
-}
-
-.recent-card-bg-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  z-index: -1;
-}
-
-.recent-bg {
-  position: absolute;
-  top: -20px;
-  left: -20px;
-  right: -20px;
-  bottom: -20px;
-  background-size: cover;
-  background-position: center;
-  filter: blur(25px) saturate(150%);
-  transform: scale(1.2);
-}
-
-.recent-bg-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    var(--color-background-overlay-strong) 0%,
-    var(--color-background-overlay-faint) 100%
-  );
-}
-
-.recent-card:hover {
-  transform: translateY(-5px);
-}
-
-.recent-cover {
-  position: absolute;
-  left: 15px;
-  bottom: 10px;
-  width: 95px;
-  height: 145px;
-  border-radius: 10px;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.recent-card:hover .recent-cover {
-  transform: scale(1.05);
-}
-
-.recent-info {
-  margin-left: 130px;
-  padding-right: 50px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.recent-title {
-  font-size: 1.1rem;
-  font-weight: 400;
-  line-height: 1.3;
-  margin: 0 0 0.5rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  color: var(--color-text-on-brand);
-  text-shadow: var(--shadow-text-on-image);
-}
-
-.recent-meta {
-  font-size: 0.8rem;
-  color: var(--color-text-on-image-secondary);
-  margin: 0;
-  font-weight: 400;
-}
-
-.recent-go-btn {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: 50%;
-  border: 1px solid var(--color-border-on-image-strong);
-  background: var(--color-surface-on-image-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-on-brand);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.recent-card:hover .recent-go-btn {
-  background: var(--color-surface-on-image-hover);
-  border-color: var(--color-text-on-image-secondary);
-  transform: translateY(-50%) scale(1.05);
-}
-
-.add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: var(--gradient-brand-primary);
-  color: var(--color-text-on-brand);
-  border-radius: 0.5rem;
-  font-weight: 400;
-  text-decoration: none;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.add-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px var(--shadow-brand-glow);
-}
-
-.retry-btn {
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.main-content-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4rem;
-  margin-bottom: 6rem;
-  padding: 0 0.5rem;
-}
-
-.popular-column {
-  grid-column: span 2;
-}
-
-.your-authors-column {
-  grid-column: span 1;
-}
-
-.popular-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  margin-top: 1.5rem;
-}
-
-.popular-card {
-  display: flex;
-  gap: 1.5rem;
-  background: transparent;
-  cursor: pointer;
-  position: relative;
-  transition: transform 0.3s ease;
-}
-
-.popular-card:hover {
-  transform: translateY(-2px);
-}
-
-.popular-cover {
-  width: 110px;
-  height: 165px;
-  border-radius: 8px;
-  object-fit: cover;
-  box-shadow: var(--shadow-cover);
-  flex-shrink: 0;
-}
-
-.popular-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  flex: 1;
-  padding-top: 0.25rem;
-  position: relative;
-}
-
-.popular-title {
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: var(--color-text-primary);
-  margin: 0 0 0.25rem 0;
-  line-height: 1.3;
-  padding-right: 2.5rem;
-}
-
-.popular-author {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin: 0 0 0.5rem 0;
-}
-
-.popular-rating {
-  margin: 0 0 0.75rem 0;
-}
-
-.popular-rating :deep(.goodreads-rating) {
-  flex-wrap: wrap;
-  row-gap: 0.2rem;
-}
-
-.popular-blurb {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  line-height: 1.6;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.popular-play-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--color-brand-primary);
-  color: var(--color-text-on-brand);
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--shadow-brand-button);
-  transition: all 0.2s;
-}
-
-.popular-play-btn:hover {
-  transform: scale(1.1);
-  background: var(--color-brand-primary-hover);
-}
-
-.authors-list-card {
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.author-list-item {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.author-list-item:hover {
-  transform: translateX(5px);
-}
-
-.author-list-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: var(--shadow-control-subtle);
-  flex-shrink: 0;
-}
-
-.author-list-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.author-initial {
-  width: 100%;
-  height: 100%;
-  background: var(--color-brand-primary-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 400;
-  color: var(--color-brand-primary);
-}
-
-.author-list-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.author-list-name {
-  font-size: 1.05rem;
-  font-weight: 400;
-  color: var(--color-text-primary);
-  margin: 0 0 0.25rem 0;
-}
-
-.author-list-count {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin: 0;
-}
-
-.home-loading {
-  padding: 0.5rem;
-}
-
-@media (max-width: 1024px) {
-  .main-content-row {
-    grid-template-columns: 1fr;
-  }
-
-  .recent-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
+.tablet-home{min-height:calc(100vh - 120px);color:var(--color-text-primary)}
+.home-toolbar,.section-heading{display:flex;align-items:center;justify-content:space-between}.home-toolbar{margin-bottom:1.15rem}
+.home-search{display:flex;width:min(280px,45vw);min-height:34px;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--color-border-card);border-radius:11px;background:var(--color-surface-card);color:var(--color-text-muted)}
+.home-search input{width:100%;border:0;outline:0;background:transparent;color:var(--color-text-primary);font:inherit;font-size:12px}
+.profile-link,.profile-link img{width:36px;height:36px;border-radius:50%}.profile-link{padding:3px;background:var(--color-brand-primary-soft)}.profile-link img{display:block;width:100%;height:100%;object-fit:cover}
+.home-columns{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(245px,1fr);gap:26px;align-items:start}.home-library-column{min-width:0}.home-section+.home-section{margin-top:1.2rem}
+.home-section h1,.series-column h1{margin:0 0 .65rem;font-size:1.05rem;font-weight:500;color:var(--color-text-primary)}.section-heading h1{margin-bottom:0}.section-heading{margin-bottom:.65rem}.section-heading a{color:var(--color-text-muted);font-size:.75rem;text-decoration:none}
+.current-card{position:relative;display:grid;grid-template-columns:112px minmax(0,1fr);gap:18px;min-height:190px;overflow:hidden;padding:16px;border-radius:18px;color:#fff;cursor:pointer}
+.current-backdrop,.series-backdrop{position:absolute;inset:-24px;background-position:center;background-size:cover;filter:blur(28px) saturate(125%);transform:scale(1.16)}.current-shade,.series-shade{position:absolute;inset:0;background:linear-gradient(110deg,rgba(12,13,18,.91),rgba(24,27,31,.72))}
+.current-cover{position:relative;z-index:1;width:112px;height:158px;align-self:center;border-radius:7px;object-fit:cover;box-shadow:var(--shadow-cover)}.current-copy{position:relative;z-index:1;display:flex;min-width:0;flex-direction:column;justify-content:center}.current-copy h2{margin:0;font-size:1.2rem;font-weight:500}.current-author{margin:3px 0 7px;color:rgba(255,255,255,.75);font-size:.72rem}.current-blurb{display:-webkit-box;margin:0 0 9px;overflow:hidden;color:rgba(255,255,255,.83);font-size:.72rem;line-height:1.45;-webkit-box-orient:vertical;-webkit-line-clamp:3}.current-copy :deep(.book-progress-display){width:min(230px,100%);color:rgba(255,255,255,.85)}
+.current-actions{display:flex;gap:7px;margin-top:10px}.current-actions button{display:inline-flex;min-height:28px;align-items:center;gap:5px;padding:0 11px;border:1px solid rgba(255,255,255,.48);border-radius:999px;background:rgba(0,0,0,.2);color:#fff;cursor:pointer;font-size:.68rem}.current-actions button:first-child{background:#fff;color:#14151a}
+.recent-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 22px}.recent-book{display:grid;grid-template-columns:72px minmax(0,1fr);gap:11px;min-width:0;cursor:pointer}.recent-book>img{width:72px;height:104px;border-radius:7px;object-fit:cover;box-shadow:var(--shadow-cover)}.recent-book h2{margin:2px 0;overflow:hidden;color:var(--color-text-primary);font-size:.88rem;font-weight:500;text-overflow:ellipsis;white-space:nowrap}.recent-author{margin:0 0 5px;color:var(--color-text-muted);font-size:.66rem}.recent-blurb{display:-webkit-box;margin:0;overflow:hidden;color:var(--color-text-secondary);font-size:.66rem;line-height:1.45;-webkit-box-orient:vertical;-webkit-line-clamp:4}
+.series-stack{display:grid;gap:13px}.series-card{position:relative;min-height:151px;overflow:hidden;border-radius:16px;color:#fff;cursor:pointer}.series-shade{background:linear-gradient(125deg,rgba(13,43,55,.86),rgba(21,82,102,.62))}.series-copy{position:relative;z-index:2;padding:15px}.series-copy h2{margin:0 0 4px;font-size:.88rem;font-weight:500}.series-copy p{margin:0;color:rgba(255,255,255,.78);font-size:.68rem}.series-covers{position:absolute;right:10px;bottom:-27px;z-index:2;display:flex;align-items:flex-end;justify-content:flex-end;width:80%}.series-covers img{width:78px;height:112px;margin-left:-26px;border-radius:4px 4px 0 0;object-fit:cover;box-shadow:-5px 0 14px rgba(0,0,0,.28);transform:rotate(-3deg)}.series-covers img:nth-child(2){transform:translateY(-5px) rotate(1deg)}.series-covers img:nth-child(3){transform:rotate(5deg)}
+.no-results{color:var(--color-text-muted);font-size:.82rem}.primary-link,.retry-btn{display:inline-flex;padding:.7rem 1rem;border:0;border-radius:10px;background:var(--color-brand-primary);color:#fff;text-decoration:none;cursor:pointer}
+@media(max-width:980px){.home-columns{grid-template-columns:minmax(0,1.8fr) minmax(220px,.9fr);gap:18px}.current-card{grid-template-columns:92px minmax(0,1fr);min-height:168px}.current-cover{width:92px;height:136px}.recent-list{gap-inline:14px}.recent-book{grid-template-columns:62px minmax(0,1fr)}.recent-book>img{width:62px;height:92px}}
 </style>

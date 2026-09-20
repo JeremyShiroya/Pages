@@ -38,7 +38,7 @@
             :duration="1300"
             :loop="false"
             eyebrow="Cover search in progress"
-            detail="Publisher-site cover search runs when the selected metadata includes a publisher."
+            detail="Checking catalog editions against the book title and author."
           />
         </div>
 
@@ -62,8 +62,8 @@
           </button>
         </div>
 
-        <div v-else class="cover-empty">
-          No cover options found.
+        <div v-else class="cover-empty" aria-live="polite">
+          {{ checkingImages ? 'Checking cover images...' : 'No matching, usable covers found.' }}
         </div>
       </div>
     </div>
@@ -83,13 +83,15 @@ const props = defineProps({
 })
 
 const failedImages = ref(new Set())
+const readyImages = ref(new Set())
+const checkingImages = ref(false)
+let searchGeneration = 0
 
 const coverLoadingStates = [
-  { text: 'Searching Goodreads, Kobo, Google Books, and Open Library covers' },
-  { text: 'Checking web image results for cover-shaped art' },
-  { text: 'Using publisher name to find official cover pages' },
-  { text: 'Collecting publisher-site cover candidates' },
-  { text: 'Filtering placeholders, logos, and duplicate images' },
+  { text: 'Searching book catalogs for matching editions' },
+  { text: 'Checking Goodreads, Google Books, Open Library, and Kobo' },
+  { text: 'Checking Apple Books and Hardcover' },
+  { text: 'Removing unrelated and unavailable images' },
 ]
 
 const normalizedImages = computed(() => props.images.map((image) => (
@@ -98,11 +100,61 @@ const normalizedImages = computed(() => props.images.map((image) => (
     : image
 )))
 
-const visibleImages = computed(() => normalizedImages.value.filter((image) => !failedImages.value.has(image.url)))
+const visibleImages = computed(() => normalizedImages.value.filter((image) => readyImages.value.has(image.url) && !failedImages.value.has(image.url)))
 
-watch(() => props.images, () => {
+const looksBlank = (image) => {
+  if (image.naturalWidth < 90 || image.naturalHeight < 90) return true
+  // A few providers return a successful image response containing only a
+  // white/gray "image not available" tile. Canvas access is optional because
+  // some catalog CDNs do not allow cross-origin pixel reads.
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = 24
+    canvas.height = 36
+    const context = canvas.getContext('2d', { willReadFrequently: true })
+    context.drawImage(image, 0, 0, 24, 36)
+    const pixels = context.getImageData(0, 0, 24, 36).data
+    let pale = 0; let vivid = 0; let dark = 0
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i]; const g = pixels[i + 1]; const b = pixels[i + 2]
+      if (r > 170 && g > 170 && b > 170 && Math.max(r, g, b) - Math.min(r, g, b) < 18) pale++
+      if (Math.max(r, g, b) - Math.min(r, g, b) > 35) vivid++
+      if (Math.min(r, g, b) < 105) dark++
+    }
+    return pale > 24 * 36 * 0.88 && vivid < 8 && dark < 8
+  } catch {
+    return false
+  }
+}
+
+watch(() => [props.images, props.visible, props.mode], () => {
+  const generation = ++searchGeneration
   failedImages.value = new Set()
-})
+  readyImages.value = new Set()
+  checkingImages.value = false
+  if (!import.meta.client || !props.visible || props.mode !== 'picker' || !props.images.length) return
+  checkingImages.value = true
+  Promise.all(normalizedImages.value.map((item) => new Promise((resolve) => {
+    const image = new Image()
+    let settled = false
+    const finish = (valid) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timeout)
+      if (generation === searchGeneration) {
+        if (valid) readyImages.value = new Set([...readyImages.value, item.url])
+        else markImageFailed(item.url)
+      }
+      resolve()
+    }
+    const timeout = setTimeout(() => finish(false), 8000)
+    image.onload = () => {
+      finish(!looksBlank(image))
+    }
+    image.onerror = () => finish(false)
+    image.src = item.url
+  }))).then(() => { if (generation === searchGeneration) checkingImages.value = false })
+}, { immediate: true })
 
 const markImageFailed = (url) => {
   const next = new Set(failedImages.value)

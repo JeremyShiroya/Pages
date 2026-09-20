@@ -1,5 +1,9 @@
 <template>
-  <div class="book-group-detail-page">
+  <div
+    class="book-group-detail-page"
+    data-system-bar-color="transparent"
+    :data-system-bar-icons="settings.readerTheme === 'dark' ? 'light' : 'dark'"
+  >
     <div class="detail-back-row">
       <button type="button" class="back-btn" @click="router.push(backTo)">
         <i class="ri-arrow-left-line"></i>
@@ -41,7 +45,16 @@
     </div>
 
     <div v-if="books.length" class="view-container" :class="{ 'is-card': viewMode === 'table' }">
+      <SelectionActionsBar
+        v-if="selectionMode"
+        class="group-selection-actions"
+        :count="selectedCount"
+        :actions="bulkActions"
+        @action="runBulkAction"
+        @clear="clearSelection"
+      />
       <LibraryDisplayControls
+        v-else
         :status="selectedStatus"
         :view="viewMode"
         @update:status="selectedStatus = $event"
@@ -54,11 +67,19 @@
           :key="book.id"
           :book="book"
           :active="isBookActive(book)"
-          @open="router.push(`/book/${book.id}`)"
+          collapse-actions
+          :selectable="selectionMode"
+          :selected="isSelected(book.id)"
+          @toggle-select="toggleSelected"
+          @pointerdown="(event) => onPointerDown(event, book)"
+          @pointermove="onPointerMove"
+          @pointerup="onPointerUp"
+          @pointercancel="onPointerUp"
+          @open="openBook"
           @play="handlePlay"
           @favourite="toggleFavourite(book.id)"
           @playlist="selectedPlaylistBook = book"
-          @edit="router.push(`/edit/${book.id}`)"
+          @edit="router.push(bookEditLocation(book.id, route.fullPath))"
           @delete="handleDeleteBook(book)"
         />
       </div>
@@ -69,8 +90,7 @@
           <div class="col-book">Book</div>
           <div class="col-status">Status</div>
           <div class="col-progress">Progress</div>
-          <div class="col-personal">Personal Rating</div>
-          <div class="col-goodreads">Goodreads Rating</div>
+          <div class="col-rating">{{ selectedRatingLabel }}</div>
           <div class="col-actions"></div>
         </div>
 
@@ -78,11 +98,19 @@
           v-for="(book, index) in filteredBooks"
           :key="book.id"
           class="data-row"
+          :class="{ selected: isSelected(book.id) }"
           tabindex="0"
-          @click="router.push(`/book/${book.id}`)"
-          @keydown.enter="router.push(`/book/${book.id}`)"
+          @pointerdown="(event) => onPointerDown(event, book)"
+          @pointermove="onPointerMove"
+          @pointerup="onPointerUp"
+          @pointercancel="onPointerUp"
+          @click="openBook(book)"
+          @keydown.enter="openBook(book)"
         >
-          <div class="col-index row-index">{{ showInstallment ? (book.seriesInstallment ?? index + 1) : (index + 1) }}</div>
+          <div class="col-index row-index">
+            <i v-if="isSelected(book.id)" class="ri-check-line"></i>
+            <template v-else>{{ showInstallment ? (book.seriesInstallment ?? index + 1) : (index + 1) }}</template>
+          </div>
           <div class="col-book book-cell">
             <img :src="resolveBookCover(book)" :alt="book.title" class="cell-cover" @error="(event) => coverFallback(event, book.title)" />
             <div class="cell-book-info">
@@ -105,47 +133,34 @@
           </div>
 
           <div class="col-progress">
-            <div class="progress-wrap">
-              <template v-if="(book.progress || 0) >= 100">
-                <i class="ri-checkbox-circle-fill progress-complete-icon"></i>
-                <span class="progress-complete-text">100%</span>
-              </template>
-              <template v-else>
-                <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: `${book.progress || 0}%` }"></div>
-                </div>
-                <span class="progress-text">{{ book.progress || 0 }}%</span>
-              </template>
-            </div>
+            <BookProgressDisplay :progress="book.progress" compact />
           </div>
 
-          <div class="col-personal">
-            <div class="rating-wrap">
-              <i class="ri-star-fill list-star"></i>
-              <span>{{ formatPersonalRating(book.rating) }}</span>
-            </div>
+          <div class="col-rating">
+            <BookRatingDisplay :book="book" compact show-empty />
           </div>
 
-          <div class="col-goodreads">
-            <div class="goodreads-wrap" :data-tooltip="goodreadsTooltip(book) || null">
-              <GoodreadsRatingDisplay v-if="getGoodreadsRating(book)" :web-review="book.webReview" compact />
-              <span v-else class="rating-empty">--</span>
+          <div v-if="!selectionMode" class="col-actions" @click.stop>
+            <div class="actions-dropdown">
+              <button type="button" class="row-action-btn" title="More actions" @click="activeActionsMenu = activeActionsMenu === book.id ? null : book.id">
+                <i class="ri-more-2-fill"></i>
+              </button>
+              <div v-if="activeActionsMenu === book.id" class="row-actions-menu">
+                <button type="button" @click="toggleFavourite(book.id); activeActionsMenu = null">
+                  <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+                  {{ book.isFavourite ? 'Remove favourite' : 'Add to favourites' }}
+                </button>
+                <button type="button" @click="selectedPlaylistBook = book; activeActionsMenu = null">
+                  <i class="ri-play-list-2-line"></i> Add to playlist
+                </button>
+                <button type="button" @click="router.push(bookEditLocation(book.id, route.fullPath))">
+                  <i class="ri-edit-line"></i> Edit book
+                </button>
+                <button type="button" class="danger" @click="handleDeleteBook(book); activeActionsMenu = null">
+                  <i class="ri-delete-bin-line"></i> Delete book
+                </button>
+              </div>
             </div>
-          </div>
-
-          <div class="col-actions" @click.stop>
-            <button type="button" class="row-action-btn" :class="{ active: book.isFavourite }" title="Favourite" @click="toggleFavourite(book.id)">
-              <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
-            </button>
-            <button type="button" class="row-action-btn muted" title="Add to playlist from Books page">
-              <i class="ri-play-list-2-line"></i>
-            </button>
-            <button type="button" class="row-action-btn" title="Edit" @click="router.push(`/edit/${book.id}`)">
-              <i class="ri-edit-line"></i>
-            </button>
-            <button type="button" class="row-action-btn delete" title="Delete" @click="handleDeleteBook(book)">
-              <i class="ri-delete-bin-line"></i>
-            </button>
           </div>
         </div>
       </section>
@@ -166,9 +181,10 @@
     />
 
     <AddToPlaylistModal
-      v-if="selectedPlaylistBook"
+      v-if="selectedPlaylistBook || bulkPlaylistBooks"
       :book="selectedPlaylistBook"
-      @close="selectedPlaylistBook = null"
+      :books="bulkPlaylistBooks"
+      @close="selectedPlaylistBook = null; bulkPlaylistBooks = null"
     />
 
     <DeleteConfirmModal
@@ -177,21 +193,33 @@
       @close="showDeleteModal = false; bookToDelete = null"
       @confirm="confirmDeleteBook"
     />
+    <DeleteConfirmModal
+      v-if="bulkDeleteBooks?.length"
+      :book="bulkDeleteBooks[0]"
+      :count="bulkDeleteBooks.length"
+      @close="bulkDeleteBooks = null"
+      @confirm="confirmBulkDelete"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import AddToPlaylistModal from './AddToPlaylistModal.vue';
 import DeleteConfirmModal from './DeleteConfirmModal.vue';
 import EmptyState from './EmptyState.vue';
-import GoodreadsRatingDisplay from './GoodreadsRatingDisplay.vue';
+import BookProgressDisplay from './BookProgressDisplay.vue';
+import BookRatingDisplay from './BookRatingDisplay.vue';
 import LibraryBookCard from './LibraryBookCard.vue';
 import LibraryDisplayControls from './LibraryDisplayControls.vue';
+import SelectionActionsBar from './SelectionActionsBar.vue';
 import { useBooks } from '~/composables/useBooks';
 import { useBookishSettings } from '~/composables/useBookishSettings';
-import { getGoodreadsRating, parseGoodreadsReview } from '~/composables/useGoodreadsRating';
+import { RATING_SOURCE_LABELS } from '~/composables/useBookRating';
 import { useTTS } from '~/composables/useTTS';
+import { bookEditLocation } from '~/composables/useBookEditNavigation';
+import { useLongPress, useMultiSelect } from '~/composables/useMultiSelect';
+import { useToast } from '~/composables/useToast';
 
 const props = defineProps({
   backTo: {
@@ -243,14 +271,70 @@ const props = defineProps({
 defineEmits(['edit-title']);
 
 const router = useRouter();
-const { deleteBook, toggleFavourite } = useBooks();
+const route = useRoute();
+const { deleteBook, toggleFavourite, hideBook } = useBooks();
+const { addToast } = useToast();
 const { settings, updateSettings } = useBookishSettings();
+const selectedRatingLabel = computed(() => RATING_SOURCE_LABELS[settings.value.ratingSource] || 'Rating');
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 const selectedStatus = ref('all');
 const viewMode = ref(settings.value.groupDetailView);
 const selectedPlaylistBook = ref(null);
 const showDeleteModal = ref(false);
 const bookToDelete = ref(null);
+const activeActionsMenu = ref(null);
+const bulkPlaylistBooks = ref(null);
+const bulkDeleteBooks = ref(null);
+
+const {
+  selectionMode,
+  selectedCount,
+  isSelected,
+  toggle: toggleSelect,
+  start: startSelection,
+  clear: clearSelection,
+  retain: retainSelection,
+} = useMultiSelect();
+const { onPointerDown, onPointerMove, onPointerUp, consumedTap } = useLongPress((book) => startSelection(book.id));
+const toggleSelected = (book) => toggleSelect(book.id);
+const openBook = (book) => {
+  if (consumedTap()) return;
+  if (selectionMode.value) return toggleSelect(book.id);
+  router.push(`/book/${book.id}`);
+};
+const selectedBooks = computed(() => props.books.filter((book) => isSelected(book.id)));
+const bulkActions = [
+  { key: 'favourite', icon: 'ri-heart-line', label: 'Favourite' },
+  { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
+  { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
+  { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },
+];
+const runBulkAction = async (key) => {
+  const chosen = selectedBooks.value;
+  if (!chosen.length) return;
+  if (key === 'playlist') return (bulkPlaylistBooks.value = chosen);
+  if (key === 'delete') return (bulkDeleteBooks.value = chosen);
+  if (key === 'favourite') {
+    const makeFavourite = chosen.some((book) => !book.isFavourite);
+    for (const book of chosen) if (!!book.isFavourite !== makeFavourite) await toggleFavourite(book.id);
+    addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} ${makeFavourite ? 'added to' : 'removed from'} favourites.`, 'success');
+    clearSelection();
+    return;
+  }
+  if (key === 'hide') {
+    for (const book of chosen) await hideBook(book.id);
+    addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} hidden.`, 'info');
+    clearSelection();
+  }
+};
+const confirmBulkDelete = async () => {
+  const chosen = bulkDeleteBooks.value || [];
+  bulkDeleteBooks.value = null;
+  for (const book of chosen) await deleteBook(book.id);
+  addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} permanently deleted.`, 'success');
+  clearSelection();
+};
+watch(() => props.books, (currentBooks) => retainSelection(currentBooks.map((book) => book.id)), { deep: true });
 
 const normalizedStatus = (book) => {
   const status = String(book.status || 'Unread').toLowerCase();
@@ -288,19 +372,6 @@ const statusBadgeClass = (status) => {
   if (status === 'Reading') return 'status-reading';
   if (status === 'Read' || status === 'Completed') return 'status-read';
   return 'status-unread';
-};
-
-const formatPersonalRating = (rating) => {
-  const score = Number(rating || 0);
-  return score > 0 ? `${score}/10` : '--/10';
-};
-
-const goodreadsTooltip = (book) => {
-  const info = parseGoodreadsReview(book.webReview);
-  const parts = [];
-  if (info.ratingsCount) parts.push(`${info.ratingsCount} ratings`);
-  if (info.reviewsCount) parts.push(`${info.reviewsCount} reviews`);
-  return parts.join(' / ');
 };
 
 const truncateWords = (text, maxWords = 9) => {
@@ -375,6 +446,8 @@ const getDetailStackStyle = (index, total = 3) => {
 .book-group-detail-page {
   width: 100%;
   min-width: 0;
+  min-height: 100dvh;
+  background: var(--color-background-app);
 }
 
 .detail-back-row {
@@ -507,7 +580,7 @@ const getDetailStackStyle = (index, total = 3) => {
 .data-header,
 .data-row {
   display: grid;
-  grid-template-columns: 36px minmax(260px, 2.2fr) 130px minmax(160px, 1fr) 120px minmax(160px, 1.1fr) 150px;
+  grid-template-columns: 36px minmax(260px, 2.2fr) 130px minmax(160px, 1fr) minmax(180px, 1.1fr) 150px;
   gap: 1rem;
   align-items: center;
   width: 100%;
@@ -555,6 +628,20 @@ const getDetailStackStyle = (index, total = 3) => {
 
 .data-row:hover {
   background: var(--color-table-row-hover);
+}
+
+.data-row.selected {
+  background: var(--color-brand-primary-faint);
+  box-shadow: inset 3px 0 0 var(--color-brand-primary);
+}
+
+.group-selection-actions {
+  justify-self: end;
+  margin-bottom: 1rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+  background: var(--color-surface-card);
 }
 
 .detail-books-grid {
@@ -660,15 +747,13 @@ const getDetailStackStyle = (index, total = 3) => {
 
 .data-header .col-status,
 .data-header .col-progress,
-.data-header .col-personal,
-.data-header .col-goodreads {
+.data-header .col-rating {
   text-align: center;
 }
 
 .col-status,
 .col-progress,
-.col-personal,
-.col-goodreads {
+.col-rating {
   display: flex;
   justify-content: center;
   min-width: 0;
@@ -802,14 +887,42 @@ const getDetailStackStyle = (index, total = 3) => {
   display: flex;
   justify-content: flex-end;
   gap: 0.15rem;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.data-row:hover .col-actions,
-.data-row:focus-within .col-actions {
   opacity: 1;
 }
+
+.actions-dropdown { position: relative; }
+
+.row-actions-menu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  min-width: 190px;
+  padding: 6px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+  background: var(--color-surface-primary);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.row-actions-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 38px;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.row-actions-menu button:hover { background: var(--color-surface-muted); }
+.row-actions-menu button.danger { color: var(--color-status-danger); }
 
 .row-action-btn {
   width: 30px;

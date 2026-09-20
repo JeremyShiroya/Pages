@@ -97,7 +97,52 @@
     </template>
 
     <template #tabletLandscape>
-      <div ref="readerPageRef" class="reader-page" :class="readerTheme">
+      <component
+        :is="tabletPortraitReaderComponent"
+        :reader-refs="mobileReaderRefs"
+        :reader-theme="readerTheme"
+        :book="book"
+        :loading="loading"
+        :content-loading="contentLoading"
+        :is-pdf-renderable="isPdfRenderable"
+        :is-pdf-book="!readsAsEpub"
+        :pdf-reflow-available="pdfReflowAvailable"
+        :pdf-source="pdfSource"
+        :zoom-level="zoomLevel"
+        :pdf-manifest="pdfManifest"
+        :active-tts-chunk-index="activeTtsChunkIndex"
+        :active-word-range="activeWordRange"
+        :has-cover="hasCover"
+        :chapter-list="mobileChapterList"
+        :current-chapter-idx="currentChapterIdx"
+        :current-pdf-page="currentPdfPage"
+        :total-pages="totalPages"
+        :toc-position="tocPosition"
+        :current-chapter-title="currentChapterTitle"
+        :sanitize-html="sanitizeHtml"
+        :resolve-chunk-at-point="resolveChunkAtPoint"
+        :prewarm-chunk="prewarmChunkAudio"
+        :readable-chunks="allReadableChunks"
+        :section-counts="epubSectionCounts"
+        :full-sections="chapterList"
+        :toc-items="displayTocItems"
+        :open-to-chunk="pagedStartChunk"
+        :pdf-figures-loading="pdfFiguresLoading"
+        :pdf-figures-progress="pdfFiguresProgress"
+        @back="router.back()"
+        @open-toc="tocOpen = true"
+        @page-change="handlePdfPageChange"
+        @pdf-loaded="handlePdfLoaded"
+        @read-current-position="playFromCurrentPosition"
+        @read-from-chunk="playFromChunk"
+        @previous-chapter="goToAdjacentChapter(-1)"
+        @next-chapter="goToAdjacentChapter(1)"
+        @mount-section="mountSection"
+        @position-change="handleMobilePosition"
+        @go-to-section="goToSectionFromMobile"
+        @jump-to-toc="goToTocItem"
+      />
+      <div v-if="false" ref="readerPageRef" class="reader-page" :class="readerTheme">
     <header class="reader-topbar">
       <div class="tb-section tb-left">
         <button class="tb-btn" @click="router.back()" title="Back to Library">
@@ -320,7 +365,6 @@ import {
 import { PDF_MANIFEST_VERSION, firstChunkForPage, pageForChunk } from '~/composables/usePdfManifest'
 import { reflowPdfManifest } from '~/composables/usePdfReflow'
 import { useMobileReaderPrefs } from '~/composables/useMobileReaderPrefs'
-import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import { pdfProgressForPage } from '~/composables/useReaderPosition'
 import {
   READING_POSITION_SAVE_DELAY_MS,
@@ -337,7 +381,6 @@ import SkeletonLoader from '~/components/shared/SkeletonLoader.vue'
 
 const mobileReaderComponent = ReaderMobile
 const tabletPortraitReaderComponent = ReaderTabletPortrait
-const { presentation: devicePresentation } = useDeviceArchitecture()
 const route = useRoute()
 const router = useRouter()
 const { books, initialized, fetchAllData, fetchBookById, updateBook } = useBooks()
@@ -549,7 +592,10 @@ const epubStyle = computed(() => {
 // Publisher EPUB CSS belongs only to the tablet's wide reading surface. Phone
 // and tablet portrait are distinct architectures but intentionally share the
 // compact presentation rules.
-const isMobileViewport = computed(() => devicePresentation.value !== 'tablet-landscape')
+// Every device now uses the compact reading surface. On landscape tablets this
+// deliberately preserves the better portrait reader instead of switching to
+// the old desktop-style canvas.
+const isMobileViewport = computed(() => true)
 
 // Which reading surface is live. The page needs this (not just ReaderMobile) so
 // it can hand the reading position across when the two are swapped.
@@ -1279,9 +1325,7 @@ function sanitizeHtml(html) {
 let _observer = null
 const _mobileReaderDom = createMobileReaderDomState()
 const _tabletReaderDom = createTabletReaderDomState()
-const _readerDom = () => (
-  devicePresentation.value === 'tablet-landscape' ? _tabletReaderDom : _mobileReaderDom
-)
+const _readerDom = () => _mobileReaderDom
 let _ttsWordHighlight = null
 
 function clearHtmlHighlight() {

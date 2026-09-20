@@ -352,23 +352,28 @@ export function buildMetadataResults(
   targetAuthor: string | undefined,
   sources: MetadataSourceGroups,
 ) {
+  const googleBooksSources = sources.googleBooksSources ?? [];
+  const openLibrarySources = sources.openLibrarySources ?? [];
   const publisherSources = sources.publisherSources ?? [];
   const hardcoverSources = sources.hardcoverSources ?? [];
   const wikidataSources = sources.wikidataSources ?? [];
   const openAlexSources = sources.openAlexSources ?? [];
   const libraryOfCongressSources = sources.libraryOfCongressSources ?? [];
+  const internetArchiveSources = sources.internetArchiveSources ?? [];
+  const koboSources = sources.koboSources ?? [];
+  const goodreadsSources = sources.goodreadsSources ?? [];
 
   const allSources = [
     ...hardcoverSources,
-    ...sources.googleBooksSources,
-    ...sources.openLibrarySources,
+    ...googleBooksSources,
+    ...openLibrarySources,
     ...wikidataSources,
     ...openAlexSources,
     ...libraryOfCongressSources,
-    ...sources.internetArchiveSources,
-    ...sources.koboSources,
+    ...internetArchiveSources,
+    ...koboSources,
     ...publisherSources,
-    ...sources.goodreadsSources,
+    ...goodreadsSources,
   ];
   if (!allSources.length) return [];
 
@@ -461,6 +466,7 @@ export function sanitizeMetadataResult<T extends { series?: string | null; autho
   const norm = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
   const bogus =
     /^by\b/i.test(series)                          // "By Author Name"
+    || /^(?:list of )?contributors?|authors?|book details|ratings?(?: and | &) reviews?|reviews?|genres?$/i.test(series)
     || !/[a-z]/i.test(series)                      // digits / punctuation only
     || (author && norm(series) === norm(author))   // series == author
     || (author && norm(series) === norm(`by${author}`));

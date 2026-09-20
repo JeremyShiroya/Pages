@@ -2,7 +2,8 @@
   <article
     ref="cardElement"
     class="library-book-card"
-    :class="{ 'no-backdrop': cardBackground === 'blank', selectable, selected, 'compact-actions': collapseActions && !restoreOnly }"
+    :class="{ 'no-backdrop': cardBackground === 'blank', selectable, selected, unavailable, 'compact-actions': collapseActions && !restoreOnly }"
+    :aria-disabled="unavailable || undefined"
     @click="onCardClick"
   >
 
@@ -58,7 +59,7 @@
 
     <div class="card-cover">
       <img :src="coverUrl" :alt="book.title" @error="handleCoverError" />
-      <div class="cover-actions">
+      <div v-if="!unavailable" class="cover-actions">
         <button
           type="button"
           class="play-button"
@@ -86,28 +87,13 @@
         <span>{{ book.genre }}</span>
       </div>
 
-      <div class="card-progress" title="Reading progress">
-        <template v-if="progress >= 100">
-          <i class="ri-checkbox-circle-fill complete-icon"></i>
-          <span class="complete-text">100%</span>
-        </template>
-        <template v-else>
-          <div class="progress-track">
-            <div class="progress-fill" :style="{ width: `${progress}%` }"></div>
-          </div>
-          <span>{{ progress }}%</span>
-        </template>
+      <p v-if="unavailable" class="card-unavailable">Not in your library</p>
+      <div v-else class="card-progress" title="Reading progress">
+        <BookProgressDisplay :progress="book.progress" compact />
       </div>
 
-      <div v-if="getGoodreadsRating(book)" class="goodreads-row" title="Goodreads rating">
-        <GoodreadsIcon />
-        <GoodreadsRatingDisplay :web-review="book.webReview" compact />
-      </div>
-
-      <div v-if="showPersonalRating" class="personal-rating" title="Personal rating">
-        <span class="rating-label">Personal Rating</span>
-        <i class="ri-star-fill"></i>
-        <span>{{ formatPersonalRating(book.rating) }}</span>
+      <div v-if="!unavailable && settings.ratingSource !== 'none'" class="goodreads-row">
+        <BookRatingDisplay :book="book" compact show-empty />
       </div>
 
       <!-- Restore-only: the Hidden Books screen has exactly one thing to do
@@ -120,7 +106,7 @@
         </button>
       </div>
 
-      <div v-else-if="!collapseActions" class="card-actions">
+      <div v-else-if="!collapseActions && !unavailable" class="card-actions">
         <button
           type="button"
           class="action-button"
@@ -158,10 +144,10 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import GoodreadsIcon from './GoodreadsIcon.vue'
-import GoodreadsRatingDisplay from './GoodreadsRatingDisplay.vue'
-import { getGoodreadsRating } from '~/composables/useGoodreadsRating'
+import BookProgressDisplay from './BookProgressDisplay.vue'
+import BookRatingDisplay from './BookRatingDisplay.vue'
 import { useBooks } from '~/composables/useBooks'
+import { useBookishSettings } from '~/composables/useBookishSettings'
 
 const props = defineProps({
   book: {
@@ -176,12 +162,6 @@ const props = defineProps({
   cardBackground: {
     type: String,
     default: 'blur',
-  },
-  // The mobile library doesn't track a personal rating at all, so its cards
-  // opt out of the row entirely.
-  showPersonalRating: {
-    type: Boolean,
-    default: true,
   },
   // Multi-select, driven by the page that owns the grid.
   selectable: {
@@ -206,14 +186,20 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  unavailable: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
   'open', 'play', 'favourite', 'playlist', 'edit', 'hide', 'share', 'delete', 'restore', 'toggle-select',
 ])
+const { settings } = useBookishSettings()
 
 // While selecting, a tap anywhere on the card picks it rather than opening it.
 const onCardClick = () => {
+  if (props.unavailable) return
   if (props.selectable) emit('toggle-select', props.book)
   else emit('open', props.book)
 }
@@ -228,7 +214,7 @@ const moreButtonElement = ref(null)
 const menuElement = ref(null)
 const menuOpen = ref(false)
 const menuStyle = ref({})
-const showActionMenu = computed(() => props.collapseActions && !props.restoreOnly && !props.selectable)
+const showActionMenu = computed(() => props.collapseActions && !props.restoreOnly && !props.selectable && !props.unavailable)
 
 const toggleMenu = () => {
   if (menuOpen.value) {
@@ -280,8 +266,6 @@ onUnmounted(() => {
   window.removeEventListener('scroll', closeMenu, true)
   window.removeEventListener('resize', closeMenu)
 })
-const progress = computed(() => Math.max(0, Math.min(100, Number(props.book.progress) || 0)))
-
 const generateCoverPlaceholder = (title) => {
   const safeTitle = String(title || 'Book')
   const colors = getThemeCssVars([
@@ -311,10 +295,6 @@ const truncateWords = (value, limit) => {
   return words.length > limit ? `${words.slice(0, limit).join(' ')}...` : words.join(' ')
 }
 
-const formatPersonalRating = (rating) => {
-  const score = Number(rating || 0)
-  return score > 0 ? `${score}/10` : '--/10'
-}
 </script>
 
 <style scoped>
@@ -539,12 +519,29 @@ const formatPersonalRating = (rating) => {
   background: var(--gradient-library-progress);
 }
 
-.complete-icon {
+.card-progress :deep(.complete-icon) {
   color: var(--color-brand-primary);
   font-size: 1rem;
 }
 
-.complete-text {
+.library-book-card.unavailable {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.library-book-card.unavailable:hover {
+  transform: none;
+  border-color: var(--color-border-on-image);
+  box-shadow: var(--shadow-card);
+}
+
+.card-unavailable {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-on-image-secondary);
+  font-size: var(--mobile-caption-size);
+}
+
+.card-progress :deep(.complete-text) {
   color: var(--color-text-on-image-primary);
   font-weight: 600;
 }
@@ -614,6 +611,10 @@ const formatPersonalRating = (rating) => {
   cursor: pointer;
   font-size: 20px;
   line-height: 1;
+}
+
+.goodreads-row :deep(.empty-text) {
+  color: var(--color-text-on-image-primary);
 }
 
 .library-book-card:not(.no-backdrop) .card-more-button {

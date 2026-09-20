@@ -26,7 +26,9 @@ onMounted(() => {
 <style scoped>
 .settings-detail-page {
   width: 100%;
+  min-height: 100vh;
   min-width: 0;
+  background: var(--color-settings-background);
 }
 
 .connection-body {

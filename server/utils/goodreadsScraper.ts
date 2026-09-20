@@ -94,6 +94,12 @@ export function parseSeriesFromText(value?: string | null) {
   const text = compact(value);
   if (!text) return { series: null as string | null, seriesInstallment: null as string | null, seriesTotal: null as string | null };
 
+  // Goodreads exposes accessibility/navigation headings alongside real book
+  // metadata. These labels are page chrome, not series names.
+  if (/^(?:list of )?contributors?|authors?|book details|ratings?(?: and | &) reviews?|reviews?|genres?$/i.test(text)) {
+    return { series: null, seriesInstallment: null, seriesTotal: null };
+  }
+
   // "Book #1 of 6 in/of [the] Series Name [series]"
   const bookOfTotal = text.match(/book\s*#?\s*([\d.]+)\s+of\s+([\d.]+)\s+(?:in\s+)?(?:the\s+)?(.+?)(?:\s+series)?$/i);
   if (bookOfTotal) {

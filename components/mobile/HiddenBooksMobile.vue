@@ -23,7 +23,6 @@
           v-for="book in filteredBooks"
           :key="book.id"
           :book="book"
-          :show-personal-rating="false"
           restore-only
           :class="{ 'mobile-list-book-card': viewMode === 'list' }"
           @open="router.push(`/book/${book.id}`)"

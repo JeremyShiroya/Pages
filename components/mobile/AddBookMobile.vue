@@ -307,10 +307,15 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="web-review-label">Goodreads Rating & Reviews</label>
+        <div v-if="settings.ratingSource === 'personal'" class="form-group">
+          <label>Personal Rating</label>
+          <PersonalRatingInput v-model="newBook.rating" />
+        </div>
+
+        <div v-else-if="settings.ratingSource !== 'none'" class="form-group">
+          <label class="web-review-label">{{ settings.ratingSource === 'storygraph' ? 'StoryGraph' : 'Goodreads' }} Rating</label>
           <div class="readonly-review">
-            <GoodreadsRatingDisplay :web-review="newBook.webReview" show-empty />
+            <BookRatingDisplay :book="newBook" show-empty />
           </div>
         </div>
 
@@ -341,6 +346,8 @@ import { useBookishSettings } from '~/composables/useBookishSettings'
 import BookishSelect from '~/components/shared/BookishSelect.vue'
 import CoverImageModal from '~/components/shared/CoverImageModal.vue'
 import GoodreadsRatingDisplay from '~/components/shared/GoodreadsRatingDisplay.vue'
+import BookRatingDisplay from '~/components/shared/BookRatingDisplay.vue'
+import PersonalRatingInput from '~/components/shared/PersonalRatingInput.vue'
 import MultiStepLoader from '~/components/shared/MultiStepLoader.vue'
 import MobileSettingsNav from './MobileSettingsNav.vue'
 
@@ -369,6 +376,7 @@ const newBook = ref({
   webReview: '',
   format: '',
   pages: 0,
+  rating: 0,
   progress: 0,
   status: 'Unread',
   isFavourite: false,

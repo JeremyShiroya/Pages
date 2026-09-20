@@ -21,6 +21,23 @@
       </div>
     </section>
 
+    <nav class="settings-shortcuts" aria-label="All settings pages">
+      <button
+        v-for="item in settingsShortcuts"
+        :key="item.label"
+        type="button"
+        class="settings-shortcut"
+        @click="openSettingsShortcut(item)"
+      >
+        <span class="shortcut-icon"><i :class="item.icon"></i></span>
+        <span class="shortcut-copy">
+          <strong>{{ item.label }}</strong>
+          <small>{{ item.description }}</small>
+        </span>
+        <i class="ri-arrow-right-s-line shortcut-arrow"></i>
+      </button>
+    </nav>
+
     <section class="stats-grid" aria-label="Library snapshot">
       <div v-for="stat in libraryStats" :key="stat.label" class="stat-item">
         <i :class="stat.icon"></i>
@@ -425,6 +442,7 @@ import {
 } from '~/composables/useBookishSettings'
 import { formatLabel, formatsRemovedBy, useFormatEnablement } from '~/composables/useFormatEnablement'
 import { useToast } from '~/composables/useToast'
+import { useShareApp } from '~/composables/useShareApp'
 import SettingsAudioPanel from '../shared/SettingsAudioPanel.vue'
 import ConnectionTestPanel from '../shared/ConnectionTestPanel.vue'
 import SettingsStoragePanel from '../shared/SettingsStoragePanel.vue'
@@ -436,9 +454,31 @@ import SeriesPreview from '../shared/previews/SeriesCardPreview.vue'
 const { books, authors, collections, genres, recentlyAddedBooks, fetchAndStoreAuthorDetails } = useBooks()
 const { settings, updateSettings } = useBookishSettings()
 const { addToast } = useToast()
+const { canShareApp, shareApp } = useShareApp()
+const router = useRouter()
 const runtimeConfig = useRuntimeConfig()
 const appVersion = runtimeConfig.public.appVersion || '0.0.0'
 const buildNumber = runtimeConfig.public.buildNumber || 'dev'
+
+const settingsShortcuts = computed(() => [
+  { label: 'Profile', description: 'Your reader identity and avatar', icon: 'ri-user-3-line', to: '/profile' },
+  { label: 'Preferences', description: 'Ratings, cards, reading, and interface', icon: 'ri-equalizer-2-line', to: '/settings/preferences' },
+  { label: 'Storage', description: 'Device library, scans, and hidden books', icon: 'ri-database-2-line', to: '/settings/storage' },
+  ...(settings.value.developerMode ? [{ label: 'Connection test', description: 'Check local and remote services', icon: 'ri-base-station-line', to: '/settings/connection' }] : []),
+  ...(canShareApp() ? [{ label: 'Share Pages', description: 'Send the app to another device', icon: 'ri-share-line', action: 'share' }] : []),
+  { label: 'About', description: 'Version and app information', icon: 'ri-information-line', to: '/settings/about' },
+  { label: 'Privacy Policy', description: 'How Pages handles your data', icon: 'ri-lock-line', to: '/settings/privacy' },
+])
+
+const openSettingsShortcut = async (item) => {
+  if (item.action === 'share') {
+    addToast('Preparing the app file…', 'info')
+    const { ok, reason } = await shareApp()
+    if (!ok) addToast(reason, 'error')
+    return
+  }
+  if (item.to) router.push(item.to)
+}
 
 const versionClickCount = ref(0)
 let versionClickTimer = null
@@ -638,6 +678,8 @@ const coverStyle = (index) => ({
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding-bottom: 2rem;
+  background: var(--color-settings-background);
 }
 
 .settings-hero,
@@ -646,7 +688,70 @@ const coverStyle = (index) => ({
 .about-section {
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-card);
-  border-radius: 10px;
+  border-radius: 18px;
+}
+
+.settings-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.settings-shortcut {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 76px;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+  background: var(--color-settings-group, var(--color-surface-card));
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.settings-shortcut:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 34%, var(--color-border-card));
+  background: var(--color-surface-hover);
+}
+
+.shortcut-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--color-brand-primary-muted);
+  color: var(--color-brand-primary);
+  font-size: 1.2rem;
+}
+
+.shortcut-copy {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.shortcut-copy strong {
+  font-size: 0.92rem;
+}
+
+.shortcut-copy small {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shortcut-arrow {
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
 }
 
 .settings-hero {
@@ -1273,6 +1378,9 @@ const coverStyle = (index) => ({
 }
 
 @media (max-width: 1180px) {
+  .settings-shortcuts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .stats-grid {
     grid-template-columns: repeat(3, minmax(140px, 1fr));
   }

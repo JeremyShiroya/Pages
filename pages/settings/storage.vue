@@ -17,7 +17,7 @@
 
 <script setup>
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
-import SettingsStorageMobile from '~/components/mobile/SettingsStorageMobile.vue'
+import SettingsStorageMobile from '~/components/mobile/SettingsStorageResetMobile.vue'
 import SettingsStorageTabletPortrait from '~/components/tablet/portrait/SettingsStorageTabletPortrait.vue'
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
 import SettingsStoragePanel from '~/components/shared/SettingsStoragePanel.vue'
@@ -26,6 +26,8 @@ import SettingsStoragePanel from '~/components/shared/SettingsStoragePanel.vue'
 <style scoped>
 .settings-detail-page {
   width: 100%;
+  min-height: 100vh;
   min-width: 0;
+  background: var(--color-settings-background);
 }
 </style>

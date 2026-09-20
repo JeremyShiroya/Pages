@@ -63,6 +63,33 @@ describe('immersive reader layout', () => {
 describe('listen view follows the reading position', () => {
   const reader = read('components/mobile/ReaderMobile.vue')
 
+  test('matches the cover-first player layout and reveals narration word by word', () => {
+    const listenView = reader.slice(
+      reader.indexOf('class="reader-listen-view"'),
+      reader.indexOf('<main', reader.indexOf('class="reader-listen-view"')),
+    )
+
+    expect(listenView.indexOf('class="listen-cover"')).toBeLessThan(listenView.indexOf('class="listen-text"'))
+    expect(listenView.indexOf('class="listen-text"')).toBeLessThan(listenView.indexOf('class="listen-progress"'))
+    expect(reader).toContain('listenSentenceWords')
+    expect(reader).toContain('ttsWordIdx')
+    expect(reader).toContain('class="listen-generated-word"')
+    expect(reader).toContain('listen-sentence-leave-to')
+    expect(reader).toContain('<Transition name="listen-sentence">')
+    expect(reader).not.toContain('<Transition name="listen-sentence" mode="out-in">')
+    expect(reader).toMatch(/\.listen-text-inner\s*\{[^}]*grid-area:\s*1 \/ 1/s)
+    expect(reader).toMatch(/\.listen-sentence-enter-active,[\s\S]*transition:\s*opacity 0\.52s/s)
+    expect(reader).toMatch(/\.listen-text\s*\{[^}]*width:\s*calc\(100% - 12px\)[^}]*padding-inline:\s*6px/s)
+    expect(reader).not.toMatch(/\.listen-text\s*\{[^}]*background:/s)
+    expect(reader).toMatch(/\.listen-text-inner\s*\{[^}]*font-size:\s*16px[^}]*font-weight:\s*800/s)
+    expect(reader).toMatch(/\.listen-text-inner\s*\{[^}]*text-shadow:\s*none/s)
+    expect(reader).toMatch(/\.listen-generated-word\s*\{[^}]*background:\s*none[^}]*color:\s*rgba\(255, 255, 255, 0\.58\)/s)
+    expect(reader).not.toMatch(/\.listen-generated-word\s*\{[^}]*linear-gradient/s)
+    expect(reader).toMatch(/\.listen-generated-word\s*\{[^}]*font-weight:\s*800 !important/s)
+    expect(reader).toMatch(/\.listen-generated-word\s*\{[^}]*margin-inline-end:\s*0\.26em/s)
+    expect(reader).toContain('LISTEN_WORD_WINDOW_SIZE = 8')
+  })
+
   test('the text shown is the page, not the whole chapter it sits in', () => {
     expect(reader).toContain('listenEpubPageRange')
     expect(reader).toContain('firstChunkAtOrAfterPage')

@@ -211,7 +211,6 @@ export async function searchGoogleBooks(title: string, author?: string): Promise
         let cover: string | null = null;
         if (info.imageLinks?.thumbnail) {
           cover = info.imageLinks.thumbnail
-            .replace(/zoom=\d+/, 'zoom=6')  // zoom=6 gives ~600-800px wide
             .replace('&edge=curl', '')       // remove page-curl effect
             .replace(/^http:\/\//, 'https://');
         }

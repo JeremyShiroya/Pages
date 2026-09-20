@@ -4,13 +4,15 @@ import { useBookStorage } from '~/composables/useBookStorage';
 import { coverAssetName, isLocalAssetCover, isRemoteCoverUrl, useCoverImageCache } from '~/composables/useCoverImageCache';
 import { useDeviceAssets } from '~/composables/useDeviceAssets';
 import { coverPlaceholder } from '~/composables/useCoverFallback';
-import { getGoodreadsRating } from '~/composables/useGoodreadsRating';
+import { getBookRating } from '~/composables/useBookRating';
 import { useLibraryStore } from '~/composables/useLibraryStore';
 import { useApiEndpoint } from '~/composables/useApiEndpoint';
-import { readBookishSettings } from '~/composables/useBookishSettings';
+import { readBookishSettings, useBookishSettings } from '~/composables/useBookishSettings';
 import { appendSeriesRepairAudit, validateAutomaticSeriesMutation } from '~/composables/seriesMutationGuard';
+import { AUTHOR_DETAILS_VERSION, newestAuthorRecordFirst } from '~/utils/authorIntelligence';
 
 const coverCacheInFlight = new Set();
+let authorIntelligenceRefresh = null;
 
 // Reading status and progress are two views of the same fact, and the cards
 // read progress while the filters read status. Editing one without the other
@@ -73,6 +75,7 @@ export const groupBooksBySeries = (sourceBooks = []) => {
 
 export const useBooks = () => {
   const { apiUrl } = useApiEndpoint()
+  const { settings: bookishSettings } = useBookishSettings()
   const books = useState('library:books', () => []);
   const collections = useState('library:collections', () => []);
   const loading = useState('library:loading', () => false);
@@ -89,10 +92,23 @@ export const useBooks = () => {
       }
       const entry = authorMap.get(name);
       entry.bookCount++;
-      if (book.authorImage && !entry.image) entry.image = book.authorImage;
-      if (book.authorBio && !entry.bio) entry.bio = book.authorBio;
+      if (!entry.records) entry.records = [];
+      entry.records.push(book);
     }
-    return [...authorMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+    return [...authorMap.values()]
+      .map((entry) => {
+        const records = [...entry.records].sort(newestAuthorRecordFirst);
+        const imageRecord = records.find(book => book.authorImage);
+        const bioRecord = records.find(book => book.authorBio);
+        const { records: _records, ...author } = entry;
+        return {
+          ...author,
+          image: imageRecord?.authorImage || null,
+          bio: bioRecord?.authorBio || null,
+          detailsVersion: Math.max(0, ...records.map(book => Number(book.authorDetailsVersion) || 0)),
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
   });
 
   const genres = computed(() => {
@@ -335,7 +351,7 @@ export const useBooks = () => {
         const existing = books.value.find(b => (
           b.author === authorName
           && b.authorBio
-          && b.authorDetailsVersion === 7
+          && b.authorDetailsVersion === AUTHOR_DETAILS_VERSION
         ))
         if (existing) return true
       }
@@ -365,6 +381,37 @@ export const useBooks = () => {
       console.warn('[useBooks] Fetch author details failed:', err)
       return false
     }
+  }
+
+  // Author facts have their own identity-aware enrichment pipeline. Refreshing
+  // here keeps the tablet Authors page correct even for libraries created with
+  // an older author-details schema, without blocking the page from rendering.
+  const refreshAuthorIntelligence = async () => {
+    if (!import.meta.client) return { refreshed: 0, failed: 0 }
+    if (authorIntelligenceRefresh) return authorIntelligenceRefresh
+
+    const staleNames = authors.value
+      .filter(author => author.detailsVersion !== AUTHOR_DETAILS_VERSION || !author.bio)
+      .map(author => author.name)
+
+    authorIntelligenceRefresh = (async () => {
+      let refreshed = 0
+      let failed = 0
+      const queue = [...staleNames]
+      const worker = async () => {
+        while (queue.length) {
+          const name = queue.shift()
+          if (await fetchAndStoreAuthorDetails(name, { force: true })) refreshed += 1
+          else failed += 1
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(2, queue.length) }, worker))
+      return { refreshed, failed }
+    })().finally(() => {
+      authorIntelligenceRefresh = null
+    })
+
+    return authorIntelligenceRefresh
   }
 
   const addBook = async (book) => {
@@ -555,7 +602,8 @@ export const useBooks = () => {
   const popularBooks = computed(() =>
     [...books.value]
       .sort((a, b) => {
-        const diff = getGoodreadsRating(b) - getGoodreadsRating(a);
+        const diff = (getBookRating(b, bookishSettings.value.ratingSource, bookishSettings.value.personalRatingScale)?.rating || 0)
+          - (getBookRating(a, bookishSettings.value.ratingSource, bookishSettings.value.personalRatingScale)?.rating || 0);
         if (diff !== 0) return diff;
         return new Date(b.createdAt) - new Date(a.createdAt);
       })
@@ -597,5 +645,6 @@ export const useBooks = () => {
     fetchBookById,
     cacheRemoteLibraryCovers,
     fetchAndStoreAuthorDetails,
+    refreshAuthorIntelligence,
   };
 };

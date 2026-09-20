@@ -24,7 +24,11 @@
     </span>
     <span class="continue-info">
       <span class="continue-title">{{ book.title }}</span>
-      <span class="continue-meta">{{ totalPagesLabel }} Pages - {{ bookFormat }}</span>
+      <span class="continue-author">
+        {{ book.author || 'Unknown author' }}<span v-if="book.publishYear"> &bull; {{ book.publishYear }}</span>
+      </span>
+      <span class="continue-series" :class="{ standalone: !book.series }">{{ book.series || 'Standalone' }}</span>
+      <span class="continue-meta"><BookProgressDisplay :progress="book.progress" compact /></span>
     </span>
     <span
       class="continue-play"
@@ -44,6 +48,7 @@
 <script setup>
 import { computed } from "vue";
 import { onCoverError } from "~/composables/useCoverFallback";
+import BookProgressDisplay from "./BookProgressDisplay.vue";
 
 const props = defineProps({
   book: {
@@ -58,8 +63,6 @@ const props = defineProps({
 
 defineEmits(["open", "play"]);
 
-const totalPagesLabel = computed(() => props.book.pages || "-");
-const bookFormat = computed(() => props.book.format || "EPUB");
 const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperCase() || "?");
 </script>
 
@@ -160,10 +163,12 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
   justify-content: center;
   min-width: 0;
   margin-left: 108px;
-  padding-right: 50px;
+  padding-right: 88px;
 }
 
 .continue-title,
+.continue-author,
+.continue-series,
 .continue-meta {
   display: block;
   overflow: hidden;
@@ -173,7 +178,7 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
 
 .continue-title {
   display: -webkit-box;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.25rem;
   overflow: hidden;
   color: var(--color-text-on-brand);
   font-size: var(--mobile-body-size);
@@ -184,8 +189,24 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
   white-space: normal;
 }
 
+.continue-author,
+.continue-series {
+  color: var(--color-text-on-image-secondary);
+  font-size: var(--mobile-subtext-size);
+  line-height: 1.2;
+}
+
+.continue-series {
+  margin-top: 0.15rem;
+  font-size: var(--mobile-caption-size);
+}
+
+.continue-series.standalone {
+  opacity: 0.8;
+}
+
 .continue-meta {
-  margin: 0;
+  margin-top: 0.45rem;
   color: var(--color-text-on-image-secondary);
   font-size: var(--mobile-subtext-size);
   font-weight: 400;
@@ -241,7 +262,7 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
 
   .continue-info {
     margin-left: 94px;
-    padding-right: 46px;
+    padding-right: 80px;
   }
 
   .continue-title {

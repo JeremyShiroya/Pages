@@ -55,13 +55,18 @@
 </template>
 
 <script setup>
+import { watch } from "vue";
 import { useRouter } from "vue-router";
 import { useBooks } from "~/composables/useBooks";
 import EmptyState from "./EmptyState.vue";
 import SkeletonLoader from "./SkeletonLoader.vue";
 
-const { allAuthors, loading, initialized } = useBooks();
+const { allAuthors, loading, initialized, refreshAuthorIntelligence } = useBooks();
 const router = useRouter();
+
+watch(initialized, (ready) => {
+  if (ready) refreshAuthorIntelligence();
+}, { immediate: true });
 </script>
 
 <style scoped>

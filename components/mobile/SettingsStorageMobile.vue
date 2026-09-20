@@ -1,11 +1,11 @@
 <template>
   <div class="storage-mobile">
-    <!-- Local storage summary -->
-    <section class="card">
-      <div class="card-head">
-        <i class="ri-database-2-line"></i>
-        <div>
-          <h2>On this device</h2>
+    <header class="storage-hero">
+      <div class="storage-hero-heading">
+        <span class="storage-hero-icon"><i class="ri-hard-drive-3-line"></i></span>
+        <div class="storage-hero-copy">
+          <span class="storage-eyebrow">Your library</span>
+          <h1>Stored on this device</h1>
           <p>{{ storageMessage }}</p>
         </div>
         <button class="refresh-btn" aria-label="Refresh" @click="refreshStorageSummary">
@@ -26,11 +26,12 @@
           <span>Space used</span>
         </div>
       </div>
-    </section>
+    </header>
 
-    <!-- Metadata backfill -->
-    <section class="card">
-      <div class="card-head">
+    <section class="storage-section">
+      <p class="section-kicker">Library intelligence</p>
+      <div class="storage-group">
+      <div class="group-heading">
         <i class="ri-file-search-line"></i>
         <div>
           <h2>Book details</h2>
@@ -105,11 +106,13 @@
           </button>
         </p>
       </template>
+      </div>
     </section>
 
-    <!-- Scanned folders -->
-    <section class="card">
-      <div class="card-head">
+    <section class="storage-section">
+      <p class="section-kicker">Device scanning</p>
+      <div class="storage-group">
+      <div class="group-heading">
         <i class="ri-folder-open-line"></i>
         <div>
           <h2>Scanned folders</h2>
@@ -155,11 +158,13 @@
         <i class="ri-refresh-line"></i>
         Scan device now
       </button>
+      </div>
     </section>
 
-    <!-- Hidden books -->
-    <section class="card">
-      <div class="card-head">
+    <section class="storage-section">
+      <p class="section-kicker">Library visibility</p>
+      <div class="storage-group">
+      <div class="group-heading">
         <i class="ri-eye-off-line"></i>
         <div>
           <h2>Hidden books</h2>
@@ -175,6 +180,7 @@
           <i class="ri-refresh-line"></i>
           Restore all
         </button>
+      </div>
       </div>
     </section>
 
@@ -446,49 +452,113 @@ onMounted(() => {
 <style scoped>
 .storage-mobile {
   display: grid;
-  gap: 14px;
-  padding: 4px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 24px);
+  min-height: calc(100vh - 70px);
+  align-content: start;
+  gap: 30px;
+  padding: 10px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
   font-family: var(--mobile-font-family);
+  background: var(--color-settings-background);
 }
 
-.card {
-  padding: 16px;
-  border: 1px solid var(--color-border-card);
-  border-radius: var(--mobile-card-radius, 14px);
-  background: var(--color-surface-card);
-}
-
-.card-head {
+.storage-hero {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: 12px;
-  margin-bottom: 12px;
+  gap: 18px;
+  padding: 20px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand, #fff);
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
-.card-head > i {
+.storage-hero-heading {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.storage-hero-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 22px;
+}
+
+.storage-eyebrow,
+.section-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.storage-eyebrow { color: rgba(255, 255, 255, 0.72); }
+
+.storage-hero h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.storage-hero p {
+  margin: 2px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.storage-section { position: relative; }
+
+.section-kicker {
+  margin: 0 0 9px 4px;
+  color: var(--color-text-muted);
+}
+
+.storage-group {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--color-settings-group);
+}
+
+.group-heading {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.group-heading > i {
   display: grid;
   width: 40px;
   height: 40px;
   place-items: center;
-  border-radius: 10px;
-  background: var(--color-brand-primary-muted, rgba(138, 43, 226, 0.12));
+  border-radius: 12px;
+  background: var(--color-brand-primary-muted);
   color: var(--color-brand-primary);
   font-size: 19px;
 }
 
-.card-head h2 {
+.group-heading h2 {
   margin: 0;
   color: var(--color-text-primary);
   font-size: 16px;
   font-weight: 600;
 }
 
-.card-head p {
-  margin: 2px 0 0;
+.group-heading p {
+  margin: 3px 0 0;
   color: var(--color-text-muted);
   font-size: 12.5px;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .refresh-btn {
@@ -496,10 +566,10 @@ onMounted(() => {
   width: 38px;
   height: 38px;
   place-items: center;
-  border: 1px solid var(--color-border-card);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--color-brand-primary);
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
   cursor: pointer;
   font-size: 17px;
 }
@@ -514,18 +584,19 @@ onMounted(() => {
   display: grid;
   gap: 2px;
   padding: 12px 10px;
-  border-radius: 10px;
-  background: var(--color-surface-secondary);
-  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.1);
+  text-align: left;
 }
 
 .stat strong {
-  color: var(--color-text-primary);
-  font-size: 17px;
+  color: #fff;
+  font-size: 19px;
 }
 
 .stat span {
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 11.5px;
 }
 
@@ -807,10 +878,50 @@ onMounted(() => {
 }
 
 .auto-switch {
+  position: relative;
+  appearance: none;
   flex-shrink: 0;
+  width: 44px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-border-card);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.auto-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
   width: 20px;
   height: 20px;
-  accent-color: var(--color-brand-primary);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.auto-switch:checked {
+  background: var(--color-brand-primary);
+}
+
+.auto-switch:checked::after {
+  transform: translateX(18px);
+}
+
+@media (orientation: portrait) and (min-width: 600px) {
+  .storage-mobile {
+    width: min(100%, 760px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  .storage-group,
+  .storage-hero {
+    padding: 20px;
+  }
 }
 
 /* Two stacked full-width buttons. Without a gap they touched, and the purple

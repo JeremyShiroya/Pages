@@ -365,25 +365,17 @@ describe('mobile UX batch', () => {
     }
   })
 
-  test('the mobile library has no personal rating anywhere', () => {
-    for (const file of [
-      'components/mobile/BooksMobile.vue',
-      'components/mobile/BookDetailMobile.vue',
-      'components/mobile/AddBookMobile.vue',
-      'components/mobile/EditBookMobile.vue',
-    ]) {
+  test('the mobile library follows the selected app-wide rating source', () => {
+    for (const file of ['components/mobile/AddBookMobile.vue', 'components/mobile/EditBookMobile.vue']) {
       const source = read(file)
-      expect(source, file).not.toContain('Personal Rating')
-      expect(source, file).not.toMatch(/\brating-star\b/)
+      expect(source, file).toContain("settings.ratingSource === 'personal'")
+      expect(source, file).toContain('<PersonalRatingInput')
+      expect(source, file).toContain('<BookRatingDisplay')
     }
 
-    // The shared card keeps the row for the wide layout, behind an opt-out prop.
     const card = read('components/shared/LibraryBookCard.vue')
-    expect(card).toContain('showPersonalRating')
-    expect(card).toContain('v-if="showPersonalRating"')
-    for (const file of ['components/mobile/BooksMobile.vue', 'components/mobile/FavouritesMobile.vue']) {
-      expect(read(file), file).toContain(':show-personal-rating="false"')
-    }
+    expect(card).toContain('<BookRatingDisplay')
+    expect(card).not.toContain('showPersonalRating')
   })
 
   test('deleting a book removes it for real, and the modal says so', () => {

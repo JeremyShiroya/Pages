@@ -163,7 +163,7 @@ onMounted(async () => {
 .profile-page {
   width: 100%;
   min-height: calc(100vh - 88px - env(safe-area-inset-bottom));
-  background: var(--color-background-app);
+  background: var(--color-settings-background);
   color: var(--color-text-primary);
 }
 
@@ -270,10 +270,10 @@ onMounted(async () => {
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: 12px;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--color-settings-group, var(--color-surface-primary));
 }
 
 .profile-field {
@@ -296,7 +296,7 @@ onMounted(async () => {
   width: 100%;
   min-width: 0;
   min-height: 44px;
-  border: 1px solid var(--color-border-card);
+  border: 0;
   border-radius: 9px;
   background: var(--color-surface-input);
   color: var(--color-text-primary);
@@ -307,7 +307,7 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-border-card);
+  border: 0;
   border-radius: 9px;
   background: var(--color-surface-card);
   color: var(--color-text-secondary);
@@ -351,10 +351,10 @@ onMounted(async () => {
   align-items: center;
   gap: 0.75rem;
   min-height: 68px;
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: 12px;
   padding: 0.65rem;
-  background: var(--color-surface-input);
+  background: var(--color-settings-group, var(--color-surface-primary));
 }
 
 .profile-preview-card img {

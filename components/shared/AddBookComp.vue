@@ -311,31 +311,16 @@
               :options="['Unread', 'Reading', 'Read']"
             />
           </div>
-          <div class="form-group">
+          <div v-if="settings.ratingSource === 'personal'" class="form-group">
             <label>Personal Rating</label>
-            <div class="rating-input-container">
-              <div class="star-rating">
-                <i
-                  v-for="n in 10"
-                  :key="n"
-                  class="rating-star"
-                  :class="{
-                    'ri-star-fill': n <= newBook.rating,
-                    'ri-star-line': n > newBook.rating,
-                    'active': n <= newBook.rating
-                  }"
-                  @click="newBook.rating = n"
-                ></i>
-              </div>
-              <span class="rating-display">{{ newBook.rating || 0 }}/10</span>
-            </div>
+            <PersonalRatingInput v-model="newBook.rating" />
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="web-review-label">Goodreads Rating & Reviews</label>
+        <div v-if="settings.ratingSource !== 'personal' && settings.ratingSource !== 'none'" class="form-group">
+          <label class="web-review-label">{{ settings.ratingSource === 'storygraph' ? 'StoryGraph' : 'Goodreads' }} Rating</label>
           <div class="readonly-review">
-            <GoodreadsRatingDisplay :web-review="newBook.webReview" show-empty />
+            <BookRatingDisplay :book="newBook" show-empty />
           </div>
         </div>
 
@@ -366,6 +351,8 @@ import { useBookishSettings } from '~/composables/useBookishSettings'
 import BookishSelect from './BookishSelect.vue'
 import CoverImageModal from './CoverImageModal.vue'
 import GoodreadsRatingDisplay from './GoodreadsRatingDisplay.vue'
+import BookRatingDisplay from './BookRatingDisplay.vue'
+import PersonalRatingInput from './PersonalRatingInput.vue'
 import MultiStepLoader from './MultiStepLoader.vue'
 
 const router = useRouter()

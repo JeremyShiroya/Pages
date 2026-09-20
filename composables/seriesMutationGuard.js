@@ -24,6 +24,35 @@ export const isSeriesFieldProtected = (book, field) => (
 export const isSeriesRepairProtected = (book) => AUTOMATIC_SERIES_FIELDS
   .some((field) => isSeriesFieldProtected(book, field))
 
+export function protectManualSeriesDecision(book) {
+  const existing = book?.userDefined
+  const userDefined = existing === true
+    ? true
+    : {
+        ...(existing && typeof existing === 'object' ? existing : {}),
+        series: true,
+        seriesInstallment: true,
+        seriesTotal: true,
+      }
+
+  return {
+    ...book,
+    seriesChecked: true,
+    userDefined,
+  }
+}
+
+const comparableSeriesValue = (value) => {
+  if (value === null || value === undefined || value === '') return null
+  return String(value).trim() || null
+}
+
+export const hasManualSeriesDecisionChanged = (before, after) => (
+  comparableSeriesValue(before?.series) !== comparableSeriesValue(after?.series)
+  || comparableSeriesValue(before?.seriesInstallment) !== comparableSeriesValue(after?.seriesInstallment)
+  || comparableSeriesValue(before?.seriesTotal) !== comparableSeriesValue(after?.seriesTotal)
+)
+
 const same = (a, b) => (a ?? null) === (b ?? null)
 
 export function validateAutomaticSeriesMutation(before, after, { allowMetadata = false } = {}) {

@@ -60,7 +60,7 @@
         </div>
       </section>
 
-      <section class="share-card">
+      <section v-if="showStreakSharing" class="share-card">
         <div><h2>Celebrate your progress</h2><p>Create a personalized streak card to save or share.</p></div>
         <div class="share-actions">
           <button type="button" :disabled="actionState !== ''" @click="shareStreak">
@@ -92,6 +92,7 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const today = new Date()
 const shownMonth = ref(new Date(today.getFullYear(), today.getMonth(), 1))
 const actionState = ref('')
+const showStreakSharing = false
 const activeSet = computed(() => new Set(activeDates.value))
 
 const monthTitle = computed(() => shownMonth.value.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }))

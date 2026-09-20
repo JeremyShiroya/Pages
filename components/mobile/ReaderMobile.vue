@@ -7,6 +7,8 @@
       'listen-blur': readerMode === 'listen' && listenBlurEnabled,
     }]"
     :style="readerStyleVars"
+    :data-system-bar-icons="readerMode === 'listen' && listenBlurEnabled ? 'light' : (readerTheme === 'dark' ? 'light' : 'dark')"
+    :data-system-bar-color="readerMode === 'listen' && listenBlurEnabled ? 'transparent' : undefined"
   >
     <header v-show="!chromeHidden" class="reader-mobile-topbar">
       <button
@@ -83,6 +85,28 @@
         <h2 class="listen-title">{{ book.title }}</h2>
         <p class="listen-byline">{{ listenByline }}</p>
 
+        <div class="listen-text">
+          <Transition name="listen-sentence">
+            <p
+              v-if="listenSentenceWords.length"
+              :key="listenSentenceKey"
+              class="listen-text-inner listen-chunk active"
+              aria-live="polite"
+            >
+              <span
+                v-for="word in listenSentenceWords"
+                :key="`${listenDisplayChunkIndex}-${word.index}`"
+                class="listen-generated-word"
+                :class="{ spoken: word.spoken, upcoming: word.upcoming }"
+                :aria-current="word.upcoming ? 'true' : undefined"
+              >{{ word.text }} </span>
+            </p>
+          </Transition>
+          <p v-if="!listenSentenceWords.length" class="listen-text-empty">
+            No readable text on this {{ isPdfBook ? "page" : "chapter" }}.
+          </p>
+        </div>
+
         <div class="listen-progress">
           <span>{{ listenElapsed }}</span>
           <input
@@ -150,31 +174,6 @@
             {{ listenNextLabel }}
             <i class="ri-arrow-right-s-line"></i>
           </button>
-        </div>
-
-        <button
-          type="button"
-          class="listen-text-toggle"
-          :aria-expanded="listenTextVisible"
-          :aria-label="listenTextVisible ? 'Hide page content' : 'Show page content'"
-          @click="listenTextVisible = !listenTextVisible"
-        >
-          <i :class="listenTextVisible ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-        </button>
-
-        <div v-show="listenTextVisible" class="listen-text">
-          <p v-if="listenChunks.length" class="listen-text-inner" :style="listenTextStyle">
-            <span
-              v-for="(chunk, index) in listenChunks"
-              :key="`${listenStartChunk}-${index}`"
-              :ref="(el) => setListenChunkEl(index, el)"
-              class="listen-chunk"
-              :class="{ active: listenStartChunk + index === activeListenChunk }"
-            >{{ chunk }} </span>
-          </p>
-          <p v-else class="listen-text-empty">
-            No readable text on this {{ isPdfBook ? "page" : "chapter" }}.
-          </p>
         </div>
       </template>
     </div>
@@ -942,6 +941,7 @@ const {
   ttsNativeVoiceIdx,
   ttsUsingDeviceVoice,
   ttsPlayingChunkIdx,
+  ttsWordIdx,
   elapsedTime,
   totalTime,
   togglePlay,
@@ -1875,6 +1875,38 @@ const activeListenChunk = computed(() => (
   isThisBookNarrating.value ? ttsPlayingChunkIdx.value : -1
 ));
 
+const listenDisplayChunkIndex = computed(() => (
+  activeListenChunk.value >= 0 ? activeListenChunk.value : listenStartChunk.value
+));
+
+const LISTEN_WORD_WINDOW_SIZE = 8;
+const listenWordWindowStart = computed(() => {
+  const spokenIndex = activeListenChunk.value >= 0 ? Number(ttsWordIdx.value) : -1;
+  return Math.floor(Math.max(0, spokenIndex) / LISTEN_WORD_WINDOW_SIZE) * LISTEN_WORD_WINDOW_SIZE;
+});
+const listenSentenceKey = computed(() => `${listenDisplayChunkIndex.value}:${listenWordWindowStart.value}`);
+
+// The player shows only the current sentence. Spoken words resolve from blur
+// to solid white as the audio boundary reaches them; the moving window keeps
+// long sentences readable without ever filling more than two lines.
+const listenSentenceWords = computed(() => {
+  const text = (props.readableChunks || [])[listenDisplayChunkIndex.value] || '';
+  const words = String(text).trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+
+  const spokenIndex = activeListenChunk.value >= 0 ? Number(ttsWordIdx.value) : -1;
+  const start = Math.min(words.length - 1, listenWordWindowStart.value);
+  return words.slice(start, start + LISTEN_WORD_WINDOW_SIZE).map((word, offset) => {
+    const index = start + offset;
+    return {
+      text: word,
+      index,
+      spoken: spokenIndex >= 0 && index <= spokenIndex,
+      upcoming: index === spokenIndex + 1,
+    };
+  });
+});
+
 const toggleListenPlay = () => {
   if (isThisBookNarrating.value) {
     togglePlay();
@@ -1934,43 +1966,8 @@ const chooseNarrator = (voiceId) => {
   narratorOpen.value = false;
 };
 
-// Slide the text so the sentence being narrated sits at the top of the panel.
-let listenChunkEls = [];
-const listenTextOffset = ref(0);
-
-const setListenChunkEl = (index, el) => {
-  if (el) listenChunkEls[index] = el;
-};
-
-const listenTextStyle = computed(() => ({
-  transform: `translateY(-${listenTextOffset.value}px)`,
-}));
-
-const syncListenOffset = async ({ resetEls = false } = {}) => {
-  if (resetEls) listenChunkEls = [];
-  await nextTick();
-  const relative = activeListenChunk.value - listenStartChunk.value;
-  const el = relative >= 0 && relative < listenChunks.value.length
-    ? listenChunkEls[relative]
-    : null;
-  listenTextOffset.value = el ? el.offsetTop : 0;
-};
-
-// ONE watcher, not two.
-//
-// A second watcher used to clear the element list when listenChunks changed,
-// and because this one yields on nextTick first, the clear landed in between —
-// wiping the refs it was about to measure. The offset fell back to 0, so Listen
-// opened at the top of the page and only snapped to the sentence being narrated
-// on the following tick. That is the "waits, then jumps" the reader sees.
-watch([activeListenChunk, listenStartChunk, listenChunks], (next, prev) => {
-  syncListenOffset({ resetEls: next[2] !== prev?.[2] });
-});
-
-// Opening Listen changes none of the above, so nothing recomputed the offset
-// and the panel appeared parked at the top of the page even mid-narration.
 watch(readerMode, (mode) => {
-  if (mode === "listen") syncListenOffset({ resetEls: true });
+  if (mode === "listen") sampleScrollChunk();
 });
 
 // Ask the engine to go back to the cloud narrators. It reports whether it
@@ -2558,7 +2555,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  padding: calc(72px + env(safe-area-inset-top)) 24px 0;
+  padding: calc(66px + env(safe-area-inset-top)) 18px calc(8px + env(safe-area-inset-bottom));
   background: var(--mobile-reader-bg);
   color: var(--mobile-reader-text);
   /* The panel is a player, not a scroll surface — don't pan the page behind. */
@@ -2567,21 +2564,23 @@ onUnmounted(() => {
 
 .listen-cover img {
   display: block;
-  width: min(42vw, 168px);
-  border-radius: 10px;
+  width: min(64vw, 242px);
+  max-height: 47vh;
+  border-radius: 6px;
+  object-fit: cover;
   box-shadow: var(--shadow-cover);
 }
 
 .listen-title {
   margin: 16px 0 2px;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
   text-align: center;
 }
 
 .listen-byline {
-  margin: 0 0 20px;
+  margin: 0 0 18px;
   color: var(--mobile-reader-muted);
   font-size: 12.5px;
   text-align: center;
@@ -2589,8 +2588,8 @@ onUnmounted(() => {
 
 .listen-progress {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
-  gap: 10px;
+  grid-template-columns: 32px minmax(0, 1fr) 38px;
+  gap: 6px;
   align-items: center;
   width: 100%;
   color: var(--mobile-reader-muted);
@@ -2628,9 +2627,10 @@ onUnmounted(() => {
 .listen-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin: 14px 0 8px;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  margin: 10px 0 5px;
 }
 
 .listen-controls button {
@@ -2673,7 +2673,7 @@ onUnmounted(() => {
   gap: 8px;
   align-items: center;
   width: 100%;
-  margin: 4px 0 16px;
+  margin: 2px 0 0;
 }
 
 .listen-page-step {
@@ -2687,7 +2687,7 @@ onUnmounted(() => {
   color: var(--mobile-reader-muted);
   cursor: pointer;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .listen-page-step:disabled {
@@ -2708,8 +2708,8 @@ onUnmounted(() => {
 }
 
 .listen-page-current {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .listen-text-toggle {
@@ -2742,27 +2742,76 @@ onUnmounted(() => {
 }
 
 .listen-text {
-  flex: 1;
-  width: 100%;
-  overflow: hidden;
-  /* Fade the last lines out instead of clipping them at the screen edge. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
-  mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
+  display: grid;
+  flex: 0 0 auto;
+  width: calc(100% - 12px);
+  min-height: 68px;
+  box-sizing: border-box;
+  align-items: center;
+  padding-inline: 6px;
 }
 
 .listen-text-inner {
-  position: relative;
+  grid-area: 1 / 1;
+  display: block;
+  width: 100%;
+  max-width: 100%;
   margin: 0;
+  color: rgba(255, 255, 255, 0.68);
   font-size: 16px;
-  line-height: 1.58;
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
-  -webkit-hyphens: auto;
-  transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
-  will-change: transform;
+  font-weight: 800;
+  line-height: 1.42;
+  text-align: left;
+  text-shadow: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.listen-generated-word {
+  display: inline;
+  margin-inline-end: 0.26em;
+  background: none;
+  color: rgba(255, 255, 255, 0.58);
+  -webkit-text-fill-color: currentColor;
+  font-weight: 800 !important;
+  opacity: 1;
+  filter: none;
+  transition: color 0.34s ease, opacity 0.34s ease;
+}
+
+.listen-generated-word.spoken {
+  background: none;
+  color: rgba(255, 255, 255, 0.92);
+  opacity: 1;
+}
+
+.listen-generated-word.upcoming {
+  color: rgba(255, 255, 255, 0.74);
+  opacity: 1;
+}
+
+.listen-sentence-enter-active,
+.listen-sentence-leave-active {
+  will-change: opacity, filter, transform;
+  transition:
+    opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.listen-sentence-enter-from {
+  opacity: 0;
+  filter: blur(2px);
+  transform: translateY(2px);
+}
+
+.listen-sentence-leave-to {
+  opacity: 0;
+  filter: blur(2px);
+  transform: translateY(-2px);
 }
 
 .listen-text-empty {
@@ -2822,8 +2871,7 @@ onUnmounted(() => {
 
 .reader-listen-view.bg-blur .listen-page-current,
 .reader-listen-view.bg-blur .listen-controls button,
-.reader-listen-view.bg-blur .listen-text-toggle,
-.reader-listen-view.bg-blur .listen-text-inner {
+.reader-listen-view.bg-blur .listen-text-toggle {
   color: #fff;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
 }
@@ -2842,8 +2890,7 @@ onUnmounted(() => {
 
 /* The narrated sentence stays legible over the image. */
 .reader-listen-view.bg-blur .listen-chunk.active {
-  background: rgba(255, 255, 255, 0.22);
-  outline-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
 }
 
 /* The fixed topbar paints above the blurred backdrop — let the image show
@@ -2879,6 +2926,12 @@ onUnmounted(() => {
     0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
+.reader-listen-view.bg-blur .listen-text-inner,
+.reader-listen-view.bg-blur .listen-chunk.active,
+.reader-listen-view.bg-blur .listen-generated-word {
+  text-shadow: none;
+}
+
 .reader-mobile-page.listen-blur .listen-text-toggle {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.1);
@@ -2890,9 +2943,31 @@ onUnmounted(() => {
 
 /* The sentence being narrated is highlighted just like in Read mode. */
 .listen-chunk.active {
-  border-radius: 3px;
-  background: var(--color-reader-highlight, rgba(138, 43, 226, 0.18));
-  outline: 1px solid var(--color-reader-highlight-border, rgba(138, 43, 226, 0.35));
+  color: var(--mobile-reader-text);
+}
+
+@media (max-height: 700px) {
+  .listen-cover img {
+    width: min(51vw, 190px);
+    max-height: 40vh;
+  }
+
+  .listen-title { margin-top: 10px; }
+  .listen-byline { margin-bottom: 10px; }
+  .listen-text {
+    flex-basis: 58px;
+  }
+
+  .listen-text-inner { font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listen-generated-word {
+    transition: none;
+  }
+
+  .listen-sentence-enter-active,
+  .listen-sentence-leave-active { transition: none; }
 }
 
 /* ── Display settings sheet ──────────────────────────────────────────────── */

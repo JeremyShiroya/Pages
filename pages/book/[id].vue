@@ -63,7 +63,7 @@
                 <i class="ri-book-open-line"></i>
                 Read
               </button>
-              <button type="button" class="edit-btn" @click="router.push(`/edit/${book.id}`)">
+              <button type="button" class="edit-btn" @click="router.push(bookEditLocation(book.id, route.fullPath))">
                 <i class="ri-edit-line"></i>
                 Edit
               </button>
@@ -82,6 +82,7 @@ import ResponsiveViewSwitch from "~/components/shared/ResponsiveViewSwitch.vue";
 import BookDetailMobile from "~/components/mobile/BookDetailMobile.vue";
 import BookDetailTabletPortrait from "~/components/tablet/portrait/BookDetailTabletPortrait.vue";
 import { useBooks } from "~/composables/useBooks";
+import { bookEditLocation } from '~/composables/useBookEditNavigation';
 
 const mobileDetailComponent = BookDetailMobile;
 const route = useRoute();

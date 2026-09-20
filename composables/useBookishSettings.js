@@ -3,7 +3,7 @@ import { readonly, ref } from 'vue'
 export const BOOKISH_SETTINGS_KEY = 'bookish:settings'
 
 export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
-  settingsVersion: 2,
+  settingsVersion: 3,
   readerTheme: 'light',
   readerZoom: 1.0,
   libraryView: 'table',
@@ -26,7 +26,9 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   favouritesCardLayout: 'list',    // 'grid' | 'list' (set from the Favourites controls row)
   playlistCardBackground: 'blur',  // 'blur' | 'blank' — matches series default
   playlistCardLayout: 'fan',       // 'fan' | 'cover' — matches series default
-  bookActionDisplay: 'visible',    // 'minimal' puts actions in a More menu; 'visible' keeps the icon row
+  bookActionDisplay: 'minimal',    // 'minimal' puts actions in a More menu; 'visible' keeps the icon row
+  ratingSource: 'goodreads',       // 'goodreads' | 'storygraph' | 'personal' | 'none'
+  personalRatingScale: 10,         // 5 | 10; values remain normalized to ten internally
   readerHighlight: true,           // highlight the section being read
   listenCoverBlur: true,           // blurred cover backdrop in Listen mode
   showStreak: true,                // reading-streak pill in the top nav
@@ -90,6 +92,8 @@ export const SERIES_CARD_LAYOUT_OPTIONS = Object.freeze(['fan', 'cover'])
 export const PLAYLIST_CARD_LAYOUT_OPTIONS = Object.freeze(['fan', 'cover'])
 export const FAVOURITES_CARD_LAYOUT_OPTIONS = Object.freeze(['grid', 'list'])
 export const BOOK_ACTION_DISPLAY_OPTIONS = Object.freeze(['minimal', 'visible'])
+export const RATING_SOURCE_OPTIONS = Object.freeze(['goodreads', 'storygraph', 'personal', 'none'])
+export const PERSONAL_RATING_SCALE_OPTIONS = Object.freeze([5, 10])
 export const FORMAT_FILTER_OPTIONS = Object.freeze(['all', 'pdf', 'epub'])
 
 // The pills every library Filter panel renders under its "Format" heading.
@@ -230,6 +234,12 @@ export function normalizeBookishSettings(value) {
     bookActionDisplay: BOOK_ACTION_DISPLAY_OPTIONS.includes(source.bookActionDisplay)
       ? source.bookActionDisplay
       : DEFAULT_BOOKISH_SETTINGS.bookActionDisplay,
+    ratingSource: RATING_SOURCE_OPTIONS.includes(source.ratingSource)
+      ? source.ratingSource
+      : DEFAULT_BOOKISH_SETTINGS.ratingSource,
+    personalRatingScale: PERSONAL_RATING_SCALE_OPTIONS.includes(Number(source.personalRatingScale))
+      ? Number(source.personalRatingScale)
+      : DEFAULT_BOOKISH_SETTINGS.personalRatingScale,
     readerHighlight: source.readerHighlight === undefined
       ? DEFAULT_BOOKISH_SETTINGS.readerHighlight
       : source.readerHighlight !== false,
@@ -302,7 +312,7 @@ const resolveStorage = (storage) => {
   return localStorage
 }
 
-export const CURRENT_SETTINGS_VERSION = 2
+export const CURRENT_SETTINGS_VERSION = 3
 
 export function readBookishSettings(storage) {
   const targetStorage = resolveStorage(storage)
@@ -328,6 +338,9 @@ export function readBookishSettings(storage) {
         seriesCardLayout: DEFAULT_BOOKISH_SETTINGS.seriesCardLayout,
         playlistCardBackground: DEFAULT_BOOKISH_SETTINGS.playlistCardBackground,
         playlistCardLayout: DEFAULT_BOOKISH_SETTINGS.playlistCardLayout,
+        bookActionDisplay: DEFAULT_BOOKISH_SETTINGS.bookActionDisplay,
+        ratingSource: DEFAULT_BOOKISH_SETTINGS.ratingSource,
+        personalRatingScale: DEFAULT_BOOKISH_SETTINGS.personalRatingScale,
         seriesSuggestions: DEFAULT_BOOKISH_SETTINGS.seriesSuggestions,
         readerHighlight: DEFAULT_BOOKISH_SETTINGS.readerHighlight,
         listenCoverBlur: DEFAULT_BOOKISH_SETTINGS.listenCoverBlur,

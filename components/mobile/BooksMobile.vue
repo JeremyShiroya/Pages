@@ -186,7 +186,6 @@
         <!-- Grid View -->
         <div v-if="viewMode === 'grid'" class="books-grid">
           <LibraryBookCard
-            :show-personal-rating="false"
             v-for="book in displayedBooks"
             :key="book.id"
             :book="book"
@@ -203,7 +202,7 @@
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"
             @playlist="selectedPlaylistBook = book"
-            @edit="router.push(`/edit/${book.id}`)"
+            @edit="openBookEditor(book)"
             @hide="handleHideBook"
             @share="handleShareBook"
             @delete="openDeleteModal(book)"
@@ -213,7 +212,6 @@
         <!-- List View -->
         <div v-else class="mobile-table-card-list">
           <LibraryBookCard
-            :show-personal-rating="false"
             v-for="book in displayedBooks"
             :key="book.id"
             class="mobile-list-book-card"
@@ -222,7 +220,7 @@
             shareable
             :selectable="selectionMode"
             :selected="isSelected(book.id)"
-            :collapse-actions="settings.bookActionDisplay === 'minimal'"
+            :collapse-actions="collapseBookActions"
             @toggle-select="toggleSelected"
             @pointerdown="(event) => onPointerDown(event, book)"
             @pointermove="onPointerMove"
@@ -232,7 +230,7 @@
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"
             @playlist="selectedPlaylistBook = book"
-            @edit="router.push(`/edit/${book.id}`)"
+            @edit="openBookEditor(book)"
             @hide="handleHideBook"
             @share="handleShareBook"
             @delete="openDeleteModal(book)"
@@ -309,7 +307,7 @@ import MobileSkeleton from "./MobileSkeleton.vue";
 import MobileTopNav from "./MobileTopNav.vue";
 
 import { useBooks } from "~/composables/useBooks";
-import { getGoodreadsRating } from "~/composables/useGoodreadsRating";
+import { getBookRating } from "~/composables/useBookRating";
 import { useTTS } from "~/composables/useTTS";
 import {
   FORMAT_FILTER_CHOICES,
@@ -319,6 +317,8 @@ import { useLibraryFilters } from "~/composables/useLibraryFilters";
 import { useToast } from "~/composables/useToast";
 import { useShareBook } from "~/composables/useShareBook";
 import { useLongPress, useMultiSelect } from "~/composables/useMultiSelect";
+import { useDeviceArchitecture } from "~/composables/useDeviceArchitecture";
+import { bookEditLocation, rememberBooksEditScroll, takeBooksEditScroll } from "~/composables/useBookEditNavigation";
 
 // Reactive data
 import EmptyState from "../shared/EmptyState.vue";
@@ -335,6 +335,8 @@ const {
 } = useBooks();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS()
 const { settings, updateSettings } = useBookishSettings();
+const { isPhone } = useDeviceArchitecture();
+const collapseBookActions = computed(() => isPhone.value || settings.value.bookActionDisplay === "minimal");
 const { addToast } = useToast();
 const { shareBook } = useShareBook();
 
@@ -364,6 +366,11 @@ const handlePlay = (book) => {
 }
 
 const router = useRouter();
+const route = useRoute();
+const openBookEditor = (book) => {
+  rememberBooksEditScroll(route.fullPath, window.scrollY);
+  router.push(bookEditLocation(book.id, route.fullPath));
+};
 
 // Filter options
 const readingStatuses = ["Unread", "Reading", "Read"];
@@ -499,7 +506,8 @@ const filteredBooks = computed(() => {
     if (sortBy.value === "name") {
       comparison = a.title.localeCompare(b.title);
     } else if (sortBy.value === "rating") {
-      comparison = getGoodreadsRating(a) - getGoodreadsRating(b);
+      comparison = (getBookRating(a, settings.value.ratingSource, settings.value.personalRatingScale)?.rating || 0)
+        - (getBookRating(b, settings.value.ratingSource, settings.value.personalRatingScale)?.rating || 0);
     } else if (sortBy.value === "year") {
       comparison = (a.publishYear || 0) - (b.publishYear || 0);
     } else if (sortBy.value === "added") {
@@ -586,6 +594,17 @@ watch([activeViewIndex, viewHoverIndex], updateViewHighlight);
 // Mobile shows the full filtered library in one scrollable list — no paging.
 const displayedBooks = computed(() => filteredBooks.value);
 
+let pendingEditScroll = null;
+const restoreEditScroll = async () => {
+  if (pendingEditScroll === null || loading.value || !displayedBooks.value.length) return;
+  await nextTick();
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    window.scrollTo({ top: pendingEditScroll, behavior: 'instant' });
+    pendingEditScroll = null;
+  }));
+};
+watch([loading, displayedBooks], restoreEditScroll, { flush: 'post' });
+
 // The dot means "this list is not in its default order or scope" — default is
 // name A–Z, all statuses, all formats.
 const hasActiveFilter = computed(() => (
@@ -658,6 +677,8 @@ const handleResize = () => {
 };
 
 onMounted(() => {
+  pendingEditScroll = takeBooksEditScroll(route.fullPath);
+  restoreEditScroll();
   handleResize();
   setTimeout(() => {
     updateViewHighlight();
@@ -1789,11 +1810,11 @@ onUnmounted(() => {
 
   .controls-row.in-container.selection-toolbar {
     position: fixed;
-    top: calc(70px + env(safe-area-inset-top));
+    top: calc(69px + env(safe-area-inset-top));
     right: 0;
     left: 0;
     z-index: 1090;
-    min-height: 54px;
+    min-height: 55px;
     padding: 10px var(--mobile-page-padding-inline);
     background: var(--color-background-app);
     border: 0;

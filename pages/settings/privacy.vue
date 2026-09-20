@@ -44,18 +44,20 @@
       <section>
         <h2>3. Metadata, cover, and author-image lookups</h2>
         <p>
-          Metadata search runs only when you press a search button — it never runs automatically in
-          the background. When you request it, Pages queries public book-information sources with
-          the title, author, or publisher you typed (and nothing else). Depending on the search,
-          those sources may include: Goodreads, Google Books, Google Images, Kobo, Open Library,
+          Metadata search runs when you press a search button or choose Goodreads or StoryGraph as
+          your app-wide rating source. A rating-source change continues in the background for the
+          books already in your library. Pages queries public book-information sources with the
+          title, author, or publisher saved for the book (and nothing else). Depending on the search,
+          those sources may include: Goodreads, StoryGraph, Google Books, Google Images, Kobo, Open Library,
           Internet Archive, Bing Images, DuckDuckGo, Wikipedia, Wikidata, Wikimedia Commons, and
           public publisher websites. Each provider receives an ordinary web request containing your
           search terms and your device's network address (IP), as with any website visit, under that
           provider's own privacy policy.
         </p>
         <p>
-          Returned details and images are saved into your local library only when you choose to
-          apply them.
+          Returned details and images are saved into your local library when you apply them;
+          ratings selected in Preferences are cached automatically so switching sources does not
+          repeat completed lookups or discard earlier results.
         </p>
       </section>
 
@@ -160,12 +162,17 @@ import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
 .privacy-page {
   width: 100%;
   max-width: 560px;
+  min-height: calc(100vh - 70px);
   margin: 0 auto;
-  padding: 0 22px 34px;
+  padding: 4px 16px 34px;
   color: var(--color-text-primary);
+  background: var(--color-settings-background);
 }
 
 .policy-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--color-settings-group);
   line-height: 1.6;
 }
 

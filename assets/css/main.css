@@ -72,6 +72,8 @@
   --color-background-overlay-strong: rgba(15, 23, 42, 0.68);
   --color-background-overlay-soft: rgba(15, 23, 42, 0.5);
   --color-background-overlay-faint: rgba(15, 23, 42, 0.4);
+  --color-settings-background: #f1f1f4;
+  --color-settings-group: #ffffff;
 
   /* Surfaces */
   --color-surface-primary: #ffffff;
@@ -288,6 +290,8 @@
   --color-background-overlay-strong: rgba(0, 0, 0, 0.76);
   --color-background-overlay-soft: rgba(0, 0, 0, 0.58);
   --color-background-overlay-faint: rgba(0, 0, 0, 0.42);
+  --color-settings-background: #000000;
+  --color-settings-group: #1f1d29;
 
   /* Surfaces */
   --color-surface-primary: #1f1d29;
@@ -433,6 +437,7 @@
   --color-surface-input-focus: #171717;
   --color-surface-glass: rgba(0, 0, 0, 0.95);
   --color-surface-card: #0a0a0a;
+  --color-settings-group: #171717;
   --color-border-subtle: #262626;
   --color-border-strong: #404040;
   --color-border-card: #262626;

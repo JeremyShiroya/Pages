@@ -24,8 +24,8 @@
     "semantic_hash": "2a90228c3ef53618c1ddd159a9844052"
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1789218861.5859456,
-    "seen": 1789219871.2947233,
+    "mtime": 1789634487.2350128,
+    "seen": 1789634651.7529829,
     "ast_hash": "9d7ac48553a5fbe2dabfa1d735929c47",
     "semantic_hash": "9d7ac48553a5fbe2dabfa1d735929c47"
   },
@@ -66,10 +66,10 @@
     "semantic_hash": "458109458de741bdc0838cad70a3c4ae"
   },
   "android/app/src/main/java/com/bookish/app/SystemBarsPlugin.java": {
-    "mtime": 1784991629.8963377,
-    "seen": 1789126705.9271946,
-    "ast_hash": "029fe91a87de11412b08f9e687932a85",
-    "semantic_hash": "029fe91a87de11412b08f9e687932a85"
+    "mtime": 1789329445.5194907,
+    "seen": 1789468091.5638888,
+    "ast_hash": "e852a67847d7a821e689ee37a877f476",
+    "semantic_hash": ""
   },
   "android/app/src/test/java/com/getcapacitor/myapp/ExampleUnitTest.java": {
     "mtime": 1781859670.0,
@@ -84,8 +84,8 @@
     "semantic_hash": "682315a426653617c6a74fc12bef55b6"
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1789218861.5839431,
-    "seen": 1789219871.2948163,
+    "mtime": 1789634487.234005,
+    "seen": 1789634651.7581224,
     "ast_hash": "27774e912a23b4f9786f7934cdc87d9e",
     "semantic_hash": "27774e912a23b4f9786f7934cdc87d9e"
   },
@@ -120,9 +120,9 @@
     "semantic_hash": "10a8a9a6c3d912f08cdf367958fdf128"
   },
   "components/mobile/AddBookMobile.vue": {
-    "mtime": 1789218233.1751041,
-    "seen": 1789219871.2948852,
-    "ast_hash": "201cd12a1db5fdbce6da5a2643a1d03c",
+    "mtime": 1789469406.7090702,
+    "seen": 1789469595.5116215,
+    "ast_hash": "31469b680e926d99a570ba4819caf475",
     "semantic_hash": ""
   },
   "components/mobile/AnnotationListMobile.vue": {
@@ -132,34 +132,34 @@
     "semantic_hash": "cbec7466171c8f14c3a4bfd40bf538cb"
   },
   "components/mobile/BookDetailMobile.vue": {
-    "mtime": 1788896775.2373424,
-    "seen": 1789126705.9272573,
-    "ast_hash": "34504ecd841ad79e5c7b1e1f1ba567fe",
-    "semantic_hash": "34504ecd841ad79e5c7b1e1f1ba567fe"
+    "mtime": 1789467077.514605,
+    "seen": 1789468091.5704238,
+    "ast_hash": "190d2da82f3318f9bfa6f5419e6394ad",
+    "semantic_hash": ""
   },
   "components/mobile/BooksMobile.vue": {
-    "mtime": 1789218269.321159,
-    "seen": 1789219871.2949035,
-    "ast_hash": "a4b3f6f57836d8d66a1e55759a2a96d6",
+    "mtime": 1789467839.3026674,
+    "seen": 1789468091.57043,
+    "ast_hash": "c9378e234edcf34208ce29bb30783676",
     "semantic_hash": ""
   },
   "components/mobile/EditBookMobile.vue": {
-    "mtime": 1786056650.5419495,
-    "seen": 1789126705.9272635,
-    "ast_hash": "fb0c00f0b4742579f89a42d00fc24e4d",
-    "semantic_hash": "fb0c00f0b4742579f89a42d00fc24e4d"
+    "mtime": 1789469411.361787,
+    "seen": 1789469595.5127435,
+    "ast_hash": "e96cf9f964c2ab6f59690b52b885f607",
+    "semantic_hash": ""
   },
   "components/mobile/FavouritesMobile.vue": {
-    "mtime": 1789218276.967002,
-    "seen": 1789219871.2949178,
-    "ast_hash": "e12ab2cd08b7adccd1dbedfbc96e91c7",
+    "mtime": 1789467842.9941475,
+    "seen": 1789468091.57044,
+    "ast_hash": "f26caa3d49d4671466430f594d9b28eb",
     "semantic_hash": ""
   },
   "components/mobile/HiddenBooksMobile.vue": {
-    "mtime": 1785488883.9798687,
-    "seen": 1789126705.927269,
-    "ast_hash": "ba8ecb824161adcb80d2bcd7f6eb0d12",
-    "semantic_hash": "ba8ecb824161adcb80d2bcd7f6eb0d12"
+    "mtime": 1789467846.7274086,
+    "seen": 1789468091.5704443,
+    "ast_hash": "e1b1793ccd459963ca7cd4af33aace70",
+    "semantic_hash": ""
   },
   "components/mobile/HomeMobile.vue": {
     "mtime": 1788997453.5064132,
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "components/mobile/MobileSettingsNav.vue": {
-    "mtime": 1789130999.374796,
-    "seen": 1789216826.4655826,
-    "ast_hash": "505d2f8c6b19b6278ada07a8c255e6df",
+    "mtime": 1789329373.2646377,
+    "seen": 1789468091.5716712,
+    "ast_hash": "b661bb84a20b7a246f953a3591e3f62d",
     "semantic_hash": ""
   },
   "components/mobile/MobileSkeleton.vue": {
@@ -192,16 +192,16 @@
     "semantic_hash": "10605cbd276a15c02ffe87941971889d"
   },
   "components/mobile/MobileTopNav.vue": {
-    "mtime": 1788994161.6005576,
-    "seen": 1789126705.9272845,
-    "ast_hash": "7c002b8a185b2cd63bb11d845140a9c4",
-    "semantic_hash": "7c002b8a185b2cd63bb11d845140a9c4"
+    "mtime": 1789226783.4338436,
+    "seen": 1789468091.5720274,
+    "ast_hash": "62a4ec7d822c9e310f11aa91719c9352",
+    "semantic_hash": ""
   },
   "components/mobile/PlaylistDetailMobile.vue": {
-    "mtime": 1785488883.9851449,
-    "seen": 1789126705.9272873,
-    "ast_hash": "99581489250e578863b9aed82039c4ea",
-    "semantic_hash": "99581489250e578863b9aed82039c4ea"
+    "mtime": 1789467850.3960605,
+    "seen": 1789468091.5720315,
+    "ast_hash": "1ee465258fc894ea47b4753cb916dbfc",
+    "semantic_hash": ""
   },
   "components/mobile/PlaylistsMobile.vue": {
     "mtime": 1785488883.987152,
@@ -210,16 +210,16 @@
     "semantic_hash": "08d9ed05478623c19186d1cb0c36fff0"
   },
   "components/mobile/PreferencesMobile.vue": {
-    "mtime": 1789218388.4560006,
-    "seen": 1789219871.294983,
-    "ast_hash": "c741f3575a4b17692361bd6e4b49634b",
+    "mtime": 1789633246.6126575,
+    "seen": 1789634651.7693071,
+    "ast_hash": "b09175084cc7b91e1d2f5cccc5f068c8",
     "semantic_hash": ""
   },
   "components/mobile/ProfileMobile.vue": {
-    "mtime": 1788997467.2416248,
-    "seen": 1789126705.9272983,
-    "ast_hash": "5086d236bfa49ea4d73c2b986c112f4d",
-    "semantic_hash": "5086d236bfa49ea4d73c2b986c112f4d"
+    "mtime": 1789242670.0162754,
+    "seen": 1789468091.5723817,
+    "ast_hash": "c787b93af5e033163345809d3bdf0cbf",
+    "semantic_hash": ""
   },
   "components/mobile/ReaderFigureViewer.vue": {
     "mtime": 1785488883.990985,
@@ -228,9 +228,9 @@
     "semantic_hash": "b1ea933a896e0ec17f08f7b3b3c54e10"
   },
   "components/mobile/ReaderMobile.vue": {
-    "mtime": 1789148562.0549908,
-    "seen": 1789216826.4708018,
-    "ast_hash": "9ced5d7950f647c100a927e6e0b1af14",
+    "mtime": 1789633254.7287881,
+    "seen": 1789634651.7704275,
+    "ast_hash": "f083e9b6d4c84de32aed9cbda6172322",
     "semantic_hash": ""
   },
   "components/mobile/ReaderNoteEditor.vue": {
@@ -252,28 +252,28 @@
     "semantic_hash": "93de9886f7b3e6115e742cc5315f2878"
   },
   "components/mobile/SeriesDetailMobile.vue": {
-    "mtime": 1786192468.260012,
-    "seen": 1789126705.927313,
-    "ast_hash": "ca97db5ffdd298fbcc05992aaff403f6",
-    "semantic_hash": "ca97db5ffdd298fbcc05992aaff403f6"
+    "mtime": 1789467854.0774317,
+    "seen": 1789468091.5740976,
+    "ast_hash": "58624f4eb378ece5138e4163fd50b5b2",
+    "semantic_hash": ""
   },
   "components/mobile/SeriesMobile.vue": {
-    "mtime": 1789218284.576693,
-    "seen": 1789219871.2950354,
-    "ast_hash": "7deeba369383c0bf22caa346e030a793",
+    "mtime": 1789229947.0281844,
+    "seen": 1789468091.574102,
+    "ast_hash": "d8b31239d9020357edf79580b07c24b7",
     "semantic_hash": ""
   },
   "components/mobile/SettingsMobile.vue": {
-    "mtime": 1789218343.7987359,
-    "seen": 1789219871.2950404,
-    "ast_hash": "2261c0148105cf9497ca0846a4521df8",
+    "mtime": 1789241968.5375004,
+    "seen": 1789468091.5741057,
+    "ast_hash": "5bca829965573040b50ebd73dc1e552f",
     "semantic_hash": ""
   },
   "components/mobile/SettingsStorageMobile.vue": {
-    "mtime": 1788871219.4250445,
-    "seen": 1789126705.9273205,
-    "ast_hash": "5deb208d459b934240cd5d69cb2b62e4",
-    "semantic_hash": "5deb208d459b934240cd5d69cb2b62e4"
+    "mtime": 1789241980.8693745,
+    "seen": 1789468091.5741103,
+    "ast_hash": "d49f5726dc5e95f7f933f8b524c06d49",
+    "semantic_hash": ""
   },
   "components/mobile/StreakCalendarMobile.vue": {
     "mtime": 1789148566.3131683,
@@ -282,10 +282,10 @@
     "semantic_hash": ""
   },
   "components/shared/AddBookComp.vue": {
-    "mtime": 1786056628.3167832,
-    "seen": 1789126705.9273262,
-    "ast_hash": "a3ab8161c0eb0a6f80b28be98d09fd51",
-    "semantic_hash": "a3ab8161c0eb0a6f80b28be98d09fd51"
+    "mtime": 1789469416.1852784,
+    "seen": 1789469595.5261385,
+    "ast_hash": "ca519895897deb8234fb0382335a7650",
+    "semantic_hash": ""
   },
   "components/shared/AddToPlaylistModal.vue": {
     "mtime": 1784991630.1749616,
@@ -300,10 +300,10 @@
     "semantic_hash": "a4665be90394773b20792440d6a6bde4"
   },
   "components/shared/AuthorDetailComp.vue": {
-    "mtime": 1782553275.6283455,
-    "seen": 1789126705.927336,
-    "ast_hash": "d56bdd07763c82cf8600f02e9ed34258",
-    "semantic_hash": "d56bdd07763c82cf8600f02e9ed34258"
+    "mtime": 1789633652.9294693,
+    "seen": 1789634651.7765548,
+    "ast_hash": "1ae9fdcce1dbdd428067fcf5c372c4c5",
+    "semantic_hash": ""
   },
   "components/shared/AuthorImageModal.vue": {
     "mtime": 1780896431.8270879,
@@ -312,16 +312,16 @@
     "semantic_hash": "4211703a4051ebe13b3d1cd5f0cfb0e5"
   },
   "components/shared/AuthorsComp.vue": {
-    "mtime": 1782815184.4414766,
-    "seen": 1789126705.927342,
-    "ast_hash": "ce722b9b601593e6cf31dd06f5b9b8c4",
-    "semantic_hash": "ce722b9b601593e6cf31dd06f5b9b8c4"
+    "mtime": 1789633648.1109972,
+    "seen": 1789634651.7770948,
+    "ast_hash": "49df69a09f2d8e304b9cfa85b8f39715",
+    "semantic_hash": ""
   },
   "components/shared/BookGroupDetail.vue": {
-    "mtime": 1782884458.150797,
-    "seen": 1789126705.9273446,
-    "ast_hash": "e1f57c895ded4bce597558dcb64d3a46",
-    "semantic_hash": "e1f57c895ded4bce597558dcb64d3a46"
+    "mtime": 1789467226.5826154,
+    "seen": 1789468091.5782044,
+    "ast_hash": "e2fe4e123af0254c5ccefa633cdc5434",
+    "semantic_hash": ""
   },
   "components/shared/BookishSelect.vue": {
     "mtime": 1782607179.735614,
@@ -336,10 +336,10 @@
     "semantic_hash": ""
   },
   "components/shared/ConnectionTestPanel.vue": {
-    "mtime": 1785883457.9934409,
-    "seen": 1789126705.9273536,
-    "ast_hash": "201e9094c5fcf88ff7a37f485def81e5",
-    "semantic_hash": "201e9094c5fcf88ff7a37f485def81e5"
+    "mtime": 1789241986.5744216,
+    "seen": 1789468091.5794783,
+    "ast_hash": "fcf247b82719e612e688590161e9b203",
+    "semantic_hash": ""
   },
   "components/shared/CoverImageModal.vue": {
     "mtime": 1783105088.2107086,
@@ -360,10 +360,10 @@
     "semantic_hash": "971ec7c9579477532cae73c725a80756"
   },
   "components/shared/EditBookComp.vue": {
-    "mtime": 1786056662.0405087,
-    "seen": 1789126705.9273653,
-    "ast_hash": "8123c21c4f4ca734d2ee56bb62793419",
-    "semantic_hash": "8123c21c4f4ca734d2ee56bb62793419"
+    "mtime": 1789469421.208947,
+    "seen": 1789469595.5328605,
+    "ast_hash": "0f6b857c5fccd0fcff6517a639ec9ca0",
+    "semantic_hash": ""
   },
   "components/shared/EditBookModal.vue": {
     "mtime": 1789130773.4873333,
@@ -432,9 +432,9 @@
     "semantic_hash": "c31ca18fb8a369d60046f3d48c933878"
   },
   "components/shared/LibraryBookCard.vue": {
-    "mtime": 1789130784.204681,
-    "seen": 1789216826.4947598,
-    "ast_hash": "8db2e9b4535f0775e3a47f6273ea34e0",
+    "mtime": 1789469176.645585,
+    "seen": 1789469595.5379868,
+    "ast_hash": "0891d49d00c2f2f37ce789c5469858ac",
     "semantic_hash": ""
   },
   "components/shared/LibraryControlsRow.vue": {
@@ -606,9 +606,9 @@
     "semantic_hash": ""
   },
   "composables/tts/nativeSpeech.js": {
-    "mtime": 1789206546.7492838,
-    "seen": 1789216826.5115352,
-    "ast_hash": "99d2f7919c738c28bc730ba5bca3ce89",
+    "mtime": 1789229862.112267,
+    "seen": 1789468091.606531,
+    "ast_hash": "e07b4499a7f4fe24644244f3aa1e6075",
     "semantic_hash": ""
   },
   "composables/useAnnotations.js": {
@@ -690,22 +690,22 @@
     "semantic_hash": "bd80f5841870018f09ca4921296bc413"
   },
   "composables/useBookishSettings.js": {
-    "mtime": 1789214152.002042,
-    "seen": 1789216826.5234082,
-    "ast_hash": "c7bc91ebd7ed3dc47332c490a06c9b51",
+    "mtime": 1789633250.715004,
+    "seen": 1789634651.8248944,
+    "ast_hash": "05b3a7abf70b8675e7a7922aed420cb3",
     "semantic_hash": ""
   },
   "composables/useBookishSettings.test.js": {
-    "mtime": 1789147219.1139128,
-    "seen": 1789216826.5234141,
-    "ast_hash": "4990f249a70378caeeaf67744d86f705",
+    "mtime": 1789633772.6147425,
+    "seen": 1789634651.824899,
+    "ast_hash": "8b3a235edcbca8532959602071e3f7b1",
     "semantic_hash": ""
   },
   "composables/useBooks.js": {
-    "mtime": 1788871199.9387758,
-    "seen": 1789126705.927577,
-    "ast_hash": "2a23d14a4058d75b0e8c4f632794a5d2",
-    "semantic_hash": "2a23d14a4058d75b0e8c4f632794a5d2"
+    "mtime": 1789633643.1937592,
+    "seen": 1789634651.8249035,
+    "ast_hash": "574d94ed332621495987dfbc2ea9dbcf",
+    "semantic_hash": ""
   },
   "composables/useBooks.test.js": {
     "mtime": 1784419602.2641282,
@@ -1032,9 +1032,9 @@
     "semantic_hash": "14ebf8425a342a63bc65454e3e18afc8"
   },
   "composables/useTTS.js": {
-    "mtime": 1789214144.9817474,
-    "seen": 1789216826.573031,
-    "ast_hash": "50550b8d4f5a862a86046d3b5ede5d9d",
+    "mtime": 1789229856.3565767,
+    "seen": 1789468091.6363254,
+    "ast_hash": "b5e23d5a0be3f76f62865e4f81090d7e",
     "semantic_hash": ""
   },
   "composables/useTTS.test.js": {
@@ -1074,9 +1074,9 @@
     "semantic_hash": "b9e68f9a04fc78bc51cc1730a116e304"
   },
   "layouts/default.vue": {
-    "mtime": 1789215410.2105668,
-    "seen": 1789216826.5782883,
-    "ast_hash": "6da6eda2bf1e2a47e3f3f62f36dc4865",
+    "mtime": 1789633969.7238462,
+    "seen": 1789634651.8554394,
+    "ast_hash": "112a4759fed3ad50d007f1afc9108047",
     "semantic_hash": ""
   },
   "layouts/reader.vue": {
@@ -1212,16 +1212,16 @@
     "semantic_hash": "246ee1bb2f510ea656021613ad71d409"
   },
   "pages/settings/about.vue": {
-    "mtime": 1784991630.257245,
-    "seen": 1789126705.9278178,
-    "ast_hash": "33c29b061e2df23fa06e999b4e5933c5",
-    "semantic_hash": "33c29b061e2df23fa06e999b4e5933c5"
+    "mtime": 1789227019.3195224,
+    "seen": 1789468091.6505814,
+    "ast_hash": "9cb098a68aedb94c99a30b623c46e8b6",
+    "semantic_hash": ""
   },
   "pages/settings/connection.vue": {
-    "mtime": 1785883871.578166,
-    "seen": 1789126705.92782,
-    "ast_hash": "ddea30465a764d915400750a41bfb0b4",
-    "semantic_hash": "ddea30465a764d915400750a41bfb0b4"
+    "mtime": 1789226919.149899,
+    "seen": 1789468091.6505885,
+    "ast_hash": "8c63efb1915cbc97d182017927bb7414",
+    "semantic_hash": ""
   },
   "pages/settings/hidden.vue": {
     "mtime": 1784991630.2599628,
@@ -1242,15 +1242,15 @@
     "semantic_hash": "7991e176ae7f06931779725957ddae38"
   },
   "pages/settings/privacy.vue": {
-    "mtime": 1784991630.2624066,
-    "seen": 1789126705.92783,
-    "ast_hash": "b83bfbd2cdfaafaa6ed9ab5e098dfac2",
-    "semantic_hash": "b83bfbd2cdfaafaa6ed9ab5e098dfac2"
+    "mtime": 1789467695.28064,
+    "seen": 1789468091.652065,
+    "ast_hash": "bbfb342f86e3285dce421e86615a82fe",
+    "semantic_hash": ""
   },
   "pages/settings/storage.vue": {
-    "mtime": 1789215620.592407,
-    "seen": 1789216826.5916414,
-    "ast_hash": "961658ea5d44808bfcf0fb06f6b091ad",
+    "mtime": 1789226912.2478735,
+    "seen": 1789468091.6520698,
+    "ast_hash": "51a20ee3dafadf1f812e12e6ec680c35",
     "semantic_hash": ""
   },
   "pages/streak.vue": {
@@ -1320,10 +1320,10 @@
     "semantic_hash": "8c865df3f44dedef5659001d8a1be380"
   },
   "server/api/authors/bio.get.ts": {
-    "mtime": 1784991630.2932026,
-    "seen": 1789126705.9278622,
-    "ast_hash": "41f93af5ec921a139eb605f0da54a7da",
-    "semantic_hash": "41f93af5ec921a139eb605f0da54a7da"
+    "mtime": 1789634078.1654246,
+    "seen": 1789634651.8738966,
+    "ast_hash": "d0d9f403f85e81432e53db33cf3ef775",
+    "semantic_hash": ""
   },
   "server/api/authors/scrape-image.get.ts": {
     "mtime": 1784991630.2952106,
@@ -1554,16 +1554,16 @@
     "semantic_hash": "85b23a3fea4cd55bf457a2ab1fcaf155"
   },
   "server/utils/metadataAggregator.ts": {
-    "mtime": 1786191055.9417794,
-    "seen": 1789126705.9279552,
-    "ast_hash": "82d4165bf3012b978d7965ce89680bb9",
-    "semantic_hash": "82d4165bf3012b978d7965ce89680bb9"
+    "mtime": 1789634429.819896,
+    "seen": 1789634651.8959818,
+    "ast_hash": "9a593a71e524b764aff7e01b5c2efa17",
+    "semantic_hash": ""
   },
   "server/utils/metadataEnrichment.test.ts": {
-    "mtime": 1780749838.2078793,
-    "seen": 1789126705.9279575,
-    "ast_hash": "4e04cd7d363c2d2d538aaaf93578b66a",
-    "semantic_hash": "4e04cd7d363c2d2d538aaaf93578b66a"
+    "mtime": 1789634434.9646747,
+    "seen": 1789634651.8959863,
+    "ast_hash": "60b1daac874e2070f53d3e07ee67727d",
+    "semantic_hash": ""
   },
   "server/utils/migrationAuditSchema.ts": {
     "mtime": 1786200395.7536318,
@@ -1800,9 +1800,9 @@
     "semantic_hash": "1692a7f864acae7dca63882adf4d3410"
   },
   "tests/mobileUxBatch.test.js": {
-    "mtime": 1789130727.703606,
-    "seen": 1789216826.6610904,
-    "ast_hash": "20ce6a3be05480f6c2aeef9a92bd5e3f",
+    "mtime": 1789467861.6338036,
+    "seen": 1789468091.6922016,
+    "ast_hash": "f1d2476ed945014d68bea24f647f94c2",
     "semantic_hash": ""
   },
   "tests/nativeApiEndpoint.test.js": {
@@ -1824,16 +1824,16 @@
     "semantic_hash": "e2f5c0d6795db1a3e11bbe7cd0d0a08e"
   },
   "tests/preferences.test.js": {
-    "mtime": 1789218411.76528,
-    "seen": 1789219871.2969563,
-    "ast_hash": "f595cf0955ec4d5d07ea00083bb0dd85",
+    "mtime": 1789633768.3483534,
+    "seen": 1789634651.922443,
+    "ast_hash": "eed2bc76ad1db830fecd2ea9eead9ca4",
     "semantic_hash": ""
   },
   "tests/readerChromeAndListen.test.js": {
-    "mtime": 1784991630.336649,
-    "seen": 1789126705.9280696,
-    "ast_hash": "00c6efb74cefb311358963bf8b6ec706",
-    "semantic_hash": "00c6efb74cefb311358963bf8b6ec706"
+    "mtime": 1789633776.6935906,
+    "seen": 1789634651.9224536,
+    "ast_hash": "aa286e90ab2cc922730372d5bf7cae3b",
+    "semantic_hash": ""
   },
   "tests/readerPositionLifecycle.test.js": {
     "mtime": 1786694857.3746083,
@@ -1842,22 +1842,22 @@
     "semantic_hash": "3299f7056676a036f2baa49a81b50570"
   },
   "tests/requestedUxUpdates.test.js": {
-    "mtime": 1789214161.0799778,
-    "seen": 1789216826.6634758,
-    "ast_hash": "6e4e3a675629e35d8153f5155a806d9b",
+    "mtime": 1789634299.122736,
+    "seen": 1789634651.9228854,
+    "ast_hash": "c3403f7ed1070306d8704310b66a3bff",
     "semantic_hash": ""
   },
   "tests/responsiveComponentSplit.test.js": {
-    "mtime": 1789216090.7058995,
-    "seen": 1789216826.6634805,
-    "ast_hash": "b871beebead935efdd88f244ebcf687b",
+    "mtime": 1789634376.1684322,
+    "seen": 1789634651.92289,
+    "ast_hash": "b203424e868859f09df0bd7959f9d4d6",
     "semantic_hash": ""
   },
   "tests/selectionAndFilters.test.js": {
-    "mtime": 1784991630.3401904,
-    "seen": 1789126705.9280798,
-    "ast_hash": "f82f6524a05a8be15c932b1cff27dd25",
-    "semantic_hash": "f82f6524a05a8be15c932b1cff27dd25"
+    "mtime": 1789230018.25399,
+    "seen": 1789468091.6946719,
+    "ast_hash": "490e8e3669019c9e6462bad7d27c2c6f",
+    "semantic_hash": ""
   },
   "tests/series-resolution/adversarialSuite.test.ts": {
     "mtime": 1786200403.7177339,
@@ -2022,10 +2022,10 @@
     "semantic_hash": "5713a389156ec042a1d93d287053b522"
   },
   "tests/uxBatchFour.test.js": {
-    "mtime": 1785001438.0361626,
-    "seen": 1789126705.9281533,
-    "ast_hash": "56cbb225a7d462fbe67a59bdef1afbba",
-    "semantic_hash": "56cbb225a7d462fbe67a59bdef1afbba"
+    "mtime": 1789329612.2945566,
+    "seen": 1789468091.7048516,
+    "ast_hash": "338ff9dcd1dadcd23efae01a1dedaf6e",
+    "semantic_hash": ""
   },
   "tests/uxBatchSix.test.js": {
     "mtime": 1785488884.071171,
@@ -2082,9 +2082,9 @@
     "semantic_hash": ""
   },
   "components/tablet/BooksDesktop.vue": {
-    "mtime": 1785488883.9629924,
-    "seen": 1789216826.5067213,
-    "ast_hash": "2e59e86e6dacb5b5ae1496114676559c",
+    "mtime": 1789467131.0752428,
+    "seen": 1789468091.594521,
+    "ast_hash": "da8ed1d97e9457f39c67848c2cb84a4b",
     "semantic_hash": ""
   },
   "components/tablet/FavouritesDesktop.vue": {
@@ -2094,9 +2094,9 @@
     "semantic_hash": ""
   },
   "components/tablet/HomeDesktop.vue": {
-    "mtime": 1784991630.1021557,
-    "seen": 1789216826.506734,
-    "ast_hash": "a7a0f99267b014027b98f91fbb4a9480",
+    "mtime": 1789633501.2891705,
+    "seen": 1789634651.8018978,
+    "ast_hash": "573d62057eff1f7c9883c03cb6c0b86d",
     "semantic_hash": ""
   },
   "components/tablet/PlaylistsDesktop.vue": {
@@ -2106,9 +2106,9 @@
     "semantic_hash": ""
   },
   "components/tablet/ProfileDesktop.vue": {
-    "mtime": 1788997474.2575974,
-    "seen": 1789216826.5068357,
-    "ast_hash": "af1ccd4135a52c76ec7c4551e7137c66",
+    "mtime": 1789633719.1335955,
+    "seen": 1789634651.802447,
+    "ast_hash": "d94c38e06bf7a326765d11a8c7a73047",
     "semantic_hash": ""
   },
   "components/tablet/SeriesDesktop.vue": {
@@ -2124,9 +2124,9 @@
     "semantic_hash": ""
   },
   "components/tablet/Sidebar.vue": {
-    "mtime": 1788997487.648379,
-    "seen": 1789216826.50686,
-    "ast_hash": "d913fae7a609a3ab7e81305c6f438260",
+    "mtime": 1789633293.1392238,
+    "seen": 1789634651.803393,
+    "ast_hash": "845716196fb16e9c64a53d38604091c5",
     "semantic_hash": ""
   },
   "components/tablet/portrait/AddBookTabletPortrait.vue": {
@@ -3074,19 +3074,115 @@
   "server/database/migrations/0000_add-pages-column.sql": {
     "mtime": 1778139591.9198406,
     "seen": 1789219871.296478,
-    "ast_hash": "fae8f00f3932a1e5e3f11be8ea24f3ea",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0001_naive_stark_industries.sql": {
     "mtime": 1778224044.757941,
     "seen": 1789219871.2964835,
-    "ast_hash": "bcb6d05640ed56e698637c15d100f6e7",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0002_drop_content_column.sql": {
     "mtime": 1778991194.1574428,
     "seen": 1789219871.2964888,
-    "ast_hash": "812224c49041ad46b8e8d1e772855b69",
+    "ast_hash": "",
+    "semantic_hash": ""
+  },
+  "components/shared/BookProgressDisplay.vue": {
+    "mtime": 1789633242.7739618,
+    "seen": 1789634651.777636,
+    "ast_hash": "5f9e095caa330f13a98a595404cd9514",
+    "semantic_hash": ""
+  },
+  "components/shared/BookRatingDisplay.vue": {
+    "mtime": 1789469401.9333208,
+    "seen": 1789469595.5296319,
+    "ast_hash": "cb6024feb632ca372d9a4d917485283d",
+    "semantic_hash": ""
+  },
+  "components/shared/PersonalRatingInput.vue": {
+    "mtime": 1789467247.7172432,
+    "seen": 1789468091.5868907,
+    "ast_hash": "7264951e61d879298ae1adab7d8732a3",
+    "semantic_hash": ""
+  },
+  "composables/useBookRating.js": {
+    "mtime": 1789466835.6132534,
+    "seen": 1789468091.612692,
+    "ast_hash": "3d565c9177d00c75dcc2a4df45ee4acf",
+    "semantic_hash": ""
+  },
+  "composables/useRatingSync.js": {
+    "mtime": 1789467940.4970868,
+    "seen": 1789468091.6307364,
+    "ast_hash": "5cce77256bd0d897fbe85280d90812f4",
+    "semantic_hash": ""
+  },
+  "plugins/settings-system-bars.client.js": {
+    "mtime": 1789633727.5305276,
+    "seen": 1789634651.871827,
+    "ast_hash": "a60bf1de8e696af558db6381a7574594",
+    "semantic_hash": ""
+  },
+  "plugins/system-bars.client.js": {
+    "mtime": 1789633723.295468,
+    "seen": 1789634651.871836,
+    "ast_hash": "a54ab9bf54b7bf4e180285884b22440a",
+    "semantic_hash": ""
+  },
+  "server/api/books/rating.get.ts": {
+    "mtime": 1789466929.6675086,
+    "seen": 1789468091.6582246,
+    "ast_hash": "0999e1dff50591b559dc7a715f1ab8fe",
+    "semantic_hash": ""
+  },
+  "server/utils/storyGraphScraper.ts": {
+    "mtime": 1789466908.019404,
+    "seen": 1789468091.685823,
+    "ast_hash": "5ab40c726a02698b8ae36337002a92bb",
+    "semantic_hash": ""
+  },
+  "tests/ratingPreferences.test.js": {
+    "mtime": 1789633764.2710755,
+    "seen": 1789634651.9224494,
+    "ast_hash": "5ab1aad0778947fce4472ff6ea7681e5",
+    "semantic_hash": ""
+  },
+  "components/shared/RatingProviderIcon.vue": {
+    "mtime": 1789469160.6920981,
+    "seen": 1789469595.548772,
+    "ast_hash": "456328793a00985dc829f55ec7b13026",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20260915_102832_06787ae0_add_visual_progress_choices__selectable_goodreads.md": {
+    "mtime": 1789468112.642019,
+    "seen": 1789469595.7353415,
+    "ast_hash": "30231dab2135e3f1f7cdbcedfce9e3ea",
+    "semantic_hash": ""
+  },
+  "composables/useSidebarState.js": {
+    "mtime": 1789633285.2041254,
+    "seen": 1789634651.8520513,
+    "ast_hash": "bf26f9cfd4832d5bf25ff2c09794217d",
+    "semantic_hash": ""
+  },
+  "utils/authorIntelligence.js": {
+    "mtime": 1789633638.084592,
+    "seen": 1789634651.9431853,
+    "ast_hash": "0567116649d7b21d81a12189a79446e8",
+    "semantic_hash": ""
+  },
+  "utils/authorIntelligence.test.js": {
+    "mtime": 1789633784.8345938,
+    "seen": 1789634651.9431944,
+    "ast_hash": "03f470412945d62ad55693ca66ea1617",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20260915_105620_de6c6f28_fix_the_progress_ring_fidelity__restore_provider_i.md": {
+    "mtime": 1789469780.8461485,
+    "seen": 1789634651.9713845,
+    "ast_hash": "2036e609b20bd0a5530d44293b4bd963",
     "semantic_hash": ""
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <ResponsiveViewSwitch>
     <template #phone>
-      <div class="app-layout compact-layout phone-layout">
+      <div class="app-layout compact-layout phone-layout" :class="{ 'settings-palette': isSettingsPalettePage }">
         <main class="main-content">
           <div class="page-container" :class="{ 'mobile-sub-page': isMobileSubPage }"><slot /></div>
           <MobilePlayingBar />
@@ -10,7 +10,7 @@
     </template>
 
     <template #tabletPortrait>
-      <div class="app-layout compact-layout tablet-portrait-layout">
+      <div class="app-layout compact-layout tablet-portrait-layout" :class="{ 'settings-palette': isSettingsPalettePage }">
         <main class="main-content">
           <div class="page-container" :class="{ 'mobile-sub-page': isMobileSubPage }"><slot /></div>
           <TabletPlayingBar />
@@ -19,7 +19,7 @@
     </template>
 
     <template #tabletLandscape>
-      <div class="app-layout tablet-landscape-layout">
+      <div class="app-layout tablet-landscape-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'settings-palette': isSettingsPalettePage }">
         <Sidebar />
         <main class="main-content">
           <div class="page-container"><slot /></div>
@@ -38,6 +38,7 @@ import MobilePlayingBar from '~/components/mobile/MobilePlayingBar.vue'
 import TabletPlayingBar from '~/components/tablet/portrait/TabletPlayingBar.vue'
 import PlayingBar from '~/components/shared/PlayingBar.vue'
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
+import { useSidebarState } from '~/composables/useSidebarState'
 
 // The five tab-root pages carry their own fixed top/bottom nav bars, which
 // already reserve the phone's status- and navigation-bar areas. Every OTHER
@@ -47,7 +48,9 @@ import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
 // own app-coloured background then fills those bar strips, in light and dark.
 const TAB_ROOT_PATHS = new Set(['/', '/books', '/series', '/favourites', '/playlists'])
 const route = useRoute()
+const { collapsed: sidebarCollapsed } = useSidebarState()
 const isMobileSubPage = computed(() => !TAB_ROOT_PATHS.has(route.path))
+const isSettingsPalettePage = computed(() => route.path.startsWith('/settings') || route.path.startsWith('/profile'))
 </script>
 
 <style scoped>
@@ -65,6 +68,16 @@ const isMobileSubPage = computed(() => !TAB_ROOT_PATHS.has(route.path))
 .page-container {
   padding: 2.5rem;
   padding-bottom: 120px; /* Account for PlayingBar (90px) + 30px breathing room */
+}
+
+.tablet-landscape-layout.sidebar-collapsed .main-content {
+  margin-left: 76px;
+}
+
+.app-layout.settings-palette,
+.app-layout.settings-palette .main-content,
+.app-layout.settings-palette .page-container {
+  background: var(--color-settings-background);
 }
 
 .compact-layout .main-content {

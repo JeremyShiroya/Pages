@@ -5,6 +5,8 @@ import { sanitizeMetadataResult } from '../server/utils/metadataAggregator'
 describe('metadata series sanitation', () => {
   test('parseSeriesFromText rejects bylines and sentence-like junk', () => {
     expect(parseSeriesFromText('By Andy Weir').series).toBeNull()
+    expect(parseSeriesFromText('List of Contributors').series).toBeNull()
+    expect(parseSeriesFromText('Book Details').series).toBeNull()
     expect(parseSeriesFromText('1234').series).toBeNull()
     expect(parseSeriesFromText('a rather long descriptive phrase that is clearly not a series name').series).toBeNull()
   })
@@ -28,6 +30,8 @@ describe('metadata series sanitation', () => {
       .toEqual({ series: null, author: 'Andy Weir', seriesInstallment: null, seriesTotal: null })
 
     expect(sanitizeMetadataResult({ series: 'Andy Weir', author: 'Andy Weir' }).series).toBeNull()
+    expect(sanitizeMetadataResult({ series: 'List of Contributors', author: 'Andy Weir', seriesInstallment: '1' }))
+      .toEqual({ series: null, author: 'Andy Weir', seriesInstallment: null, seriesTotal: null })
   })
 
   test('sanitizeMetadataResult keeps a genuine series', () => {

@@ -1,5 +1,9 @@
 <template>
-  <div class="group-detail-page">
+  <div
+    class="group-detail-page"
+    data-system-bar-color="transparent"
+    :data-system-bar-icons="settings.readerTheme === 'dark' ? 'light' : 'dark'"
+  >
     <!-- No title: the hero below names the playlist in full. One overflow
          button in the bar, opposite the back button, keeps the two destructive
          -ish actions a deliberate step away rather than one stray tap. -->
@@ -59,8 +63,16 @@
         </div>
       </header>
 
+      <SelectionActionsBar
+        v-if="selectionMode"
+        class="group-selection-actions"
+        :count="selectedCount"
+        :actions="bulkActions"
+        @action="runBulkAction"
+        @clear="clearSelection"
+      />
       <LibraryControlsRow
-        v-if="playlistBooks.length"
+        v-else-if="playlistBooks.length"
         :status="filters.status"
         :format="filters.format"
         v-model:view="viewMode"
@@ -70,17 +82,24 @@
 
       <div v-if="filteredBooks.length" :class="viewMode === 'list' ? 'book-list' : 'books-grid'">
         <LibraryBookCard
-          :show-personal-rating="false"
           v-for="book in filteredBooks"
           :key="book.id"
           :book="book"
           :active="isBookActive(book)"
           :class="{ 'mobile-list-book-card': viewMode === 'list' }"
-          @open="router.push(`/book/${book.id}`)"
+          collapse-actions
+          :selectable="selectionMode"
+          :selected="isSelected(book.id)"
+          @toggle-select="toggleSelected"
+          @pointerdown="(event) => onPointerDown(event, book)"
+          @pointermove="onPointerMove"
+          @pointerup="onPointerUp"
+          @pointercancel="onPointerUp"
+          @open="openBook"
           @play="handlePlay"
           @favourite="toggleFavourite(book.id)"
           @playlist="selectedPlaylistBook = book"
-          @edit="router.push(`/edit/${book.id}`)"
+          @edit="router.push(bookEditLocation(book.id, route.fullPath))"
           @hide="handleHideBook"
           @delete="handleDeleteBook(book)"
         />
@@ -117,9 +136,10 @@
     />
 
     <AddToPlaylistModal
-      v-if="selectedPlaylistBook"
+      v-if="selectedPlaylistBook || bulkPlaylistBooks"
       :book="selectedPlaylistBook"
-      @close="selectedPlaylistBook = null"
+      :books="bulkPlaylistBooks"
+      @close="selectedPlaylistBook = null; bulkPlaylistBooks = null"
     />
 
     <DeleteConfirmModal
@@ -127,6 +147,14 @@
       :book="bookToDelete"
       @close="showDeleteModal = false; bookToDelete = null"
       @confirm="confirmDeleteBook"
+    />
+
+    <DeleteConfirmModal
+      v-if="bulkDeleteBooks?.length"
+      :book="bulkDeleteBooks[0]"
+      :count="bulkDeleteBooks.length"
+      @close="bulkDeleteBooks = null"
+      @confirm="confirmBulkDelete"
     />
 
     <PlaylistDeleteModal
@@ -139,25 +167,30 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import AddToPlaylistModal from '~/components/shared/AddToPlaylistModal.vue';
 import DeleteConfirmModal from '~/components/shared/DeleteConfirmModal.vue';
 import EmptyState from '~/components/shared/EmptyState.vue';
 import LibraryBookCard from '~/components/shared/LibraryBookCard.vue';
 import LibraryControlsRow from '~/components/shared/LibraryControlsRow.vue';
+import SelectionActionsBar from '~/components/shared/SelectionActionsBar.vue';
 import PlaylistDeleteModal from '~/components/shared/PlaylistDeleteModal.vue';
 import PlaylistEditModal from '~/components/shared/PlaylistEditModal.vue';
 import { useLibraryFilters } from '~/composables/useLibraryFilters';
+import { useBookishSettings } from '~/composables/useBookishSettings';
 import { useBooks } from '~/composables/useBooks';
 import { useToast } from '~/composables/useToast';
 import { useTTS } from '~/composables/useTTS';
+import { bookEditLocation } from '~/composables/useBookEditNavigation';
+import { useLongPress, useMultiSelect } from '~/composables/useMultiSelect';
 import MobileSettingsNav from './MobileSettingsNav.vue';
 
 const route = useRoute();
 const router = useRouter();
 const { books, collections, updatePlaylist, deletePlaylist, deleteBook, toggleFavourite, hideBook } = useBooks();
 const { addToast } = useToast();
+const { settings } = useBookishSettings();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 // Each playlist remembers its own filters — filtering one is not a statement
 // about the others.
@@ -168,8 +201,31 @@ const editingPlaylist = ref(null);
 const savingPlaylist = ref(false);
 const showDeleteModal = ref(false);
 const bookToDelete = ref(null);
+const bulkPlaylistBooks = ref(null);
+const bulkDeleteBooks = ref(null);
 const showDeletePlaylist = ref(false);
 const menuOpen = ref(false);
+
+const {
+  selectionMode,
+  selectedCount,
+  isSelected,
+  toggle: toggleSelect,
+  start: startSelection,
+  clear: clearSelection,
+  retain: retainSelection,
+} = useMultiSelect();
+
+const { onPointerDown, onPointerMove, onPointerUp, consumedTap } = useLongPress((book) => {
+  startSelection(book.id);
+});
+
+const toggleSelected = (book) => toggleSelect(book.id);
+const openBook = (book) => {
+  if (consumedTap()) return;
+  if (selectionMode.value) return toggleSelect(book.id);
+  router.push(`/book/${book.id}`);
+};
 
 const closeMenuOnOutsideClick = (event) => {
   if (!event.target.closest('.more-wrap')) menuOpen.value = false;
@@ -188,6 +244,42 @@ const playlistBooks = computed(() => {
     .map((id) => books.value.find((book) => String(book.id) === String(id)))
     .filter(Boolean);
 });
+
+watch(playlistBooks, (currentBooks) => retainSelection(currentBooks.map((book) => book.id)));
+const selectedBooks = computed(() => playlistBooks.value.filter((book) => isSelected(book.id)));
+const bulkActions = [
+  { key: 'favourite', icon: 'ri-heart-line', label: 'Favourite' },
+  { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
+  { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
+  { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },
+];
+
+const runBulkAction = async (key) => {
+  const chosen = selectedBooks.value;
+  if (!chosen.length) return;
+  if (key === 'playlist') return (bulkPlaylistBooks.value = chosen);
+  if (key === 'delete') return (bulkDeleteBooks.value = chosen);
+  if (key === 'favourite') {
+    const makeFavourite = chosen.some((book) => !book.isFavourite);
+    for (const book of chosen) if (!!book.isFavourite !== makeFavourite) await toggleFavourite(book.id);
+    addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} ${makeFavourite ? 'added to' : 'removed from'} favourites.`, 'success');
+    clearSelection();
+    return;
+  }
+  if (key === 'hide') {
+    for (const book of chosen) await hideBook(book.id);
+    addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} hidden.`, 'info');
+    clearSelection();
+  }
+};
+
+const confirmBulkDelete = async () => {
+  const chosen = bulkDeleteBooks.value || [];
+  bulkDeleteBooks.value = null;
+  for (const book of chosen) await deleteBook(book.id);
+  addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} permanently deleted.`, 'success');
+  clearSelection();
+};
 
 const previewBooks = computed(() => playlistBooks.value.slice(0, 3));
 
@@ -295,6 +387,17 @@ const getStackStyle = (index, total = 3) => {
 <style scoped>
 .group-detail-page {
   width: 100%;
+  min-height: 100dvh;
+  background: var(--color-background-app);
+}
+
+.group-selection-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 14px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--color-settings-group, var(--color-surface-card));
 }
 
 .detail-shell {
@@ -310,8 +413,8 @@ const getStackStyle = (index, total = 3) => {
   display: grid;
   gap: 0.9rem;
   overflow: hidden;
-  margin: calc(-1 * var(--detail-nav-height)) calc(-1 * var(--mobile-page-padding-inline)) 1.1rem;
-  padding: calc(var(--detail-nav-height) + 1.4rem) var(--mobile-page-padding-inline) 1.3rem;
+  margin: calc(0px - var(--detail-nav-height) - env(safe-area-inset-top)) calc(-1 * var(--mobile-page-padding-inline)) 1.1rem;
+  padding: calc(var(--detail-nav-height) + env(safe-area-inset-top) + 1.4rem) var(--mobile-page-padding-inline) 1.3rem;
   border-radius: 0 0 24px 24px;
   text-align: center;
 }

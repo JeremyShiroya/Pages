@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import {
+  hasManualSeriesDecisionChanged,
   isSeriesRepairProtected,
+  protectManualSeriesDecision,
   validateAutomaticSeriesMutation,
 } from '../composables/seriesMutationGuard.js'
 
@@ -23,5 +25,22 @@ describe('automatic series mutation safety boundary', () => {
     expect(validateAutomaticSeriesMutation(before, after).valid).toBe(true)
     expect(validateAutomaticSeriesMutation(before, { ...after, title: 'Changed' }).valid).toBe(false)
     expect(validateAutomaticSeriesMutation(before, { ...after, title: 'Changed' }, { allowMetadata: true }).valid).toBe(true)
+  })
+
+  test('persists a manual standalone decision as protected', () => {
+    const original = { id: 'book-1', series: 'Wrong Series', seriesInstallment: 1, seriesTotal: 2 }
+    const standalone = { ...original, series: null, seriesInstallment: null, seriesTotal: null }
+
+    expect(hasManualSeriesDecisionChanged(original, standalone)).toBe(true)
+    expect(protectManualSeriesDecision(standalone)).toMatchObject({
+      series: null,
+      seriesChecked: true,
+      userDefined: { series: true, seriesInstallment: true, seriesTotal: true },
+    })
+  })
+
+  test('does not report untouched series fields as a manual decision', () => {
+    const book = { id: 'book-1', series: null, seriesInstallment: null, seriesTotal: null }
+    expect(hasManualSeriesDecisionChanged(book, { ...book })).toBe(false)
   })
 })

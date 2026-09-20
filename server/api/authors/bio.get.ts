@@ -5,6 +5,7 @@ import {
   selectAuthorCandidate,
 } from '../../utils/authorEnrichment'
 import { verifyAuthorDetails } from '../../utils/aiAuthorVerifier'
+import { AUTHOR_DETAILS_VERSION } from '~~/utils/authorIntelligence'
 
 const JSON_HEADERS = {
   'User-Agent': 'Pages/1.0 (author info lookup; contact: local-app)',
@@ -133,6 +134,7 @@ async function fetchWikipediaBio(
       let birthDate: string | null = null
       let validatedBooksCount: number | null = null
       let validatedSeriesCount: number | null = null
+      let identityValidated = knownBooks.length === 0
       try {
         const pageRes: any = await $fetch(
           `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title.replace(/\s+/g, '_'))}&prop=revisions&rvprop=content&rvslots=main&format=json&origin=*`,
@@ -140,6 +142,17 @@ async function fetchWikipediaBio(
         )
         const page = Object.values(pageRes.query?.pages || {})[0] as any
         const wikitext = page?.revisions?.[0]?.slots?.main?.['*'] || ''
+        // Same-name writers are common. When the library gives us known titles,
+        // require at least one of them on the candidate page before accepting
+        // biography or personal details for that identity.
+        if (knownBooks.length) {
+          const identityCorpus = `${bio} ${wikitext}`.toLocaleLowerCase()
+          const matchesLibrary = knownBooks.some(book => (
+            book.length > 2 && identityCorpus.includes(book.toLocaleLowerCase())
+          ))
+          if (!matchesLibrary) continue
+          identityValidated = true
+        }
         const leadFacts = extractAuthorLeadFacts(wikitext)
         const bibliography = extractAuthorBibliographySummary(wikitext)
         birthDate = leadFacts.birthDate
@@ -179,6 +192,8 @@ async function fetchWikipediaBio(
           notableWorks = leadFacts.notableWorks
         }
       } catch {}
+
+      if (!identityValidated) continue
 
       return {
         bio: bio.slice(0, 600),
@@ -259,8 +274,12 @@ export default defineEventHandler(async (event) => {
     ])
 
     const wiki = wikiResult.status === 'fulfilled' ? wikiResult.value : null
-    const wikidata = wikidataResult.status === 'fulfilled' ? wikidataResult.value : null
+    const rawWikidata = wikidataResult.status === 'fulfilled' ? wikidataResult.value : null
     const openLib = openLibResult.status === 'fulfilled' ? openLibResult.value : null
+    // Wikidata's search result alone cannot disambiguate two writers with the
+    // same name. Only merge its personal facts after a title-aware source has
+    // confirmed the author identity.
+    const wikidata = (wiki || openLib) ? rawWikidata : null
 
     const bio = wiki?.bio || openLib?.bio || null
     // Wikipedia infoboxes often omit notable_works; fall back to the
@@ -281,7 +300,7 @@ export default defineEventHandler(async (event) => {
       hasChildren: wikidata?.hasChildren || null,
       childrenCount: wikidata?.childrenCount || null,
       source: bio ? (wiki?.bio ? 'wikipedia' : 'openlibrary') : 'none',
-      version: 7,
+      version: AUTHOR_DETAILS_VERSION,
     }
 
     return await verifyAuthorDetails(name, knownBooks, details)
@@ -291,7 +310,7 @@ export default defineEventHandler(async (event) => {
       bio: null, birthDate: null, deathDate: null, nationality: null,
       notableWorks: [], validatedBooksCount: null, validatedSeriesCount: null, latestWork: null,
       spouseName: null, hasChildren: null, childrenCount: null, source: 'none',
-      version: 7,
+      version: AUTHOR_DETAILS_VERSION,
     }
   }
 })

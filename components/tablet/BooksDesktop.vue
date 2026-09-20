@@ -246,7 +246,7 @@
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"
             @playlist="selectedPlaylistBook = book"
-            @edit="router.push(`/edit/${book.id}`)"
+            @edit="router.push(bookEditLocation(book.id, route.fullPath))"
             @delete="openDeleteModal(book)"
           />
         </div>
@@ -258,8 +258,7 @@
               <div class="col-book">Book</div>
               <div class="col-status">Status</div>
               <div class="col-progress">Progress</div>
-              <div class="col-personal">Personal Rating</div>
-              <div class="col-goodreads">Goodreads Rating</div>
+              <div class="col-rating">{{ selectedRatingLabel }}</div>
               <div class="col-actions"></div>
             </div>
 
@@ -292,47 +291,44 @@
               </div>
 
               <div class="col-progress">
-                <div class="progress-wrap">
-                  <template v-if="(book.progress || 0) >= 100">
-                    <i class="ri-checkbox-circle-fill progress-complete-icon"></i>
-                    <span class="progress-complete-text">100%</span>
-                  </template>
-                  <template v-else>
-                    <div class="progress-bar">
-                      <div class="progress-fill" :style="{ width: `${book.progress || 0}%` }"></div>
-                    </div>
-                    <span class="progress-text">{{ book.progress || 0 }}%</span>
-                  </template>
-                </div>
+                <BookProgressDisplay :progress="book.progress" compact />
               </div>
 
-              <div class="col-personal">
-                <div class="rating-wrap">
-                  <i class="ri-star-fill list-star"></i>
-                  <span>{{ formatPersonalRating(book.rating) }}</span>
-                </div>
-              </div>
-
-              <div class="col-goodreads">
-                <div class="goodreads-wrap" :data-tooltip="goodreadsTooltip(book) || null">
-                  <GoodreadsRatingDisplay v-if="getGoodreadsRating(book)" :web-review="book.webReview" compact />
-                  <span v-else class="rating-empty">—</span>
-                </div>
+              <div class="col-rating">
+                <BookRatingDisplay :book="book" compact show-empty />
               </div>
 
               <div class="col-actions" @click.stop>
-                <button class="row-action-btn" :class="{ active: book.isFavourite }" title="Favourite" @click="toggleFavourite(book.id)">
-                  <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
-                </button>
-                <button class="row-action-btn" title="Add to playlist" @click="selectedPlaylistBook = book">
-                  <i class="ri-play-list-2-line"></i>
-                </button>
-                <button class="row-action-btn" title="Edit" @click="router.push(`/edit/${book.id}`)">
-                  <i class="ri-edit-line"></i>
-                </button>
-                <button class="row-action-btn delete" title="Delete" @click="openDeleteModal(book)">
-                  <i class="ri-delete-bin-line"></i>
-                </button>
+                <div class="actions-dropdown">
+                  <button
+                    class="row-action-btn more"
+                    type="button"
+                    title="More actions"
+                    :aria-label="`More actions for ${book.title}`"
+                    :aria-expanded="activeActionsMenu === book.id"
+                    @click="toggleActionsMenu(book.id)"
+                  >
+                    <i class="ri-more-2-fill"></i>
+                  </button>
+                  <div v-if="activeActionsMenu === book.id" class="row-actions-menu">
+                    <button type="button" @click="toggleFavourite(book.id); activeActionsMenu = null">
+                      <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+                      {{ book.isFavourite ? 'Remove favourite' : 'Add to favourites' }}
+                    </button>
+                    <button type="button" @click="selectedPlaylistBook = book; activeActionsMenu = null">
+                      <i class="ri-play-list-2-line"></i>
+                      Add to playlist
+                    </button>
+                    <button type="button" @click="router.push(bookEditLocation(book.id, route.fullPath))">
+                      <i class="ri-edit-line"></i>
+                      Edit book
+                    </button>
+                    <button class="danger" type="button" @click="openDeleteModal(book)">
+                      <i class="ri-delete-bin-line"></i>
+                      Delete book
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -391,17 +387,19 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import DeleteConfirmModal from "../shared/DeleteConfirmModal.vue";
-import GoodreadsRatingDisplay from "../shared/GoodreadsRatingDisplay.vue";
+import BookProgressDisplay from "../shared/BookProgressDisplay.vue";
+import BookRatingDisplay from "../shared/BookRatingDisplay.vue";
 import LibraryBookCard from "../shared/LibraryBookCard.vue";
 import AddToPlaylistModal from "../shared/AddToPlaylistModal.vue";
 import SkeletonLoader from "../shared/SkeletonLoader.vue";
 
 import { useBooks } from "~/composables/useBooks";
-import { getGoodreadsRating, parseGoodreadsReview } from "~/composables/useGoodreadsRating";
+import { getBookRating, RATING_SOURCE_LABELS } from "~/composables/useBookRating";
 import { useTTS } from "~/composables/useTTS";
 import { useBookishSettings } from "~/composables/useBookishSettings";
 import { useLibraryFilters } from "~/composables/useLibraryFilters";
 import { useToast } from "~/composables/useToast";
+import { bookEditLocation } from "~/composables/useBookEditNavigation";
 
 // Reactive data
 import EmptyState from "../shared/EmptyState.vue";
@@ -417,6 +415,7 @@ const {
 } = useBooks();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS()
 const { settings, updateSettings } = useBookishSettings();
+const selectedRatingLabel = computed(() => RATING_SOURCE_LABELS[settings.value.ratingSource] || 'Rating');
 const { addToast } = useToast();
 
 const isBookActive = (book) =>
@@ -431,6 +430,7 @@ const handlePlay = (book) => {
 }
 
 const router = useRouter();
+const route = useRoute();
 
 // Filter options
 const readingStatuses = ["Unread", "Reading", "Read"];
@@ -469,7 +469,8 @@ const filteredBooks = computed(() => {
     if (sortBy.value === "name") {
       comparison = a.title.localeCompare(b.title);
     } else if (sortBy.value === "rating") {
-      comparison = getGoodreadsRating(a) - getGoodreadsRating(b);
+      comparison = (getBookRating(a, settings.value.ratingSource, settings.value.personalRatingScale)?.rating || 0)
+        - (getBookRating(b, settings.value.ratingSource, settings.value.personalRatingScale)?.rating || 0);
     } else if (sortBy.value === "year") {
       comparison = (a.publishYear || 0) - (b.publishYear || 0);
     }
@@ -625,19 +626,6 @@ const truncateWords = (value, limit = 7) => {
   const words = String(value || "").trim().split(/\s+/).filter(Boolean);
   if (words.length <= limit) return words.join(" ");
   return `${words.slice(0, limit).join(" ")}...`;
-};
-
-const formatPersonalRating = (rating) => {
-  const score = Number(rating || 0);
-  return score > 0 ? `${score}/10` : "--/10";
-};
-
-const goodreadsTooltip = (book) => {
-  const info = parseGoodreadsReview(book.webReview);
-  const parts = [];
-  if (info.ratingsCount) parts.push(`${info.ratingsCount} ratings`);
-  if (info.reviewsCount) parts.push(`${info.reviewsCount} reviews`);
-  return parts.join(" · ");
 };
 
 // Methods
@@ -1731,7 +1719,7 @@ onUnmounted(() => {
 .data-header,
 .data-row {
   display: grid;
-  grid-template-columns: minmax(260px, 2.2fr) 130px minmax(160px, 1fr) 120px minmax(160px, 1.1fr) 150px;
+  grid-template-columns: minmax(260px, 2.2fr) 130px minmax(160px, 1fr) minmax(180px, 1.1fr) 150px;
   gap: 1rem;
   align-items: center;
   padding: 0.95rem 1.25rem;
@@ -1749,8 +1737,7 @@ onUnmounted(() => {
 
 .data-header .col-status,
 .data-header .col-progress,
-.data-header .col-personal,
-.data-header .col-goodreads {
+.data-header .col-rating {
   text-align: center;
 }
 
@@ -1954,7 +1941,7 @@ onUnmounted(() => {
 }
 
 /* Goodreads rating */
-.col-goodreads {
+.col-rating {
   display: flex;
   justify-content: center;
   min-width: 0;
@@ -2016,13 +2003,49 @@ onUnmounted(() => {
 
 /* Table view only: hide action buttons until the row is hovered */
 .data-row .col-actions {
-  opacity: 0;
-  transition: opacity 0.15s ease;
+  opacity: 1;
 }
 
-.data-row:hover .col-actions,
-.data-row:focus-within .col-actions {
-  opacity: 1;
+.actions-dropdown {
+  position: relative;
+}
+
+.row-actions-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  width: max-content;
+  min-width: 190px;
+  padding: 6px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 12px;
+  background: var(--color-surface-primary);
+  box-shadow: var(--shadow-card-hover, 0 14px 32px rgba(15, 23, 42, 0.18));
+}
+
+.row-actions-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 38px;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.row-actions-menu button:hover {
+  background: var(--color-surface-muted);
+}
+
+.row-actions-menu button.danger {
+  color: var(--color-status-danger);
 }
 
 .row-action-btn {

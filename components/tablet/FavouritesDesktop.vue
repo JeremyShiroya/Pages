@@ -21,7 +21,7 @@
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"
             @playlist="selectedPlaylistBook = book"
-            @edit="router.push(`/edit/${book.id}`)"
+            @edit="router.push(bookEditLocation(book.id, route.fullPath))"
             @delete="deleteFavouriteBook(book)"
           />
         </div>
@@ -59,6 +59,7 @@
 import { ref } from 'vue';
 import { useBooks } from "~/composables/useBooks";
 import { useTTS } from '~/composables/useTTS';
+import { bookEditLocation } from '~/composables/useBookEditNavigation';
 import EmptyState from "../shared/EmptyState.vue";
 import LibraryBookCard from '../shared/LibraryBookCard.vue';
 import AddToPlaylistModal from '../shared/AddToPlaylistModal.vue';
@@ -68,6 +69,7 @@ import SkeletonLoader from '../shared/SkeletonLoader.vue';
 const { favourites, toggleFavourite, deleteBook, loading, initialized } = useBooks();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 const router = useRouter();
+const route = useRoute();
 const selectedPlaylistBook = ref(null);
 const showDeleteModal = ref(false);
 const selectedDeleteBook = ref(null);

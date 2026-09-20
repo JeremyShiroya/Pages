@@ -26,18 +26,18 @@
           :class="favouritesLayout === 'list' ? 'favourites-list' : 'books-grid'"
         >
           <LibraryBookCard
-            :show-personal-rating="false"
             v-for="book in displayedFavourites"
             :key="book.id"
             :book="book"
             :active="isBookActive(book)"
             :card-background="favouritesBackground"
             :class="{ 'mobile-list-book-card': favouritesLayout === 'list' }"
+            collapse-actions
             @open="router.push(`/book/${book.id}`)"
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"
             @playlist="selectedPlaylistBook = book"
-            @edit="router.push(`/edit/${book.id}`)"
+            @edit="router.push(bookEditLocation(book.id, route.fullPath))"
             @hide="hideBook(book.id)"
             @delete="deleteFavouriteBook(book)"
           />
@@ -50,7 +50,7 @@
           description="Try a different reading status to see more of your favourites."
         >
           <template #action>
-            <button type="button" class="explore-btn" @click="clearFilters">
+            <button type="button" class="add-btn" @click="clearFilters">
               Clear filter
             </button>
           </template>
@@ -63,10 +63,10 @@
           description="Tap the heart on any book and it will be kept here for quick access."
         >
           <template #action>
-            <NuxtLink to="/books" class="explore-btn">
+            <button type="button" class="add-btn" @click="router.push('/books')">
               <i class="ri-add-line"></i>
               Explore Library
-            </NuxtLink>
+            </button>
           </template>
         </EmptyState>
     </template>
@@ -95,6 +95,7 @@ import { useBookishSettings } from '~/composables/useBookishSettings';
 import { useLibraryFilters } from '~/composables/useLibraryFilters';
 import { useToast } from '~/composables/useToast';
 import { useTTS } from '~/composables/useTTS';
+import { bookEditLocation } from '~/composables/useBookEditNavigation';
 import EmptyState from "../shared/EmptyState.vue";
 import LibraryBookCard from '../shared/LibraryBookCard.vue';
 import LibraryControlsRow from '../shared/LibraryControlsRow.vue';
@@ -111,6 +112,7 @@ const favouritesLayout = computed(() => settings.value.favouritesCardLayout || '
 const favouritesBackground = computed(() => settings.value.favouritesCardBackground || 'blur');
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 const router = useRouter();
+const route = useRoute();
 const selectedPlaylistBook = ref(null);
 const showDeleteModal = ref(false);
 const selectedDeleteBook = ref(null);
@@ -171,6 +173,25 @@ const confirmDelete = async () => {
   margin-bottom: 1rem;
 }
 
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  background: var(--gradient-brand-primary);
+  color: var(--color-text-on-brand);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-brand-button-hover);
+}
+
 .books-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -185,6 +206,14 @@ const confirmDelete = async () => {
   grid-template-columns: 1fr;
   gap: 16px;
   padding: 0 var(--mobile-page-padding-inline);
+}
+
+@media (max-width: 640px) {
+  .add-btn {
+    min-height: var(--mobile-touch-target);
+    border-radius: var(--mobile-control-radius);
+    font-size: var(--mobile-subtext-size);
+  }
 }
 
   .book-card {
@@ -324,17 +353,4 @@ const confirmDelete = async () => {
   margin: 0;
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5rem 0;
-  color: var(--color-text-subtle);
-}
-
-.empty-state i {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
 </style>

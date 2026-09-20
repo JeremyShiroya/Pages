@@ -3,7 +3,7 @@
     href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
     rel="stylesheet"
   />
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ collapsed }">
     <div class="top">
       <router-link to="/" class="brand-link">
         <div class="logo-container">
@@ -13,8 +13,28 @@
           <h1 class="title">Pages</h1>
         </div>
       </router-link>
+      <button
+        type="button"
+        class="collapse-toggle"
+        :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        @click="toggleCollapsed"
+      >
+        <i :class="collapsed ? 'ri-arrow-right-s-line' : 'ri-arrow-left-s-line'"></i>
+      </button>
     </div>
     <nav class="nav-menu" ref="navRef" @mouseleave="hoverIndex = -1">
+      <button
+        v-if="collapsed"
+        type="button"
+        class="menu-item collapsed-expand"
+        aria-label="Expand sidebar"
+        title="Expand sidebar"
+        @click="toggleCollapsed"
+      >
+        <i class="ri ri-arrow-right-s-line"></i>
+        <span>Expand sidebar</span>
+      </button>
       <div
         class="highlight-pill"
         :style="highlightStyle"
@@ -55,9 +75,11 @@
 <script setup>
 import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
+import { useSidebarState } from '~/composables/useSidebarState'
 
 const route = useRoute();
 const navRef = ref(null);
+const { collapsed, toggleCollapsed } = useSidebarState()
 
 const menuItems = [
   { name: "Home", icon: "ri-home-smile-2-line", path: "/" },
@@ -178,6 +200,7 @@ watch(hoverIndex, updateHighlight);
   flex-direction: column;
   overflow: hidden;
   z-index: 100;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .top {
@@ -185,6 +208,7 @@ watch(hoverIndex, updateHighlight);
   align-items: center;
   padding: 0 20px;
   margin-bottom: 10px;
+  gap: 8px;
 }
 
 .brand-link {
@@ -195,6 +219,26 @@ watch(hoverIndex, updateHighlight);
 .logo-container {
   display: flex;
   align-items: center;
+}
+
+.collapse-toggle {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: var(--purple-ul-hover);
+  color: var(--purple-li);
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.collapse-toggle:hover {
+  color: var(--color-brand-primary);
 }
 
 .logo {
@@ -277,6 +321,60 @@ watch(hoverIndex, updateHighlight);
   padding: 10px;
   /* border-top: 1px solid var(--color-border-on-image); */
   position: relative;
+}
+
+.sidebar.collapsed {
+  width: 76px;
+}
+
+.sidebar.collapsed .top {
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 10px;
+  margin-bottom: 14px;
+}
+
+.sidebar.collapsed .logo {
+  margin-right: 0;
+}
+
+.sidebar.collapsed .title,
+.sidebar.collapsed .menu-item span {
+  display: none;
+}
+
+.sidebar.collapsed .collapse-toggle {
+  display: none;
+}
+
+.collapsed-expand {
+  width: calc(100% - 20px);
+  min-height: 50px;
+  flex: 0 0 auto;
+  justify-content: center;
+  margin: 0 10px 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.collapsed-expand:hover {
+  background: var(--purple-ul-hover);
+  color: var(--color-brand-primary);
+}
+
+.sidebar.collapsed .menu-list,
+.sidebar.collapsed .settings {
+  padding-inline: 10px;
+}
+
+.sidebar.collapsed .menu-item {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.sidebar.collapsed .menu-item i {
+  margin-right: 0;
 }
 
 </style>

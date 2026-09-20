@@ -63,8 +63,8 @@ describe('playlist detail overflow icon', () => {
 describe('system bar icons follow the theme', () => {
   test('a native plugin flips the bar appearance', () => {
     const plugin = read('android/app/src/main/java/com/bookish/app/SystemBarsPlugin.java')
-    expect(plugin).toContain('setAppearanceLightStatusBars(!dark)')
-    expect(plugin).toContain('setAppearanceLightNavigationBars(!dark)')
+    expect(plugin).toContain('setAppearanceLightStatusBars(!statusBarDark)')
+    expect(plugin).toContain('setAppearanceLightNavigationBars(!navigationBarDark)')
     expect(read('android/app/src/main/java/com/bookish/app/MainActivity.java'))
       .toContain('registerPlugin(SystemBarsPlugin.class)')
   })

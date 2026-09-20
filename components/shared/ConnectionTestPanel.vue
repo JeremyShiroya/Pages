@@ -207,10 +207,12 @@ const copyReport = async () => {
 <style scoped>
 .conn-test {
   display: grid;
-  gap: 14px;
+  gap: 22px;
+  padding-top: 24px;
 }
 
 .card {
+  position: relative;
   padding: 16px;
   border-radius: var(--mobile-card-radius, 20px);
   background: var(--color-surface-primary);
@@ -229,10 +231,15 @@ const copyReport = async () => {
 }
 
 .card-head h2 {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 4px;
   margin: 0;
-  color: var(--color-text-primary);
-  font-size: var(--mobile-section-title-size, 1.05rem);
-  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
 .card-head p {

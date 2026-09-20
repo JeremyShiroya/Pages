@@ -78,6 +78,7 @@ const goBack = () => {
 
   router.push(props.backTo)
 }
+
 </script>
 
 <style scoped>

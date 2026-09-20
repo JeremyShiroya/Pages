@@ -259,11 +259,14 @@ onMounted(refreshStorageSummary)
 
 <style scoped>
 .settings-panel {
-  padding: 1.25rem;
+  padding: 1.5rem;
   min-width: 0;
-  background: var(--color-surface-card);
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-brand-primary) 12%, transparent), transparent 34%),
+    var(--color-settings-group, var(--color-surface-card));
   border: 1px solid var(--color-border-card);
-  border-radius: 10px;
+  border-radius: 18px;
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--color-text-primary) 7%, transparent);
 }
 
 .panel-heading {
@@ -278,7 +281,7 @@ onMounted(refreshStorageSummary)
 .panel-heading > i {
   width: 46px;
   height: 46px;
-  border-radius: 8px;
+  border-radius: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -317,8 +320,9 @@ onMounted(refreshStorageSummary)
 .storage-metric {
   min-height: 84px;
   border: 1px solid var(--color-border-subtle);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 1rem;
+  background: color-mix(in srgb, var(--color-surface-secondary) 84%, transparent);
 }
 
 .storage-metric strong {
@@ -336,7 +340,7 @@ onMounted(refreshStorageSummary)
   margin-top: 1.25rem;
   min-height: 58px;
   padding: 0.65rem 0.9rem;
-  border-radius: 8px;
+  border-radius: 14px;
   border: 1px solid var(--color-border-card);
   color: var(--color-status-success);
   font-size: 0.95rem;
@@ -351,7 +355,7 @@ onMounted(refreshStorageSummary)
   width: 42px;
   height: 42px;
   border: 1px solid var(--color-border-card);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--color-surface-card);
   color: var(--color-brand-primary-hover);
   display: flex;
@@ -386,7 +390,7 @@ onMounted(refreshStorageSummary)
 .data-action {
   min-height: 45px;
   border: 1px solid var(--color-border-card);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--color-surface-card);
   color: var(--color-text-secondary);
   padding: 0 0.9rem;
@@ -438,7 +442,7 @@ onMounted(refreshStorageSummary)
   min-height: 45px;
   padding: 0 0.9rem;
   border: 1px solid var(--color-border-card);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--color-surface-card);
   color: var(--color-text-primary);
   font-size: 0.95rem;

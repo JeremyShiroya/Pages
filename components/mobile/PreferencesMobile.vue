@@ -74,6 +74,73 @@
       </section>
 
       <section class="pref-group">
+        <h2 class="pref-group-title">Ratings</h2>
+
+        <div class="pref-block">
+          <div class="pref-copy">
+            <span class="pref-label">Rating shown across Pages</span>
+            <span class="pref-hint">External ratings are saved per book, so switching sources never discards them.</span>
+          </div>
+          <div class="rating-option-list" role="radiogroup" aria-label="Rating source">
+            <button
+              v-for="opt in ratingSourceOptions"
+              :key="opt.value"
+              type="button"
+              class="rating-source-option"
+              :class="{ active: settings.ratingSource === opt.value }"
+              role="radio"
+              :aria-pressed="settings.ratingSource === opt.value"
+              :aria-checked="settings.ratingSource === opt.value"
+              @click="chooseRatingSource(opt.value)"
+            >
+              <span class="rating-source-copy">
+                <strong>{{ opt.label }}</strong>
+                <small>{{ opt.hint }}</small>
+              </span>
+              <span v-if="opt.value !== 'none'" class="rating-source-sample" aria-hidden="true">
+                <BookRatingDisplay
+                  :book="ratingPreviewBook"
+                  :source="opt.value"
+                  compact
+                />
+              </span>
+              <span class="rating-choice-mark" aria-hidden="true">
+                <i v-if="settings.ratingSource === opt.value" class="ri-check-line"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="settings.ratingSource === 'personal'" class="pref-row">
+          <div class="pref-copy">
+            <span class="pref-label">Personal rating scale</span>
+            <span class="pref-hint">Existing scores are converted for display and remain lossless.</span>
+          </div>
+          <div class="segmented" role="group" aria-label="Personal rating scale">
+            <button
+              v-for="scale in personalRatingScales"
+              :key="scale"
+              type="button"
+              class="segment"
+              :class="{ active: settings.personalRatingScale === scale }"
+              @click="set('personalRatingScale', scale)"
+            >1–{{ scale }}</button>
+          </div>
+        </div>
+
+        <div v-if="ratingSync.state.running" class="rating-sync" role="status" aria-live="polite">
+          <div class="rating-sync-copy">
+            <span>Updating {{ ratingSyncLabel }} ratings</span>
+            <strong>{{ ratingSyncPercent }}%</strong>
+          </div>
+          <div class="rating-sync-track" aria-hidden="true">
+            <span :style="{ width: `${ratingSyncPercent}%` }"></span>
+          </div>
+          <small>{{ ratingSync.state.current }} of {{ ratingSync.state.total }} · {{ ratingSync.state.currentTitle }}</small>
+        </div>
+      </section>
+
+      <section v-if="isTablet" class="pref-group">
         <h2 class="pref-group-title">Book actions</h2>
 
         <div class="pref-block">
@@ -400,17 +467,24 @@
 import { computed, ref } from 'vue'
 import { enabledFormatsForMode, useBookishSettings } from '~/composables/useBookishSettings'
 import { useBooks } from '~/composables/useBooks'
+import { RATING_SOURCE_LABELS } from '~/composables/useBookRating'
+import { useRatingSync } from '~/composables/useRatingSync'
 import { formatLabel, formatsRemovedBy, useFormatEnablement } from '~/composables/useFormatEnablement'
 import { useToast } from '~/composables/useToast'
+import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import MobileSettingsNav from './MobileSettingsNav.vue'
 import BookActionsPreview from '../shared/previews/BookActionsPreview.vue'
+import BookRatingDisplay from '../shared/BookRatingDisplay.vue'
 import ReadingPreview from '../shared/previews/ReadingPreview.vue'
 // Playlist cards offer the same two layouts as series cards, so they share the
 // same preview mockup.
 import SeriesPreview from '../shared/previews/SeriesCardPreview.vue'
 
 const { settings, updateSettings } = useBookishSettings()
+const { isTablet } = useDeviceArchitecture()
 const { addToast } = useToast()
+const { books, updateBook, fetchAllData } = useBooks()
+const ratingSync = useRatingSync()
 
 const set = (key, value) => updateSettings({ [key]: value })
 
@@ -429,11 +503,43 @@ const bookActionDisplayOptions = [
   { value: 'visible', label: 'Always visible' },
 ]
 
+const ratingSourceOptions = [
+  { value: 'goodreads', label: 'Goodreads', hint: 'Community rating from Goodreads' },
+  { value: 'storygraph', label: 'StoryGraph', hint: 'Community rating from StoryGraph' },
+  { value: 'personal', label: 'Personal Rating', hint: 'Your own score for each book' },
+  { value: 'none', label: 'No rating', hint: 'Hide ratings across Pages' },
+]
+const personalRatingScales = [5, 10]
+const ratingPreviewBook = {
+  rating: 8,
+  webReview: 'Goodreads Rating: 4.20/5',
+  externalRatings: {
+    goodreads: { rating: 4.2 },
+    storygraph: { rating: 4.15 },
+  },
+}
+const ratingSyncLabel = computed(() => RATING_SOURCE_LABELS[ratingSync.state.source] || 'book')
+const ratingSyncPercent = computed(() => ratingSync.state.total
+  ? Math.round((ratingSync.state.current / ratingSync.state.total) * 100)
+  : 0)
+
+const chooseRatingSource = (source) => {
+  if (settings.value.ratingSource === source) return
+  set('ratingSource', source)
+  if (source === 'personal') {
+    addToast('Personal ratings are now shown across Pages.', 'info')
+    return
+  }
+  if (source === 'none') return
+  // Module-level sync state keeps this job alive when Preferences unmounts;
+  // useToast is also global, so completion is announced on whichever page is open.
+  void ratingSync.start({ source, books: books.value, updateBook, addToast })
+}
+
 // Hide content swaps the in-memory library for an empty one (or back), so
 // the change is visible the moment you leave settings — no restart needed.
 const toggleHideContent = async () => {
   set('hideContent', settings.value.hideContent !== true)
-  const { fetchAllData } = useBooks()
   await fetchAllData(true)
 }
 
@@ -525,31 +631,35 @@ const confirmFormatMode = async () => {
 <style scoped>
 .preferences {
   min-height: 100vh;
-  background: var(--color-background-app);
+  background: var(--color-settings-background);
   font-family: var(--mobile-font-family);
 }
 
 .preferences-body {
   display: grid;
-  gap: 18px;
-  padding: 10px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
+  gap: 32px;
+  padding: 28px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
 }
 
 .pref-group {
+  position: relative;
   display: grid;
   gap: 14px;
   padding: 14px;
-  border: 1px solid var(--color-border-subtle);
+  border: 0;
   border-radius: 16px;
-  background: var(--color-surface-card);
+  background: var(--color-settings-group);
 }
 
 .pref-group-title {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 4px;
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -592,11 +702,11 @@ const confirmFormatMode = async () => {
   display: grid;
   gap: 8px;
   padding: 8px;
-  border: 2px solid var(--color-border-card);
+  border: 0;
   border-radius: 14px;
   background: var(--color-surface-card, var(--color-surface-secondary));
   cursor: pointer;
-  transition: border-color 0.18s ease, transform 0.12s ease;
+  transition: background-color 0.18s ease, transform 0.12s ease;
 }
 
 .option:active {
@@ -604,7 +714,129 @@ const confirmFormatMode = async () => {
 }
 
 .option.active {
+  background: color-mix(in srgb, var(--color-settings-group) 82%, var(--color-brand-primary) 18%);
+}
+
+.rating-option-list {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 14px;
+  background: var(--color-border-subtle);
+}
+
+.rating-source-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 24px;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 72px;
+  padding: 12px 13px;
+  border: 0;
+  background: var(--color-surface-card, var(--color-surface-secondary));
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.18s ease;
+}
+
+.rating-source-option.active {
+  background: color-mix(in srgb, var(--color-surface-card) 90%, var(--color-brand-primary) 10%);
+}
+
+.rating-source-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.rating-source-copy strong {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.rating-source-copy small {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rating-source-sample {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.rating-choice-mark {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1.5px solid var(--color-border-card);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 13px;
+}
+
+.rating-source-option.active .rating-choice-mark {
   border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary);
+}
+
+.rating-sync {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-surface-card));
+}
+
+.rating-sync-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.rating-sync-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-border-subtle);
+}
+
+.rating-sync-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gradient-library-progress);
+  transition: width 0.25s ease;
+}
+
+.rating-sync small {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 390px) {
+  .rating-source-option {
+    grid-template-columns: minmax(0, 1fr) 24px;
+  }
+
+  .rating-source-sample {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-start;
+  }
 }
 
 .preview {
