@@ -86,7 +86,7 @@
             </NuxtLink>
           </div>
           <div class="empty-reading-arc"></div>
-          <img src="/images/Empty State 1.png" alt="" class="empty-reading-illustration" />
+          <img src="/Images/Empty State 1.png" alt="" class="empty-reading-illustration" />
         </div>
       </section>
 
@@ -105,7 +105,7 @@
           />
         </div>
         <div v-else class="empty-recently-card">
-          <img src="/images/Empty State 2.png" alt="" class="empty-recently-illustration" />
+          <img src="/Images/Empty State 2.png" alt="" class="empty-recently-illustration" />
           <div class="empty-recently-content">
             <h3 class="empty-recently-title">Let's build your library<br />One book at a time</h3>
             <NuxtLink to="/add" class="empty-recently-btn">
@@ -130,7 +130,7 @@
           />
         </div>
         <div v-else class="empty-series-card">
-          <img src="/images/Empty State 3.png" alt="" class="empty-series-illustration" />
+          <img src="/Images/Empty State 3.png" alt="" class="empty-series-illustration" />
           <h3 class="empty-series-title">Nothing to show yet</h3>
           <p class="empty-series-sub">Books belonging to a series will be shown here</p>
         </div>

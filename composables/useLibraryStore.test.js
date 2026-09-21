@@ -160,7 +160,7 @@ describe('useLibraryStore — profile', () => {
       id: 'local',
       displayName: 'Reader',
       avatarType: 'image',
-      avatarValue: '/images/User%20Avatars/default-user.jpeg',
+      avatarValue: '/Images/User%20Avatars/default-user.jpeg',
     })
   })
 
@@ -177,7 +177,7 @@ describe('useLibraryStore — profile', () => {
       id: 'local',
       displayName: 'John',
       avatarType: 'image',
-      avatarValue: '/images/User%20Avatars/E-commerce-1.svg',
+      avatarValue: '/Images/User%20Avatars/E-commerce-1.svg',
     })
   })
 })

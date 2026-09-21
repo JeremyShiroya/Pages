@@ -113,7 +113,7 @@ const {
 
 const avatarModalOpen = ref(false)
 const profileDraftName = ref('Reader')
-const selectedAvatar = ref('/images/User%20Avatars/default-user.jpeg')
+const selectedAvatar = ref('/Images/User%20Avatars/default-user.jpeg')
 
 const profileAvatarSrc = computed(() => {
   return selectedAvatar.value || activeAvatarPreset.value.src
@@ -125,7 +125,7 @@ const firstName = computed(() => {
 
 const syncProfileDraft = (nextProfile = profile.value) => {
   profileDraftName.value = nextProfile.displayName || 'Reader'
-  selectedAvatar.value = nextProfile.avatarValue || '/images/User%20Avatars/default-user.jpeg'
+  selectedAvatar.value = nextProfile.avatarValue || '/Images/User%20Avatars/default-user.jpeg'
 }
 
 const persistProfile = async (patch, toastMessage) => {
