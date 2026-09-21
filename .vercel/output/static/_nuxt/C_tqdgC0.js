@@ -1,1 +1,0 @@
-import{A as o}from"./CprV63pF.js";import{_ as t,c as a,b as e,o as s}from"./Q_0UIkpk.js";import"./cBzA24kv.js";import"./C1lJLqxa.js";import"./mVMl_AVB.js";import"./D-W5Btpj.js";const i={class:"annotation-page"},r={__name:"[id]",setup(_){return(c,n)=>(s(),a("main",i,[e(o,{mode:"highlights"})]))}},u=t(r,[["__scopeId","data-v-dfacb408"]]);export{u as default};

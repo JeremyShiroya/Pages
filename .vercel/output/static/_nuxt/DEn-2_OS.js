@@ -1,1 +1,0 @@
-import{af as s,aK as r,c as o,aL as c,o as _}from"./Q_0UIkpk.js";const n={class:"series-redirect"},m={__name:"[id]",async setup(i){let e,t;const a=s();return[e,t]=r(()=>c(`/serie/${a.params.id}`,{replace:!0})),await e,t(),(p,u)=>(_(),o("div",n))}};export{m as default};

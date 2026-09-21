@@ -1,1 +1,0 @@
-import{A as o}from"./CprV63pF.js";import{_ as t,c as e,b as a,o as s}from"./Q_0UIkpk.js";import"./cBzA24kv.js";import"./C1lJLqxa.js";import"./mVMl_AVB.js";import"./D-W5Btpj.js";const n={class:"annotation-page"},r={__name:"[id]",setup(_){return(c,i)=>(s(),e("main",n,[a(o,{mode:"notes"})]))}},x=t(r,[["__scopeId","data-v-e59d6e4e"]]);export{x as default};
