@@ -24,8 +24,8 @@
     "semantic_hash": "2a90228c3ef53618c1ddd159a9844052"
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1789947687.7537427,
-    "seen": 1789947801.4733891,
+    "mtime": 1789978486.4281318,
+    "seen": 1789978997.0052502,
     "ast_hash": "9d7ac48553a5fbe2dabfa1d735929c47",
     "semantic_hash": "9d7ac48553a5fbe2dabfa1d735929c47"
   },
@@ -84,8 +84,8 @@
     "semantic_hash": "682315a426653617c6a74fc12bef55b6"
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1789947687.7518816,
-    "seen": 1789947801.4734433,
+    "mtime": 1789978486.4281318,
+    "seen": 1789978997.005285,
     "ast_hash": "27774e912a23b4f9786f7934cdc87d9e",
     "semantic_hash": "27774e912a23b4f9786f7934cdc87d9e"
   },
@@ -162,10 +162,10 @@
     "semantic_hash": ""
   },
   "components/mobile/HomeMobile.vue": {
-    "mtime": 1788997453.5064132,
-    "seen": 1789126705.9272714,
+    "mtime": 1789978624.4544466,
+    "seen": 1789978997.005344,
     "ast_hash": "e4a3bbb0ad994241296a54f77471ea51",
-    "semantic_hash": "e4a3bbb0ad994241296a54f77471ea51"
+    "semantic_hash": ""
   },
   "components/mobile/MobileBottomNav.vue": {
     "mtime": 1789130986.3370516,
@@ -216,8 +216,8 @@
     "semantic_hash": ""
   },
   "components/mobile/ProfileMobile.vue": {
-    "mtime": 1789242670.0162754,
-    "seen": 1789468091.5723817,
+    "mtime": 1789978624.4650147,
+    "seen": 1789978997.005372,
     "ast_hash": "c787b93af5e033163345809d3bdf0cbf",
     "semantic_hash": ""
   },
@@ -372,10 +372,10 @@
     "semantic_hash": ""
   },
   "components/shared/EmptyState.vue": {
-    "mtime": 1788997460.3390336,
-    "seen": 1789126705.927371,
+    "mtime": 1789978624.470832,
+    "seen": 1789978997.005467,
     "ast_hash": "ee6a9d661709b1f21f4102f6c08c75d0",
-    "semantic_hash": "ee6a9d661709b1f21f4102f6c08c75d0"
+    "semantic_hash": ""
   },
   "components/shared/FavouritesComp.vue": {
     "mtime": 1789215361.131947,
@@ -828,10 +828,10 @@
     "semantic_hash": "b4759a0a9c25c27bd13eb135a9b35806"
   },
   "composables/useLibraryBackup.test.js": {
-    "mtime": 1782733812.5804465,
-    "seen": 1789126705.9276357,
-    "ast_hash": "a04ce44079bf3729e4999687797e3434",
-    "semantic_hash": "a04ce44079bf3729e4999687797e3434"
+    "mtime": 1789978783.8014038,
+    "seen": 1789978997.0058277,
+    "ast_hash": "dc46f1b5047f3cfde81548dc1f27edbe",
+    "semantic_hash": ""
   },
   "composables/useLibraryFilters.js": {
     "mtime": 1785488884.0314164,
@@ -852,16 +852,16 @@
     "semantic_hash": "96837e332d6ff19472af6bc581b39463"
   },
   "composables/useLibraryStore.js": {
-    "mtime": 1788997534.9135208,
-    "seen": 1789126705.9276457,
+    "mtime": 1789978624.591233,
+    "seen": 1789978997.0058396,
     "ast_hash": "f172eabfdb10c680afeeafd2f2adc53e",
-    "semantic_hash": "f172eabfdb10c680afeeafd2f2adc53e"
+    "semantic_hash": ""
   },
   "composables/useLibraryStore.test.js": {
-    "mtime": 1788997666.522239,
-    "seen": 1789126705.9276483,
-    "ast_hash": "9a78dae51e3c0f882404ce77a75e4129",
-    "semantic_hash": "9a78dae51e3c0f882404ce77a75e4129"
+    "mtime": 1789978624.511546,
+    "seen": 1789978997.0058424,
+    "ast_hash": "4e66c749d106bec1492bcc66b18e480b",
+    "semantic_hash": ""
   },
   "composables/useMetadataBackfill.js": {
     "mtime": 1788871512.1097178,
@@ -1056,10 +1056,10 @@
     "semantic_hash": "cfe899413028b552234f0f472e3523b5"
   },
   "composables/useUserProfile.js": {
-    "mtime": 1788997528.0372481,
-    "seen": 1789126705.9277442,
+    "mtime": 1789978624.5948367,
+    "seen": 1789978997.0059638,
     "ast_hash": "826391d6f4819d607f1d51a5854a1b87",
-    "semantic_hash": "826391d6f4819d607f1d51a5854a1b87"
+    "semantic_hash": ""
   },
   "composables/useUserProfile.test.js": {
     "mtime": 1782734524.933383,
@@ -1086,16 +1086,16 @@
     "semantic_hash": ""
   },
   "nuxt.config.ts": {
-    "mtime": 1785800599.1477585,
-    "seen": 1789126705.92776,
-    "ast_hash": "2505e99a8b13afaa610c8cbfb1b71882",
-    "semantic_hash": "2505e99a8b13afaa610c8cbfb1b71882"
+    "mtime": 1789978624.523123,
+    "seen": 1789978997.0059814,
+    "ast_hash": "4a01a8958b6c9fed068626bae28a711f",
+    "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1786801809.3308792,
-    "seen": 1789126705.9277627,
-    "ast_hash": "9c5f390ba8921e7ad0012654a9c86368",
-    "semantic_hash": "9c5f390ba8921e7ad0012654a9c86368"
+    "mtime": 1789948002.2792995,
+    "seen": 1789948132.3889925,
+    "ast_hash": "e39da9e9a8e0fe039514d9cb0caf848b",
+    "semantic_hash": ""
   },
   "pages/add.vue": {
     "mtime": 1789215587.7881136,
@@ -2046,10 +2046,10 @@
     "semantic_hash": "99d8d7543e8bac462160e11d33e5146e"
   },
   "version.json": {
-    "mtime": 1786801825.828002,
-    "seen": 1789126705.9281628,
-    "ast_hash": "c11bd7c0906323dd5d2131906c4839a8",
-    "semantic_hash": "c11bd7c0906323dd5d2131906c4839a8"
+    "mtime": 1789948077.6024368,
+    "seen": 1789948132.3895667,
+    "ast_hash": "58f8691bac1c615d9b9bbec3a754865e",
+    "semantic_hash": ""
   },
   "vitest.config.ts": {
     "mtime": 1784991630.350059,
@@ -2106,8 +2106,8 @@
     "semantic_hash": ""
   },
   "components/tablet/ProfileDesktop.vue": {
-    "mtime": 1789633719.1335955,
-    "seen": 1789634651.802447,
+    "mtime": 1789978624.4806788,
+    "seen": 1789978997.005595,
     "ast_hash": "d94c38e06bf7a326765d11a8c7a73047",
     "semantic_hash": ""
   },
@@ -2118,14 +2118,14 @@
     "semantic_hash": ""
   },
   "components/tablet/SettingsDesktop.vue": {
-    "mtime": 1789733672.3794055,
-    "seen": 1789947801.4739573,
+    "mtime": 1789978624.4891014,
+    "seen": 1789978997.0056005,
     "ast_hash": "427dd7d7832c66c178024415377ee278",
     "semantic_hash": ""
   },
   "components/tablet/Sidebar.vue": {
-    "mtime": 1789733591.011045,
-    "seen": 1789947801.4739614,
+    "mtime": 1789978624.497947,
+    "seen": 1789978997.0056036,
     "ast_hash": "37bac0b37686e39023504f56b6065e1b",
     "semantic_hash": ""
   },
@@ -3231,6 +3231,792 @@
     "mtime": 1789946786.5672698,
     "seen": 1789947801.4759512,
     "ast_hash": "af10b32e4ec4b9cd7f939d53bd8fd3ae",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/5JkcT4B-.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0744305,
+    "ast_hash": "43807df471f021f4a571c8304ce7f6e4",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/67QK-hSw.js": {
+    "mtime": 1789978189.4812288,
+    "seen": 1789978291.0744362,
+    "ast_hash": "2263e697ddbdd57ec2ab1c3710d47aec",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/9VNLicRS.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0744398,
+    "ast_hash": "e22ee375c8a4f134281e0a88b8f895af",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/ABJzF0zC.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.0744429,
+    "ast_hash": "2a6496697e865a798ce971cb514e719a",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/B-V3t04U.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.074446,
+    "ast_hash": "06895e937c8eb98eb0a43f4864430298",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/B3aFN2qE.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0744488,
+    "ast_hash": "b032b0a9cd9d9f43ea26054af98d70e8",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/B4ZZ2GXZ.js": {
+    "mtime": 1789978189.474383,
+    "seen": 1789978291.0744517,
+    "ast_hash": "e8b4e84837c0570cc8e5fd535fffd380",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/B6hSgSUR.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0744545,
+    "ast_hash": "d8083fcd37200955bbebaf1e51def96b",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/B75MOh95.js": {
+    "mtime": 1789978189.489202,
+    "seen": 1789978291.0744574,
+    "ast_hash": "6c62215ddd642b0dfc6a23b9b2646f3c",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BBnX5xw4.js": {
+    "mtime": 1789978189.4812288,
+    "seen": 1789978291.0744603,
+    "ast_hash": "b63a6c814e11c0837136540cf08ca10f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BDI3_C3n.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.074463,
+    "ast_hash": "318ad754f53f971caa501c188deedb4f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BEhAsajr.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0744653,
+    "ast_hash": "ceaa1a2ba98893abd8786c47907473a0",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BMFUV_KN.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0744681,
+    "ast_hash": "875f412ecdd420cdd0f2c4aa8a1af955",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BOw-0qHO.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0744712,
+    "ast_hash": "de45efe1e61fa63b020c9bc5e4cc23ca",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BPWEvC_a.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.0744736,
+    "ast_hash": "44941810478f090e4bb4133824b2d6a1",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BUJPZyaX.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0744762,
+    "ast_hash": "d4a39601b1450df217056e6e3f3ad5c0",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BUkT8CbN.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.074479,
+    "ast_hash": "6bc7e8c725abffdc315e4fe7f6498a14",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BW5j-qiM.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0744815,
+    "ast_hash": "0315438523b481badccc580d172c1890",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BYe9tUhK.js": {
+    "mtime": 1789978189.474383,
+    "seen": 1789978291.074484,
+    "ast_hash": "c56f4121e4608504b81dfdb57404566d",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BcQn2aJ4.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0744865,
+    "ast_hash": "abb05b35618c3bca5712d4ea0f76d5fb",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BcTGGfoY.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0744894,
+    "ast_hash": "0f2a5b3f64f3344865fb92e536c3325b",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Bed9ObDU.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0744922,
+    "ast_hash": "ebe3de80b149c98bffabaf6e2939aa3c",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Bk1AJfmD.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0744948,
+    "ast_hash": "375604bad42ef1d27605940131d35214",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BsCyUOfY.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0744977,
+    "ast_hash": "eaf0e59a797d3dfc62c19fa88ab2cc43",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Bux6oAyl.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0745006,
+    "ast_hash": "52331a2925067806aa614c5649a432e7",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/BxX5Q09J.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0745037,
+    "ast_hash": "c039aff64cf2e2eadfb58c84323e475b",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/C-RbsSWT.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.074506,
+    "ast_hash": "2f212adf4e30f5e052fbdfc6c9784ece",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/C-cRj51Z.js": {
+    "mtime": 1789978189.4812288,
+    "seen": 1789978291.074508,
+    "ast_hash": "55e7104679bc63a85ac54dd16171e05e",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/C12B7_Kl.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.074511,
+    "ast_hash": "0cca0b72e2350c97d17560055d64b13e",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/C1lJLqxa.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0745137,
+    "ast_hash": "40bf87ea7abf7768b5cacf80c76a282e",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/C5M-x6MD.js": {
+    "mtime": 1789978189.4812288,
+    "seen": 1789978291.0745165,
+    "ast_hash": "2e845c6c3507323c869b4c889679107f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CFWCaXjP.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0745192,
+    "ast_hash": "94425a6ff38cd9fa7b15b4ce9cfe86fc",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CFhmFvzF.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0745218,
+    "ast_hash": "59a3a65af770b2b0c74ea2476278a5bc",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CHfjGXPl.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0745244,
+    "ast_hash": "c7e458305db07deebc974a2723916f56",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CIKxhCpr.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.074527,
+    "ast_hash": "5765628a87ed6295bd9360464584e0f8",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CJzlubhx.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0745296,
+    "ast_hash": "c7d82caf59d188743523bcf88f4938d4",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CSH8Fg-0.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0745323,
+    "ast_hash": "ab2b3ee3eb037016161ccdbb89f60b25",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/C_tqdgC0.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0745347,
+    "ast_hash": "187360ab89263a92403538f66f0c7a24",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Ccaza-hF.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0745375,
+    "ast_hash": "d48e65422f2c03cec891145253318b11",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Cf1qQLhP.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0745397,
+    "ast_hash": "7f679088935d368467920fd611d82547",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Ch3YINNP.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.074542,
+    "ast_hash": "eb29e11ac74bb2c7c9a70bff835aa0cf",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Cj5xYdIp.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.074545,
+    "ast_hash": "1fac62946d19e4da8517e230826cf8b2",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Cpj98o6Y.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0745478,
+    "ast_hash": "146eaf85c344cee008c91f2685dbf82f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CprV63pF.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0745509,
+    "ast_hash": "c677ff278d7824ececf8dea8fad2b998",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Cvdz0ic2.js": {
+    "mtime": 1789978189.4780643,
+    "seen": 1789978291.0745533,
+    "ast_hash": "c0de7354cf5724c82efeb1a80ab6ee44",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Cy4FebX7.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0745564,
+    "ast_hash": "eaf325635d41c792e63fa0a60fc64e9d",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/CyDNiwFy.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.074559,
+    "ast_hash": "e62589d1c5c818cec5bcc73168e2af34",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/D-W5Btpj.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0745614,
+    "ast_hash": "504498a554d678093c51a3baffac5d79",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/D0rCik1O.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0745637,
+    "ast_hash": "f7b43e3aaac366aa8bd406316e69890b",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/D0toqlkb.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0745668,
+    "ast_hash": "9b07c939867e51cfb5e96b99a0f0e3fa",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/D23xq3nL.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0745697,
+    "ast_hash": "2db3ba18c30113bbcf2b5e0319287e03",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/D4ak7zMx.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0745723,
+    "ast_hash": "5faaff3c8548e49e6a974b7db2f29252",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/D58HeFwH.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.074575,
+    "ast_hash": "e5506c83b999e60870f0e18f090f2fd1",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DDHDfiBz.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.074577,
+    "ast_hash": "e78ba0f1609bb99edf7e3131d5becf1f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DEn-2_OS.js": {
+    "mtime": 1789978189.4780643,
+    "seen": 1789978291.07458,
+    "ast_hash": "b9cc8f81a71f1ff5563b4a9413cc84ef",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DFCv8GAS.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.0745823,
+    "ast_hash": "a90f4b1ff5a4210d8cc6bf96ea7e16df",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DKHfM0Qa.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0745847,
+    "ast_hash": "1cff53163493811c2cd20abae4d637d1",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DL4JPYl_.js": {
+    "mtime": 1789978189.4780643,
+    "seen": 1789978291.074587,
+    "ast_hash": "67e925df5a02ec59b63bb15600465e09",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DOgoeE6f.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.07459,
+    "ast_hash": "46d9bea80d39cf399dd4124eb0abcd2d",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DP3_tlzr.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0745926,
+    "ast_hash": "b15770b04e2f5dc232e3c9d154bd22bd",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DQ_wlJcA.js": {
+    "mtime": 1789978189.4812288,
+    "seen": 1789978291.0745947,
+    "ast_hash": "72fade75cc635de14c224d81ab6c7f14",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DTtNUFxP.js": {
+    "mtime": 1789978189.4780643,
+    "seen": 1789978291.0745971,
+    "ast_hash": "6c8a98cc76a762ca59999f50d0dc6e2b",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DX9u_fId.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0746,
+    "ast_hash": "b3ea8531de20b88d7034cda07fbf7bee",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DXuW3F03.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0746026,
+    "ast_hash": "626244ef5b44ab4108cb25e911f60f5f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/D_grzeH2.js": {
+    "mtime": 1789978189.474383,
+    "seen": 1789978291.0746052,
+    "ast_hash": "6d5eafa6c475f535bd59122e9b40f283",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DgM-Tn__.js": {
+    "mtime": 1789978189.489202,
+    "seen": 1789978291.0746076,
+    "ast_hash": "cd31a00444ceeb6cf9789e90d7b9fe35",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DijYkd-2.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.07461,
+    "ast_hash": "dfa02544abb04071c3fac4b1790f664f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DjtRlowM.js": {
+    "mtime": 1789978189.4855714,
+    "seen": 1789978291.0746124,
+    "ast_hash": "620d7a2dadc40d536fc2126cbfb0a43f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Dl-iy7qS.js": {
+    "mtime": 1789978189.474383,
+    "seen": 1789978291.074615,
+    "ast_hash": "8fed783350fd0c46bd822cb8fcc63002",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DsKm6pLg.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.074618,
+    "ast_hash": "9446497d8740a63c9a041b4fa6357669",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DsY5pEH9.js": {
+    "mtime": 1789978189.4780643,
+    "seen": 1789978291.0746207,
+    "ast_hash": "18931a024e40ba2c15f763465d95b5ed",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/DzlUQh5b.js": {
+    "mtime": 1789978189.4780643,
+    "seen": 1789978291.0746236,
+    "ast_hash": "5d709340e229df1b7e7c782d8d57213c",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/G8Siohqk.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.0746257,
+    "ast_hash": "ed7099f863c6383fd7c02d397ab554cb",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/HCBmfE-O.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0746284,
+    "ast_hash": "d32ab2cbf4035737fedabdf3402df564",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/P22CZNCU.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.0746307,
+    "ast_hash": "c0fc4e3f665df3ab04571d543adb8140",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Q_0UIkpk.js": {
+    "mtime": 1789978189.474383,
+    "seen": 1789978291.0746331,
+    "ast_hash": "f884bef8c2e7807c1e6e0dd71dc8932c",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/RId8cFMl.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0746357,
+    "ast_hash": "5c6f060ab4b8aca9c0b137bbc37300ec",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/WUl-VInr.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0746386,
+    "ast_hash": "32748e39e6ab31e5f28456ed8d685908",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/YugXHjuw.js": {
+    "mtime": 1789978189.4769907,
+    "seen": 1789978291.0746415,
+    "ast_hash": "c88d91b4db43d2d715439afd1ebe8a68",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/Z2Bu6WWa.js": {
+    "mtime": 1789978189.4920018,
+    "seen": 1789978291.0746443,
+    "ast_hash": "553dda3787de76f0f5a3b85de5bd915a",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/builds/latest.json": {
+    "mtime": 1789978190.7439733,
+    "seen": 1789978291.0746467,
+    "ast_hash": "423f5d56505acde0958edbdac03c440c",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/builds/meta/45fea658-cccd-4218-98e7-7932bd490dc4.json": {
+    "mtime": 1789978190.7454903,
+    "seen": 1789978291.0746496,
+    "ast_hash": "1030e24be0a96eb311f341062006ea90",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/cBzA24kv.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0746522,
+    "ast_hash": "d84598ed5cd34f1af1520942dcd6ee2a",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/gRcD3CNl.js": {
+    "mtime": 1789978189.4812288,
+    "seen": 1789978291.074655,
+    "ast_hash": "49b9c1603a6d5a1ae7498701c90781e1",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/he0XHq6r.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0746582,
+    "ast_hash": "a65509e944e569155aab8d73ed228b14",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/kfBP8M6e.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0746608,
+    "ast_hash": "f5ebb484a34bc5dd09780fd662f78106",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/mVMl_AVB.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.0746632,
+    "ast_hash": "0cd6032c7ecae31bc190bee3e220415c",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/mt6K1KZ5.js": {
+    "mtime": 1789978189.4791398,
+    "seen": 1789978291.0746655,
+    "ast_hash": "15323656fa7de7a2216941b7ed3ebfb1",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/pdf.worker.B1D2UnXD.mjs": {
+    "mtime": 1789978189.512356,
+    "seen": 1789978291.074668,
+    "ast_hash": "b169314e56c737213dba6418ab0b6512",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/rCgEe0N1.js": {
+    "mtime": 1789978189.4801526,
+    "seen": 1789978291.0746708,
+    "ast_hash": "24cbd4954e97dd36f157ab3540c13f33",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/twaOW2Jj.js": {
+    "mtime": 1789978189.475971,
+    "seen": 1789978291.0746734,
+    "ast_hash": "2538aab6f423ee88287b9b4fd25e25c0",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/yoveu4pO.js": {
+    "mtime": 1789978189.4785993,
+    "seen": 1789978291.0746758,
+    "ast_hash": "d6ef73cdcab939f74b7bec18f18c0d38",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/sw.js": {
+    "mtime": 1789978201.1752748,
+    "seen": 1789978291.0746784,
+    "ast_hash": "9ea1dc82e4921768b1e7f415daf9bc9e",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/workbox-07e28819.js": {
+    "mtime": 1789978201.1798356,
+    "seen": 1789978291.0746808,
+    "ast_hash": "07def569da29fb4560a94a5525ce5712",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/robots.txt": {
+    "mtime": 1775638500.0,
+    "seen": 1789978291.0759773,
+    "ast_hash": "243b03ecba82dde9612cd5163145a86d",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/_nuxt/remixicon.BTtOSOPh.svg": {
+    "mtime": 1789978189.5162714,
+    "seen": 1789978291.0761032,
+    "ast_hash": "c67337ab1a4fbf37dd51c527a38aa0d7",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/icons/drizzle.svg": {
+    "mtime": 1779998729.6340208,
+    "seen": 1789978291.0761058,
+    "ast_hash": "5a17674322da9a9533c55cd79c922d49",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/icons/neon.svg": {
+    "mtime": 1779998794.1630273,
+    "seen": 1789978291.076108,
+    "ast_hash": "76b1e2208d79632835b83d669becab38",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/icons/nuxt.svg": {
+    "mtime": 1779998831.159214,
+    "seen": 1789978291.0761106,
+    "ast_hash": "3431a6cae886d8e767c64311285e4a10",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/icons/type--script.svg": {
+    "mtime": 1779999529.482091,
+    "seen": 1789978291.076113,
+    "ast_hash": "f7c6335b22e121bf9e8e19a69aa8d05f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/icons/vue.svg": {
+    "mtime": 1779998588.3396113,
+    "seen": 1789978291.0761154,
+    "ast_hash": "6b6569e8bf5105d680572d3bf5fbcf64",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Empty State 1.png": {
+    "mtime": 1785794692.6276653,
+    "seen": 1789978291.0761182,
+    "ast_hash": "66575d88bf36e76a8aac9b7e5c306bf2",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Empty State 2.png": {
+    "mtime": 1785796861.082862,
+    "seen": 1789978291.076121,
+    "ast_hash": "e0da7202c46d00657e5b81be13d9eb1f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Empty State 3.png": {
+    "mtime": 1785831857.4964077,
+    "seen": 1789978291.0761235,
+    "ast_hash": "8ecfa25bc8dc65d756d6a86ffddfdcd8",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Empty-state.png": {
+    "mtime": 1783682533.596378,
+    "seen": 1789978291.0761259,
+    "ast_hash": "23a2d1b9adde206a6935b646e32273bb",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Favourites empty-state.png": {
+    "mtime": 1786791580.0548134,
+    "seen": 1789978291.0761285,
+    "ast_hash": "ce6928382fa5c8fac5f457870af49998",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Flame.png": {
+    "mtime": 1788943392.8476906,
+    "seen": 1789978291.076131,
+    "ast_hash": "07ae16c543938587b1dac23022fef5e1",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Logo 1.png": {
+    "mtime": 1784991630.2790446,
+    "seen": 1789978291.0761335,
+    "ast_hash": "1096b5128da9225af8f1a77c41beb7a3",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Logo 2.png": {
+    "mtime": 1776090015.0247328,
+    "seen": 1789978291.0761359,
+    "ast_hash": "18ab0225eda24e053f2977cc0acd131f",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Logo.png": {
+    "mtime": 1778224656.9868689,
+    "seen": 1789978291.0761385,
+    "ast_hash": "ead67d34ca66a863e7c36a547fb8e173",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/P Logo.png": {
+    "mtime": 1785763895.260803,
+    "seen": 1789978291.0761414,
+    "ast_hash": "8f77a4e19d1a3bb33f805d527db52397",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Pages-Logo.png": {
+    "mtime": 1784991630.291413,
+    "seen": 1789978291.0761435,
+    "ast_hash": "58a798deeadc449bf7079e07aaa6870e",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Playlist empty-state.png": {
+    "mtime": 1786792363.3690825,
+    "seen": 1789978291.076146,
+    "ast_hash": "3dd0bffdbdc3bdbf6e1d609da988c00d",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/Streak.png": {
+    "mtime": 1789946786.5672698,
+    "seen": 1789978291.0761483,
+    "ast_hash": "af10b32e4ec4b9cd7f939d53bd8fd3ae",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/01.png": {
+    "mtime": 1782857825.767578,
+    "seen": 1789978291.0761502,
+    "ast_hash": "196c76ea8940ef0d31059523cac811ad",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Afterclap-2.png": {
+    "mtime": 1782857826.579204,
+    "seen": 1789978291.0761526,
+    "ast_hash": "b441a17861bb5cde9a62cd72fbcce2bb",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Afterclap-4.png": {
+    "mtime": 1782857826.3058047,
+    "seen": 1789978291.0761552,
+    "ast_hash": "7d2b87d93e85aa29031f3019c5fa6b3c",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Afterclap-5.png": {
+    "mtime": 1782857826.2447183,
+    "seen": 1789978291.0761583,
+    "ast_hash": "300820beaa45b850766f5caf3477d613",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Afterclap-6.png": {
+    "mtime": 1782857826.370147,
+    "seen": 1789978291.0761604,
+    "ast_hash": "54b76b656bebbd9cbabfa1bee1e993c6",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Funny Bunny-1.png": {
+    "mtime": 1782857826.4454367,
+    "seen": 1789978291.0761628,
+    "ast_hash": "7f6217abc883e03dc8fa337b627cdf54",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Funny Bunny-4.png": {
+    "mtime": 1782857826.591419,
+    "seen": 1789978291.0761652,
+    "ast_hash": "5e9f20a435ee37aca23044a43cb8d1e6",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Funny Bunny-6.png": {
+    "mtime": 1782857826.6447918,
+    "seen": 1789978291.0761673,
+    "ast_hash": "7990c35b135b3cc849b43201a7ce4775",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Funny Bunny.png": {
+    "mtime": 1782857826.357387,
+    "seen": 1789978291.07617,
+    "ast_hash": "7c4d9652288ec249219e9868ac7e10bc",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Teamwork-5.png": {
+    "mtime": 1782857825.9756284,
+    "seen": 1789978291.0761724,
+    "ast_hash": "5369e48e602a591d24b8d363c2b492e8",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Teamwork-6.png": {
+    "mtime": 1782857825.906534,
+    "seen": 1789978291.0761755,
+    "ast_hash": "9f98354ca1ac8ef1fe58314b8148a0ba",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Upstream-1.png": {
+    "mtime": 1782857826.1158793,
+    "seen": 1789978291.0761776,
+    "ast_hash": "8033b0c2955032c3e05535e725aa2418",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Upstream-2.png": {
+    "mtime": 1782857826.0840948,
+    "seen": 1789978291.0761802,
+    "ast_hash": "9a55bafb4d1016c5e6c174686b346f76",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Upstream-4.png": {
+    "mtime": 1782857826.1448953,
+    "seen": 1789978291.076183,
+    "ast_hash": "05a8be4f5fec97319cbc1f504087066a",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Upstream-5.png": {
+    "mtime": 1782857826.1306474,
+    "seen": 1789978291.0761857,
+    "ast_hash": "9c1439d705ea7f33e56ca5687f574ada",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/Upstream-8.png": {
+    "mtime": 1782857825.8474903,
+    "seen": 1789978291.0761878,
+    "ast_hash": "ec2537a8217f8094fa62bbab2533d824",
+    "semantic_hash": ""
+  },
+  ".vercel/output/static/images/User Avatars/default-user.jpeg": {
+    "mtime": 1776000711.13842,
+    "seen": 1789978291.07619,
+    "ast_hash": "3b78aaeb450b8192e09d7c437c41e59d",
     "semantic_hash": ""
   }
 }
