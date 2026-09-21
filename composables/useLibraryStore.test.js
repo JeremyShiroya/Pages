@@ -160,7 +160,7 @@ describe('useLibraryStore — profile', () => {
       id: 'local',
       displayName: 'Reader',
       avatarType: 'image',
-      avatarValue: '/Images/User%20Avatars/default-user.jpeg',
+      avatarValue: '/images/User%20Avatars/default-user.jpeg',
     })
   })
 
@@ -170,14 +170,14 @@ describe('useLibraryStore — profile', () => {
     await saveProfile({
       displayName: '  John  ',
       avatarType: 'image',
-      avatarValue: '/Images/User%20Avatars/E-commerce-1.svg',
+      avatarValue: '/images/User%20Avatars/E-commerce-1.svg',
     })
 
     expect(await getProfile()).toMatchObject({
       id: 'local',
       displayName: 'John',
       avatarType: 'image',
-      avatarValue: '/Images/User%20Avatars/E-commerce-1.svg',
+      avatarValue: '/images/User%20Avatars/E-commerce-1.svg',
     })
   })
 })

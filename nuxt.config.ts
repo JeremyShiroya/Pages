@@ -41,9 +41,9 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
       ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/Images/P Logo.png' },
-        { rel: 'shortcut icon', type: 'image/png', href: '/Images/P Logo.png' },
-        { rel: 'apple-touch-icon', href: '/Images/P Logo.png' },
+        { rel: 'icon', type: 'image/png', href: '/images/P Logo.png' },
+        { rel: 'shortcut icon', type: 'image/png', href: '/images/P Logo.png' },
+        { rel: 'apple-touch-icon', href: '/images/P Logo.png' },
       ],
     },
   },
@@ -114,13 +114,13 @@ export default defineNuxtConfig({
       start_url: '/',
       icons: [
         {
-          src: '/Images/P Logo.png',
+          src: '/images/P Logo.png',
           sizes: '192x192',
           type: 'image/png',
           purpose: 'any maskable',
         },
         {
-          src: '/Images/P Logo.png',
+          src: '/images/P Logo.png',
           sizes: '512x512',
           type: 'image/png',
           purpose: 'any maskable',

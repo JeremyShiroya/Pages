@@ -8,12 +8,12 @@ export const DEFAULT_PROFILE = Object.freeze({
   id: PROFILE_ID,
   displayName: 'Reader',
   avatarType: 'image',
-  avatarValue: '/Images/User%20Avatars/default-user.jpeg',
+  avatarValue: '/images/User%20Avatars/default-user.jpeg',
 })
 
 const PROFILE_AVATAR_TYPES = new Set(['preset', 'image'])
-const USER_AVATAR_PATH_PREFIX = '/Images/User%20Avatars/'
-const LEGACY_USER_AVATAR_PATH_PREFIX = '/images/User%20Avatars/'
+const USER_AVATAR_PATH_PREFIX = '/images/User%20Avatars/'
+const LEGACY_USER_AVATAR_PATH_PREFIX = '/Images/User%20Avatars/'
 
 // IndexedDB's structured clone cannot serialize Vue reactive proxies — passing
 // one to `put()` throws DataCloneError ("#<Object> could not be cloned"), and a

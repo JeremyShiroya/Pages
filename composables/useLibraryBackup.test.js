@@ -80,7 +80,7 @@ describe('useLibraryBackup', () => {
     expect(restoredProfile).toMatchObject({
       displayName: 'John',
       avatarType: 'image',
-      avatarValue: '/Images/User%20Avatars/E-commerce-1.svg',
+      avatarValue: '/images/User%20Avatars/E-commerce-1.svg',
     })
     expect(restoredContent.content).toBe('<p>Hello</p>')
     expect(restoredContent.source).toBeInstanceOf(ArrayBuffer)

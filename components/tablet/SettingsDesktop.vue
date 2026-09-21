@@ -405,7 +405,7 @@
     </section>
 
     <section class="about-section" aria-labelledby="about-title">
-      <img src="/Images/P Logo.png" alt="Pages" class="about-logo" />
+      <img src="/images/P Logo.png" alt="Pages" class="about-logo" />
       <h2 id="about-title">Pages</h2>
       <p style="cursor: pointer; user-select: none;" @click="handleVersionClick">Version {{ appVersion }} &bull; Build {{ buildNumber }}</p>
       <nav class="about-links" aria-label="Pages links">
