@@ -68,7 +68,6 @@ describe('responsive mobile component split', () => {
       ['Series', 'components/shared/SeriesComp.vue', 'components/mobile/SeriesMobile.vue', 'components/tablet/SeriesDesktop.vue'],
       ['Playlists', 'components/shared/PlaylistComp.vue', 'components/mobile/PlaylistsMobile.vue', 'components/tablet/PlaylistsDesktop.vue'],
       ['Favourites', 'components/shared/FavouritesComp.vue', 'components/mobile/FavouritesMobile.vue', 'components/tablet/FavouritesDesktop.vue'],
-      ['Profile', 'pages/profile.vue', 'components/mobile/ProfileMobile.vue', 'components/tablet/ProfileDesktop.vue'],
     ]
 
     expect(exists('components/shared/ResponsiveViewSwitch.vue')).toBe(true)
@@ -86,6 +85,11 @@ describe('responsive mobile component split', () => {
       expect(wrapper, `${name} wrapper mounts mobile view`).toContain(`<${name}Mobile />`)
       expect(wrapper, `${name} wrapper mounts desktop view`).toContain(`<${name}Desktop />`)
     }
+
+    const profile = read('pages/profile.vue')
+    expect(profile).toContain('<ResponsiveViewSwitch')
+    expect(profile.match(/<ProfilePage \/>/g)).toHaveLength(3)
+    expect(exists('components/shared/ProfilePage.vue')).toBe(true)
 
     expect(exists('components/home')).toBe(false)
     expect(exists('components/settings')).toBe(false)

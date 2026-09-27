@@ -169,6 +169,35 @@
         </div>
       </section>
 
+      <section class="pref-group">
+        <h2 class="pref-group-title">Profile favourites</h2>
+
+        <div class="pref-block">
+          <div class="pref-copy">
+            <span class="pref-label">Layout</span>
+            <span class="pref-hint">Choose how favourite books appear on your Profile page.</span>
+          </div>
+          <div class="option-grid">
+            <button
+              v-for="opt in profileFavouritesLayoutOptions"
+              :key="opt.value"
+              type="button"
+              class="option"
+              :class="{ active: settings.profileFavouritesLayout === opt.value }"
+              @click="set('profileFavouritesLayout', opt.value)"
+            >
+              <span class="preview profile-layout-preview" :class="`profile-layout-preview--${opt.value}`" aria-hidden="true">
+                <i v-for="index in (opt.value === 'grid' ? 6 : 3)" :key="index"></i>
+              </span>
+              <span class="option-label">
+                {{ opt.label }}
+                <i v-if="settings.profileFavouritesLayout === opt.value" class="ri-check-line"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Series cards -->
       <section class="pref-group">
         <h2 class="pref-group-title">Series cards</h2>
@@ -551,6 +580,10 @@ const seriesLayoutOptions = [
   { value: 'fan', label: 'Fanned' },
   { value: 'cover', label: 'Playlist style' },
 ]
+const profileFavouritesLayoutOptions = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+]
 // Reading options are booleans, but they're presented as picture choices like
 // the card sections rather than as bare switches.
 const toggleOptions = [
@@ -844,6 +877,28 @@ const confirmFormatMode = async () => {
   height: 92px;
   overflow: hidden;
   border-radius: 9px;
+}
+
+.profile-layout-preview {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  padding: 14px;
+  background: var(--color-background-app);
+}
+
+.profile-layout-preview--grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.profile-layout-preview--list {
+  grid-template-columns: 1fr;
+}
+
+.profile-layout-preview i {
+  min-height: 17px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-surface-primary));
 }
 
 .palette-preview {

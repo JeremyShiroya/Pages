@@ -35,7 +35,7 @@
         @click.stop
       >
         <button type="button" role="menuitem" @click="runMenuAction('favourite')">
-          <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+          <i class="ri-heart-fill favourite-heart-icon"></i>
           <span>{{ book.isFavourite ? 'Remove favourite' : 'Favourite' }}</span>
         </button>
         <button type="button" role="menuitem" @click="runMenuAction('playlist')">
@@ -114,7 +114,7 @@
           title="Favourite"
           @click.stop="emit('favourite', book)"
         >
-          <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+          <i class="ri-heart-fill favourite-heart-icon"></i>
         </button>
         <button
           type="button"

@@ -19,6 +19,7 @@ describe('appearance preferences', () => {
     expect(DEFAULT_BOOKISH_SETTINGS.seriesCardLayout).toBe('fan')
     expect(DEFAULT_BOOKISH_SETTINGS.favouritesCardBackground).toBe('blur')
     expect(DEFAULT_BOOKISH_SETTINGS.favouritesCardLayout).toBe('list')
+    expect(DEFAULT_BOOKISH_SETTINGS.profileFavouritesLayout).toBe('grid')
     // Playlist cards default to the same look as series cards.
     expect(DEFAULT_BOOKISH_SETTINGS.playlistCardBackground).toBe('blur')
     expect(DEFAULT_BOOKISH_SETTINGS.playlistCardLayout).toBe('fan')
@@ -54,6 +55,7 @@ describe('appearance preferences', () => {
       seriesCardLayout: 'cover',
       favouritesCardBackground: 'blank',
       favouritesCardLayout: 'list',
+      profileFavouritesLayout: 'list',
       bookActionDisplay: 'visible',
       readerHighlight: false,
       showStreak: false,
@@ -63,6 +65,7 @@ describe('appearance preferences', () => {
     expect(ok.seriesCardLayout).toBe('cover')
     expect(ok.favouritesCardBackground).toBe('blank')
     expect(ok.favouritesCardLayout).toBe('list')
+    expect(ok.profileFavouritesLayout).toBe('list')
     expect(ok.bookActionDisplay).toBe('visible')
     expect(ok.readerHighlight).toBe(false)
     expect(ok.showStreak).toBe(false)
@@ -71,6 +74,7 @@ describe('appearance preferences', () => {
     const junk = normalizeBookishSettings({
       seriesCardLayout: 'nonsense',
       favouritesCardLayout: 'nope',
+      profileFavouritesLayout: 'nope',
       playlistCardLayout: 'spiral',
       playlistCardBackground: 'rainbow',
       bookActionDisplay: 'floating',
@@ -78,6 +82,7 @@ describe('appearance preferences', () => {
     })
     expect(junk.seriesCardLayout).toBe('fan')
     expect(junk.favouritesCardLayout).toBe('list')
+    expect(junk.profileFavouritesLayout).toBe('grid')
     expect(junk.playlistCardLayout).toBe('fan')
     expect(junk.playlistCardBackground).toBe('blur')
     expect(junk.bookActionDisplay).toBe('minimal')
@@ -123,10 +128,11 @@ describe('appearance preferences', () => {
     // Hiding between formats is meaningless once only one is handled.
     expect(prefs).toContain('v-if="enabledFormats.length > 1"')
 
-    // The Favourites card section moved out of Preferences: its layout is now
-    // chosen from the grid/list toggle in the Favourites page's controls row.
-    expect(prefs).not.toContain('favouritesCardLayout')
+    // The standalone Favourites page still owns its own view toggle, while
+    // Profile gets a separate persisted grid/list preference here.
+    expect(prefs).not.toContain("set('favouritesCardLayout'")
     expect(prefs).not.toContain('favouritesCardBackground')
+    expect(prefs).toContain("set('profileFavouritesLayout'")
 
     // Every Reading option is illustrated, like the card sections above it.
     expect(prefs).toContain('ReadingPreview')

@@ -87,7 +87,7 @@
           :book="book"
           :active="isBookActive(book)"
           :class="{ 'mobile-list-book-card': viewMode === 'list' }"
-          collapse-actions
+          :collapse-actions="viewMode === 'list'"
           :selectable="selectionMode"
           :selected="isSelected(book.id)"
           @toggle-select="toggleSelected"
@@ -248,7 +248,7 @@ const playlistBooks = computed(() => {
 watch(playlistBooks, (currentBooks) => retainSelection(currentBooks.map((book) => book.id)));
 const selectedBooks = computed(() => playlistBooks.value.filter((book) => isSelected(book.id)));
 const bulkActions = [
-  { key: 'favourite', icon: 'ri-heart-line', label: 'Favourite' },
+  { key: 'favourite', icon: 'ri-heart-fill', label: 'Favourite' },
   { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
   { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
   { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },

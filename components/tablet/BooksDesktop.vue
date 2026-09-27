@@ -242,6 +242,7 @@
             :key="book.id"
             :book="book"
             :active="isBookActive(book)"
+            :collapse-actions="false"
             @open="router.push(`/book/${book.id}`)"
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"
@@ -312,7 +313,7 @@
                   </button>
                   <div v-if="activeActionsMenu === book.id" class="row-actions-menu">
                     <button type="button" @click="toggleFavourite(book.id); activeActionsMenu = null">
-                      <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+                      <i class="ri-heart-fill favourite-heart-icon"></i>
                       {{ book.isFavourite ? 'Remove favourite' : 'Add to favourites' }}
                     </button>
                     <button type="button" @click="selectedPlaylistBook = book; activeActionsMenu = null">
@@ -1672,6 +1673,10 @@ onUnmounted(() => {
   border: 0;
   border-radius: 14px;
   overflow: hidden;
+}
+
+:root[data-theme="dark"][data-dark-app-background="dark"] .view-container.is-card {
+  background: transparent;
 }
 
 /* Controls row inside the container */

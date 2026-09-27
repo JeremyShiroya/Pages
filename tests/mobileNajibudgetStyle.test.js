@@ -41,7 +41,7 @@ describe('mobile Najibudget style transfer', () => {
     expect(settings).toContain('padding: 14px 0')
     expect(settings).toContain('grid-template-columns: minmax(0, 1fr) auto')
     expect(settings).toContain('grid-template-columns: 20px minmax(0, 1fr)')
-    expect(settings).toContain('padding-left: 16px')
+    expect(settings).toContain('padding-left: 14px')
     expect(settings).toContain('padding-right: 16px')
     expect(settings).toContain('font-size: 18px')
     expect(settings).toContain('font-size: 20px')

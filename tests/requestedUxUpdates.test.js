@@ -88,10 +88,10 @@ describe('requested mobile UX updates', () => {
     expect(read('components/mobile/ReaderMobile.vue')).toContain('data-system-bar-color')
     expect(read('components/mobile/ProfileMobile.vue')).toMatch(/\.profile-page\s*\{[^}]*background:\s*var\(--color-settings-background\)/s)
     expect(read('components/tablet/ProfileDesktop.vue')).toMatch(/\.profile-page\s*\{[^}]*background:\s*var\(--color-settings-background\)/s)
-    expect(read('layouts/default.vue')).toContain("route.path.startsWith('/profile')")
+    expect(read('layouts/default.vue')).toContain("route.path.startsWith('/editprofilepage')")
     expect(read('layouts/default.vue')).toMatch(/\.app-layout\.settings-palette[\s\S]*background:\s*var\(--color-settings-background\)/)
-    expect(systemBarSync).toContain("window.location.pathname.startsWith('/profile')")
-    expect(read('plugins/settings-system-bars.client.js')).toContain("pathname.startsWith('/profile')")
+    expect(systemBarSync).toContain("window.location.pathname.startsWith('/editprofilepage')")
+    expect(read('plugins/settings-system-bars.client.js')).toContain("pathname.startsWith('/editprofilepage')")
     expect(settings).toMatch(/\.about-item\s*\{[^}]*background-color:\s*transparent/s)
   })
 

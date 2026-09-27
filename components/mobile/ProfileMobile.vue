@@ -1,6 +1,6 @@
 <template>
   <main class="profile-page">
-    <MobileSettingsNav title="Profile" back-to="/settings" aria-label="Settings navigation" />
+    <MobileSettingsNav title="Edit Profile" back-to="/profile" aria-label="Edit profile navigation" />
 
     <section class="profile-hero" aria-label="Profile details">
       <div class="profile-identity">

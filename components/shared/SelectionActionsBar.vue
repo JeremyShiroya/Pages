@@ -7,7 +7,7 @@
       :key="action.key"
       type="button"
       class="selection-action"
-      :class="{ danger: action.danger }"
+      :class="{ danger: action.danger, favourite: action.key === 'favourite' }"
       :aria-label="action.label"
       :title="action.label"
       @click="emit('action', action.key)"
@@ -75,6 +75,10 @@ const emit = defineEmits(['action', 'clear'])
 }
 
 .selection-action.danger {
+  color: var(--color-status-danger-bright, #dc2626);
+}
+
+.selection-action.favourite {
   color: var(--color-status-danger-bright, #dc2626);
 }
 

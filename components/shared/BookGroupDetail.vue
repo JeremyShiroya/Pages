@@ -67,7 +67,7 @@
           :key="book.id"
           :book="book"
           :active="isBookActive(book)"
-          collapse-actions
+          :collapse-actions="false"
           :selectable="selectionMode"
           :selected="isSelected(book.id)"
           @toggle-select="toggleSelected"
@@ -147,7 +147,7 @@
               </button>
               <div v-if="activeActionsMenu === book.id" class="row-actions-menu">
                 <button type="button" @click="toggleFavourite(book.id); activeActionsMenu = null">
-                  <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+                  <i class="ri-heart-fill favourite-heart-icon"></i>
                   {{ book.isFavourite ? 'Remove favourite' : 'Add to favourites' }}
                 </button>
                 <button type="button" @click="selectedPlaylistBook = book; activeActionsMenu = null">
@@ -304,7 +304,7 @@ const openBook = (book) => {
 };
 const selectedBooks = computed(() => props.books.filter((book) => isSelected(book.id)));
 const bulkActions = [
-  { key: 'favourite', icon: 'ri-heart-line', label: 'Favourite' },
+  { key: 'favourite', icon: 'ri-heart-fill', label: 'Favourite' },
   { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
   { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
   { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },

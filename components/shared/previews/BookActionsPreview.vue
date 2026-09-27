@@ -6,7 +6,7 @@
       <span class="mock-line short"></span>
       <span class="mock-line"></span>
       <span v-if="mode === 'visible'" class="mock-actions">
-        <i class="ri-heart-line"></i>
+        <i class="ri-heart-fill favourite-heart-icon"></i>
         <i class="ri-play-list-2-line"></i>
         <i class="ri-edit-line"></i>
       </span>

@@ -29,7 +29,8 @@ const androidColor = ({ red, green, blue }) => (
 )
 
 const usesSettingsPalette = (pathname) => (
-  pathname.startsWith('/settings') || pathname.startsWith('/profile')
+  pathname.startsWith('/settings')
+  || pathname.startsWith('/editprofilepage')
 )
 
 export default defineNuxtPlugin((nuxtApp) => {

@@ -74,7 +74,7 @@ const { isMobileView } = useResponsiveView()
 // The mini player only belongs on the main tab roots — never on detail pages
 // (book/series/playlist), settings, add/edit, or the reader. All of those are
 // simply absent from this whitelist.
-const NAV_ROUTES = new Set(['/', '/books', '/series', '/favourites', '/playlists'])
+const NAV_ROUTES = new Set(['/', '/books', '/series', '/favourites', '/playlists', '/profile'])
 
 const hasBottomNav = computed(() => NAV_ROUTES.has(route.path))
 

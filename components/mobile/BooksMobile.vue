@@ -190,6 +190,7 @@
             :key="book.id"
             :book="book"
             :active="isBookActive(book)"
+            :collapse-actions="false"
             shareable
             :selectable="selectionMode"
             :selected="isSelected(book.id)"
@@ -437,7 +438,7 @@ const openBook = (book) => {
 const selectedBooks = computed(() => books.value.filter((book) => isSelected(book.id)));
 
 const bulkActions = [
-  { key: 'favourite', icon: 'ri-heart-line', label: 'Favourite' },
+  { key: 'favourite', icon: 'ri-heart-fill', label: 'Favourite' },
   { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
   { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
   { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },
@@ -1426,6 +1427,10 @@ onUnmounted(() => {
   border: 0;
   border-radius: 14px;
   overflow: hidden;
+}
+
+:root[data-theme="dark"][data-dark-app-background="dark"] .view-container.is-card {
+  background: transparent;
 }
 
 .view-container.is-card.is-selecting {

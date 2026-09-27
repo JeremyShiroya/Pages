@@ -19,7 +19,7 @@
           @click="handleFavourite"
         >
           <i
-            :class="ttsBook.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"
+            class="ri-heart-fill favourite-heart-icon"
             :style="{ color: ttsBook.isFavourite ? 'var(--color-status-danger)' : '' }"
           ></i>
         </button>

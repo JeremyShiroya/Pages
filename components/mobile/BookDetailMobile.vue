@@ -16,7 +16,7 @@
           </button>
           <div v-if="detailMenuOpen" class="detail-more-menu" role="menu">
             <button type="button" role="menuitem" @click="runDetailAction('favourite')">
-              <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+              <i class="ri-heart-fill favourite-heart-icon"></i>
               <span>{{ book.isFavourite ? 'Remove favourite' : 'Favourite' }}</span>
             </button>
             <button type="button" role="menuitem" @click="runDetailAction('playlist')">
@@ -95,7 +95,7 @@
               title="Favourite"
               @click="toggleFavourite(book.id)"
             >
-              <i :class="book.isFavourite ? 'ri-heart-fill' : 'ri-heart-line'"></i>
+              <i class="ri-heart-fill favourite-heart-icon"></i>
             </button>
             <button
               type="button"

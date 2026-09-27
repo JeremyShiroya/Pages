@@ -81,7 +81,7 @@
             :book="entry.book"
             :active="isBookActive(entry.book)"
             :class="{ 'mobile-list-book-card': viewMode === 'list' }"
-            collapse-actions
+            :collapse-actions="viewMode === 'list'"
             :selectable="selectionMode"
             :selected="isSelected(entry.book.id)"
             @toggle-select="toggleSelected"
@@ -102,7 +102,7 @@
             v-else
             :book="entry.book"
             :class="{ 'mobile-list-book-card': viewMode === 'list' }"
-            collapse-actions
+            :collapse-actions="viewMode === 'list'"
             unavailable
           />
         </template>
@@ -237,7 +237,7 @@ const openBook = (book) => {
 
 const selectedBooks = computed(() => seriesBooks.value.filter((book) => isSelected(book.id)));
 const bulkActions = [
-  { key: 'favourite', icon: 'ri-heart-line', label: 'Favourite' },
+  { key: 'favourite', icon: 'ri-heart-fill', label: 'Favourite' },
   { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
   { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
   { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },

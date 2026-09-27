@@ -4,7 +4,7 @@
       <button type="button" aria-label="Back" title="Back" @click="goBack">
         <i class="ri-arrow-left-s-line"></i>
       </button>
-      <h1>Profile</h1>
+      <h1>Edit Profile</h1>
       <span aria-hidden="true"></span>
     </header>
 

@@ -71,10 +71,13 @@ export default defineNuxtPlugin((nuxtApp) => {
     frame = null
     const bridge = globalThis.Capacitor
     if (!bridge?.isNativePlatform?.()) return
-    // Settings and Profile use their own palette rather than the normal app canvas. Their
+    // Settings and Edit Profile use their own palette rather than the normal app canvas. Their
     // dedicated plugin owns both system bars so the generic surface sampler
     // cannot race it with a colour from the header or responsive shell.
-    if (window.location.pathname.startsWith('/settings') || window.location.pathname.startsWith('/profile')) return
+    if (
+      window.location.pathname.startsWith('/settings')
+      || window.location.pathname.startsWith('/editprofilepage')
+    ) return
 
     const width = Math.max(1, window.innerWidth)
     const height = Math.max(1, window.innerHeight)

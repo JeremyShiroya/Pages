@@ -71,11 +71,13 @@ describe('series suggestion placeholders', () => {
     const source = read('components/mobile/SeriesDetailMobile.vue')
     expect(source).toContain('fetchSeriesInstallments')
     expect(source).toContain('installmentMeta')
-    // The suggestion card renders the four resolved fields: cover, name,
-    // author, and year.
-    expect(source).toMatch(/missing-cover[\s\S]{0,200}entry\.cover/)
-    expect(source).toContain('entry.author')
-    expect(source).toContain('entry.year')
+    // Suggested installments now reuse the same library card as owned books;
+    // the entry's synthetic book carries the resolved cover, name, author,
+    // and year into that shared renderer.
+    expect(source).toContain(':book="entry.book"')
+    expect(source).toContain('cover: meta?.cover || null')
+    expect(source).toContain('author: meta?.author ||')
+    expect(source).toContain('publishYear: meta?.year || null')
 
     const suggestions = read('composables/useSeriesSuggestions.js')
     // The roster (which enumerates the whole series) is the resolver — the

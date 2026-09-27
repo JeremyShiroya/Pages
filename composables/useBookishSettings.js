@@ -24,6 +24,7 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   seriesCardLayout: 'fan',         // 'fan' (books centered) | 'cover'
   favouritesCardBackground: 'blur',// 'blur' | 'blank'
   favouritesCardLayout: 'list',    // 'grid' | 'list' (set from the Favourites controls row)
+  profileFavouritesLayout: 'grid', // 'grid' | 'list' inside the Profile favourites tab
   playlistCardBackground: 'blur',  // 'blur' | 'blank' — matches series default
   playlistCardLayout: 'fan',       // 'fan' | 'cover' — matches series default
   bookActionDisplay: 'minimal',    // 'minimal' puts actions in a More menu; 'visible' keeps the icon row
@@ -225,6 +226,9 @@ export function normalizeBookishSettings(value) {
     favouritesCardLayout: FAVOURITES_CARD_LAYOUT_OPTIONS.includes(source.favouritesCardLayout)
       ? source.favouritesCardLayout
       : DEFAULT_BOOKISH_SETTINGS.favouritesCardLayout,
+    profileFavouritesLayout: FAVOURITES_CARD_LAYOUT_OPTIONS.includes(source.profileFavouritesLayout)
+      ? source.profileFavouritesLayout
+      : DEFAULT_BOOKISH_SETTINGS.profileFavouritesLayout,
     playlistCardBackground: CARD_BACKGROUND_OPTIONS.includes(source.playlistCardBackground)
       ? source.playlistCardBackground
       : DEFAULT_BOOKISH_SETTINGS.playlistCardBackground,

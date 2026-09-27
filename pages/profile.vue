@@ -1,20 +1,18 @@
 <template>
   <ResponsiveViewSwitch>
     <template #phone>
-      <ProfileMobile />
+      <ProfilePage />
     </template>
     <template #tabletPortrait>
-      <ProfileTabletPortrait />
+      <ProfilePage />
     </template>
     <template #tabletLandscape>
-      <ProfileDesktop />
+      <ProfilePage />
     </template>
   </ResponsiveViewSwitch>
 </template>
 
 <script setup>
-import ProfileDesktop from '~/components/tablet/ProfileDesktop.vue'
-import ProfileMobile from '~/components/mobile/ProfileMobile.vue'
-import ProfileTabletPortrait from '~/components/tablet/portrait/ProfileTabletPortrait.vue'
+import ProfilePage from '~/components/shared/ProfilePage.vue'
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
 </script>

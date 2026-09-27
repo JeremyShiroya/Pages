@@ -42,15 +42,18 @@ import { useSidebarState } from '~/composables/useSidebarState'
 
 // The five tab-root pages carry their own fixed top/bottom nav bars, which
 // already reserve the phone's status- and navigation-bar areas. Every OTHER
-// page (details, settings, profile, …) has content in normal flow, so once the
+// page (details, settings, …) has content in normal flow, so once the
 // app draws edge-to-edge it needs the safe-area insets applied here — otherwise
 // it slides up under the status bar and down under the gesture bar. The body's
 // own app-coloured background then fills those bar strips, in light and dark.
-const TAB_ROOT_PATHS = new Set(['/', '/books', '/series', '/favourites', '/playlists'])
+const TAB_ROOT_PATHS = new Set(['/', '/books', '/series', '/favourites', '/playlists', '/profile'])
 const route = useRoute()
 const { collapsed: sidebarCollapsed } = useSidebarState()
 const isMobileSubPage = computed(() => !TAB_ROOT_PATHS.has(route.path))
-const isSettingsPalettePage = computed(() => route.path.startsWith('/settings') || route.path.startsWith('/profile'))
+const isSettingsPalettePage = computed(() => (
+  route.path.startsWith('/settings')
+  || route.path.startsWith('/editprofilepage')
+))
 </script>
 
 <style scoped>

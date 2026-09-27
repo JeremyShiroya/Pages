@@ -32,7 +32,7 @@
             :active="isBookActive(book)"
             :card-background="favouritesBackground"
             :class="{ 'mobile-list-book-card': favouritesLayout === 'list' }"
-            collapse-actions
+            :collapse-actions="favouritesLayout === 'list'"
             @open="router.push(`/book/${book.id}`)"
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"

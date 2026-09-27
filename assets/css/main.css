@@ -780,3 +780,7 @@ textarea {
   max-width: 240px;
 }
 
+/* Favourite actions stay recognizable in every menu and card state. */
+.favourite-heart-icon {
+  color: var(--color-status-danger-bright, #dc2626) !important;
+}
