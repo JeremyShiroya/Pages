@@ -242,7 +242,7 @@
             :key="book.id"
             :book="book"
             :active="isBookActive(book)"
-            :collapse-actions="false"
+            :collapse-actions="true"
             @open="router.push(`/book/${book.id}`)"
             @play="handlePlay"
             @favourite="toggleFavourite(book.id)"
@@ -307,13 +307,13 @@
                     title="More actions"
                     :aria-label="`More actions for ${book.title}`"
                     :aria-expanded="activeActionsMenu === book.id"
-                    @click="toggleActionsMenu(book.id)"
+                    @click="toggleActionsMenu(book.id, $event)"
                   >
                     <i class="ri-more-2-fill"></i>
                   </button>
-                  <div v-if="activeActionsMenu === book.id" class="row-actions-menu">
+                  <div v-if="activeActionsMenu === book.id" class="row-actions-menu" :style="actionsMenuStyle">
                     <button type="button" @click="toggleFavourite(book.id); activeActionsMenu = null">
-                      <i class="ri-heart-fill favourite-heart-icon"></i>
+                      <i :class="book.isFavourite ? 'ri-heart-fill favourite-heart-icon' : 'ri-heart-line'"></i>
                       {{ book.isFavourite ? 'Remove favourite' : 'Add to favourites' }}
                     </button>
                     <button type="button" @click="selectedPlaylistBook = book; activeActionsMenu = null">
@@ -449,6 +449,7 @@ const viewMode = ref(settings.value.libraryView);
 // Dropdown states
 const activeDropdown = ref(null);
 const activeActionsMenu = ref(null);
+const actionsMenuStyle = ref({});
 
 // Modal states
 const showDeleteModal = ref(false);
@@ -634,8 +635,17 @@ const toggleDropdown = (dropdown) => {
   activeDropdown.value = activeDropdown.value === dropdown ? null : dropdown;
 };
 
-const toggleActionsMenu = (bookId) => {
-  activeActionsMenu.value = activeActionsMenu.value === bookId ? null : bookId;
+const toggleActionsMenu = (bookId, event) => {
+  if (activeActionsMenu.value === bookId) { activeActionsMenu.value = null; return; }
+  const rect = event.currentTarget.getBoundingClientRect();
+  const menuHeight = 206;
+  const spaceBelow = window.innerHeight - rect.bottom - 12;
+  const openAbove = spaceBelow < menuHeight && rect.top > spaceBelow;
+  actionsMenuStyle.value = {
+    top: `${openAbove ? Math.max(8, rect.top - menuHeight - 6) : Math.min(window.innerHeight - menuHeight - 8, rect.bottom + 6)}px`,
+    right: `${Math.max(8, window.innerWidth - rect.right)}px`,
+  };
+  activeActionsMenu.value = bookId;
 };
 
 const setSort = (field, direction) => {
@@ -985,15 +995,15 @@ onUnmounted(() => {
 
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: clamp(1.25rem, 2.5vw, 2.25rem);
   justify-content: start;
   align-items: start;
 }
 
 @media (max-width: 1100px) {
   .books-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   }
 }
 
@@ -2016,7 +2026,7 @@ onUnmounted(() => {
 }
 
 .row-actions-menu {
-  position: absolute;
+  position: fixed;
   z-index: 30;
   top: calc(100% + 6px);
   right: 0;

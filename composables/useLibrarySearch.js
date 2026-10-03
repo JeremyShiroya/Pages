@@ -50,3 +50,19 @@ export function searchLibrary(books, rawQuery, limit = DEFAULT_SEARCH_LIMIT) {
     .slice(0, limit)
     .map((entry) => entry.book)
 }
+
+export function searchPlaylists(playlists, rawQuery, limit = 4) {
+  const query = normalizeSearchText(rawQuery)
+  if (!query) return []
+
+  return (playlists || [])
+    .map((playlist) => ({ playlist, score: Math.max(
+      matchQuality(playlist?.name, query) * 100,
+      matchQuality(playlist?.description, query) * 30,
+    ) }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score
+      || String(a.playlist.name || '').localeCompare(String(b.playlist.name || '')))
+    .slice(0, limit)
+    .map(({ playlist }) => playlist)
+}

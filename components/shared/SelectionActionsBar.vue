@@ -7,7 +7,7 @@
       :key="action.key"
       type="button"
       class="selection-action"
-      :class="{ danger: action.danger, favourite: action.key === 'favourite' }"
+      :class="{ danger: action.danger, 'favourite-active': action.key === 'favourite' && action.icon === 'ri-heart-fill' }"
       :aria-label="action.label"
       :title="action.label"
       @click="emit('action', action.key)"
@@ -78,7 +78,7 @@ const emit = defineEmits(['action', 'clear'])
   color: var(--color-status-danger-bright, #dc2626);
 }
 
-.selection-action.favourite {
+.selection-action.favourite-active {
   color: var(--color-status-danger-bright, #dc2626);
 }
 

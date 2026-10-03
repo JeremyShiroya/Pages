@@ -236,12 +236,12 @@ const openBook = (book) => {
 };
 
 const selectedBooks = computed(() => seriesBooks.value.filter((book) => isSelected(book.id)));
-const bulkActions = [
-  { key: 'favourite', icon: 'ri-heart-fill', label: 'Favourite' },
+const bulkActions = computed(() => [
+  { key: 'favourite', icon: selectedBooks.value.length && selectedBooks.value.every((book) => book.isFavourite) ? 'ri-heart-fill' : 'ri-heart-line', label: 'Favourite' },
   { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
   { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
   { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },
-];
+]);
 
 const runBulkAction = async (key) => {
   const chosen = selectedBooks.value;

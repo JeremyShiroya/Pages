@@ -60,6 +60,7 @@ function normalizeProfile(value) {
     ? `${USER_AVATAR_PATH_PREFIX}${rawAvatarValue.slice(LEGACY_USER_AVATAR_PATH_PREFIX.length)}`
     : rawAvatarValue
   const avatarValue = normalizedAvatarValue.startsWith(USER_AVATAR_PATH_PREFIX)
+    || (/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(normalizedAvatarValue) && normalizedAvatarValue.length <= 1_000_000)
     ? normalizedAvatarValue
     : DEFAULT_USER_PROFILE.avatarValue
 

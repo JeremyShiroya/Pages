@@ -24,14 +24,19 @@
       <section class="mobile-search-section">
         <label class="mobile-search-bar">
           <i class="ri-search-line"></i>
+          <span v-if="!homeSearch && !searchFocused" class="mobile-search-placeholder" aria-hidden="true">
+            Search <Transition name="search-word" mode="out-in"><span :key="searchWord">{{ searchWord }}</span></Transition>
+          </span>
           <input
             :value="homeSearch"
             type="search"
-            placeholder="Search books"
+            aria-label="Search books, authors, series, and playlists"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="none"
             spellcheck="false"
+            @focus="searchFocused = true"
+            @blur="searchFocused = false"
             @input="homeSearch = $event.target.value"
           />
           <button
@@ -45,7 +50,7 @@
           </button>
         </label>
 
-        <div v-if="homeSearchResults.length > 0" class="mobile-search-results">
+        <div v-if="homeSearchResults.length > 0 || homePlaylistResults.length > 0" class="mobile-search-results">
           <button
             v-for="book in homeSearchResults"
             :key="book.id"
@@ -62,8 +67,21 @@
               <small>{{ book.author || 'Unknown author' }}</small>
             </span>
           </button>
+          <button
+            v-for="playlist in homePlaylistResults"
+            :key="`playlist-${playlist.id}`"
+            class="mobile-search-result"
+            type="button"
+            @click="openPlaylist(playlist); homeSearch = ''"
+          >
+            <span class="mobile-search-playlist-icon"><i class="ri-play-list-2-line"></i></span>
+            <span class="mobile-search-result-text">
+              <strong>{{ playlist.name }}</strong>
+              <small>Playlist · {{ (playlist.bookIds || []).length }} books</small>
+            </span>
+          </button>
         </div>
-        <p v-else-if="homeSearch.trim()" class="mobile-search-empty">No books found</p>
+        <p v-else-if="homeSearch.trim()" class="mobile-search-empty">No books or playlists found</p>
       </section>
 
       <!-- Currently Reading -->
@@ -142,11 +160,11 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBooks } from '~/composables/useBooks'
 import { onCoverError } from '~/composables/useCoverFallback'
-import { searchLibrary } from '~/composables/useLibrarySearch'
+import { searchLibrary, searchPlaylists } from '~/composables/useLibrarySearch'
 import { useTTS } from '~/composables/useTTS'
 import EmptyState from '../shared/EmptyState.vue'
 import HomeBookRailCard from '../shared/HomeBookRailCard.vue'
@@ -158,6 +176,7 @@ import MobileTopNav from './MobileTopNav.vue'
 
 const {
   books,
+  collections,
   recentlyReadBooks,
   recentlyAddedBooks,
   seriesList,
@@ -169,6 +188,17 @@ const {
 const { ttsBook, ttsStatus, play: playTTS, togglePlay: toggleTTS } = useTTS()
 const router = useRouter()
 const homeSearch = ref('')
+const searchFocused = ref(false)
+const searchWords = ['books', 'authors', 'series', 'playlists']
+const searchWordIndex = ref(0)
+const searchWord = computed(() => searchWords[searchWordIndex.value])
+let searchWordTimer
+onMounted(() => {
+  searchWordTimer = window.setInterval(() => {
+    if (!homeSearch.value && !searchFocused.value) searchWordIndex.value = (searchWordIndex.value + 1) % searchWords.length
+  }, 2600)
+})
+onBeforeUnmount(() => clearInterval(searchWordTimer))
 
 const isBookPlaying = (book) => (
   !!book && ttsBook.value?.id === book.id && ttsStatus.value === 'playing'
@@ -204,6 +234,7 @@ const mobileSeries = computed(() => seriesList.value.slice(0, 2));
 
 // Ranked so the very first typed letter already surfaces the right books.
 const homeSearchResults = computed(() => searchLibrary(books.value, homeSearch.value))
+const homePlaylistResults = computed(() => searchPlaylists(collections.value, homeSearch.value))
 
 const openBook = (book) => {
   if (book?.id) router.push(`/book/${book.id}`)
@@ -211,6 +242,10 @@ const openBook = (book) => {
 
 const openSeries = (series) => {
   if (series?.id) router.push(`/serie/${series.id}`)
+}
+
+const openPlaylist = (playlist) => {
+  if (playlist?.id) router.push(`/playlist/${playlist.id}`)
 }
 
 const retryLoadLibrary = () => {
@@ -241,6 +276,7 @@ const retryLoadLibrary = () => {
 }
 
 .mobile-search-bar {
+  position: relative;
   display: flex;
   height: 42px;
   align-items: center;
@@ -252,6 +288,12 @@ const retryLoadLibrary = () => {
   color: var(--color-text-muted);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
+
+.mobile-search-placeholder { position: absolute; left: 42px; display: flex; gap: 4px; align-items: center; color: var(--color-text-muted); font-size: var(--mobile-subtext-size); pointer-events: none; }
+.search-word-enter-active, .search-word-leave-active { transition: opacity 280ms ease, filter 280ms ease, transform 280ms ease; }
+.search-word-enter-from { opacity: 0; filter: blur(6px); transform: translateY(5px); }
+.search-word-leave-to { opacity: 0; filter: blur(6px); transform: translateY(-5px); }
+@media (prefers-reduced-motion: reduce) { .search-word-enter-active, .search-word-leave-active { transition: none; } }
 
 .mobile-search-bar i {
   flex: 0 0 auto;
@@ -339,6 +381,8 @@ const retryLoadLibrary = () => {
   color: var(--color-brand-primary);
   font-weight: 600;
 }
+
+.mobile-search-playlist-icon { display: grid; width: 34px; height: 48px; flex: 0 0 auto; place-items: center; border-radius: 8px; background: var(--color-brand-primary-faint); color: var(--color-brand-primary); font-size: 20px; }
 
 .mobile-search-result-text {
   display: grid;

@@ -148,7 +148,8 @@
             type="button"
             class="listen-aux"
             aria-label="Choose narrator"
-            @click="narratorOpen = true"
+            ref="narratorButton"
+            @click="openNarrator"
           >
             <i class="ri-speak-line"></i>
           </button>
@@ -706,7 +707,7 @@
 
     <!-- Narrator picker (opened from the Listen controls) -->
     <Teleport to="body">
-      <div v-if="narratorOpen" class="reader-media-layer">
+      <div v-if="narratorOpen" class="reader-media-layer" :class="{ 'tablet-narrator-layer': tabletMode }">
         <button
           class="reader-media-backdrop"
           type="button"
@@ -716,6 +717,7 @@
         <section
           class="reader-media-sheet reader-narrator-sheet"
           :class="readerTheme"
+          :style="tabletMode ? narratorMenuStyle : undefined"
           role="dialog"
           aria-modal="true"
           aria-label="Choose narrator"
@@ -870,6 +872,7 @@ import ReaderNoteEditor from "./ReaderNoteEditor.vue";
 import ReaderSelectionMenu from "./ReaderSelectionMenu.vue";
 
 const props = defineProps({
+  tabletMode: { type: Boolean, default: false },
   readerRefs: { type: Object, required: true },
   readerTheme: { type: String, default: "light" },
   book: { type: Object, default: null },
@@ -941,7 +944,9 @@ const {
   ttsNativeVoiceIdx,
   ttsUsingDeviceVoice,
   ttsPlayingChunkIdx,
+  ttsPlayingChunkText,
   ttsWordIdx,
+  ttsBoundaries,
   elapsedTime,
   totalTime,
   togglePlay,
@@ -962,6 +967,21 @@ const mediaOpen = ref(false);
 const displayOpen = ref(false);
 const voicePickerOpen = ref(false);
 const narratorOpen = ref(false);
+const narratorButton = ref(null);
+const narratorMenuStyle = ref({});
+const openNarrator = () => {
+  if (props.tabletMode && narratorButton.value) {
+    const rect = narratorButton.value.getBoundingClientRect();
+    const height = Math.min(360, window.innerHeight - 24);
+    const openAbove = window.innerHeight - rect.bottom < height && rect.top > window.innerHeight - rect.bottom;
+    narratorMenuStyle.value = {
+      position: 'fixed',
+      top: `${openAbove ? Math.max(12, rect.top - height - 8) : Math.min(window.innerHeight - height - 12, rect.bottom + 8)}px`,
+      left: `${Math.max(12, Math.min(window.innerWidth - 292, rect.right - 280))}px`,
+    };
+  }
+  narratorOpen.value = true;
+};
 const listenTextVisible = ref(true);
 const retryingOnlineVoices = ref(false);
 const tocModalOpen = ref(false);
@@ -1880,8 +1900,21 @@ const listenDisplayChunkIndex = computed(() => (
 ));
 
 const LISTEN_WORD_WINDOW_SIZE = 8;
+const listenSourceText = computed(() => props.tabletMode && activeListenChunk.value >= 0
+  ? (ttsPlayingChunkText.value || (props.readableChunks || [])[listenDisplayChunkIndex.value] || '')
+  : ((props.readableChunks || [])[listenDisplayChunkIndex.value] || ''));
+const listenSpokenWordIndex = computed(() => {
+  const boundaryIndex = activeListenChunk.value >= 0 ? Number(ttsWordIdx.value) : -1;
+  if (!props.tabletMode || boundaryIndex < 0) return boundaryIndex;
+  const charIndex = Number(ttsBoundaries.value?.[boundaryIndex]?.charIndex);
+  if (!Number.isFinite(charIndex) || charIndex < 0) return boundaryIndex;
+  const starts = [...String(listenSourceText.value).matchAll(/\S+/g)].map(match => match.index || 0);
+  let wordIndex = 0;
+  while (wordIndex + 1 < starts.length && starts[wordIndex + 1] <= charIndex) wordIndex += 1;
+  return wordIndex;
+});
 const listenWordWindowStart = computed(() => {
-  const spokenIndex = activeListenChunk.value >= 0 ? Number(ttsWordIdx.value) : -1;
+  const spokenIndex = listenSpokenWordIndex.value;
   return Math.floor(Math.max(0, spokenIndex) / LISTEN_WORD_WINDOW_SIZE) * LISTEN_WORD_WINDOW_SIZE;
 });
 const listenSentenceKey = computed(() => `${listenDisplayChunkIndex.value}:${listenWordWindowStart.value}`);
@@ -1890,11 +1923,11 @@ const listenSentenceKey = computed(() => `${listenDisplayChunkIndex.value}:${lis
 // to solid white as the audio boundary reaches them; the moving window keeps
 // long sentences readable without ever filling more than two lines.
 const listenSentenceWords = computed(() => {
-  const text = (props.readableChunks || [])[listenDisplayChunkIndex.value] || '';
+  const text = listenSourceText.value;
   const words = String(text).trim().split(/\s+/).filter(Boolean);
   if (!words.length) return [];
 
-  const spokenIndex = activeListenChunk.value >= 0 ? Number(ttsWordIdx.value) : -1;
+  const spokenIndex = listenSpokenWordIndex.value;
   const start = Math.min(words.length - 1, listenWordWindowStart.value);
   return words.slice(start, start + LISTEN_WORD_WINDOW_SIZE).map((word, offset) => {
     const index = start + offset;
@@ -2443,7 +2476,11 @@ onUnmounted(() => {
    Left on --color-background-app it was the one strip of app chrome that stayed
    grey while the rest of the page turned brown. */
 .reader-mobile-page :deep(.mobile-bottom-nav) {
-  background: var(--mobile-reader-bg);
+  --nav-surface-color: var(--mobile-reader-bg);
+}
+
+.reader-mobile-page :deep(.mobile-bottom-nav.material-current) {
+  background: color-mix(in srgb, var(--mobile-reader-bg) var(--nav-opacity), transparent);
   box-shadow: 0 -2px 10px color-mix(in srgb, var(--mobile-reader-text) 8%, transparent);
 }
 
@@ -3725,6 +3762,21 @@ onUnmounted(() => {
 .reader-narrator-sheet .voice-list {
   max-height: 46vh;
 }
+
+.tablet-narrator-layer .reader-media-backdrop { background: transparent; }
+.tablet-narrator-layer .reader-narrator-sheet {
+  width: 280px;
+  min-height: 0;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .28);
+  text-align: left;
+}
+.tablet-narrator-layer .sheet-grabber { display: none; }
+.tablet-narrator-layer .reader-narrator-sheet h2 { margin-bottom: 8px; font-size: 15px; }
 
 /* Table-of-contents sheet — a scrollable chapter list. */
 .reader-toc-sheet {

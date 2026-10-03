@@ -1,5 +1,5 @@
 <template>
-  <ReaderMobile v-bind="$attrs" />
+  <ReaderMobile v-bind="$attrs" tablet-mode />
 </template>
 
 <script setup>

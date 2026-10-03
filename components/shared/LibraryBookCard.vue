@@ -2,7 +2,7 @@
   <article
     ref="cardElement"
     class="library-book-card"
-    :class="{ 'no-backdrop': cardBackground === 'blank', selectable, selected, unavailable, 'compact-actions': collapseActions && !restoreOnly }"
+    :class="{ 'no-backdrop': cardBackground === 'blank', selectable, selected, unavailable, 'tablet-card': isTablet, 'compact-actions': effectiveCollapseActions && !restoreOnly }"
     :aria-disabled="unavailable || undefined"
     @click="onCardClick"
   >
@@ -35,7 +35,7 @@
         @click.stop
       >
         <button type="button" role="menuitem" @click="runMenuAction('favourite')">
-          <i class="ri-heart-fill favourite-heart-icon"></i>
+          <i :class="book.isFavourite ? 'ri-heart-fill favourite-heart-icon' : 'ri-heart-line'"></i>
           <span>{{ book.isFavourite ? 'Remove favourite' : 'Favourite' }}</span>
         </button>
         <button type="button" role="menuitem" @click="runMenuAction('playlist')">
@@ -106,7 +106,7 @@
         </button>
       </div>
 
-      <div v-else-if="!collapseActions && !unavailable" class="card-actions">
+      <div v-else-if="!effectiveCollapseActions && !unavailable" class="card-actions">
         <button
           type="button"
           class="action-button"
@@ -114,7 +114,7 @@
           title="Favourite"
           @click.stop="emit('favourite', book)"
         >
-          <i class="ri-heart-fill favourite-heart-icon"></i>
+          <i :class="book.isFavourite ? 'ri-heart-fill favourite-heart-icon' : 'ri-heart-line'"></i>
         </button>
         <button
           type="button"
@@ -143,11 +143,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import BookProgressDisplay from './BookProgressDisplay.vue'
 import BookRatingDisplay from './BookRatingDisplay.vue'
 import { useBooks } from '~/composables/useBooks'
 import { useBookishSettings } from '~/composables/useBookishSettings'
+import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 
 const props = defineProps({
   book: {
@@ -196,6 +197,8 @@ const emit = defineEmits([
   'open', 'play', 'favourite', 'playlist', 'edit', 'hide', 'share', 'delete', 'restore', 'toggle-select',
 ])
 const { settings } = useBookishSettings()
+const { isTablet } = useDeviceArchitecture()
+const effectiveCollapseActions = computed(() => props.collapseActions || isTablet.value)
 
 // While selecting, a tap anywhere on the card picks it rather than opening it.
 const onCardClick = () => {
@@ -214,27 +217,29 @@ const moreButtonElement = ref(null)
 const menuElement = ref(null)
 const menuOpen = ref(false)
 const menuStyle = ref({})
-const showActionMenu = computed(() => props.collapseActions && !props.restoreOnly && !props.selectable && !props.unavailable)
+const showActionMenu = computed(() => effectiveCollapseActions.value && !props.restoreOnly && !props.selectable && !props.unavailable)
 
-const toggleMenu = () => {
+const toggleMenu = async () => {
   if (menuOpen.value) {
     menuOpen.value = false
     return
   }
   const rect = moreButtonElement.value?.getBoundingClientRect()
   if (!rect) return
-  const menuHeight = 250
+  menuOpen.value = true
+  await nextTick()
+  const menuHeight = menuElement.value?.offsetHeight || 250
   const safeBottom = 88
   const belowTop = rect.bottom + 7
   const availableBelow = window.innerHeight - safeBottom - belowTop
-  const top = availableBelow >= menuHeight
-    ? belowTop
+  const availableAbove = rect.top - 12
+  const top = availableBelow >= menuHeight || availableBelow >= availableAbove
+    ? Math.min(belowTop, window.innerHeight - safeBottom - menuHeight)
     : Math.max(12, rect.top - menuHeight - 7)
   menuStyle.value = {
-    top: `${top}px`,
+    top: `${Math.max(12, top)}px`,
     right: `${Math.max(12, window.innerWidth - rect.right)}px`,
   }
-  menuOpen.value = true
 }
 
 const runMenuAction = (action) => {
@@ -522,6 +527,14 @@ const truncateWords = (value, limit) => {
 .card-progress :deep(.complete-icon) {
   color: var(--color-brand-primary);
   font-size: 1rem;
+}
+
+.library-book-card.tablet-card.compact-actions {
+  min-height: 0;
+  height: auto;
+}
+.library-book-card.tablet-card.compact-actions .card-info {
+  height: auto;
 }
 
 .library-book-card.unavailable {

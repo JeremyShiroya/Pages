@@ -3,6 +3,8 @@ import { useState } from "#app";
 import { useBookStorage } from '~/composables/useBookStorage';
 import { coverAssetName, isLocalAssetCover, isRemoteCoverUrl, useCoverImageCache } from '~/composables/useCoverImageCache';
 import { useDeviceAssets } from '~/composables/useDeviceAssets';
+import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform';
+import { useToast } from '~/composables/useToast';
 import { coverPlaceholder } from '~/composables/useCoverFallback';
 import { getBookRating } from '~/composables/useBookRating';
 import { useLibraryStore } from '~/composables/useLibraryStore';
@@ -480,26 +482,36 @@ export const useBooks = () => {
   // storage — the original document on the phone. This is destructive and
   // irreversible; callers must confirm with the user first (DeleteConfirmModal
   // spells out exactly what will be removed). Use `hideBook` to merely hide one.
-  const deleteBook = async (bookId) => {
-    const previousBooks = [...books.value];
+  const deleteBook = async (bookId, { skipDeviceFile = false } = {}) => {
     const book = books.value.find(b => b.id === bookId) || null;
-    books.value = books.value.filter(b => b.id !== bookId);
+    if (!skipDeviceFile && import.meta.client && book?.deviceImport && book.deviceImportPath && isNativeCapacitorPlatform()) {
+      try {
+        const { deleteDeviceImport } = await import('~/composables/useDeviceLibrarySync');
+        await deleteDeviceImport(book);
+      } catch (err) {
+        useToast().addToast('Android could not delete the book file. The book is still in your library.', 'error', 6000);
+        console.error('Failed to delete device book file:', err);
+        throw err;
+      }
+    }
+
     try {
       const store = useLibraryStore();
-      const deleteContentPromise = import.meta.client
-        ? useBookStorage().deleteBookContent(bookId)
-        : Promise.resolve();
-      await Promise.all([store.deleteBook(bookId), deleteContentPromise]);
+      await store.deleteBook(bookId);
+      books.value = books.value.filter(b => b.id !== bookId);
     } catch (err) {
-      // The record write failed — put the book back rather than leaving the UI
-      // claiming a deletion that never happened.
-      books.value = previousBooks;
       console.error('Failed to delete book:', err);
       throw err;
     }
 
-    // Best-effort cleanup AFTER the record is gone. A failure here leaves an
-    // orphaned file, not a resurrected book, so it must not fail the delete.
+    // The record is gone; cached content and covers can be cleaned separately.
+    if (import.meta.client) {
+      try {
+        await useBookStorage().deleteBookContent(bookId);
+      } catch (err) {
+        console.warn('Could not remove cached book content:', err);
+      }
+    }
     if (import.meta.client && book) {
       try {
         const name = coverAssetName(book.cover);
@@ -510,14 +522,6 @@ export const useBooks = () => {
         console.warn('Could not remove cached cover:', err);
       }
 
-      if (book.deviceImport && book.deviceImportPath) {
-        try {
-          const { deleteDeviceImport } = await import('~/composables/useDeviceLibrarySync');
-          await deleteDeviceImport(book);
-        } catch (err) {
-          console.warn('Could not remove the book file from device storage:', err);
-        }
-      }
     }
   };
 

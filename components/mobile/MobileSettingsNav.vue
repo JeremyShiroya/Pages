@@ -51,6 +51,7 @@ const pageTitle = computed(() => {
   const titles = {
     '/settings': 'Settings',
     '/settings/preferences': 'Preferences',
+    '/settings/preferences/bottom-navigation': 'Bottom navigation',
     '/settings/storage': 'Storage',
     '/settings/about': 'About',
     '/settings/privacy': 'Privacy Policy',

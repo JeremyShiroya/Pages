@@ -358,13 +358,45 @@ public class DeviceBooksPlugin extends Plugin {
                     call.resolve(ret);
                     return;
                 }
+                if (!file.isFile()) {
+                    call.reject("The selected path is not a book file");
+                    return;
+                }
                 boolean deleted = file.delete();
+                if (!deleted || file.exists()) {
+                    call.reject("Android could not delete the file: " + path);
+                    return;
+                }
                 ret.put("deleted", deleted);
                 ret.put("missing", false);
                 call.resolve(ret);
             } catch (Exception e) {
                 call.reject("Failed to delete file: " + e.getMessage());
             }
+        }).start();
+    }
+
+    /** Check known imported paths independently of the capped discovery scan. */
+    @PluginMethod
+    public void checkFiles(PluginCall call) {
+        if (!hasFullAccess()) {
+            call.reject("Storage permission has not been granted");
+            return;
+        }
+        JSArray paths = call.getArray("paths");
+        if (paths == null) {
+            call.reject("File paths are required");
+            return;
+        }
+        new Thread(() -> {
+            JSArray missingPaths = new JSArray();
+            for (int i = 0; i < paths.length(); i++) {
+                String path = paths.optString(i, "");
+                if (!path.isEmpty() && !new File(path).isFile()) missingPaths.put(path);
+            }
+            JSObject ret = new JSObject();
+            ret.put("missingPaths", missingPaths);
+            call.resolve(ret);
         }).start();
     }
 

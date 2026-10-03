@@ -1,26 +1,13 @@
 <template>
   <main class="settings-page">
-    <section class="settings-hero" aria-labelledby="settings-title">
-      <div>
-        <span class="eyebrow">Pages Settings</span>
-        <h1 id="settings-title">Tune Pages for your reading flow.</h1>
-        <p>Reader defaults, library sorting, audiobook playback, metadata, and local storage in one place.</p>
-      </div>
-      <div class="hero-covers" aria-hidden="true">
-        <div
-          v-for="(book, index) in coverPreviewBooks"
-          :key="book.id"
-          class="hero-cover"
-          :style="coverStyle(index)"
-        >
-          <img :src="resolveBookCover(book)" :alt="book.title" @error="(event) => coverFallback(event, book.title)" />
-        </div>
-        <div v-if="!coverPreviewBooks.length" class="hero-cover placeholder-cover">
-          <i class="ri-book-open-line"></i>
-        </div>
-      </div>
-    </section>
-
+    <header class="settings-intro">
+      <span class="settings-kicker">YOUR SPACE</span>
+      <h1 id="settings-title">Settings</h1>
+      <p>Shape how Pages reads, listens, and organizes your library.</p>
+    </header>
+    <div class="settings-workspace">
+      <aside class="settings-directory">
+        <span class="directory-label">EXPLORE</span>
     <nav class="settings-shortcuts" aria-label="All settings pages">
       <button
         v-for="item in settingsShortcuts"
@@ -37,17 +24,12 @@
         <i class="ri-arrow-right-s-line shortcut-arrow"></i>
       </button>
     </nav>
-
-    <section class="stats-grid" aria-label="Library snapshot">
-      <div v-for="stat in libraryStats" :key="stat.label" class="stat-item">
-        <i :class="stat.icon"></i>
-        <div>
-          <strong>{{ stat.value }}</strong>
-          <span>{{ stat.label }}</span>
-        </div>
-      </div>
-    </section>
-
+        <span class="directory-label directory-label--lower">ON THIS PAGE</span>
+        <a v-for="section in settingsSections" :key="section.id" class="directory-anchor" :href="`#${section.id}`">
+          <i :class="section.icon"></i>{{ section.label }}
+        </a>
+      </aside>
+      <div class="settings-main">
     <section class="settings-grid" aria-label="Settings controls">
       <article id="reading" class="settings-panel">
         <div class="panel-heading">
@@ -403,7 +385,6 @@
 
       <ConnectionTestPanel v-if="settings.developerMode" id="connection" />
     </section>
-
     <section class="about-section" aria-labelledby="about-title">
       <img src="/images/P Logo.png" alt="Pages" class="about-logo" />
       <h2 id="about-title">Pages</h2>
@@ -428,6 +409,8 @@
       </div>
       <small>© 2026 Pages. Made with <i class="ri-heart-fill heart-icon"></i> for readers.</small>
     </section>
+      </div>
+    </div>
   </main>
 </template>
 
@@ -469,6 +452,14 @@ const settingsShortcuts = computed(() => [
   { label: 'About', description: 'Version and app information', icon: 'ri-information-line', to: '/settings/about' },
   { label: 'Privacy Policy', description: 'How Pages handles your data', icon: 'ri-lock-line', to: '/settings/privacy' },
 ])
+const settingsSections = [
+  { id: 'reading', label: 'Reading', icon: 'ri-book-read-line' },
+  { id: 'audio', label: 'Audio', icon: 'ri-headphone-line' },
+  { id: 'library', label: 'Library', icon: 'ri-archive-line' },
+  { id: 'appearance', label: 'Appearance', icon: 'ri-palette-line' },
+  { id: 'metadata', label: 'Metadata', icon: 'ri-database-2-line' },
+  { id: 'storage', label: 'Storage', icon: 'ri-hard-drive-2-line' },
+]
 
 const openSettingsShortcut = async (item) => {
   if (item.action === 'share') {
@@ -1389,5 +1380,31 @@ const coverStyle = (index) => ({
     grid-template-columns: 1fr;
   }
 }
+
+/* Tablet settings workspace: a calm directory with a single reading column. */
+.settings-page { gap: 0; background: transparent; }
+.settings-intro { padding: 0.5rem 0 1.75rem; border-bottom: 1px solid var(--color-border-card); }
+.settings-kicker, .directory-label { color: var(--color-brand-primary); font-size: .7rem; font-weight: 700; letter-spacing: .13em; }
+.settings-intro h1 { margin: .45rem 0 .35rem; color: var(--color-text-primary); font-size: clamp(2rem, 3vw, 3rem); font-weight: 600; letter-spacing: -.04em; }
+.settings-intro p { margin: 0; color: var(--color-text-muted); font-size: .95rem; }
+.settings-workspace { display: grid; grid-template-columns: minmax(205px, 250px) minmax(0, 1fr); gap: clamp(1.5rem, 3vw, 3.5rem); align-items: start; padding-top: 1.5rem; }
+.settings-directory { position: sticky; top: 1.25rem; display: grid; gap: .4rem; align-content: start; }
+.settings-shortcuts { display: grid; grid-template-columns: 1fr; gap: .15rem; margin: .55rem 0 1.4rem; }
+.settings-shortcut { grid-template-columns: 28px minmax(0, 1fr) auto; min-height: 44px; padding: .45rem .55rem; border: 0; border-radius: 9px; background: transparent; }
+.settings-shortcut:hover { transform: none; border: 0; background: var(--color-brand-primary-soft); }
+.settings-shortcut .shortcut-icon { width: 28px; height: 28px; border-radius: 7px; background: transparent; font-size: 1rem; }
+.settings-shortcut .shortcut-copy strong { font-size: .83rem; font-weight: 500; }
+.settings-shortcut .shortcut-copy small { display: none; }
+.settings-shortcut .shortcut-arrow { font-size: 1rem; }
+.directory-label--lower { margin: 0 0 .3rem .55rem; }
+.directory-anchor { display: flex; align-items: center; gap: .7rem; padding: .55rem .75rem; border-radius: 9px; color: var(--color-text-secondary); font-size: .82rem; text-decoration: none; }
+.directory-anchor:hover { background: var(--color-brand-primary-soft); color: var(--color-brand-primary); }
+.directory-anchor i { font-size: 1rem; }
+.settings-main { min-width: 0; }
+.settings-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+.settings-panel { padding: 1.5rem clamp(1.25rem, 3vw, 2.25rem); border-radius: 14px; scroll-margin-top: 1rem; }
+.panel-heading { margin-bottom: .5rem; }
+.about-section { margin: 1.5rem 0 0; width: 100%; }
+@media (max-width: 900px) { .settings-workspace { grid-template-columns: minmax(155px, 190px) minmax(0, 1fr); gap: 1rem; } .settings-directory { position: sticky; } .settings-shortcuts { grid-template-columns: 1fr; } }
 
 </style>

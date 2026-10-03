@@ -73,13 +73,12 @@ export function normalizeProfile(profile, existing = null) {
   const avatarType = PROFILE_AVATAR_TYPES.has(source.avatarType)
     ? source.avatarType
     : existing?.avatarType || DEFAULT_PROFILE.avatarType
-  const rawAvatarValue = String(source.avatarValue ?? existing?.avatarValue ?? DEFAULT_PROFILE.avatarValue)
-    .trim()
-    .slice(0, 50000)
+  const rawAvatarValue = String(source.avatarValue ?? existing?.avatarValue ?? DEFAULT_PROFILE.avatarValue).trim()
   const normalizedAvatarValue = rawAvatarValue.startsWith(LEGACY_USER_AVATAR_PATH_PREFIX)
     ? `${USER_AVATAR_PATH_PREFIX}${rawAvatarValue.slice(LEGACY_USER_AVATAR_PATH_PREFIX.length)}`
     : rawAvatarValue
   const avatarValue = normalizedAvatarValue.startsWith(USER_AVATAR_PATH_PREFIX)
+    || (/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(normalizedAvatarValue) && normalizedAvatarValue.length <= 1_000_000)
     ? normalizedAvatarValue
     : DEFAULT_PROFILE.avatarValue
 

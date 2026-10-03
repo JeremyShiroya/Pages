@@ -147,7 +147,7 @@
               </button>
               <div v-if="activeActionsMenu === book.id" class="row-actions-menu">
                 <button type="button" @click="toggleFavourite(book.id); activeActionsMenu = null">
-                  <i class="ri-heart-fill favourite-heart-icon"></i>
+                  <i :class="book.isFavourite ? 'ri-heart-fill favourite-heart-icon' : 'ri-heart-line'"></i>
                   {{ book.isFavourite ? 'Remove favourite' : 'Add to favourites' }}
                 </button>
                 <button type="button" @click="selectedPlaylistBook = book; activeActionsMenu = null">
@@ -303,12 +303,12 @@ const openBook = (book) => {
   router.push(`/book/${book.id}`);
 };
 const selectedBooks = computed(() => props.books.filter((book) => isSelected(book.id)));
-const bulkActions = [
-  { key: 'favourite', icon: 'ri-heart-fill', label: 'Favourite' },
+const bulkActions = computed(() => [
+  { key: 'favourite', icon: selectedBooks.value.length && selectedBooks.value.every((book) => book.isFavourite) ? 'ri-heart-fill' : 'ri-heart-line', label: 'Favourite' },
   { key: 'playlist', icon: 'ri-play-list-2-line', label: 'Add to playlist' },
   { key: 'hide', icon: 'ri-eye-off-line', label: 'Hide' },
   { key: 'delete', icon: 'ri-delete-bin-line', label: 'Delete', danger: true },
-];
+]);
 const runBulkAction = async (key) => {
   const chosen = selectedBooks.value;
   if (!chosen.length) return;

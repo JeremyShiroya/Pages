@@ -76,26 +76,20 @@ export function writeScanFolders(folders, storage = resolveStorage()) {
   return normalized
 }
 
-// Permanently remove a device-imported document from the phone, and forget it in
-// the import registry so the next scan doesn't treat it as a "new" file and
-// re-import the book the user just deleted. Best-effort: a missing file or a
-// denied permission must never block deleting the book from the library.
+// Permanently remove a device-imported document. Only tombstone the registry
+// after Android confirms deletion (or confirms the file was already missing).
+// A failed native deletion must leave the library entry intact.
 export async function deleteDeviceImport(book) {
   const path = book?.deviceImportPath
   if (!path || !import.meta.client || !isNativeCapacitorPlatform()) return false
 
-  let deleted = false
-  try {
-    const result = await DeviceBooks.deleteFile({ path })
-    deleted = !!result?.deleted
-  } catch (error) {
-    console.warn('[DeviceSync] Could not delete device file', path, error)
+  const result = await DeviceBooks.deleteFile({ path })
+  if (!result?.deleted && !result?.missing) {
+    throw new Error(`Android did not delete the file: ${path}`)
   }
 
   // KEEP the registry entry and tombstone it. Clearing it would make the next
-  // scan treat the file as brand new — so a deletion that failed (permission
-  // revoked, read-only volume) would silently re-import the book the user just
-  // deleted. A tombstone keeps it deleted either way.
+  // scan treat a cached file as brand new.
   try {
     const registry = readImportRegistry()
     registry[path] = { ...(registry[path] || {}), bookId: null, deletedByUser: true }
@@ -104,13 +98,23 @@ export async function deleteDeviceImport(book) {
     // Quota failure only means the file gets re-checked on the next scan.
   }
 
-  return deleted
+  return true
 }
 
 export function fileInScanFolders(path, folders) {
   const target = String(path || '')
   return (folders || []).some((folder) => (
     target === folder || target.startsWith(`${folder}/`)
+  ))
+}
+
+export function missingImportedBooks(books, missingPaths, folders) {
+  const missing = new Set(missingPaths || [])
+  return (books || []).filter((book) => (
+    book?.deviceImport === true
+    && String(book.deviceImportPath || '').startsWith('/storage/emulated/0/')
+    && fileInScanFolders(book.deviceImportPath, folders)
+    && missing.has(book.deviceImportPath)
   ))
 }
 
@@ -400,7 +404,7 @@ export async function syncDeviceLibrary({ silent = false, announce = !silent } =
   const { addToast: realToast } = useToast()
   const sessionToast = silent ? () => {} : realToast
   const addToast = announce ? sessionToast : () => {}
-  const { addBook, updateBook, fetchAllData, initialized } = useBooks()
+  const { books, addBook, updateBook, deleteBook, fetchAllData, initialized } = useBooks()
   const { saveBookContent } = useBookStorage()
   const { ask } = useDevicePermissionPrompt()
   const { settings } = useBookishSettings()
@@ -430,15 +434,38 @@ export async function syncDeviceLibrary({ silent = false, announce = !silent } =
     addToast('Scanning your device for new books…', 'info')
 
     const { files } = await DeviceBooks.scan()
-    const registry = readImportRegistry()
     const inFolders = (files || []).filter((file) => fileInScanFolders(file.path, scanFolders))
+    if (!initialized.value) await fetchAllData()
+
+    // The discovery scan is capped, so absence from its results does not prove
+    // a file is gone. Ask Android about each known internal-storage path before
+    // removing stale entries from this app's separate library database.
+    const knownPaths = [...new Set(books.value
+      .filter((book) => book?.deviceImport && String(book.deviceImportPath || '').startsWith('/storage/emulated/0/')
+        && fileInScanFolders(book.deviceImportPath, scanFolders))
+      .map((book) => book.deviceImportPath))]
+    const missingPaths = []
+    for (let index = 0; index < knownPaths.length; index += 100) {
+      const result = await DeviceBooks.checkFiles({ paths: knownPaths.slice(index, index + 100) })
+      missingPaths.push(...(result?.missingPaths || []))
+    }
+    const staleBooks = missingImportedBooks(books.value, missingPaths, scanFolders)
+    if (staleBooks.length) {
+      const registry = readImportRegistry()
+      for (const book of staleBooks) {
+        await deleteBook(book.id, { skipDeviceFile: true })
+        delete registry[book.deviceImportPath]
+      }
+      writeImportRegistry(registry)
+      addToast(`Removed ${staleBooks.length} book${staleBooks.length === 1 ? '' : 's'} whose device file is gone.`, 'info')
+    }
+
+    const registry = readImportRegistry()
     const newFiles = selectNewDeviceFiles(inFolders, registry, settings.value.enabledFormats)
     if (!newFiles.length) {
       addToast('Device scan complete — no new books found.', 'success')
       return
     }
-
-    if (!initialized.value) await fetchAllData()
 
     addToast(`Found ${newFiles.length} book${newFiles.length === 1 ? '' : 's'} on your device — importing…`, 'info')
 

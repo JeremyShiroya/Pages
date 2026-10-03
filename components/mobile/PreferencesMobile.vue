@@ -19,7 +19,7 @@
               class="option palette-option"
               :class="{ active: settings.appBackground === opt.value }"
               :aria-pressed="settings.appBackground === opt.value"
-              @click="set('appBackground', opt.value)"
+              @click="chooseAppearance('light', 'appBackground', opt.value)"
             >
               <span class="preview palette-preview" :class="`palette-preview--${opt.preview}`" aria-hidden="true">
                 <span class="palette-sidebar">
@@ -52,7 +52,7 @@
               class="option palette-option"
               :class="{ active: settings.darkAppBackground === opt.value }"
               :aria-pressed="settings.darkAppBackground === opt.value"
-              @click="set('darkAppBackground', opt.value)"
+              @click="chooseAppearance('dark', 'darkAppBackground', opt.value)"
             >
               <span class="preview palette-preview" :class="`palette-preview--${opt.preview}`" aria-hidden="true">
                 <span class="palette-sidebar">
@@ -71,9 +71,15 @@
             </button>
           </div>
         </div>
+
+        <NuxtLink class="pref-destination" to="/settings/preferences/bottom-navigation">
+          <span class="pref-destination-icon"><i class="ri-layout-bottom-line" aria-hidden="true"></i></span>
+          <span><strong>Bottom navigation</strong><small>Layout, frosted glass, selected tab, opacity and blur</small></span>
+          <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+        </NuxtLink>
       </section>
 
-      <section class="pref-group">
+      <section class="pref-group ratings-group">
         <h2 class="pref-group-title">Ratings</h2>
 
         <div class="pref-block">
@@ -146,15 +152,15 @@
         <div class="pref-block">
           <div class="pref-copy">
             <span class="pref-label">Action display</span>
-            <span class="pref-hint">Choose a cleaner More menu or keep every action visible.</span>
+            <span class="pref-hint">{{ isTablet ? 'Card actions are kept in a More menu.' : 'Choose a cleaner More menu or keep every action visible.' }}</span>
           </div>
           <div class="option-grid">
             <button
-              v-for="opt in bookActionDisplayOptions"
+              v-for="opt in (isTablet ? bookActionDisplayOptions.slice(0, 1) : bookActionDisplayOptions)"
               :key="opt.value"
               type="button"
               class="option"
-              :class="{ active: settings.bookActionDisplay === opt.value }"
+              :class="{ active: (isTablet ? 'minimal' : settings.bookActionDisplay) === opt.value }"
               @click="set('bookActionDisplay', opt.value)"
             >
               <span class="preview">
@@ -162,14 +168,14 @@
               </span>
               <span class="option-label">
                 {{ opt.label }}
-                <i v-if="settings.bookActionDisplay === opt.value" class="ri-check-line"></i>
+                <i v-if="(isTablet ? 'minimal' : settings.bookActionDisplay) === opt.value" class="ri-check-line"></i>
               </span>
             </button>
           </div>
         </div>
       </section>
 
-      <section class="pref-group">
+      <section class="pref-group profile-favourites-group">
         <h2 class="pref-group-title">Profile favourites</h2>
 
         <div class="pref-block">
@@ -516,6 +522,7 @@ const { books, updateBook, fetchAllData } = useBooks()
 const ratingSync = useRatingSync()
 
 const set = (key, value) => updateSettings({ [key]: value })
+const chooseAppearance = (theme, key, value) => updateSettings({ readerTheme: theme, [key]: value })
 
 const appBackgroundOptions = [
   { value: 'white', label: 'Bright', preview: 'bright' },
@@ -731,6 +738,12 @@ const confirmFormatMode = async () => {
   gap: 12px;
 }
 
+.pref-destination { display: grid; grid-template-columns: 40px minmax(0, 1fr) 20px; align-items: center; gap: 12px; min-height: 64px; padding: 10px; border-radius: 16px; background: var(--color-surface-card); color: var(--color-text-primary); text-decoration: none; }
+.pref-destination-icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 12px; background: var(--color-brand-primary-faint); color: var(--color-brand-primary); font-size: 20px; }
+.pref-destination strong, .pref-destination small { display: block; }
+.pref-destination small { margin-top: 3px; color: var(--color-text-muted); font-size: 12px; line-height: 1.3; }
+.pref-destination > i { color: var(--color-text-muted); font-size: 20px; }
+
 .option {
   display: grid;
   gap: 8px;
@@ -819,6 +832,35 @@ const confirmFormatMode = async () => {
   border-color: var(--color-brand-primary);
   background: var(--color-brand-primary);
 }
+
+/* These two preference groups use quiet, solid surfaces in both light palettes. */
+:global(html[data-theme="light"]) .ratings-group {
+  --rating-choice-surface: #ffffff;
+  --rating-choice-selected: #f2eef9;
+}
+:global(html[data-theme="light"][data-app-background="muted"]) .ratings-group {
+  --rating-choice-surface: #f3f4f9;
+  --rating-choice-selected: #e9e7f3;
+}
+.ratings-group .rating-source-option { background: var(--rating-choice-surface, var(--color-settings-group)); }
+.ratings-group .rating-source-option.active { background: var(--rating-choice-selected, var(--color-brand-primary-faint)); }
+
+:global(html[data-theme="light"]) .profile-favourites-group {
+  --profile-choice-surface: #ffffff;
+  --profile-choice-selected: #f2eef9;
+  --profile-preview-surface: #edf0f6;
+  --profile-preview-tile: #c5cede;
+}
+:global(html[data-theme="light"][data-app-background="muted"]) .profile-favourites-group {
+  --profile-choice-surface: #f3f4f9;
+  --profile-choice-selected: #e9e7f3;
+  --profile-preview-surface: #e4e7f0;
+  --profile-preview-tile: #b5bfd2;
+}
+.profile-favourites-group .option { background: var(--profile-choice-surface, var(--color-settings-group)); }
+.profile-favourites-group .option.active { background: var(--profile-choice-selected, var(--color-brand-primary-faint)); }
+.profile-favourites-group .profile-layout-preview { background: var(--profile-preview-surface, var(--color-background-app)); }
+.profile-favourites-group .profile-layout-preview i { background: var(--profile-preview-tile, var(--color-surface-primary)); }
 
 .rating-sync {
   display: grid;

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { searchLibrary, normalizeSearchText, matchQuality } from './useLibrarySearch.js'
+import { searchLibrary, searchPlaylists, normalizeSearchText, matchQuality } from './useLibrarySearch.js'
 
 const dune = { id: 1, title: 'Dune', author: 'Frank Herbert', series: 'Dune', genre: 'Sci-Fi' }
 const emma = { id: 2, title: 'Emma', author: 'Jane Austen', genre: 'Drama' }
@@ -51,4 +51,13 @@ describe('library search', () => {
     expect(searchLibrary([{ id: 9 }], 'a')).toEqual([])
     expect(searchLibrary(undefined, 'a')).toEqual([])
   })
+})
+
+test('playlist names and descriptions are searchable with title matches first', () => {
+  const playlists = [
+    { id: 1, name: 'Morning reads', description: 'Quiet fiction' },
+    { id: 2, name: 'Fiction favourites' },
+  ]
+  expect(searchPlaylists(playlists, 'fiction').map((item) => item.id)).toEqual([2, 1])
+  expect(searchPlaylists(playlists, '')).toEqual([])
 })

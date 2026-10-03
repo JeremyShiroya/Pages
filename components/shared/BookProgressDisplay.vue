@@ -1,7 +1,7 @@
 <template>
   <div
     class="book-progress-display"
-    :class="{ compact, complete: percent >= 100 }"
+    :class="{ compact, complete: percent >= 100, 'tablet-progress': isTablet }"
     :aria-label="`Reading progress ${percent}%`"
   >
     <i v-if="percent >= 100" class="ri-checkbox-circle-fill complete-icon" aria-hidden="true"></i>
@@ -17,6 +17,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
+
+const { isTablet } = useDeviceArchitecture()
 
 const props = defineProps({
   progress: { type: [Number, String], default: 0 },
@@ -63,7 +66,7 @@ const percent = computed(() => Math.round(Math.max(0, Math.min(100, Number(props
 
 .complete-icon,
 .complete-text {
-  color: inherit;
+  color: var(--color-brand-primary);
 }
 
 </style>

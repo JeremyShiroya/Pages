@@ -50,11 +50,7 @@
       <aside class="series-column">
         <div class="section-heading"><h1>Series</h1><NuxtLink to="/series">See all</NuxtLink></div>
         <div class="series-stack">
-          <article v-for="group in visibleSeries" :key="group.id" class="series-card" @click="openSeries(group)">
-            <div class="series-backdrop" :style="coverBackground(group.books[0])"></div><div class="series-shade"></div>
-            <div class="series-copy"><h2>{{ group.name }}</h2><p>{{ group.books.length }}/{{ group.seriesTotal || group.books.length }} Books</p></div>
-            <div class="series-covers"><img v-for="book in group.books.slice(0, 3)" :key="book.id" :src="book.cover" :alt="book.title" /></div>
-          </article>
+          <SeriesCollageCard v-for="group in visibleSeries" :key="group.id" :series="group" @open="openSeries" />
           <p v-if="!visibleSeries.length" class="no-results">No series match “{{ query }}”.</p>
         </div>
       </aside>
@@ -69,6 +65,7 @@ import { useBooks } from '~/composables/useBooks'
 import { useTTS } from '~/composables/useTTS'
 import { useUserProfile } from '~/composables/useUserProfile'
 import BookProgressDisplay from '../shared/BookProgressDisplay.vue'
+import SeriesCollageCard from '../shared/SeriesCollageCard.vue'
 import EmptyState from '../shared/EmptyState.vue'
 import HomeSkeleton from '../shared/HomeSkeleton.vue'
 

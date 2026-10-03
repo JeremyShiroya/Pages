@@ -342,8 +342,8 @@ const fanStyle = (i, n) => {
   right: 48%;
   z-index: 3;
   color: var(--color-text-primary);
-  font-size: 1.12rem;
-  font-weight: 600 !important;
+  font-size: var(--mobile-body-size);
+  font-weight: 400 !important;
   line-height: 1.25;
   word-break: break-word;
   hyphens: auto;

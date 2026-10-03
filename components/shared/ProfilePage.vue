@@ -1,5 +1,9 @@
 <template>
-  <main class="profile-page">
+  <main
+    class="profile-page"
+    data-system-bar-color="transparent"
+    :data-system-bar-icons="settings.readerTheme === 'dark' ? 'light' : 'dark'"
+  >
     <header class="profile-nav" aria-label="Profile navigation">
       <span class="nav-spacer" aria-hidden="true"></span>
       <h1>Profile</h1>
@@ -134,6 +138,8 @@
       @confirm="confirmBulkDelete"
     />
 
+    <AvatarSourcePicker :open="avatarSourceOpen" @close="avatarSourceOpen = false" @presets="openPresetPicker" @cropped="saveGalleryAvatar" />
+
     <Teleport to="body">
       <div v-if="avatarModalOpen" class="avatar-modal-layer" role="presentation">
         <button class="avatar-modal-backdrop" type="button" aria-label="Close avatar picker" @click="avatarModalOpen = false"></button>
@@ -190,6 +196,7 @@ import LibraryBookCard from './LibraryBookCard.vue'
 import SelectionActionsBar from './SelectionActionsBar.vue'
 import SeriesCollageCard from './SeriesCollageCard.vue'
 import MobileBottomNav from '~/components/mobile/MobileBottomNav.vue'
+import AvatarSourcePicker from './AvatarSourcePicker.vue'
 
 const router = useRouter()
 const { books, collections, favourites, fetchAllData, toggleFavourite, hideBook, deleteBook } = useBooks()
@@ -200,6 +207,7 @@ const { addToast } = useToast()
 const { profile, avatarPresets, activeAvatarPreset, loadProfile, updateProfile } = useUserProfile()
 
 const activeTab = ref('favourites')
+const avatarSourceOpen = ref(false)
 const avatarModalOpen = ref(false)
 const pendingAvatar = ref('')
 const updatingAvatar = ref(false)
@@ -308,8 +316,27 @@ watch(favourites, (current) => retainSelection(current.map((book) => book.id)))
 watch(activeTab, (tab) => { if (tab !== 'favourites') clearSelection() })
 
 const openAvatarPicker = () => {
+  avatarSourceOpen.value = true
+}
+
+const openPresetPicker = () => {
+  avatarSourceOpen.value = false
   pendingAvatar.value = profileAvatar.value
   avatarModalOpen.value = true
+}
+
+const saveGalleryAvatar = async (cropped) => {
+  if (updatingAvatar.value) return
+  updatingAvatar.value = true
+  try {
+    await updateProfile({ avatarType: 'image', avatarValue: cropped })
+    avatarSourceOpen.value = false
+    addToast('Profile photo updated', 'success')
+  } catch (error) {
+    addToast(error?.message || 'Could not update profile photo', 'error')
+  } finally {
+    updatingAvatar.value = false
+  }
 }
 
 const updateAvatar = async () => {
@@ -371,7 +398,7 @@ onMounted(async () => {
 .profile-details { margin-top: 20px; }
 .profile-details h2 { margin: 0; font-size: 1.2rem; font-weight: 650; }
 .profile-details p { margin: 5px 0 0; color: var(--color-text-muted); font-size: 0.9rem; }
-.edit-profile-button { display: flex; width: 100%; min-height: 40px; align-items: center; justify-content: center; gap: 7px; margin-top: 16px; padding: 0 18px; border: 1px solid var(--color-border-card); border-radius: 9px; background: var(--color-settings-group); color: var(--color-text-primary); text-decoration: none; font-size: 0.86rem; font-weight: 600; }
+.edit-profile-button { display: flex; width: 100%; min-height: 40px; align-items: center; justify-content: center; gap: 7px; margin-top: 16px; padding: 0 18px; border: 1px solid var(--color-border-card); border-radius: var(--mobile-control-radius); background: var(--color-settings-group); color: var(--color-text-primary); text-decoration: none; font-size: 0.86rem; font-weight: 600; }
 .edit-profile-button:active { background: var(--color-surface-hover); }
 :root[data-theme="dark"] .edit-profile-button { border-color: transparent; }
 .profile-library { margin-top: 28px; }

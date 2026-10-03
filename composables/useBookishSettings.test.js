@@ -53,6 +53,44 @@ describe('useBookishSettings storage helpers', () => {
     expect(normalizeBookishSettings({ darkAppBackground: 'invalid' }).darkAppBackground).toBe('muted')
   })
 
+  it('validates bottom navigation style, opacity, and blur', () => {
+    expect(normalizeBookishSettings({})).toMatchObject({ mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95, mobileNavBlur: 18 })
+    expect(normalizeBookishSettings({ mobileNavStyle: 'standard', mobileNavOpacity: 35, mobileNavBlur: 50 }))
+      .toMatchObject({ mobileNavStyle: 'standard', mobileNavOpacity: 50, mobileNavBlur: 30 })
+    expect(normalizeBookishSettings({ mobileNavStyle: 'unknown', mobileNavOpacity: 'invalid' }))
+      .toMatchObject({ mobileNavStyle: 'standard', mobileNavOpacity: 95 })
+    expect(normalizeBookishSettings({ mobileNavSize: 'compact' }).mobileNavSize).toBe('compact')
+    expect(normalizeBookishSettings({ mobileNavSize: 'invalid' }).mobileNavSize).toBe('standard')
+  })
+
+  it('retains frosted navigation and migrates removed liquid and bead choices', () => {
+    expect(normalizeBookishSettings({})).toMatchObject({
+      mobileNavMaterial: 'current', mobileNavHighlight: 'soft',
+    })
+    expect(normalizeBookishSettings({
+      mobileNavMaterial: 'frosted', mobileNavHighlight: 'none',
+    })).toMatchObject({
+      mobileNavMaterial: 'frosted', mobileNavHighlight: 'none',
+    })
+    const migrated = normalizeBookishSettings({ mobileNavMaterial: 'liquid', mobileNavHighlight: 'bead', mobileNavBeadSize: 'large' })
+    expect(migrated).toMatchObject({ mobileNavMaterial: 'current', mobileNavHighlight: 'soft' })
+    expect(migrated).not.toHaveProperty('mobileNavBeadSize')
+  })
+
+  it('validates the selected navigation icon style', () => {
+    expect(normalizeBookishSettings({}).mobileNavActiveIconStyle).toBe('fill')
+    expect(normalizeBookishSettings({ mobileNavActiveIconStyle: 'fill' }).mobileNavActiveIconStyle).toBe('fill')
+    expect(normalizeBookishSettings({ mobileNavActiveIconStyle: 'unknown' }).mobileNavActiveIconStyle).toBe('fill')
+  })
+
+  it('validates profile avatar and tab title preferences', () => {
+    expect(normalizeBookishSettings({})).toMatchObject({ mobileNavProfileDisplay: 'icon', mobileNavShowTitles: true })
+    expect(normalizeBookishSettings({ mobileNavProfileDisplay: 'avatar', mobileNavShowTitles: false }))
+      .toMatchObject({ mobileNavProfileDisplay: 'avatar', mobileNavShowTitles: false })
+    expect(normalizeBookishSettings({ mobileNavProfileDisplay: 'other', mobileNavShowTitles: 'false' }))
+      .toMatchObject({ mobileNavProfileDisplay: 'icon', mobileNavShowTitles: true })
+  })
+
   it('applies the saved app background palette with the color theme', () => {
     applyBookishTheme('light', 'muted', 'dark')
     expect(document.documentElement.dataset.theme).toBe('light')

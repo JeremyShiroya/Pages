@@ -18,7 +18,6 @@ describe('responsive mobile component split', () => {
     for (const shellPath of [
       'assets/css/main.css',
       'layouts/default.vue',
-      'layouts/reader.vue',
       'components/mobile/MobileBottomNav.vue',
       'components/mobile/MobileSettingsNav.vue',
     ]) {
@@ -133,7 +132,7 @@ describe('responsive mobile component split', () => {
 
       const page = read(pagePath)
       expect(page, `${name} page uses responsive switch`).toContain('<ResponsiveViewSwitch')
-      expect(page, `${name} page mounts mobile detail`).toContain('<component :is="mobileDetailComponent"')
+      expect(page, `${name} page mounts mobile detail`).toMatch(/<component :is="mobileDetailComponent"|<BookDetailMobile\s*\/>/)
       expect(page, `${name} page does not import mobile nav directly`).not.toContain('MobileSettingsNav')
     }
 
@@ -301,17 +300,16 @@ describe('responsive mobile component split', () => {
     expect(readerMobile).toContain('class="chapter-pill-step step-next"')
   })
 
-  test('reader layout keeps desktop chrome out of the mobile reader', () => {
+  test('reader layout gives phone and tablet a full-screen reader in both modes', () => {
     const layout = read('layouts/reader.vue')
 
     expect(layout).toContain('<ResponsiveViewSwitch')
     expect(layout).toContain('<template #phone>')
     expect(layout).toContain('<template #tabletPortrait>')
     expect(layout).toContain('class="reader-mobile-layout"')
-    expect(layout).toMatch(/<template #tabletLandscape>[\s\S]*<Sidebar/)
-    expect(layout).toMatch(/<template #tabletLandscape>[\s\S]*<PlayingBar/)
-    expect(layout).toMatch(/@media \(max-width:\s*768px\)[\s\S]*:deep\(\.sidebar\)/)
-    expect(layout).toMatch(/@media \(max-width:\s*768px\)[\s\S]*:deep\(\.playing-bar\)/)
-    expect(layout).toMatch(/@media \(max-width:\s*768px\)[\s\S]*margin-left:\s*0/)
+    expect(layout).toContain('<template #tabletLandscape>')
+    expect(layout).toContain('class="reader-tablet-landscape-layout"')
+    expect(layout).not.toContain('<Sidebar')
+    expect(layout).not.toContain('<PlayingBar')
   })
 })

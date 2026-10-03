@@ -1,8 +1,8 @@
 {
-  "versionCode": 269,
-  "versionName": "1.3.0",
-  "apkUrl": "https://github.com/JeremyShiroya/Pages/releases/download/v1.3.0/bookish-1.3.0.apk",
-  "notes": "A redesigned Profile brings reading metrics, favourites and playlists together, with direct avatar updates, daily compliments, configurable favourite layouts, and long-press bulk actions. This release also improves dark-mode backgrounds and Android system bars, streamlines mobile navigation, removes grid-card overflow menus, standardizes favourite actions with red filled hearts, and includes production asset-path fixes.",
+  "versionCode": 270,
+  "versionName": "1.3.1",
+  "apkUrl": "https://github.com/JeremyShiroya/Pages/releases/download/v1.3.1/bookish-1.3.1.apk",
+  "notes": "Customizable mobile navigation, profile photo cropping, improved search and themes, and safer device book deletion.",
   "mandatory": false,
-  "releasedAt": "2026-09-27T11:43:14.880Z"
+  "releasedAt": "2026-10-03T15:19:07.580Z"
 }

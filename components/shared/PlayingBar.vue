@@ -1,5 +1,5 @@
 <template>
-  <div class="playing-bar">
+  <div class="playing-bar" :class="{ 'tablet-playing-bar': isTablet }">
     <div class="track-info">
       <template v-if="ttsBook">
         <div class="album-art track-link" @click="router.push(`/book/${ttsBook.id}`)">
@@ -18,10 +18,7 @@
           :title="ttsBook.isFavourite ? 'Unfavourite' : 'Favourite'"
           @click="handleFavourite"
         >
-          <i
-            class="ri-heart-fill favourite-heart-icon"
-            :style="{ color: ttsBook.isFavourite ? 'var(--color-status-danger)' : '' }"
-          ></i>
+          <i :class="ttsBook.isFavourite ? 'ri-heart-fill favourite-heart-icon' : 'ri-heart-line'"></i>
         </button>
       </template>
       <template v-else>
@@ -225,9 +222,11 @@ import { useRouter } from 'vue-router'
 import { useTTS } from '~/composables/useTTS'
 import { useBooks } from '~/composables/useBooks'
 import { useBookishSettings } from '~/composables/useBookishSettings'
+import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import BookishSelect from './BookishSelect.vue'
 
 const router = useRouter()
+const { isTablet } = useDeviceArchitecture()
 
 const {
   ttsBook, ttsStatus, ttsSpeed, ttsVolume,
@@ -530,6 +529,10 @@ const coverFallback = (event, title) => {
   overflow: hidden;
   gap: 0.75rem;
 }
+
+.tablet-playing-bar .track-info { flex: 0 1 auto; max-width: 30%; }
+.tablet-playing-bar .track-details { flex: 0 1 auto; max-width: 210px; }
+.tablet-playing-bar .like-btn { flex: 0 0 34px; }
 
 .track-link {
   cursor: pointer;

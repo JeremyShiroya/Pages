@@ -16,7 +16,7 @@
           </button>
           <div v-if="detailMenuOpen" class="detail-more-menu" role="menu">
             <button type="button" role="menuitem" @click="runDetailAction('favourite')">
-              <i class="ri-heart-fill favourite-heart-icon"></i>
+              <i :class="[book.isFavourite ? 'ri-heart-fill favourite-heart-icon' : 'ri-heart-line']"></i>
               <span>{{ book.isFavourite ? 'Remove favourite' : 'Favourite' }}</span>
             </button>
             <button type="button" role="menuitem" @click="runDetailAction('playlist')">
@@ -95,7 +95,7 @@
               title="Favourite"
               @click="toggleFavourite(book.id)"
             >
-              <i class="ri-heart-fill favourite-heart-icon"></i>
+              <i :class="[book.isFavourite ? 'ri-heart-fill favourite-heart-icon' : 'ri-heart-line']"></i>
             </button>
             <button
               type="button"
@@ -456,6 +456,8 @@ watch(
   color: var(--color-brand-primary);
   font-size: 1.05rem;
 }
+
+.progress-row :deep(.complete-text) { color: var(--color-text-primary); }
 
 /* Stars + score on the first line, "76 ratings · 6 reviews" on the second —
    the single cramped row is what made this block hard to read. */

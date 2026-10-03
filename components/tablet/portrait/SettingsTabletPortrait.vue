@@ -1,2 +1,2 @@
-<template><SettingsMobile /></template>
-<script setup>import SettingsMobile from '~/components/mobile/SettingsMobile.vue'</script>
+<template><SettingsDesktop /></template>
+<script setup>import SettingsDesktop from '~/components/tablet/SettingsDesktop.vue'</script>

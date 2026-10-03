@@ -284,7 +284,7 @@ watch(hoverIndex, updateHighlight);
 }
 
 .highlight-pill.is-active {
-  background-color: var(--purple-li-active);
+  background-color: var(--color-brand-primary);
 }
 
 .menu-list {
@@ -308,8 +308,10 @@ watch(hoverIndex, updateHighlight);
 }
 
 .menu-item.active {
-  color: var(--color-brand-primary);
+  color: #fff;
+  background: var(--color-brand-primary);
 }
+.menu-item:not(.active):hover { color: var(--color-brand-primary); }
 
 .menu-item i {
   margin-right: 10px;

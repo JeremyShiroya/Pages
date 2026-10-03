@@ -180,4 +180,11 @@ describe('useLibraryStore — profile', () => {
       avatarValue: '/images/User%20Avatars/E-commerce-1.svg',
     })
   })
+
+  it('keeps a cropped gallery photo after saving and reading the profile', async () => {
+    const { getProfile, saveProfile } = useLibraryStore()
+    const photo = `data:image/jpeg;base64,${'A'.repeat(60_000)}`
+    await saveProfile({ displayName: 'Reader', avatarType: 'image', avatarValue: photo })
+    expect((await getProfile()).avatarValue).toBe(photo)
+  })
 })

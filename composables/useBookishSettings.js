@@ -20,6 +20,15 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   // ── Appearance preferences (Settings → Preferences) ──────────────────────
   appBackground: 'white',          // 'white' | 'muted' (#dfe0eb canvas)
   darkAppBackground: 'muted',      // 'dark' (#000) | 'muted' (charcoal canvas)
+  mobileNavStyle: 'standard',       // 'standard' | 'floating'
+  mobileNavSize: 'standard',        // 'standard' | 'compact'
+  mobileNavOpacity: 95,            // percent, 50–100
+  mobileNavBlur: 18,               // backdrop blur in px, 0–30
+  mobileNavMaterial: 'current',     // 'current' | 'frosted'
+  mobileNavHighlight: 'soft',       // 'soft' | 'none'
+  mobileNavActiveIconStyle: 'fill', // 'fill' | 'line'
+  mobileNavProfileDisplay: 'icon',  // 'icon' | 'avatar'
+  mobileNavShowTitles: true,
   seriesCardBackground: 'blur',    // 'blank' | 'blur'
   seriesCardLayout: 'fan',         // 'fan' (books centered) | 'cover'
   favouritesCardBackground: 'blur',// 'blur' | 'blank'
@@ -89,6 +98,12 @@ export const enabledAcceptAttribute = (enabledFormats) => (
 export const CARD_BACKGROUND_OPTIONS = Object.freeze(['blank', 'blur'])
 export const APP_BACKGROUND_OPTIONS = Object.freeze(['white', 'muted'])
 export const DARK_APP_BACKGROUND_OPTIONS = Object.freeze(['dark', 'muted'])
+export const MOBILE_NAV_STYLE_OPTIONS = Object.freeze(['standard', 'floating'])
+export const MOBILE_NAV_SIZE_OPTIONS = Object.freeze(['standard', 'compact'])
+export const MOBILE_NAV_MATERIAL_OPTIONS = Object.freeze(['current', 'frosted'])
+export const MOBILE_NAV_HIGHLIGHT_OPTIONS = Object.freeze(['soft', 'none'])
+export const MOBILE_NAV_ACTIVE_ICON_OPTIONS = Object.freeze(['line', 'fill'])
+export const MOBILE_NAV_PROFILE_OPTIONS = Object.freeze(['icon', 'avatar'])
 export const SERIES_CARD_LAYOUT_OPTIONS = Object.freeze(['fan', 'cover'])
 export const PLAYLIST_CARD_LAYOUT_OPTIONS = Object.freeze(['fan', 'cover'])
 export const FAVOURITES_CARD_LAYOUT_OPTIONS = Object.freeze(['grid', 'list'])
@@ -214,6 +229,23 @@ export function normalizeBookishSettings(value) {
     darkAppBackground: DARK_APP_BACKGROUND_OPTIONS.includes(source.darkAppBackground)
       ? source.darkAppBackground
       : DEFAULT_BOOKISH_SETTINGS.darkAppBackground,
+    mobileNavStyle: MOBILE_NAV_STYLE_OPTIONS.includes(source.mobileNavStyle)
+      ? source.mobileNavStyle
+      : DEFAULT_BOOKISH_SETTINGS.mobileNavStyle,
+    mobileNavSize: MOBILE_NAV_SIZE_OPTIONS.includes(source.mobileNavSize)
+      ? source.mobileNavSize : DEFAULT_BOOKISH_SETTINGS.mobileNavSize,
+    mobileNavOpacity: numberOrDefault(source.mobileNavOpacity, DEFAULT_BOOKISH_SETTINGS.mobileNavOpacity, 50, 100),
+    mobileNavBlur: numberOrDefault(source.mobileNavBlur, DEFAULT_BOOKISH_SETTINGS.mobileNavBlur, 0, 30),
+    mobileNavMaterial: MOBILE_NAV_MATERIAL_OPTIONS.includes(source.mobileNavMaterial)
+      ? source.mobileNavMaterial : DEFAULT_BOOKISH_SETTINGS.mobileNavMaterial,
+    mobileNavHighlight: MOBILE_NAV_HIGHLIGHT_OPTIONS.includes(source.mobileNavHighlight)
+      ? source.mobileNavHighlight : DEFAULT_BOOKISH_SETTINGS.mobileNavHighlight,
+    mobileNavActiveIconStyle: MOBILE_NAV_ACTIVE_ICON_OPTIONS.includes(source.mobileNavActiveIconStyle)
+      ? source.mobileNavActiveIconStyle : DEFAULT_BOOKISH_SETTINGS.mobileNavActiveIconStyle,
+    mobileNavProfileDisplay: MOBILE_NAV_PROFILE_OPTIONS.includes(source.mobileNavProfileDisplay)
+      ? source.mobileNavProfileDisplay : DEFAULT_BOOKISH_SETTINGS.mobileNavProfileDisplay,
+    mobileNavShowTitles: typeof source.mobileNavShowTitles === 'boolean'
+      ? source.mobileNavShowTitles : DEFAULT_BOOKISH_SETTINGS.mobileNavShowTitles,
     seriesCardBackground: CARD_BACKGROUND_OPTIONS.includes(source.seriesCardBackground)
       ? source.seriesCardBackground
       : DEFAULT_BOOKISH_SETTINGS.seriesCardBackground,
@@ -393,8 +425,20 @@ export function resetBookishSettingsForTests() {
 }
 
 export const useBookishSettings = () => {
+  const applyMobileNavSpacing = () => {
+    if (typeof document === 'undefined') return
+    const compact = settingsState.value.mobileNavSize === 'compact'
+    document.documentElement.style.setProperty(
+      '--mobile-bottom-nav-height',
+      settingsState.value.mobileNavStyle === 'standard'
+        ? (compact ? '60px' : '70px')
+        : (compact ? '84px' : '96px'),
+    )
+  }
+
   const loadSettings = () => {
     settingsState.value = readBookishSettings()
+    applyMobileNavSpacing()
     applyBookishTheme(
       settingsState.value.readerTheme,
       settingsState.value.appBackground,
@@ -413,6 +457,7 @@ export const useBookishSettings = () => {
       ...settingsState.value,
       ...patch,
     })
+    applyMobileNavSpacing()
     applyBookishTheme(
       settingsState.value.readerTheme,
       settingsState.value.appBackground,

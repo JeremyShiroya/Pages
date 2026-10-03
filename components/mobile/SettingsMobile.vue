@@ -3,19 +3,6 @@
     <MobileSettingsNav title="Settings" back-to="/" aria-label="Settings navigation" />
 
     <div class="profile-container">
-      <div
-        class="profile-link"
-        role="button"
-        tabindex="0"
-        aria-label="Open profile"
-        @click="navigate('/profile')"
-        @keydown.enter="navigate('/profile')"
-      >
-        <img :src="profileAvatarSrc" :alt="`${profile.displayName} avatar`" />
-        <strong>{{ profile.displayName || 'Reader' }}</strong>
-        <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
-      </div>
-
       <section v-for="group in settingsGroups" :key="group.label" class="section">
         <h2 class="section-title">{{ group.label }}</h2>
         <div
@@ -60,23 +47,18 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
 import { useBookishSettings } from '~/composables/useBookishSettings'
 import { useShareApp } from '~/composables/useShareApp'
 import { useToast } from '~/composables/useToast'
-import { BOOKISH_PROFILE_UPDATED_EVENT, useUserProfile } from '~/composables/useUserProfile'
 
 const runtimeConfig = useRuntimeConfig()
 const { settings, updateSettings } = useBookishSettings()
 const { canShareApp, shareApp } = useShareApp()
 const { addToast } = useToast()
-const { profile, activeAvatarPreset, loadProfile } = useUserProfile()
 const router = useRouter()
 const appVersion = computed(() => runtimeConfig.public.appVersion || '0.0.0')
-const profileAvatarSrc = computed(() => profile.value.avatarType === 'image'
-  ? profile.value.avatarValue
-  : activeAvatarPreset.value.src)
 
 const versionClickCount = ref(0)
 let versionClickTimer = null
@@ -152,14 +134,6 @@ const handleSettingsRow = async (row) => {
 
 const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
 
-onMounted(() => {
-  loadProfile()
-  window.addEventListener(BOOKISH_PROFILE_UPDATED_EVENT, loadProfile)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener(BOOKISH_PROFILE_UPDATED_EVENT, loadProfile)
-})
 </script>
 
 <style scoped>
@@ -196,46 +170,6 @@ onBeforeUnmount(() => {
   font-weight: 650;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-}
-
-.profile-link {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  min-height: 68px;
-  margin-bottom: 24px;
-  padding: 10px 14px 10px 10px;
-  border: 0;
-  border-radius: 16px;
-  background: var(--color-settings-group);
-  color: var(--color-text-primary);
-  cursor: pointer;
-}
-
-.profile-link:focus-visible {
-  outline: 2px solid var(--color-brand-primary);
-  outline-offset: 3px;
-}
-
-.profile-link img {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.profile-link strong {
-  overflow: hidden;
-  font-size: 16px;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile-link i {
-  color: var(--color-text-muted);
-  font-size: 20px;
 }
 
 .setting-item {

@@ -37,9 +37,10 @@
   --mobile-list-icon-size: 44px;
   --mobile-touch-target: 44px;
   --mobile-top-avatar-size: 40px;
-  --mobile-bottom-nav-height: 70px;
+  /* Includes the floating bar and its gap above the Android gesture area. */
+  --mobile-bottom-nav-height: 96px;
   --mobile-card-radius: 20px;
-  --mobile-control-radius: 12px;
+  --mobile-control-radius: 24px;
   --mobile-panel-radius: 16px;
   --mobile-divider-color: #e2e8f0;
   --mobile-muted-text: #999999;
@@ -72,8 +73,8 @@
   --color-background-overlay-strong: rgba(15, 23, 42, 0.68);
   --color-background-overlay-soft: rgba(15, 23, 42, 0.5);
   --color-background-overlay-faint: rgba(15, 23, 42, 0.4);
-  --color-settings-background: #f1f1f4;
-  --color-settings-group: #ffffff;
+  --color-settings-background: var(--color-background-app);
+  --color-settings-group: #f1f1f4;
 
   /* Surfaces */
   --color-surface-primary: #ffffff;
@@ -245,6 +246,7 @@
   --color-background-app: #dfe0eb;
   --color-background-page: #f8fafc;
   --color-background-sidebar: #dfe0eb;
+  --color-settings-group: #f8fafc;
   --color-surface-secondary: rgba(138, 43, 226, 0.05);
   --color-surface-tertiary: rgba(138, 43, 226, 0.08);
   --color-surface-muted: rgba(138, 43, 226, 0.06);
@@ -290,7 +292,7 @@
   --color-background-overlay-strong: rgba(0, 0, 0, 0.76);
   --color-background-overlay-soft: rgba(0, 0, 0, 0.58);
   --color-background-overlay-faint: rgba(0, 0, 0, 0.42);
-  --color-settings-background: #000000;
+  --color-settings-background: var(--color-background-app);
   --color-settings-group: #1f1d29;
 
   /* Surfaces */
@@ -564,6 +566,15 @@ textarea {
   :root {
     --layout-sidebar-width: 200px;
   }
+
+  /* Text actions share the softer pill-like shape across phone and tablet. */
+  button:is(.btn-primary, .btn-cancel, .btn-fetch, .primary-btn, .secondary-btn,
+    .primary-button, .plain-button, .read-btn, .listen-btn, .add-book-btn,
+    .add-btn, .empty-reading-btn, .empty-recently-btn, .sweep-done-btn,
+    .update-avatar-button, .card-btn, .retry-btn, .filter-button,
+    .ghost-btn, .link-btn, .option, .narrator-btn, .speed-btn) {
+    border-radius: var(--mobile-control-radius) !important;
+  }
 }
 
 @media (max-width: 768px),
@@ -780,7 +791,7 @@ textarea {
   max-width: 240px;
 }
 
-/* Favourite actions stay recognizable in every menu and card state. */
+/* Only saved favourites use the filled red heart. */
 .favourite-heart-icon {
   color: var(--color-status-danger-bright, #dc2626) !important;
 }

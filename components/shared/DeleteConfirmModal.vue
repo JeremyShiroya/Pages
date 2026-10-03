@@ -62,6 +62,7 @@
 <script setup>
 import { computed } from 'vue'
 import { onCoverError } from '~/composables/useCoverFallback'
+import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 
 const props = defineProps({
   book: {
@@ -85,7 +86,9 @@ const formatLabel = computed(() => (props.book.format || 'book').toUpperCase())
 
 // Books auto-imported from device storage own the original document on the
 // phone; deleting the book deletes that file too.
-const removesDeviceFile = computed(() => Boolean(props.book.deviceImport && props.book.deviceImportPath))
+const removesDeviceFile = computed(() => Boolean(
+  props.book.deviceImport && props.book.deviceImportPath && isNativeCapacitorPlatform(),
+))
 
 const closeModal = () => emit('close')
 const confirmDelete = () => emit('confirm')

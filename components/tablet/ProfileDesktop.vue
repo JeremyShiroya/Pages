@@ -14,7 +14,7 @@
           class="profile-avatar-button"
           type="button"
           aria-label="Choose avatar"
-          @click="avatarModalOpen = true"
+          @click="avatarSourceOpen = true"
         >
           <span class="profile-avatar-ring">
             <img :src="profileAvatarSrc" :alt="`${profile.displayName} avatar`" />
@@ -52,7 +52,7 @@
             <i class="ri-save-3-line"></i>
             <span>Save profile</span>
           </button>
-          <button class="profile-action" type="button" @click="avatarModalOpen = true">
+          <button class="profile-action" type="button" @click="avatarSourceOpen = true">
             <i class="ri-image-line"></i>
             <span>Change avatar</span>
           </button>
@@ -75,6 +75,8 @@
         <i class="ri-arrow-right-s-line"></i>
       </div>
     </section>
+
+    <AvatarSourcePicker :open="avatarSourceOpen" @close="avatarSourceOpen = false" @presets="openPresetPicker" @cropped="saveGalleryAvatar" />
 
     <Teleport to="body">
       <div v-if="avatarModalOpen" class="avatar-modal-layer" role="presentation">
@@ -113,6 +115,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useToast } from '~/composables/useToast'
 import { useUserProfile } from '~/composables/useUserProfile'
+import AvatarSourcePicker from '~/components/shared/AvatarSourcePicker.vue'
 
 const router = useRouter()
 const { addToast } = useToast()
@@ -124,6 +127,7 @@ const {
   updateProfile,
 } = useUserProfile()
 
+const avatarSourceOpen = ref(false)
 const avatarModalOpen = ref(false)
 const profileDraftName = ref('Reader')
 const selectedAvatar = ref('/images/User%20Avatars/default-user.jpeg')
@@ -163,6 +167,22 @@ const selectAvatar = async (avatarSrc) => {
   selectedAvatar.value = avatarSrc
   avatarModalOpen.value = false
   await persistProfile({ avatarValue: avatarSrc }, 'Avatar updated')
+}
+
+const openPresetPicker = () => {
+  avatarSourceOpen.value = false
+  avatarModalOpen.value = true
+}
+
+const saveGalleryAvatar = async (cropped) => {
+  try {
+    await updateProfile({ displayName: profileDraftName.value, avatarType: 'image', avatarValue: cropped })
+    selectedAvatar.value = cropped
+    avatarSourceOpen.value = false
+    addToast('Profile photo updated', 'success')
+  } catch (error) {
+    addToast(error?.message || 'Could not update profile photo', 'error')
+  }
 }
 
 const goBack = () => {

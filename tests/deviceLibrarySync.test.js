@@ -7,6 +7,7 @@ import {
   MAX_DEVICE_IMPORT_BYTES,
   cleanTitleFromFileName,
   fileInScanFolders,
+  missingImportedBooks,
   isTooLargeError,
   mergeMetadataIntoBook,
   normalizeScanFolder,
@@ -29,6 +30,17 @@ const fakeStorage = (initial = {}) => {
 }
 
 describe('device library sync', () => {
+  test('removes only confirmed missing device imports in scanned internal storage', () => {
+    const books = [
+      { id: 1, deviceImport: true, deviceImportPath: '/storage/emulated/0/Books/gone.epub' },
+      { id: 2, deviceImport: true, deviceImportPath: '/storage/emulated/0/Books/present.pdf' },
+      { id: 3, deviceImport: false, deviceImportPath: '/storage/emulated/0/Books/gone.epub' },
+      { id: 4, deviceImport: true, deviceImportPath: '/storage/emulated/0/Other/gone.epub' },
+      { id: 5, deviceImport: true, deviceImportPath: '/storage/1234-5678/Books/gone.epub' },
+    ]
+    expect(missingImportedBooks(books, [books[0].deviceImportPath, books[3].deviceImportPath, books[4].deviceImportPath], ['/storage/emulated/0/Books']))
+      .toEqual([books[0]])
+  })
   test('imports only unseen or changed pdf/epub files', () => {
     const registry = {
       '/storage/emulated/0/Books/known.epub': { size: 100, modified: 5 },
