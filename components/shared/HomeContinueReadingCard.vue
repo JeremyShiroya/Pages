@@ -27,7 +27,7 @@
       <span class="continue-author">
         {{ book.author || 'Unknown author' }}<span v-if="book.publishYear"> &bull; {{ book.publishYear }}</span>
       </span>
-      <span class="continue-series" :class="{ standalone: !book.series }">{{ book.series || 'Standalone' }}</span>
+      <span class="continue-series" :class="{ standalone: !book.series }">{{ seriesDisplayLabel(book) }}</span>
       <span class="continue-meta"><BookProgressDisplay :progress="book.progress" compact /></span>
     </span>
     <span
@@ -46,6 +46,7 @@
 </template>
 
 <script setup>
+import { seriesDisplayLabel } from '~/utils/bookSeriesState'
 import { computed } from "vue";
 import { onCoverError } from "~/composables/useCoverFallback";
 import BookProgressDisplay from "./BookProgressDisplay.vue";

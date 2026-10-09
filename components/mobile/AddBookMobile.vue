@@ -4,7 +4,7 @@
 
     <!-- Metadata Selection Modal -->
     <div v-if="showMetadataModal" class="metadata-modal-overlay" @click="closeMetadataModal">
-      <div class="metadata-modal-container" @click.stop>
+      <div class="metadata-modal-container metadata-search-glass" @click.stop>
         <div class="metadata-modal-header">
           <h2>Select Metadata</h2>
           <button class="close-button" @click="closeMetadataModal">
@@ -175,8 +175,9 @@
 
       <!-- Details Section -->
       <div class="details-column">
+        <div class="form-group"><label>This file is</label><DocumentTypePicker :model-value="newBook.documentType" @update:model-value="chooseDocumentType" /></div>
         <!-- Web Fetch CTA -->
-        <div class="fetch-metadata-card">
+        <div v-if="newBook.documentType === 'book'" class="fetch-metadata-card">
           <div class="fetch-info">
             <i class="ri-file-search-line"></i>
             <div>
@@ -202,12 +203,12 @@
             />
           </div>
           <div class="form-group">
-            <label for="author">Author <span class="required">*</span></label>
+            <label for="author">Author <span v-if="newBook.documentType === 'book'" class="required">*</span></label>
             <input 
               type="text" 
               id="author" 
               v-model="newBook.author" 
-              required 
+              :required="newBook.documentType === 'book'"
               class="form-input"
               placeholder="e.g. J.R.R. Tolkien"
             />
@@ -225,9 +226,10 @@
           ></textarea>
         </div>
 
-        <div class="form-group">
+        <div v-if="newBook.documentType === 'book'" class="form-group">
           <label>Book Type</label>
           <div class="radio-group">
+            <label class="radio-option" :class="{ active: bookKind === 'unknown' }"><input type="radio" value="unknown" v-model="bookKind" @change="handleBookKindChange" /><span>Not sure yet</span></label>
             <label class="radio-option" :class="{ active: bookKind === 'standalone' }">
               <input type="radio" value="standalone" v-model="bookKind" @change="handleBookKindChange" />
               <span>Standalone</span>
@@ -239,7 +241,7 @@
           </div>
         </div>
 
-        <div class="form-row" v-if="bookKind === 'series'">
+        <div class="form-row" v-if="newBook.documentType === 'book' && bookKind === 'series'">
           <div class="form-group">
             <label for="series">Series</label>
             <input 
@@ -273,7 +275,7 @@
           </div>
         </div>
 
-        <div class="form-row">
+        <div v-if="newBook.documentType === 'book'" class="form-row">
           <div class="form-group">
             <label for="publishYear">Publish Year</label>
             <input 
@@ -312,7 +314,12 @@
           <PersonalRatingInput v-model="newBook.rating" />
         </div>
 
-        <div v-else-if="settings.ratingSource !== 'none'" class="form-group">
+        <div v-if="newBook.documentType === 'personal'" class="form-group">
+          <label>File created</label>
+          <div class="form-input">{{ newBook.fileCreatedAt ? new Date(newBook.fileCreatedAt).toLocaleDateString() : 'Unavailable from phone records' }}</div>
+        </div>
+
+        <div v-else-if="newBook.documentType === 'book' && settings.ratingSource !== 'none'" class="form-group">
           <label class="web-review-label">{{ settings.ratingSource === 'storygraph' ? 'StoryGraph' : 'Goodreads' }} Rating</label>
           <div class="readonly-review">
             <BookRatingDisplay :book="newBook" show-empty />
@@ -332,6 +339,7 @@
 </template>
 
 <script setup>
+import { seriesMembership, applySeriesChoice } from '~/utils/bookSeriesState'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { reconcileStatusProgress, useBooks } from '~/composables/useBooks'
@@ -343,6 +351,11 @@ import { propagateSeriesTotal } from '~/composables/useSeriesProgress'
 import { useCoverImageCache } from '~/composables/useCoverImageCache'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
 import { useBookishSettings } from '~/composables/useBookishSettings'
+import { withDocumentType } from '~/composables/useDocumentReview'
+import { collectDocumentEvidence, createIntelligenceSnapshot } from '~/composables/documentIntelligence'
+import { useDocumentIntelligenceStore } from '~/composables/useDocumentIntelligenceStore'
+import { runDocumentIntelligence } from '~/composables/useDocumentIntelligence'
+import { readBookishSettings } from '~/composables/useBookishSettings'
 import BookishSelect from '~/components/shared/BookishSelect.vue'
 import CoverImageModal from '~/components/shared/CoverImageModal.vue'
 import GoodreadsRatingDisplay from '~/components/shared/GoodreadsRatingDisplay.vue'
@@ -363,8 +376,12 @@ const extractedTocTitles = ref([])
 const extractedSource = ref(null)
 const extractedTocItems = ref([])
 const extractedPdfManifest = ref(null)
+const typeChosenManually = ref(false)
+const extractedEmbedded = ref({ title: '', author: '' })
+const chooseDocumentType = (type) => { newBook.value.documentType = type; typeChosenManually.value = true }
 
 const newBook = ref({
+  documentType: 'book',
   title: '',
   author: '',
   blurb: '',
@@ -400,7 +417,8 @@ const showCoverModal = ref(false)
 const coverModalMode = ref('choice')
 const isSearchingCovers = ref(false)
 const coverOptions = ref([])
-const bookKind = ref('standalone')
+const bookKind = ref('unknown')
+const seriesChoiceChanged = ref(false)
 
 const createMetadataLoadingStates = () => [
   { id: 'core', text: 'Searching core metadata providers', status: 'pending' },
@@ -564,6 +582,10 @@ const handleDocumentChange = async (event) => {
   extractedPdfManifest.value = null
   const extension = file.name.split('.').pop().toLowerCase()
   newBook.value.format = extension
+  newBook.value.sourceFileName = file.name
+  typeChosenManually.value = false
+  extractedEmbedded.value = { title: '', author: '' }
+  newBook.value.documentType = extension === 'pdf' ? 'unclassified' : 'book'
 
   if (!newBook.value.title) {
     newBook.value.title = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ')
@@ -612,6 +634,12 @@ const handleDocumentChange = async (event) => {
       extractedTocItems.value = result.tocItems ?? []
       extractedPdfManifest.value = result.pdfManifest ?? null
       newBook.value.pages = result.pages || 0
+      extractedEmbedded.value = { title: result.embeddedTitle || '', author: result.embeddedAuthor || '' }
+      if (!typeChosenManually.value) newBook.value.documentType = createIntelligenceSnapshot(
+        collectDocumentEvidence({ format: 'pdf', fileName: file.name, content: result.content,
+          pages: result.pages, tocItems: result.tocItems,
+          embeddedTitle: result.embeddedTitle, embeddedAuthor: result.embeddedAuthor }),
+      ).kind
     } catch (err) {
       extractionError.value = 'Could not extract PDF text. The book will be added without in-app reading.'
     } finally {
@@ -765,7 +793,8 @@ const selectMetadata = (result) => {
 }
 
 const handleBookKindChange = () => {
-  if (bookKind.value === 'standalone') {
+  seriesChoiceChanged.value = true
+  if (bookKind.value !== 'series') {
     newBook.value.series = ''
     newBook.value.seriesInstallment = ''
     newBook.value.seriesTotal = null
@@ -786,20 +815,27 @@ const saveBook = async () => {
   isProcessing.value = true;
   const cachedCover = await cacheCoverImage(coverPreview.value);
 
-  const bookToSave = {
+  const evidence = collectDocumentEvidence({ format: newBook.value.format, fileName: documentFile.value.name,
+    content: extractedContent.value, pages: newBook.value.pages, tocItems: extractedTocItems.value,
+    embeddedTitle: extractedEmbedded.value.title, embeddedAuthor: extractedEmbedded.value.author })
+  let bookToSave = withDocumentType({
     ...newBook.value,
+    intelligence: createIntelligenceSnapshot(evidence, typeChosenManually.value ? newBook.value.documentType : null),
     progress: reconcileStatusProgress(newBook.value.status, newBook.value.progress),
     cover: cachedCover || generateCoverPlaceholder(newBook.value.title || 'Book')
-  }
+  }, newBook.value.documentType, { automatic: !typeChosenManually.value })
   
-  if (bookKind.value === 'standalone' || !bookToSave.series || bookToSave.series.trim() === '') {
+  if (bookKind.value !== 'series' || !bookToSave.series || bookToSave.series.trim() === '') {
     bookToSave.series = null
     bookToSave.seriesInstallment = null
     bookToSave.seriesTotal = null
   }
   
   try {
+    bookToSave = applySeriesChoice(bookToSave, bookKind.value)
     const savedBook = await addBook(bookToSave);
+    try { await useDocumentIntelligenceStore().saveEvidence(savedBook.id, evidence) }
+    catch (error) { console.warn('[DocumentIntelligence] Evidence cache failed', error) }
     if (savedBook.series && Number(savedBook.seriesTotal) > 0) {
       await propagateSeriesTotal({
         seriesName: savedBook.series,
@@ -851,6 +887,7 @@ const saveBook = async () => {
       }
     }
 
+    if (savedBook.format === 'pdf') void runDocumentIntelligence(savedBook.id, { searchEnabled: readBookishSettings().metadataAutoFill === true }).catch((error) => console.warn('[DocumentIntelligence] Analysis will retry', error));
     addToast('Book added to library successfully', 'success');
     router.push('/books');
   } catch (error) {
@@ -1355,6 +1392,19 @@ const saveBook = async () => {
   flex-direction: column;
   box-shadow: var(--shadow-modal);
   overflow: hidden;
+}
+
+.metadata-search-glass {
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  background: linear-gradient(160deg, rgba(255, 255, 255, .2), transparent 54%),
+    color-mix(in srgb, var(--color-surface-primary) 67%, transparent);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .36), 0 18px 48px rgba(15, 23, 42, .22);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .metadata-search-glass { background: var(--color-surface-primary); backdrop-filter: none; }
 }
 
 .metadata-modal-body {

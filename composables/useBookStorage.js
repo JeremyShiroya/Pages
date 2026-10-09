@@ -244,6 +244,18 @@ export const useBookStorage = () => {
     return result
   }
 
+  // Classification only needs extracted text. Avoid resolving or migrating
+  // large PDF source files while checking older library records.
+  const getBookText = async (bookId) => {
+    const db = await openDB()
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly')
+      const req = tx.objectStore(STORE_NAME).get(bookId)
+      req.onsuccess = (e) => resolve(e.target.result?.content || '')
+      req.onerror = (e) => reject(e.target.error)
+    })
+  }
+
   const deleteBookContent = async (bookId) => {
     // Remove the on-device PDF file too (native).
     if (assetsAvailable()) {
@@ -297,6 +309,7 @@ export const useBookStorage = () => {
   return {
     saveBookContent,
     getBookContent,
+    getBookText,
     deleteBookContent,
     hasBookContent,
     savePdfSource,

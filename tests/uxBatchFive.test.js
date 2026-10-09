@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { beforeEach, describe, expect, test } from 'vitest'
 import {
+  clearUnavailableLibraryFormatFilters,
   DEFAULT_LIBRARY_FILTERS,
   matchesLibraryFilters,
   normalizeLibraryFilters,
@@ -81,6 +82,24 @@ describe('per-page library filters', () => {
     // is exactly when a component-local ref lost the choice.
     resetLibraryFiltersForTests()
     expect(useLibraryFilters('spec-remount', {}, storage).filters.value.status).toBe('Reading')
+  })
+
+  test('changing handled formats clears incompatible saved filters across scopes', () => {
+    const entries = new Map()
+    const storage = {
+      get length() { return entries.size },
+      key: (index) => [...entries.keys()][index] ?? null,
+      getItem: (key) => entries.get(key) ?? null,
+      setItem: (key, value) => entries.set(key, value),
+    }
+    const books = useLibraryFilters('format-books', {}, storage)
+    books.setFilters({ status: 'Reading', format: 'pdf' })
+    entries.set('bookish:filters:format-series', JSON.stringify({ status: 'all', format: 'pdf' }))
+
+    clearUnavailableLibraryFormatFilters(['epub'], storage)
+
+    expect(books.filters.value).toEqual({ status: 'Reading', format: 'all' })
+    expect(JSON.parse(entries.get('bookish:filters:format-series')).format).toBe('all')
   })
 
   test('unknown values fall back to the defaults', () => {

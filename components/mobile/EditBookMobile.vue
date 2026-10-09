@@ -9,7 +9,7 @@
     <template v-else>
       <!-- Metadata Selection Modal -->
       <div v-if="showMetadataModal" class="metadata-modal-overlay" @click="closeMetadataModal">
-        <div class="metadata-modal-container" @click.stop>
+      <div class="metadata-modal-container metadata-search-glass" @click.stop>
           <div class="metadata-modal-header">
             <h2>Select Metadata</h2>
             <button class="close-button" @click="closeMetadataModal">
@@ -161,8 +161,13 @@
 
         <!-- Details Section -->
         <div class="details-column">
+          <div class="form-group">
+            <label for="document-type">This file is</label>
+            <DocumentTypePicker v-model="editBook.documentType" />
+            <small v-if="editBook.documentType === 'unclassified'">Pages will not search the web for this file until you mark it as a book.</small>
+          </div>
           <!-- Web Fetch CTA -->
-          <div class="fetch-metadata-card">
+          <div v-if="editBook.documentType === 'book'" class="fetch-metadata-card">
             <div class="fetch-info">
               <i class="ri-file-search-line"></i>
               <div>
@@ -177,7 +182,7 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="title">Book Title <span class="required">*</span></label>
+              <label for="title">Title <span class="required">*</span></label>
               <input 
                 type="text" 
                 id="title" 
@@ -188,12 +193,11 @@
               />
             </div>
             <div class="form-group">
-              <label for="author">Author <span class="required">*</span></label>
+              <label for="author">Author</label>
               <input 
                 type="text" 
                 id="author" 
                 v-model="editBook.author" 
-                required 
                 class="form-input"
                 placeholder="e.g. J.R.R. Tolkien"
               />
@@ -211,9 +215,10 @@
             ></textarea>
           </div>
 
-          <div class="form-group">
-            <label>Book Type</label>
+          <div v-if="editBook.documentType === 'book'" class="form-group">
+            <label>Series membership</label>
             <div class="radio-group">
+              <label class="radio-option" :class="{ active: bookKind === 'unknown' }"><input type="radio" value="unknown" v-model="bookKind" @change="handleBookKindChange" /><span>Not sure yet</span></label>
               <label class="radio-option" :class="{ active: bookKind === 'standalone' }">
                 <input type="radio" value="standalone" v-model="bookKind" @change="handleBookKindChange" />
                 <span>Standalone</span>
@@ -259,7 +264,7 @@
             </div>
           </div>
 
-          <div class="form-row">
+          <div v-if="editBook.documentType === 'book'" class="form-row">
             <div class="form-group">
               <label for="publishYear">Publish Year</label>
               <input 
@@ -298,7 +303,12 @@
             <PersonalRatingInput v-model="editBook.rating" />
           </div>
 
-          <div v-else-if="settings.ratingSource !== 'none'" class="form-group">
+          <div v-if="editBook.documentType === 'personal'" class="form-group">
+            <label>File created</label>
+            <div class="form-input">{{ editBook.fileCreatedAt ? new Date(editBook.fileCreatedAt).toLocaleDateString() : 'Unavailable from phone records' }}</div>
+          </div>
+
+          <div v-else-if="editBook.documentType === 'book' && settings.ratingSource !== 'none'" class="form-group">
             <label class="web-review-label">{{ settings.ratingSource === 'storygraph' ? 'StoryGraph' : 'Goodreads' }} Rating</label>
             <div class="readonly-review">
               <BookRatingDisplay :book="editBook" show-empty />
@@ -319,6 +329,7 @@
 </template>
 
 <script setup>
+import { seriesMembership, applySeriesChoice } from '~/utils/bookSeriesState'
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { reconcileStatusProgress, useBooks } from '~/composables/useBooks'
@@ -339,6 +350,7 @@ import MultiStepLoader from '~/components/shared/MultiStepLoader.vue'
 import SkeletonLoader from '~/components/shared/SkeletonLoader.vue'
 import MobileSettingsNav from './MobileSettingsNav.vue'
 import { useBookEditReturn } from '~/composables/useBookEditNavigation'
+import { documentTypeOf, withDocumentType } from '~/composables/useDocumentReview'
 
 const props = defineProps({
   bookId: {
@@ -377,6 +389,7 @@ const editBook = ref({
 const isLoading = ref(true)
 const isUpdating = ref(false)
 const originalSeriesState = ref(null)
+const originalDocumentType = ref('unclassified')
 const coverPreview = ref(null)
 // When checked, applying a metadata result leaves the existing cover alone.
 const keepCurrentCover = ref(false)
@@ -390,7 +403,8 @@ const showCoverModal = ref(false)
 const coverModalMode = ref('choice')
 const isSearchingCovers = ref(false)
 const coverOptions = ref([])
-const bookKind = ref('standalone')
+const bookKind = ref('unknown')
+const seriesChoiceChanged = ref(false)
 
 const createMetadataLoadingStates = () => [
   { id: 'core', text: 'Searching core metadata providers', status: 'pending' },
@@ -474,7 +488,9 @@ onMounted(async () => {
         router.push('/books')
       }
     }
-    bookKind.value = editBook.value.series || editBook.value.seriesInstallment ? 'series' : 'standalone'
+    bookKind.value = seriesMembership(editBook.value)
+    editBook.value.documentType = documentTypeOf(editBook.value)
+    originalDocumentType.value = editBook.value.documentType
     originalSeriesState.value = {
       series: editBook.value.series,
       seriesInstallment: editBook.value.seriesInstallment,
@@ -689,7 +705,8 @@ const selectMetadata = (result) => {
 }
 
 const handleBookKindChange = () => {
-  if (bookKind.value === 'standalone') {
+  seriesChoiceChanged.value = true
+  if (bookKind.value !== 'series') {
     editBook.value.series = ''
     editBook.value.seriesInstallment = ''
     editBook.value.seriesTotal = null
@@ -708,17 +725,21 @@ const handleUpdateBook = async () => {
     cover: cachedCover || editBook.value.cover,
   }
   
-  if (bookKind.value === 'standalone' || !bookToUpdate.series || bookToUpdate.series.trim() === '') {
+  if (bookKind.value !== 'series' || !bookToUpdate.series || bookToUpdate.series.trim() === '') {
     bookToUpdate.series = null
     bookToUpdate.seriesInstallment = null
     bookToUpdate.seriesTotal = null
   }
+  bookToUpdate = withDocumentType({ ...bookToUpdate, documentType: originalDocumentType.value }, editBook.value.documentType, {
+    defer: editBook.value.reviewState === 'deferred',
+  })
 
-  if (hasManualSeriesDecisionChanged(originalSeriesState.value, bookToUpdate)) {
+  if (bookKind.value !== 'unknown' && hasManualSeriesDecisionChanged(originalSeriesState.value, bookToUpdate)) {
     bookToUpdate = protectManualSeriesDecision(bookToUpdate)
   }
   
   try {
+    if (seriesChoiceChanged.value) bookToUpdate = applySeriesChoice(bookToUpdate, bookKind.value)
     await updateBook(bookToUpdate);
     if (bookToUpdate.series && Number(bookToUpdate.seriesTotal) > 0) {
       await propagateSeriesTotal({
@@ -1179,6 +1200,19 @@ const handleUpdateBook = async () => {
   flex-direction: column;
   overflow: hidden;
   box-shadow: var(--shadow-modal);
+}
+
+.metadata-search-glass {
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  background: linear-gradient(160deg, rgba(255, 255, 255, .2), transparent 54%),
+    color-mix(in srgb, var(--color-surface-primary) 67%, transparent);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .36), 0 18px 48px rgba(15, 23, 42, .22);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .metadata-search-glass { background: var(--color-surface-primary); backdrop-filter: none; }
 }
 
 .metadata-modal-body {

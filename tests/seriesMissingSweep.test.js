@@ -98,15 +98,15 @@ describe('roster coverage decides the real series length', () => {
 })
 
 describe('the series total is reconciled against roster evidence', () => {
-  test('a contiguous roster is authoritative', () => {
-    expect(reconcileEffectiveTotal({ contiguous: true, rosterMax: 28, claimedTotal: 30 })).toBe(28)
+  test('a partial contiguous roster cannot shrink a known total', () => {
+    expect(reconcileEffectiveTotal({ contiguous: true, rosterMax: 28, claimedTotal: 30 })).toBe(30)
   })
 
-  test('a small overcount above the roster max is trimmed (Prey: works=37, last book #36)', () => {
+  test('an incomplete provider roster cannot prove a stored total is wrong', () => {
     // The real Lucas Davenport bug: one owned book carried seriesTotal 37, but
     // the roster's highest real book is Revenge Prey #36, so slot 37 is a
     // phantom from the "works" count and must be dropped.
-    expect(reconcileEffectiveTotal({ contiguous: false, rosterMax: 36, claimedTotal: 37 })).toBe(36)
+    expect(reconcileEffectiveTotal({ contiguous: false, rosterMax: 36, claimedTotal: 37 })).toBe(37)
   })
 
   test('a large gap keeps the claimed total so a missed page never hides real books', () => {
@@ -255,8 +255,8 @@ describe('the series detail page exposes the missing-book actions', () => {
     expect(page).toContain('propagateSeriesTotal')
     // Corrects when the roster is authoritative (contiguous) OR when it trimmed
     // the stored total DOWN — never silently raises off a gappy roster.
-    expect(page).toMatch(/effectiveTotal > 0 && effectiveTotal !== derivedSeriesTotal\.value/)
-    expect(page).toMatch(/coverage\.contiguous \|\| effectiveTotal < derivedSeriesTotal\.value/)
+    expect(page).toContain('effectiveTotal > (derivedSeriesTotal.value || 0)')
+    expect(reconcileEffectiveTotal({ contiguous: true, rosterMax: 1, claimedTotal: 5 })).toBe(5)
     // Owned installments are handed to the composable so it can rebuild the list.
     expect(page).toContain('ownedInstallments')
   })

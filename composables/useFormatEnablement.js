@@ -29,6 +29,12 @@ import {
 // files still sitting on disk.
 
 import { useToast } from '~/composables/useToast'
+import { clearUnavailableLibraryFormatFilters } from '~/composables/useLibraryFilters'
+import { backfillLibraryMetadata, useLibraryBackfill } from '~/composables/useMetadataBackfill'
+import { realignEntireLibrarySeries, runSeriesSuggestionSweep } from '~/composables/useSeriesSuggestions'
+
+let formatRefreshTail = Promise.resolve()
+let formatRefreshVersion = 0
 
 export const formatLabel = (format) => (format === 'pdf' ? 'PDF' : 'EPUB')
 
@@ -50,8 +56,9 @@ export const formatsAddedBy = (currentFormats, nextFormats) => {
 }
 
 export const useFormatEnablement = () => {
+  const nuxtApp = useNuxtApp()
   const { settings, updateSettings } = useBookishSettings()
-  const { books, fetchAllData } = useBooks()
+  const { books, seriesList, updateBook, fetchAllData } = useBooks()
   const { addToast } = useToast()
 
   const enabledFormats = computed(() => normalizeEnabledFormats(settings.value.enabledFormats))
@@ -117,6 +124,7 @@ export const useFormatEnablement = () => {
       formatFilter: 'all',
       formatChoiceMade: true,
     })
+    clearUnavailableLibraryFormatFilters(next)
 
     let removed = 0
     if (removedFormats.length > 0) {
@@ -140,11 +148,41 @@ export const useFormatEnablement = () => {
     }
 
     if (import.meta.client) {
-      try {
-        await syncDeviceLibrary({ silent: false })
-      } catch (error) {
-        console.warn('[Formats] Could not scan device after format update:', error)
+      // The same full detail and series pass as Storage → Update book details
+      // runs after the phone scan. Keep it outside the preference confirmation:
+      // hundreds of network lookups must not pin its Remove button on screen.
+      const version = ++formatRefreshVersion
+      const scanPromise = nuxtApp.runWithContext(() => syncDeviceLibrary({
+        silent: false,
+        backfillImported: false,
+      }))
+      const updateExistingBook = (record, options) => {
+        const current = books.value.find((book) => book.id === record?.id)
+        if (!current || !enabledFormats.value.includes(String(current.format).toLowerCase())) return null
+        return updateBook(record, options)
       }
+      formatRefreshTail = formatRefreshTail.catch(() => {}).then(async () => {
+        await scanPromise
+        if (version !== formatRefreshVersion) return
+        const backfill = nuxtApp.runWithContext(() => useLibraryBackfill())
+        if (backfill.state.running) await backfill.start({ books: books.value, updateBook })
+        if (version !== formatRefreshVersion) return
+        await backfillLibraryMetadata({
+          books: [...books.value],
+          updateBook: updateExistingBook,
+          shouldStop: () => version !== formatRefreshVersion,
+        })
+        if (version !== formatRefreshVersion) return
+        await nuxtApp.runWithContext(() => realignEntireLibrarySeries({
+          books: [...books.value], seriesList: seriesList.value, updateBook: updateExistingBook,
+        }))
+        if (settings.value.seriesSuggestions === true && version === formatRefreshVersion) {
+          await nuxtApp.runWithContext(() => runSeriesSuggestionSweep({ seriesList, settings }))
+        }
+      }).catch((error) => {
+        console.warn('[Formats] Could not finish the full library refresh:', error)
+        addToast('Book details could not be fully updated. You can retry from Storage.', 'error')
+      })
     }
 
     if (removedFormats.length === 0 && addedFormats.length === 0) {

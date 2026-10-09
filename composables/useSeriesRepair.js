@@ -1,3 +1,4 @@
+import { metadataEligible, metadataCandidateMatches } from './metadataPolicy'
 // Client-safe Series Repair & Reconciliation Composable for Pages.
 
 import { isUserOverrideProtected } from '~/server/utils/migrationEngine'
@@ -25,7 +26,7 @@ export function reconcileAndRepairBookSeries(book, candidateResults = []) {
   }
 
   // 1. User Override Protection Check
-  if (isUserOverrideProtected(book)) {
+  if (!metadataEligible(book) || book.userDefined === true || isUserOverrideProtected(book)) {
     return {
       decision: 'PROTECTED',
       reason: 'Book has user-defined series overrides protecting it from automated repair.',
@@ -55,18 +56,7 @@ export function reconcileAndRepairBookSeries(book, candidateResults = []) {
   const bookTitleNorm = normalizeText(book.title)
   const bookAuthorNorm = normalizeText(book.author)
 
-  const matchingCandidates = candidateResults.filter((cand) => {
-    if (!cand?.title) return false
-    const candTitleNorm = normalizeText(cand.title)
-    const titleMatch = bookTitleNorm === candTitleNorm || bookTitleNorm.includes(candTitleNorm) || candTitleNorm.includes(bookTitleNorm)
-    if (!titleMatch) return false
-
-    if (bookAuthorNorm && cand.author) {
-      const candAuthorNorm = normalizeText(cand.author)
-      return bookAuthorNorm === candAuthorNorm || bookAuthorNorm.includes(candAuthorNorm) || candAuthorNorm.includes(bookAuthorNorm)
-    }
-    return true
-  })
+  const matchingCandidates = candidateResults.filter((candidate) => metadataCandidateMatches(book, candidate))
 
   if (!matchingCandidates.length) {
     return {
@@ -138,7 +128,7 @@ export function reconcileAndRepairBookSeries(book, candidateResults = []) {
 
   if (!bestSeriesName) {
     // If provider match confirms no series, and book has no series
-    if (!previousState.series) {
+    if (!previousState.series && matchingCandidates.some((candidate) => candidate.seriesStatus === 'standalone')) {
       const isAlreadyChecked = previousState.seriesChecked
       const proposedState = { series: null, seriesInstallment: null, seriesTotal: null, seriesChecked: true }
       if (isAlreadyChecked) {
@@ -160,7 +150,7 @@ export function reconcileAndRepairBookSeries(book, candidateResults = []) {
         evidenceSources,
         previousState,
         proposedState,
-        record: { ...book, series: null, seriesInstallment: null, seriesTotal: null, seriesChecked: true },
+        record: { ...book, series: null, seriesInstallment: null, seriesTotal: null, seriesChecked: true, seriesStatus: 'standalone' },
         fieldsModified: ['seriesChecked'],
       }
     }
@@ -170,8 +160,10 @@ export function reconcileAndRepairBookSeries(book, candidateResults = []) {
   const rosterResult = reconcileSeriesRoster(seriesCandidates, providerTotals)
 
   const reconciledSeriesName = bestSeriesName || previousState.series
-  const reconciledInstallment = bestInstallment || previousState.seriesInstallment || 1
-  const reconciledTotal = rosterResult.mainWorksCount || (topGroup(totalGroups)?.value ? Number(topGroup(totalGroups).value) : null)
+  const reconciledInstallment = bestInstallment || previousState.seriesInstallment || null
+  // Search results for one owned book are not a complete series roster.
+  const reportedTotal = Number(topGroup(totalGroups)?.value) || 0
+  const reconciledTotal = Math.max(Number(previousState.seriesTotal) || 0, reportedTotal, Number(reconciledInstallment) || 0) || null
 
   // Calculate evidence confidence
   const confidenceByField = {

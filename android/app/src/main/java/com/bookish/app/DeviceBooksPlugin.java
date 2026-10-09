@@ -448,6 +448,16 @@ public class DeviceBooksPlugin extends Plugin {
             item.put("name", name);
             item.put("size", entry.length());
             item.put("modified", entry.lastModified());
+            // Android's filesystem can expose a real creation timestamp on
+            // API 26+, though some providers substitute the modified time.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                try {
+                    long created = java.nio.file.Files.readAttributes(
+                        entry.toPath(), java.nio.file.attribute.BasicFileAttributes.class
+                    ).creationTime().toMillis();
+                    if (created > 0 && created != entry.lastModified()) item.put("created", created);
+                } catch (Exception ignored) {}
+            }
             results.put(item);
         }
     }

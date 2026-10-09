@@ -20,8 +20,46 @@ const createMemoryStorage = () => {
 }
 
 describe('useBookishSettings storage helpers', () => {
+  it('keeps Listen back and forward counters independent and migrates the old interval', () => {
+    expect(normalizeBookishSettings({ listenBackSeconds: 3, listenForwardSeconds: 42 }))
+      .toMatchObject({ listenBackSeconds: 3, listenForwardSeconds: 42 })
+    expect(normalizeBookishSettings({ listenBackSeconds: 0, listenForwardSeconds: 99 }))
+      .toMatchObject({ listenBackSeconds: 1, listenForwardSeconds: 60 })
+    expect(normalizeBookishSettings({ listenSkipSeconds: 24 }))
+      .toMatchObject({ listenBackSeconds: 24, listenForwardSeconds: 24 })
+  })
   it('returns defaults when no saved settings exist', () => {
     expect(readBookishSettings(createMemoryStorage())).toEqual(DEFAULT_BOOKISH_SETTINGS)
+  })
+
+  it('migrates only an untouched former navigation, without changing other preferences', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(BOOKISH_SETTINGS_KEY, JSON.stringify({
+      settingsVersion: 3, readerTheme: 'dark', appBackground: 'muted',
+      mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95,
+      mobileNavBlur: 18, mobileNavMaterial: 'current', mobileNavHighlight: 'soft',
+      mobileNavActiveIconStyle: 'fill', mobileNavProfileDisplay: 'icon',
+      mobileNavShowTitles: true,
+    }))
+    expect(readBookishSettings(storage)).toMatchObject({
+      settingsVersion: 4, readerTheme: 'dark', appBackground: 'muted',
+      mobileNavStyle: 'floating', mobileNavSize: 'compact',
+      mobileNavMaterial: 'frosted', mobileNavProfileDisplay: 'avatar',
+      mobileNavActiveIconStyle: 'fill', mobileNavShowTitles: true,
+    })
+    expect(readBookishSettings(storage).mobileNavStyle).toBe('floating')
+  })
+
+  it('preserves the whole former navigation when even one field was customized', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(BOOKISH_SETTINGS_KEY, JSON.stringify({
+      settingsVersion: 3, mobileNavHighlight: 'none',
+    }))
+    expect(readBookishSettings(storage)).toMatchObject({
+      mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95,
+      mobileNavMaterial: 'current', mobileNavHighlight: 'none',
+      mobileNavProfileDisplay: 'icon', mobileNavShowTitles: true,
+    })
   })
 
   it('hide content activates only when explicitly true', () => {
@@ -54,18 +92,18 @@ describe('useBookishSettings storage helpers', () => {
   })
 
   it('validates bottom navigation style, opacity, and blur', () => {
-    expect(normalizeBookishSettings({})).toMatchObject({ mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95, mobileNavBlur: 18 })
+    expect(normalizeBookishSettings({})).toMatchObject({ mobileNavStyle: 'floating', mobileNavSize: 'compact', mobileNavOpacity: 95, mobileNavBlur: 18 })
     expect(normalizeBookishSettings({ mobileNavStyle: 'standard', mobileNavOpacity: 35, mobileNavBlur: 50 }))
       .toMatchObject({ mobileNavStyle: 'standard', mobileNavOpacity: 50, mobileNavBlur: 30 })
     expect(normalizeBookishSettings({ mobileNavStyle: 'unknown', mobileNavOpacity: 'invalid' }))
-      .toMatchObject({ mobileNavStyle: 'standard', mobileNavOpacity: 95 })
+      .toMatchObject({ mobileNavStyle: 'floating', mobileNavOpacity: 95 })
     expect(normalizeBookishSettings({ mobileNavSize: 'compact' }).mobileNavSize).toBe('compact')
-    expect(normalizeBookishSettings({ mobileNavSize: 'invalid' }).mobileNavSize).toBe('standard')
+    expect(normalizeBookishSettings({ mobileNavSize: 'invalid' }).mobileNavSize).toBe('compact')
   })
 
   it('retains frosted navigation and migrates removed liquid and bead choices', () => {
     expect(normalizeBookishSettings({})).toMatchObject({
-      mobileNavMaterial: 'current', mobileNavHighlight: 'soft',
+      mobileNavMaterial: 'frosted', mobileNavHighlight: 'soft',
     })
     expect(normalizeBookishSettings({
       mobileNavMaterial: 'frosted', mobileNavHighlight: 'none',
@@ -73,7 +111,7 @@ describe('useBookishSettings storage helpers', () => {
       mobileNavMaterial: 'frosted', mobileNavHighlight: 'none',
     })
     const migrated = normalizeBookishSettings({ mobileNavMaterial: 'liquid', mobileNavHighlight: 'bead', mobileNavBeadSize: 'large' })
-    expect(migrated).toMatchObject({ mobileNavMaterial: 'current', mobileNavHighlight: 'soft' })
+    expect(migrated).toMatchObject({ mobileNavMaterial: 'frosted', mobileNavHighlight: 'soft' })
     expect(migrated).not.toHaveProperty('mobileNavBeadSize')
   })
 
@@ -84,11 +122,11 @@ describe('useBookishSettings storage helpers', () => {
   })
 
   it('validates profile avatar and tab title preferences', () => {
-    expect(normalizeBookishSettings({})).toMatchObject({ mobileNavProfileDisplay: 'icon', mobileNavShowTitles: true })
+    expect(normalizeBookishSettings({})).toMatchObject({ mobileNavProfileDisplay: 'avatar', mobileNavShowTitles: true })
     expect(normalizeBookishSettings({ mobileNavProfileDisplay: 'avatar', mobileNavShowTitles: false }))
       .toMatchObject({ mobileNavProfileDisplay: 'avatar', mobileNavShowTitles: false })
     expect(normalizeBookishSettings({ mobileNavProfileDisplay: 'other', mobileNavShowTitles: 'false' }))
-      .toMatchObject({ mobileNavProfileDisplay: 'icon', mobileNavShowTitles: true })
+      .toMatchObject({ mobileNavProfileDisplay: 'avatar', mobileNavShowTitles: true })
   })
 
   it('applies the saved app background palette with the color theme', () => {

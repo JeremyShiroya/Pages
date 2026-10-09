@@ -1,14 +1,19 @@
+
+import { mergeAutomaticMetadata } from './metadataPolicy'
+import { recoverLegacyMetadata } from './metadataRecovery'
 export const LIBRARY_DB_NAME = 'bookish-library'
 const DB_NAME = LIBRARY_DB_NAME
-// v3 adds `annotations` (highlights and notes). Version bumps must only ever
+// v4 adds document intelligence records. Version bumps must only ever
 // ADD stores here — existing ones hold the user's whole library.
-const DB_VERSION = 3
+const DB_VERSION = 4
 export const PROFILE_ID = 'local'
 export const DEFAULT_PROFILE = Object.freeze({
   id: PROFILE_ID,
   displayName: 'Reader',
   avatarType: 'image',
   avatarValue: '/images/User%20Avatars/default-user.jpeg',
+  profileTextMode: 'compliment',
+  bio: '',
 })
 
 const PROFILE_AVATAR_TYPES = new Set(['preset', 'image'])
@@ -59,6 +64,9 @@ export function openLibraryDB() {
         // Every read is "the annotations for this book", so index the book.
         store.createIndex('bookId', 'bookId', { unique: false })
       }
+      for (const name of ['documentEvidence', 'documentDecisions', 'metadataCandidates', 'intelligenceJobs']) {
+        if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath: 'bookId' })
+      }
     }
     request.onsuccess = (e) => resolve(e.target.result)
     request.onerror = (e) => reject(e.target.error)
@@ -89,6 +97,8 @@ export function normalizeProfile(profile, existing = null) {
     displayName: displayName || DEFAULT_PROFILE.displayName,
     avatarType: avatarType === 'preset' ? 'image' : avatarType,
     avatarValue: avatarValue || DEFAULT_PROFILE.avatarValue,
+    profileTextMode: (source.profileTextMode ?? existing?.profileTextMode) === 'bio' ? 'bio' : 'compliment',
+    bio: String(source.bio ?? existing?.bio ?? '').trim().slice(0, 240),
   }
 }
 
@@ -96,10 +106,24 @@ export const useLibraryStore = () => {
   const getBooks = async () => {
     const db = await openLibraryDB()
     return new Promise((resolve, reject) => {
-      const tx = db.transaction('books', 'readonly')
+      const tx = db.transaction(['books', 'documentEvidence'], 'readwrite')
       const req = tx.objectStore('books').getAll()
-      req.onsuccess = (e) => resolve(e.target.result)
-      req.onerror = (e) => reject(e.target.error)
+      let records = []
+      req.onsuccess = (e) => {
+        records = e.target.result
+        records.forEach((book, index) => {
+          if (book.metadataRecoveryVersion === 2 || book.format !== 'pdf' || !book.intelligence?.engineVersion || book.intelligence.engineVersion > 2 && book.metadataRecoveryVersion !== 1) return
+          const evidenceRequest = tx.objectStore('documentEvidence').get(book.id)
+          evidenceRequest.onsuccess = () => {
+            const recovered = recoverLegacyMetadata(book, evidenceRequest.result)
+            records[index] = { ...recovered, updatedAt: nextTimestamp(book.updatedAt) }
+            tx.objectStore('books').put(records[index])
+          }
+        })
+      }
+      tx.oncomplete = () => resolve(records)
+      tx.onerror = (e) => reject(e.target.error)
+      tx.onabort = (e) => reject(e.target.error ?? new DOMException('Transaction aborted'))
     })
   }
 
@@ -117,15 +141,117 @@ export const useLibraryStore = () => {
     return book
   }
 
-  const updateBook = async (book) => {
-    const updated = toPlainRecord({ ...book, updatedAt: nextTimestamp(book.updatedAt) })
+  // Device scans can race a format switch, an Open-with import, or a restart.
+  // Check the complete store (including hidden books) and insert in one
+  // readwrite transaction so one physical path can acquire only one record.
+  const addDeviceBookIfAbsent = async (bookData) => {
+    const path = String(bookData?.deviceImportPath || '')
+    if (!path) throw new Error('A device import needs a file path')
+    const now = new Date().toISOString()
+    const candidate = toPlainRecord({ ...bookData, id: crypto.randomUUID(), createdAt: now, updatedAt: now })
+    const db = await openLibraryDB()
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('books', 'readwrite')
+      const store = tx.objectStore('books')
+      let result = null
+      const request = store.getAll()
+      request.onsuccess = () => {
+        const existing = request.result.find((book) => book.deviceImportPath === path)
+        if (existing) result = { book: existing, created: false }
+        else {
+          result = { book: candidate, created: true }
+          store.put(candidate)
+        }
+      }
+      tx.oncomplete = () => resolve(result)
+      tx.onerror = (event) => reject(event.target.error)
+      tx.onabort = (event) => reject(event.target.error ?? new DOMException('Transaction aborted'))
+    })
+  }
+
+  // Repair records produced by older scan races. Remap playlists and notes in
+  // the same transaction as the delete, so nothing can point at a lost id.
+  const mergeDuplicateDeviceBooks = async (path, keeperId) => {
+    const db = await openLibraryDB()
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(['books', 'collections', 'annotations'], 'readwrite')
+      const bookStore = tx.objectStore('books')
+      const collectionStore = tx.objectStore('collections')
+      const annotationStore = tx.objectStore('annotations')
+      const values = {}
+      let removedIds = []
+      const maybeMerge = () => {
+        if (!values.books || !values.collections || !values.annotations) return
+        const matches = values.books.filter((book) => book.deviceImportPath === path)
+        const keeper = matches.find((book) => book.id === keeperId)
+        if (!keeper || matches.length < 2) return
+        const losers = matches.filter((book) => book.id !== keeperId)
+        removedIds = losers.map((book) => book.id)
+        const merged = { ...keeper }
+        const keepFields = new Set(['id', 'deviceImportPath', 'createdAt', 'updatedAt', 'progress', 'status', 'lastReadAt', 'isFavourite', 'isHidden'])
+        for (const loser of losers) {
+          for (const [field, value] of Object.entries(loser)) {
+            if (keepFields.has(field) || value === null || value === undefined || value === '') continue
+            if (merged[field] === null || merged[field] === undefined || merged[field] === '') merged[field] = value
+          }
+          if ((Number(loser.progress) || 0) > (Number(merged.progress) || 0)) {
+            merged.progress = loser.progress
+            merged.status = loser.status
+          }
+          if (String(loser.lastReadAt || '') > String(merged.lastReadAt || '')) merged.lastReadAt = loser.lastReadAt
+          merged.isFavourite = !!(merged.isFavourite || loser.isFavourite)
+          merged.isHidden = !!(merged.isHidden && loser.isHidden)
+        }
+        merged.updatedAt = nextTimestamp(merged.updatedAt)
+        bookStore.put(toPlainRecord(merged))
+        for (const id of removedIds) bookStore.delete(id)
+        const removed = new Set(removedIds.map(String))
+        for (const collection of values.collections) {
+          if (!(collection.bookIds || []).some((id) => removed.has(String(id)))) continue
+          collection.bookIds = [...new Set(collection.bookIds.map((id) => removed.has(String(id)) ? keeperId : id))]
+          collection.updatedAt = nextTimestamp(collection.updatedAt)
+          collectionStore.put(collection)
+        }
+        for (const annotation of values.annotations) {
+          if (removed.has(String(annotation.bookId))) {
+            annotationStore.put({ ...annotation, bookId: String(keeperId) })
+          }
+        }
+      }
+      for (const [name, store] of [['books', bookStore], ['collections', collectionStore], ['annotations', annotationStore]]) {
+        const request = store.getAll()
+        request.onsuccess = () => { values[name] = request.result; maybeMerge() }
+      }
+      tx.oncomplete = () => resolve(removedIds)
+      tx.onerror = (event) => reject(event.target.error)
+      tx.onabort = (event) => reject(event.target.error ?? new DOMException('Transaction aborted'))
+    })
+  }
+
+  const updateBook = async (book, { automaticMetadata = false } = {}) => {
+    let updated = toPlainRecord({ ...book, updatedAt: nextTimestamp(book.updatedAt) })
     const db = await openLibraryDB()
     await new Promise((resolve, reject) => {
       const tx = db.transaction('books', 'readwrite')
-      tx.objectStore('books').put(updated)
+      const store = tx.objectStore('books')
+      const request = store.get(updated.id)
+      request.onsuccess = () => {
+        // A delayed metadata update must not recreate a book removed by a
+        // format switch while its network request was in flight.
+        if (!request.result) {
+          tx.abort()
+          return
+        }
+        if (automaticMetadata) {
+          const current = request.result
+          if (book.updatedAt && book.updatedAt !== current.updatedAt) { tx.abort(); return }
+          updated = toPlainRecord({ ...mergeAutomaticMetadata(current, book), updatedAt: nextTimestamp(current.updatedAt) })
+        }
+        store.put(updated)
+      }
       tx.oncomplete = () => resolve()
       tx.onerror = (e) => reject(e.target.error)
-      tx.onabort = (e) => reject(e.target.error ?? new DOMException('Transaction aborted'))
+      tx.onabort = (e) => reject(e.target.error ?? new Error(`Book ${updated.id} no longer exists`))
     })
     return updated
   }
@@ -368,6 +494,8 @@ export const useLibraryStore = () => {
   return {
     getBooks,
     addBook,
+    addDeviceBookIfAbsent,
+    mergeDuplicateDeviceBooks,
     updateBook,
     deleteBook,
     getCollections,

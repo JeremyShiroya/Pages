@@ -1,3 +1,4 @@
+import { metadataEligible, metadataCandidateMatches } from './metadataPolicy'
 import { reactive, readonly } from 'vue'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
@@ -24,6 +25,7 @@ export const hasRatingLookup = (book, source) => (
 const goodreadsFromMetadata = async (book) => {
   const results = await fetchBookMetadataResults(book.title, book.author || undefined, undefined, { light: true })
   for (const result of results || []) {
+    if (!metadataCandidateMatches(book, result)) continue
     const parsed = parseGoodreadsReview(result?.webReview)
     if (!parsed.hasRating) continue
     return {
@@ -37,6 +39,7 @@ const goodreadsFromMetadata = async (book) => {
 }
 
 export async function fetchExternalBookRating(book, source) {
+  if (!metadataEligible(book)) return null
   if (source === 'goodreads') return goodreadsFromMetadata(book)
   if (source !== 'storygraph') return null
 
@@ -101,7 +104,7 @@ export function startRatingSync({ source, books, updateBook, addToast } = {}) {
         syncState.currentTitle = book.title
         try {
           const rating = await fetchExternalBookRating(book, source)
-          await updateBook(withExternalRating(book, source, rating || { rating: 0, fetchedAt: Date.now() }))
+          await updateBook(withExternalRating(book, source, rating || { rating: 0, fetchedAt: Date.now() }), { automaticMetadata: true })
           if (rating?.rating) syncState.updated += 1
           else syncState.unavailable += 1
         } catch {

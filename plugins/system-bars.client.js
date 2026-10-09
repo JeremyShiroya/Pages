@@ -76,6 +76,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     // cannot race it with a colour from the header or responsive shell.
     if (
       window.location.pathname.startsWith('/settings')
+      || window.location.pathname.startsWith('/listen-settings')
       || window.location.pathname.startsWith('/editprofilepage')
     ) return
 

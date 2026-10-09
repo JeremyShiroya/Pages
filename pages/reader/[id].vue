@@ -43,6 +43,7 @@
         @next-chapter="goToAdjacentChapter(1)"
         @mount-section="mountSection"
         @position-change="handleMobilePosition"
+        @page-sync="handlePageSync"
         @go-to-section="goToSectionFromMobile"
         @jump-to-toc="goToTocItem"
       />
@@ -91,6 +92,7 @@
         @next-chapter="goToAdjacentChapter(1)"
         @mount-section="mountSection"
         @position-change="handleMobilePosition"
+        @page-sync="handlePageSync"
         @go-to-section="goToSectionFromMobile"
         @jump-to-toc="goToTocItem"
       />
@@ -139,6 +141,7 @@
         @next-chapter="goToAdjacentChapter(1)"
         @mount-section="mountSection"
         @position-change="handleMobilePosition"
+        @page-sync="handlePageSync"
         @go-to-section="goToSectionFromMobile"
         @jump-to-toc="goToTocItem"
       />
@@ -346,6 +349,7 @@ import { createTabletReaderDomState } from '~/architectures/tablet/readerDomStat
 import { useBooks } from '~/composables/useBooks'
 import { isRenderableSection, buildReadableChunks, useTTS } from '~/composables/useTTS'
 import { useBookStorage } from '~/composables/useBookStorage'
+import { recordBookActivity } from '~/composables/useBookAnalytics'
 import { useBookishSettings } from '~/composables/useBookishSettings'
 import { sanitizeBookHtml } from '~/composables/useHtmlSanitizer'
 import {
@@ -419,6 +423,21 @@ const mobileReaderRefs = {
 }
 
 const book = ref(null)
+let readingActivityTimer = null
+let lastReadingActivityAt = 0
+function saveReadingActivity() {
+  if (!import.meta.client || !readerReady.value || !book.value || document.hidden) {
+    lastReadingActivityAt = Date.now()
+    return
+  }
+  const now = Date.now()
+  const elapsed = Math.max(0, Math.min(15, (now - lastReadingActivityAt) / 1000))
+  lastReadingActivityAt = now
+  if (ttsBook.value?.id === book.value.id && ttsStatus.value === 'playing') return
+  if (elapsed > 0) recordBookActivity(book.value.id, {
+    mode: 'read', seconds: elapsed, completed: book.value.status === 'Read',
+  })
+}
 const loading = ref(true)
 const contentLoading = ref(false)
 const rawContent = ref('')
@@ -961,6 +980,10 @@ function handleMobilePosition(position) {
   const section = Number(position?.section)
   if (!Number.isFinite(section)) return
   if (section !== currentChapterIdx.value) currentChapterIdx.value = section
+  const pageInSection = Number(position?.pageInSection)
+  if (Number.isInteger(pageInSection) && pageInSection >= 0 && book.value) {
+    recordBookActivity(book.value.id, { page: `${section}:${pageInSection}` })
+  }
 
   // The page's own chunk, so a page turn inside one chapter is a real position
   // change — that is what scroll mode reads back when the modes are swapped.
@@ -970,6 +993,24 @@ function handleMobilePosition(position) {
   }
 }
 
+// Page Sync commits the located page as the shared reading position. The
+// existing progress watcher then persists it for both Listen and Read.
+async function handlePageSync({ page, chunk }) {
+  if (isPdfRenderable.value) {
+    currentPdfPage.value = page
+    pdfViewerRef.value?.scrollToPage?.(page, 'instant')
+  } else {
+    const target = Number(chunk)
+    if (!Number.isFinite(target) || target < 0) return
+    if (pagedRef.value?.goToChunk) await pagedRef.value.goToChunk(target)
+    else {
+      currentChapterIdx.value = sectionForChunk(target)
+      await scrollToChunk(target)
+    }
+    currentReadingChunk.value = target
+  }
+  await flushPendingSave()
+}
 // Mobile Listen stepper (scroll mode) jumping to the section that owns a page.
 function goToSectionFromMobile(index) {
   if (!chapterList.value.length) return
@@ -1607,6 +1648,11 @@ async function saveReadingProgress(position) {
   book.value = updated
   try {
     await updateBook(updated)
+    recordBookActivity(updated.id, {
+      page: isPdfBook.value ? currentPdfPage.value : undefined,
+      chapter: readsAsEpub.value ? currentChapterIdx.value + 1 : undefined,
+      completed: updated.status === 'Read',
+    })
   } catch (err) {
     console.error('[Reader] Failed to save reading progress:', err)
   }
@@ -1773,6 +1819,17 @@ async function loadBook(id) {
     let stored = appliedPrewarmedContent ? prewarmedContent : null
     if (!stored && prewarmed?.promise) stored = await prewarmed.promise
     if (!stored && !appliedPrewarmedContent) stored = await getBookContent(id)
+    if (bookFormat.value === 'pdf' && !stored?.source && book.value?.deviceImportPath) {
+      try {
+        const { repairDevicePdfSource } = await import('~/composables/useDeviceLibrarySync')
+        if (await repairDevicePdfSource(book.value)) {
+          stored = await getBookContent(id)
+          if (stored) applyStoredReaderContent(stored)
+        }
+      } catch (error) {
+        console.warn('[Reader] Could not restore the original PDF pages:', error)
+      }
+    }
     if (stored) {
       if (!appliedPrewarmedContent) applyStoredReaderContent(stored)
 
@@ -2035,6 +2092,8 @@ onBeforeRouteLeave(async (to, from, next) => {
 let _windowUnloadHandler = null
 
 onMounted(async () => {
+  lastReadingActivityAt = Date.now()
+  readingActivityTimer = window.setInterval(saveReadingActivity, 10000)
   _windowUnloadHandler = () => { flushPendingSave() }
   if (import.meta.client) {
     window.addEventListener('beforeunload', _windowUnloadHandler)
@@ -2060,6 +2119,8 @@ onMounted(async () => {
 })
 
 onUnmounted(async () => {
+  saveReadingActivity()
+  if (readingActivityTimer) clearInterval(readingActivityTimer)
   if (import.meta.client && _windowUnloadHandler) {
     window.removeEventListener('beforeunload', _windowUnloadHandler)
     window.removeEventListener('pagehide', _windowUnloadHandler)

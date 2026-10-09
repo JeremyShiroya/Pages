@@ -69,7 +69,7 @@ describe('mobile home and profile refinements', () => {
     expect(hub).toContain(':collapse-actions="profileFavouritesLayout === \'list\'"')
     expect(hub).toContain('<SelectionActionsBar')
     expect(hub).toContain('useLongPress')
-    expect(hub).toContain('{{ dailyCompliment }}')
+    expect(hub).toContain("profile.profileTextMode === 'bio' && profile.bio ? profile.bio : dailyCompliment")
     expect(route).toContain('<ProfilePage />')
     expect(editor).toContain('<ProfileMobile />')
     expect(bottomNav).toContain('ri-user-smile-line')

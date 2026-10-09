@@ -10,7 +10,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.runWithContext(async () => {
       const { settings } = useBookishSettings()
       const { books, seriesList, updateBook, initialized, fetchAllData } = useBooks()
-      const { state: backfill, unmarkFalseStandalones } = useLibraryBackfill()
+      const { state: backfill } = useLibraryBackfill()
 
       if (!initialized.value) {
         try {
@@ -18,14 +18,15 @@ export default defineNuxtPlugin((nuxtApp) => {
         } catch {}
       }
 
-      const REALIGN_KEY = 'bookish:migration:v2.0-instant-series-realign'
+      const REALIGN_KEY = 'bookish:migration:v3-series-status'
       if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function' && !localStorage.getItem(REALIGN_KEY)) {
         try {
           const list = books.value || []
           if (list.length > 0) {
             if (settings.value.metadataAutoFill && settings.value.seriesSuggestions) {
               await unmarkFalseStandalones(list, updateBook)
-              await realignEntireLibrarySeries({ books: list, seriesList: seriesList?.value || [], updateBook })
+              // Network discovery belongs to the background worker. Waiting
+              // for a whole series crawl here delays all metadata at startup.
             }
             localStorage.setItem?.(REALIGN_KEY, 'true')
           }

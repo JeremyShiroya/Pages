@@ -468,6 +468,7 @@
               type="button"
               class="segment"
               :class="{ active: formatMode === opt.value }"
+              :disabled="applyingFormat"
               @click="chooseFormatMode(opt.value)"
             >{{ opt.label }}</button>
           </div>
@@ -634,6 +635,7 @@ const pendingFormatMessage = computed(() => {
 })
 
 const chooseFormatMode = async (mode) => {
+  if (applyingFormat.value) return
   if (mode === formatMode.value) return
   // Only a removal needs confirming; widening the set destroys nothing.
   const removes = formatsRemovedBy(
@@ -649,9 +651,11 @@ const chooseFormatMode = async (mode) => {
 
 const confirmFormatMode = async () => {
   if (applyingFormat.value || !pendingFormatMode.value) return
+  const mode = pendingFormatMode.value
+  pendingFormatMode.value = null
   applyingFormat.value = true
   try {
-    const { removed } = await applyFormatMode(pendingFormatMode.value)
+    const { removed } = await applyFormatMode(mode)
     addToast(
       removed > 0
         ? `Removed ${removed} book${removed === 1 ? '' : 's'} from your library.`
@@ -663,7 +667,6 @@ const confirmFormatMode = async () => {
     addToast('Could not change the book formats.', 'error')
   } finally {
     applyingFormat.value = false
-    pendingFormatMode.value = null
   }
 }
 </script>

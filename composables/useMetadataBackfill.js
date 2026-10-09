@@ -1,16 +1,20 @@
+import { metadataEligible, metadataCandidateMatches, selectMetadataCandidate } from './metadataPolicy'
 import { reactive, readonly } from 'vue'
 import { fetchBookMetadataResults } from '~/composables/useBookMetadataSearch'
 import { mergeMetadataIntoBook } from '~/composables/useDeviceLibrarySync'
 import { reconcileAndRepairBookSeries } from '~/composables/useSeriesRepair'
 import { isSeriesRepairProtected } from '~/composables/seriesMutationGuard'
+import { seriesMembership } from '~/utils/bookSeriesState'
 
 // Library-wide metadata backfill & Series Reconciliation used by Settings → Storage.
 
 export function needsSeriesLookup(book) {
-  return !String(book?.series ?? '').trim() && !book?.seriesChecked
+  if (!metadataEligible(book)) return false
+  return seriesMembership(book) === 'unknown'
 }
 
 export function missingMetadataFields(book) {
+  if (!metadataEligible(book)) return []
   if (!book?.title) return []
   const missing = []
 
@@ -42,30 +46,8 @@ const normalizeForMatch = (value) => String(value ?? '')
   .replace(/[^a-z0-9]+/g, ' ')
   .trim()
 
-export function metadataResultMatchesBook(book, result) {
-  if (!result) return false
-  const bookTitle = normalizeForMatch(book?.title)
-  const resultTitle = normalizeForMatch(result.title)
-  if (!bookTitle || !resultTitle) return false
-
-  const titleMatches = bookTitle === resultTitle
-    || bookTitle.includes(resultTitle)
-    || resultTitle.includes(bookTitle)
-  if (!titleMatches) return false
-
-  const bookAuthor = normalizeForMatch(book?.author)
-  const resultAuthor = normalizeForMatch(result.author)
-  if (bookAuthor && resultAuthor) {
-    return bookAuthor === resultAuthor
-      || bookAuthor.includes(resultAuthor)
-      || resultAuthor.includes(bookAuthor)
-  }
-  return true
-}
-
-export function bestMetadataResultForBook(book, results = []) {
-  return (results || []).find((result) => metadataResultMatchesBook(book, result)) || null
-}
+export const metadataResultMatchesBook = metadataCandidateMatches
+export const bestMetadataResultForBook = selectMetadataCandidate
 
 export function markMetadataCheck(book, { now = Date.now(), lookedUp = true } = {}) {
   const record = { ...book }
@@ -102,16 +84,16 @@ export function applyMetadataResult(book, meta, { didLookup = true, isLightPass 
       ? meta.sourceTags.some((tag) => ['goodreads', 'hardcover', 'kobo', 'wikidata'].includes(tag))
       : Boolean(meta?.primarySource && ['goodreads', 'hardcover', 'kobo', 'wikidata'].includes(meta.primarySource)))
 
-  const resolveStandalone = didLookup && !isLightPass && hadNoSeries && stillNoSeries && !book?.seriesChecked && !!meta?.title && hasMultiSourceVerification
+  const resolveStandalone = didLookup && !isLightPass && hadNoSeries && stillNoSeries && !book?.seriesChecked && metadataCandidateMatches(book, meta) && meta?.seriesStatus === 'standalone'
 
   if (!merged && !resolveStandalone) return { record: null, filled: false }
   const record = { ...(merged || book) }
-  if (resolveStandalone) record.seriesChecked = true
+  if (resolveStandalone) { record.seriesChecked = true; record.seriesStatus = 'standalone' }
   return { record, filled: !!merged }
 }
 
 export async function unmarkFalseStandalones(books, updateBook) {
-  const falseStandalones = (books || []).filter((book) => !String(book?.series ?? '').trim())
+  const falseStandalones = (books || []).filter((book) => metadataEligible(book) && seriesMembership(book) === 'unknown')
   for (const book of falseStandalones) {
     if (isSeriesRepairProtected(book)) continue
     await updateBook({ ...book, seriesChecked: false, metaCheckedAt: 0 }, {
@@ -146,16 +128,20 @@ export async function backfillLibraryMetadata({ books, updateBook, onProgress, s
     const book = allBooks[index]
     onProgress?.({ current: index + 1, total: totalSteps, title: book.title })
 
+    if (!metadataEligible(book)) {
+      diagnostics.push({ bookId: book.id, title: book.title, decision: 'SKIPPED', reason: 'PDF sorting: personal or undecided file; use its edit page to change its type.' })
+      continue
+    }
     try {
       // Step 1: Missing non-series metadata pass (cover, blurb, genre, publishYear)
-      const results = await fetcher(book.title, book.author || undefined, undefined, { light: true })
+      const results = await fetcher(book.title, book.author || undefined, undefined, { light: false, force: true })
       const match = bestMetadataResultForBook(book, results)
       const { record: backfilledRecord, filled } = applyMetadataResult(book, match, { didLookup: !!match, isLightPass: true })
       
       if (filled) updated += 1
 
       // Step 2: Series Reconciliation & Repair Pass against original book state
-      const repairResult = reconcileAndRepairBookSeries(book, results || [])
+      const repairResult = reconcileAndRepairBookSeries(book, match ? [match] : [])
       
       const diagEntry = {
         bookId: book.id,
@@ -173,17 +159,17 @@ export async function backfillLibraryMetadata({ books, updateBook, onProgress, s
       if (repairResult.decision === 'PROTECTED') {
         protectedCount += 1
         if (backfilledRecord) {
-          await updateBook(markMetadataCheck(backfilledRecord))
+          await updateBook(markMetadataCheck(backfilledRecord), { automaticMetadata: true })
         }
       } else if (repairResult.decision === 'LOW_CONFIDENCE') {
         lowConfidenceCount += 1
         if (backfilledRecord) {
-          await updateBook(markMetadataCheck(backfilledRecord))
+          await updateBook(markMetadataCheck(backfilledRecord), { automaticMetadata: true })
         }
       } else if (repairResult.decision === 'UNCHANGED') {
         unchangedCount += 1
         if (backfilledRecord) {
-          await updateBook(markMetadataCheck(backfilledRecord))
+          await updateBook(markMetadataCheck(backfilledRecord), { automaticMetadata: true })
         }
       } else if (repairResult.decision === 'REPAIRED') {
         repairedCount += 1
@@ -196,7 +182,7 @@ export async function backfillLibraryMetadata({ books, updateBook, onProgress, s
               seriesChecked: true,
             }
           : repairResult.record
-        await updateBook(markMetadataCheck(combinedRecord))
+        await updateBook(markMetadataCheck(combinedRecord), { automaticMetadata: true })
       }
     } catch (error) {
       failures.push({ id: book.id, title: book.title, reason: friendlyMetadataFailure(error) })
@@ -216,6 +202,8 @@ export async function backfillLibraryMetadata({ books, updateBook, onProgress, s
   return {
     total: allBooks.length,
     updated,
+    searched: allBooks.length - diagnostics.filter((d) => d.decision === 'SKIPPED').length,
+    skipped: diagnostics.filter((d) => d.decision === 'SKIPPED').length,
     repairedCount,
     protectedCount,
     lowConfidenceCount,

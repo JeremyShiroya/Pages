@@ -42,9 +42,11 @@ export const propagateSeriesTotal = async ({
   if (!Number.isSafeInteger(total) || total < 1) return 0;
 
   const target = normalizeSeriesName(seriesName);
-  const matchingBooks = books.filter((book) => normalizeSeriesName(book?.series) === target);
+  const matchingBooks = books.filter((book) => normalizeSeriesName(book?.series) === target
+    && book.userDefined !== true && !book.userDefined?.seriesTotal && !book.userDefined?.series
+    && total >= (Number(book.seriesTotal) || 0));
   await Promise.all(matchingBooks.map((book) => (
-    updateBook({ ...book, seriesTotal: total })
+    updateBook({ ...book, seriesTotal: total }, { automaticMetadata: true })
   )));
   return matchingBooks.length;
 };
@@ -76,7 +78,7 @@ export const ensureSeriesTotal = async ({
       const total = metadataSeriesTotal(results, seriesName, highestInstallment);
       if (!total) continue;
 
-      if (total !== storedTotal || (storedTotal === 1 && total > 1)) {
+      if (total > (storedTotal || 0)) {
         await propagateSeriesTotal({
           seriesName,
           seriesTotal: total,
@@ -85,7 +87,7 @@ export const ensureSeriesTotal = async ({
         });
         return total;
       }
-      return total;
+      return Math.max(total, storedTotal || 0);
     } catch {
       // Try another owned installment before falling back to the local count.
     }

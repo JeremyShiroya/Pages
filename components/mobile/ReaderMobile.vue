@@ -7,8 +7,8 @@
       'listen-blur': readerMode === 'listen' && listenBlurEnabled,
     }]"
     :style="readerStyleVars"
-    :data-system-bar-icons="readerMode === 'listen' && listenBlurEnabled ? 'light' : (readerTheme === 'dark' ? 'light' : 'dark')"
-    :data-system-bar-color="readerMode === 'listen' && listenBlurEnabled ? 'transparent' : undefined"
+    :data-system-bar-icons="pageSyncOpen ? 'light' : (pageSyncWorking || pageSyncError ? 'dark' : readerMode === 'listen' && listenBlurEnabled ? 'light' : (readerTheme === 'dark' ? 'light' : 'dark'))"
+    :data-system-bar-color="pageSyncOpen || (readerMode === 'listen' && listenBlurEnabled) ? 'transparent' : undefined"
   >
     <header v-show="!chromeHidden" class="reader-mobile-topbar">
       <button
@@ -41,9 +41,6 @@
         </button>
       </div>
 
-      <!-- Both controls belong to reading. Listen mode already has the whole
-           player on screen (speed, narrator, seek) and has no text to typeset,
-           so its top-right corner stays empty. -->
       <div v-if="readerMode !== 'listen'" class="reader-top-actions">
         <button
           type="button"
@@ -62,7 +59,11 @@
           <i class="ri-equalizer-line"></i>
         </button>
       </div>
-      <div v-else class="reader-top-actions"></div>
+      <div v-else class="reader-top-actions">
+        <button type="button" class="reader-nav-btn" aria-label="Listen settings" @click="openListenSettings">
+          <i class="ri-settings-3-line"></i>
+        </button>
+      </div>
     </header>
 
     <div
@@ -84,6 +85,12 @@
         </div>
         <h2 class="listen-title">{{ book.title }}</h2>
         <p class="listen-byline">{{ listenByline }}</p>
+        <div class="listen-summary">
+          <span>{{ listenSummaryText }}</span>
+          <button type="button" class="listen-summary-toggle" :aria-label="listenSummaryMode === 'remaining' ? 'Show listened time' : 'Show time left'" @click="listenSummaryMode = listenSummaryMode === 'remaining' ? 'listened' : 'remaining'">
+            <i class="ri-expand-vertical-s-line"></i>
+          </button>
+        </div>
 
         <div class="listen-text">
           <Transition name="listen-sentence">
@@ -107,18 +114,23 @@
           </p>
         </div>
 
+        <button type="button" class="listen-page-sync" @click="openPageSync">
+          <i class="ri-file-search-line" aria-hidden="true"></i>
+          Page Sync
+        </button>
+
         <div class="listen-progress">
-          <span>{{ listenElapsed }}</span>
+          <span>{{ listenBarElapsed }}</span>
           <input
             type="range"
             min="0"
             max="100"
-            :value="listenProgress"
-            :style="{ '--fill': `${listenProgress}%` }"
-            aria-label="Audio progress"
-            @input="seekToProgress(Number($event.target.value))"
+            :value="listenBarProgress"
+            :style="{ '--fill': `${listenBarProgress}%` }"
+            :aria-label="`${listenBarScopeLabel} audio progress`"
+            @input="seekListenBar(Number($event.target.value))"
           />
-          <span>{{ listenTotal }}</span>
+          <span>{{ listenBarTotal }}</span>
         </div>
 
         <div class="listen-controls">
@@ -130,8 +142,8 @@
           >
             {{ speedLabel }}
           </button>
-          <button type="button" class="listen-skip" aria-label="Back 10 seconds" @click="skipSeconds(-10)">
-            <i class="ri-replay-10-line"></i>
+          <button type="button" class="listen-skip" :aria-label="`Back ${listenBackSeconds} seconds`" @click="skipSeconds(-listenBackSeconds)">
+            <i class="ri-arrow-go-back-line"></i><span>{{ listenBackSeconds }}</span>
           </button>
           <button
             type="button"
@@ -141,8 +153,8 @@
           >
             <i :class="isPlaying ? 'ri-pause-fill' : 'ri-play-fill'"></i>
           </button>
-          <button type="button" class="listen-skip" aria-label="Forward 10 seconds" @click="skipSeconds(10)">
-            <i class="ri-forward-10-line"></i>
+          <button type="button" class="listen-skip" :aria-label="`Forward ${listenForwardSeconds} seconds`" @click="skipSeconds(listenForwardSeconds)">
+            <i class="ri-arrow-go-forward-line"></i><span>{{ listenForwardSeconds }}</span>
           </button>
           <button
             type="button"
@@ -178,6 +190,44 @@
         </div>
       </template>
     </div>
+
+    <Teleport to="body">
+      <div v-if="pageSyncOpen" class="page-sync-overlay" role="dialog" aria-modal="true" aria-label="Page Sync camera">
+        <video ref="pageSyncVideo" autoplay playsinline muted class="page-sync-video"></video>
+        <div class="page-sync-shade" aria-hidden="true"><div ref="pageSyncFrame" class="page-sync-frame"></div></div>
+        <div class="page-sync-top">
+          <button type="button" aria-label="Close Page Sync" @click="closePageSync"><i class="ri-close-line"></i></button>
+          <strong>Page Sync</strong>
+        </div>
+        <div class="page-sync-bottom">
+          <p>Fit one printed page inside the purple frame</p>
+          <button type="button" class="page-sync-shutter" aria-label="Capture page" :disabled="!pageSyncReady" @click="capturePageSync"></button>
+          <button type="button" class="page-sync-upload" @click="pageSyncFile?.click()">Choose a photo</button>
+        </div>
+        <input ref="pageSyncFile" class="page-sync-file" type="file" accept="image/*" capture="environment" @change="onPageSyncFile" />
+      </div>
+      <div v-if="pageSyncWorking" class="page-sync-overlay page-sync-working" role="dialog" aria-modal="true" aria-label="Finding your page">
+        <section class="page-sync-status">
+          <i class="ri-file-search-line"></i>
+          <h2>Finding your page</h2>
+          <ol>
+            <li v-for="(phase, index) in pageSyncPhases" :key="phase" :class="{ active: index === pageSyncPhase, done: index < pageSyncPhase }">
+              <i :class="index < pageSyncPhase ? 'ri-check-line' : index === pageSyncPhase ? 'ri-loader-4-line page-sync-spin' : 'ri-circle-line'"></i>
+              {{ phase }}
+            </li>
+          </ol>
+        </section>
+      </div>
+      <div v-if="pageSyncError" class="page-sync-overlay page-sync-working" role="alertdialog" aria-modal="true" aria-label="Page Sync could not find the page">
+        <section class="page-sync-status">
+          <i class="ri-file-search-line"></i>
+          <h2>Page not found</h2>
+          <p>{{ pageSyncError }}</p>
+          <button type="button" @click="pageSyncError = ''; openPageSync()">Try again</button>
+          <button type="button" class="page-sync-dismiss" @click="pageSyncError = ''">Cancel</button>
+        </section>
+      </div>
+    </Teleport>
 
     <main
       class="reader-mobile-content"
@@ -823,14 +873,17 @@
 
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { registerPlugin } from "@capacitor/core";
+import { findPageSyncMatch } from "~/composables/usePageSyncMatch";
 import { onCoverError } from "~/composables/useCoverFallback";
 import { offeredDeviceVoices } from "~/composables/tts/nativeSpeech";
 import { shouldAskWhereToResume } from "~/composables/useResumePrompt";
 import { firstChunkForPage, pageForChunk } from "~/composables/usePdfManifest";
 import PdfViewer from "~/components/shared/PdfViewer.vue";
 import SkeletonLoader from "~/components/shared/SkeletonLoader.vue";
-import { useTTS } from "~/composables/useTTS";
+import { formatDuration, useTTS } from "~/composables/useTTS";
+import { estimatedListenTimeline, scopedListenProgress } from "~/composables/useListenProgress";
 import { isNativeCapacitorPlatform } from "~/composables/useNativePlatform";
 import { useBookishSettings } from "~/composables/useBookishSettings";
 import { mapSectionChunks } from "~/composables/useChunkSpans";
@@ -929,6 +982,7 @@ const emit = defineEmits([
   "position-change",
   "go-to-section",
   "jump-to-toc",
+  "page-sync",
 ]);
 
 const route = useRoute();
@@ -937,6 +991,8 @@ const {
   ttsBook,
   ttsStatus,
   ttsProgress,
+  ttsChunkIdx,
+  ttsChapterBoundaries,
   ttsSpeed,
   ttsVoices,
   ttsVoiceId,
@@ -1587,6 +1643,11 @@ const toggleMediaPlay = () => {
 const READER_MODE_KEY = "bookish:reader-mode";
 
 const { settings: appSettings } = useBookishSettings();
+const router = useRouter();
+const openListenSettings = () => router.push(`/listen-settings/${encodeURIComponent(String(props.book.id))}`);
+const listenSummaryMode = ref("remaining");
+const listenBackSeconds = computed(() => appSettings.value.listenBackSeconds);
+const listenForwardSeconds = computed(() => appSettings.value.listenForwardSeconds);
 const { addToast } = useToast();
 const { annotations } = useAnnotations();
 
@@ -1738,10 +1799,6 @@ const listenByline = computed(() => {
   const year = props.book?.publishYear ? String(props.book.publishYear) : "";
   return [author, year].filter(Boolean).join(" · ");
 });
-
-const listenProgress = computed(() => (isThisBookNarrating.value ? ttsProgress.value || 0 : 0));
-const listenElapsed = computed(() => (isThisBookNarrating.value ? elapsedTime.value || "00:00" : "00:00"));
-const listenTotal = computed(() => (isThisBookNarrating.value ? totalTime.value || "00:00" : "00:00"));
 
 // Which section (ch-N) / PDF page a flat chunk index falls in.
 const sectionForChunkLocal = (chunkIndex) => {
@@ -1913,6 +1970,81 @@ const listenSpokenWordIndex = computed(() => {
   while (wordIndex + 1 < starts.length && starts[wordIndex + 1] <= charIndex) wordIndex += 1;
   return wordIndex;
 });
+
+const listenCurrentChunk = computed(() => isThisBookNarrating.value
+  ? Math.max(0, Number(ttsChunkIdx.value) || 0)
+  : Math.max(0, Number(listenStartChunk.value) || 0));
+const listenCurrentChunkFraction = computed(() => {
+  if (!isThisBookNarrating.value || ttsWordIdx.value < 0) return 0;
+  const words = String(props.readableChunks[listenCurrentChunk.value] || "").trim().split(/\s+/).filter(Boolean).length;
+  return words ? Math.min(1, (ttsWordIdx.value + 1) / words) : 0;
+});
+const listenTimeline = computed(() => estimatedListenTimeline(props.readableChunks, ttsSpeed.value));
+const listenChapterRange = computed(() => {
+  const total = props.readableChunks.length;
+  if (!total) return null;
+  const current = listenCurrentChunk.value;
+  if (props.isPdfBook) {
+    const chunks = props.pdfManifest?.chunks || [];
+    const starts = [...new Set((props.tocItems || [])
+      .filter((item) => item.type === "pdf" && Number.isFinite(Number(item.page)))
+      .map((item) => chunks.find((chunk) => chunk.page >= Number(item.page))?.id)
+      .filter((index) => Number.isFinite(index)))].sort((a, b) => a - b);
+    if (!starts.length) return null;
+    const at = Math.max(0, starts.findLastIndex((start) => start <= current));
+    return { start: starts[at], end: (starts[at + 1] ?? total) - 1 };
+  }
+  if (isThisBookNarrating.value) {
+    const boundary = (ttsChapterBoundaries.value || []).find(
+      (item) => current >= item.chunkStart && current <= item.chunkEnd,
+    );
+    if (boundary) return { start: boundary.chunkStart, end: boundary.chunkEnd };
+  }
+  let start = 0;
+  for (const count of props.sectionCounts || []) {
+    const end = start + Math.max(0, Number(count) || 0) - 1;
+    if (current <= end) return { start, end };
+    start = end + 1;
+  }
+  return null;
+});
+const scopeRange = (scope) => scope === "chapter" && listenChapterRange.value
+  ? listenChapterRange.value
+  : { start: 0, end: Math.max(0, props.readableChunks.length - 1) };
+const listenBarStats = computed(() => {
+  const range = scopeRange(appSettings.value.listenBarScope);
+  return scopedListenProgress(listenTimeline.value, listenCurrentChunk.value, range.start, range.end, listenCurrentChunkFraction.value);
+});
+const listenSummaryStats = computed(() => {
+  const range = scopeRange(appSettings.value.listenSummaryScope);
+  return scopedListenProgress(listenTimeline.value, listenCurrentChunk.value, range.start, range.end, listenCurrentChunkFraction.value);
+});
+const listenBarProgress = computed(() => listenBarStats.value.percent);
+const listenBarElapsed = computed(() => formatDuration(listenBarStats.value.elapsed));
+const listenBarTotal = computed(() => formatDuration(listenBarStats.value.total));
+const listenBarScopeLabel = computed(() => appSettings.value.listenBarScope === "chapter" && listenChapterRange.value ? "Chapter" : "Book");
+const formatListenTime = (seconds) => {
+  const minutes = Math.max(0, Math.round(seconds / 60));
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  if (!hours) return `${minutes} ${minutes === 1 ? "min" : "mins"}`;
+  return `${hours} ${hours === 1 ? "hour" : "hours"}${remainder ? ` ${remainder} ${remainder === 1 ? "min" : "mins"}` : ""}`;
+};
+const listenSummaryText = computed(() => {
+  const { total, elapsed, percent } = listenSummaryStats.value;
+  if (!total) return "Time estimate unavailable";
+  return listenSummaryMode.value === "remaining"
+    ? `${formatListenTime(total - elapsed)} left at ${ttsSpeed.value}x (${100 - percent}%)`
+    : `Listened to ${formatListenTime(elapsed)} (${percent}%)`;
+});
+const seekListenBar = (percent) => {
+  if (appSettings.value.listenBarScope !== "chapter" || !listenChapterRange.value) {
+    seekToProgress(percent);
+    return;
+  }
+  const { start, end } = listenChapterRange.value;
+  seekToChunk(Math.min(end, start + Math.floor((percent / 100) * (end - start + 1))));
+};
 const listenWordWindowStart = computed(() => {
   const spokenIndex = listenSpokenWordIndex.value;
   return Math.floor(Math.max(0, spokenIndex) / LISTEN_WORD_WINDOW_SIZE) * LISTEN_WORD_WINDOW_SIZE;
@@ -1990,6 +2122,150 @@ const stepListenPage = (delta) => {
   // Scroll mode: move the reading position to the section holding that page.
   const chunk = firstChunkOnPage(map.chunkPages, target);
   if (chunk >= 0) emit("go-to-section", sectionForChunkLocal(chunk));
+};
+
+const pageSyncPlugin = registerPlugin("PageSync");
+const pageSyncPhases = ["Reading the photo", "Searching this book", "Moving to your page"];
+const pageSyncOpen = ref(false);
+const pageSyncWorking = ref(false);
+const pageSyncError = ref("");
+const pageSyncPhase = ref(0);
+const pageSyncReady = ref(false);
+const pageSyncVideo = ref(null);
+const pageSyncFrame = ref(null);
+const pageSyncFile = ref(null);
+let pageSyncStream = null;
+
+const stopPageSyncCamera = () => {
+  pageSyncStream?.getTracks().forEach((track) => track.stop());
+  pageSyncStream = null;
+  pageSyncReady.value = false;
+};
+const closePageSync = () => {
+  pageSyncOpen.value = false;
+  stopPageSyncCamera();
+};
+const openPageSync = async () => {
+  pageSyncError.value = "";
+  pageSyncOpen.value = true;
+  await nextTick();
+  try {
+    pageSyncStream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    });
+    if (!pageSyncOpen.value) return stopPageSyncCamera();
+    pageSyncVideo.value.srcObject = pageSyncStream;
+    await pageSyncVideo.value.play();
+    pageSyncReady.value = true;
+  } catch {
+    // The native photo picker remains available when a browser cannot stream
+    // the camera or the user prefers to use a photo already taken.
+    stopPageSyncCamera();
+  }
+};
+
+const pageSyncPages = () => {
+  const groups = new Map();
+  if (props.isPdfBook) {
+    for (const item of props.pdfManifest?.chunks || []) {
+      const page = Number(item.page);
+      if (!Number.isFinite(page)) continue;
+      if (!groups.has(page)) groups.set(page, { page, chunk: item.id, text: "" });
+      groups.get(page).text += ` ${item.text || ""}`;
+    }
+  } else {
+    for (let chunk = 0; chunk < props.readableChunks.length; chunk += 1) {
+      const zeroPage = pageMap.value?.chunkPages?.[chunk];
+      if (!Number.isFinite(zeroPage)) continue;
+      const page = zeroPage + 1;
+      if (!groups.has(page)) groups.set(page, { page, chunk, text: "" });
+      groups.get(page).text += ` ${props.readableChunks[chunk] || ""}`;
+    }
+  }
+  return [...groups.values()];
+};
+
+const recognizePageSyncImage = async (dataUrl) => {
+  if (isNativeCapacitorPlatform()) {
+    const result = await pageSyncPlugin.recognize({ image: dataUrl.split(",")[1] });
+    return result.text || "";
+  }
+  if (typeof window.TextDetector === "function") {
+    const blob = await (await fetch(dataUrl)).blob();
+    const bitmap = await createImageBitmap(blob);
+    try {
+      const blocks = await new window.TextDetector().detect(bitmap);
+      return blocks.map((block) => block.rawValue).join(" ");
+    } finally {
+      bitmap.close();
+    }
+  }
+  throw new Error("Page Sync text recognition is available in the Android app on this device.");
+};
+
+const processPageSyncImage = async (dataUrl) => {
+  closePageSync();
+  pageSyncPhase.value = 0;
+  pageSyncWorking.value = true;
+  try {
+    const phasePause = () => new Promise((resolve) => setTimeout(resolve, 450));
+    const text = await recognizePageSyncImage(dataUrl);
+    if (!text.trim()) throw new Error("No text was visible. Try a brighter, sharper photo of one page.");
+    await phasePause();
+    pageSyncPhase.value = 1;
+    // EPUB pagination can still be measuring when Listen first opens.
+    for (let attempt = 0; !props.isPdfBook && !pageMap.value && attempt < 40; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    const match = findPageSyncMatch(text, pageSyncPages());
+    if (!match) throw new Error("The photo did not match a page confidently. Keep the page flat and include several lines of text.");
+    await phasePause();
+    pageSyncPhase.value = 2;
+    if (isThisBookNarrating.value && Number.isFinite(match.chunk)) seekToChunk(match.chunk);
+    emit("page-sync", { page: match.page, chunk: match.chunk });
+    await phasePause();
+  } catch (error) {
+    pageSyncError.value = error?.message || "Could not scan this page. Please try again.";
+  } finally {
+    pageSyncWorking.value = false;
+  }
+};
+
+const capturePageSync = () => {
+  const video = pageSyncVideo.value;
+  const frame = pageSyncFrame.value?.getBoundingClientRect();
+  const shown = video?.getBoundingClientRect();
+  if (!video?.videoWidth || !frame || !shown) return;
+  const scale = Math.max(shown.width / video.videoWidth, shown.height / video.videoHeight);
+  const visibleWidth = shown.width / scale;
+  const visibleHeight = shown.height / scale;
+  const left = (video.videoWidth - visibleWidth) / 2 + (frame.left - shown.left) / scale;
+  const top = (video.videoHeight - visibleHeight) / 2 + (frame.top - shown.top) / scale;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(frame.width / scale);
+  canvas.height = Math.round(frame.height / scale);
+  canvas.getContext("2d").drawImage(video, left, top, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+  processPageSyncImage(canvas.toDataURL("image/jpeg", 0.88));
+};
+
+const onPageSyncFile = async (event) => {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (!file) return;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 1800 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    processPageSyncImage(canvas.toDataURL("image/jpeg", 0.88));
+  } catch {
+    closePageSync();
+    pageSyncError.value = "The photo could not be opened. Try taking another one.";
+  }
 };
 
 // Narrator picker opened from the Listen controls (mirrors the media sheet's
@@ -2418,6 +2694,7 @@ watch(
 );
 
 onUnmounted(() => {
+  stopPageSyncCamera();
   window.removeEventListener("scroll", onScroll);
   window.removeEventListener("touchstart", noteInteraction);
   window.removeEventListener("touchmove", noteInteraction);
@@ -2601,10 +2878,11 @@ onUnmounted(() => {
 
 .listen-cover img {
   display: block;
-  width: min(64vw, 242px);
-  max-height: 47vh;
-  border-radius: 6px;
-  object-fit: cover;
+  width: auto;
+  height: auto;
+  max-width: min(64vw, 242px);
+  max-height: 41vh;
+  border-radius: 8px;
   box-shadow: var(--shadow-cover);
 }
 
@@ -2617,15 +2895,45 @@ onUnmounted(() => {
 }
 
 .listen-byline {
-  margin: 0 0 18px;
+  margin: 0 0 7px;
   color: var(--mobile-reader-muted);
   font-size: 12.5px;
   text-align: center;
 }
 
+.listen-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 30px;
+  margin-bottom: 12px;
+  color: var(--mobile-reader-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+.listen-summary-toggle {
+  position: relative;
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .18);
+  color: var(--mobile-reader-text);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.listen-summary-toggle i { position: absolute; top: 50%; left: 50%; display: block; line-height: 1; transform: translate(-50%, -50%); }
+
 .listen-progress {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 38px;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
   gap: 6px;
   align-items: center;
   width: 100%;
@@ -2684,8 +2992,12 @@ onUnmounted(() => {
 }
 
 .listen-controls .listen-skip {
-  font-size: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 21px;
 }
+.listen-controls .listen-skip span { font-size: 10px; font-weight: 700; line-height: 1; }
 
 .listen-controls .listen-play {
   font-size: 38px;
@@ -2787,6 +3099,71 @@ onUnmounted(() => {
   align-items: center;
   padding-inline: 6px;
 }
+
+.listen-page-sync {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  gap: 7px;
+  min-height: 32px;
+  margin: 0 0 12px 6px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--mobile-reader-text) 16%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mobile-reader-surface) 70%, transparent);
+  color: var(--mobile-reader-text);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.listen-page-sync i { font-size: 15px; }
+.reader-listen-view.bg-blur .listen-page-sync {
+  border-color: rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .24);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+.reader-listen-view.bg-blur .listen-summary { color: rgba(255, 255, 255, .84); text-shadow: 0 1px 4px rgba(0, 0, 0, .5); }
+.reader-listen-view.bg-blur .listen-summary-toggle { color: #fff; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+.page-sync-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  overflow: hidden;
+  background: #080511;
+  color: white;
+  font-family: inherit;
+}
+.page-sync-video { width: 100%; height: 100%; object-fit: cover; }
+.page-sync-shade { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5, 3, 13, .32); pointer-events: none; }
+.page-sync-frame { width: min(84vw, 470px); height: min(62vh, 660px); border: 3px solid #b26bff; border-radius: 14px; box-shadow: 0 0 0 999px rgba(5, 3, 13, .38), 0 0 24px #a35aff88; }
+.page-sync-top { position: absolute; top: calc(16px + env(safe-area-inset-top)); left: 18px; right: 18px; display: flex; align-items: center; gap: 16px; font-size: 17px; }
+.page-sync-top button { border: 0; background: #22172f; color: white; width: 42px; height: 42px; border-radius: 50%; font-size: 24px; }
+.page-sync-bottom { position: absolute; bottom: calc(22px + env(safe-area-inset-bottom)); left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.page-sync-bottom p { margin: 0; font-size: 14px; text-align: center; text-shadow: 0 1px 5px black; }
+.page-sync-shutter { width: 74px; height: 74px; border: 6px solid white; border-radius: 50%; background: #a65cf0; box-shadow: inset 0 0 0 4px #a65cf0; }
+.page-sync-shutter:disabled { opacity: .45; }
+.page-sync-upload { border: 0; background: none; color: white; text-decoration: underline; font: inherit; font-size: 13px; }
+.page-sync-file { display: none; }
+.page-sync-working { display: grid; place-items: center; padding: 24px; background: #f8f8fa; color: #29252e; }
+.page-sync-status { width: min(100%, 380px); padding: 30px 26px; border: 1px solid #e7e5ea; border-radius: 22px; background: #fff; box-shadow: 0 10px 35px rgba(35, 25, 45, .07); text-align: center; }
+.page-sync-status > i { font-size: 38px; color: #61586b; }
+.page-sync-status h2 { margin: 12px 0 20px; font-size: 21px; }
+.page-sync-status p { line-height: 1.5; }
+.page-sync-status ol { list-style: none; padding: 0; margin: 0; text-align: left; }
+.page-sync-status li { display: flex; align-items: center; gap: 12px; padding: 10px 0; color: #a29ca9; }
+.page-sync-status li.active, .page-sync-status li.done { color: #29252e; }
+.page-sync-status li i { font-size: 20px; color: #70667b; }
+.page-sync-spin { display: inline-block; animation: page-sync-spin 1s linear infinite; }
+@keyframes page-sync-spin { to { transform: rotate(360deg); } }
+.page-sync-status button { min-height: 42px; margin: 7px; padding: 0 18px; border: 0; border-radius: 999px; background: #302b35; color: white; font: inherit; }
+.page-sync-status button.page-sync-dismiss { background: transparent; color: #514a59; }
 
 .listen-text-inner {
   grid-area: 1 / 1;
@@ -2930,37 +3307,28 @@ onUnmounted(() => {
   color: #fff;
 }
 
-/* The fixed topbar paints above the blurred backdrop — let the image show
-   through it, and lift its controls onto the imagery like the card text. */
+/* Let the blurred cover continue behind Listen's navigation controls. */
 .reader-mobile-page.listen-blur .reader-mobile-topbar {
   background: transparent;
 }
-
 .reader-mobile-page.listen-blur .reader-nav-btn {
   color: #fff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .55);
 }
-
-/* Listen mode: frosted glass over the blurred cover — the purple pill read as a
-   foreign UI chip on top of the artwork. */
 .reader-mobile-page.listen-blur .reader-mode-toggle {
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .1);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
 }
-
 .reader-mobile-page.listen-blur .reader-mode-toggle button {
-  color: rgba(255, 255, 255, 0.72);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, .72);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .45);
 }
-
 .reader-mobile-page.listen-blur .reader-mode-toggle button.active {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, .24);
   color: #fff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 2px 8px rgba(0, 0, 0, .22);
 }
 
 .reader-listen-view.bg-blur .listen-text-inner,
@@ -2985,12 +3353,13 @@ onUnmounted(() => {
 
 @media (max-height: 700px) {
   .listen-cover img {
-    width: min(51vw, 190px);
-    max-height: 40vh;
+    max-width: min(51vw, 190px);
+    max-height: 35vh;
   }
 
   .listen-title { margin-top: 10px; }
-  .listen-byline { margin-bottom: 10px; }
+  .listen-byline { margin-bottom: 4px; }
+  .listen-summary { margin-bottom: 6px; }
   .listen-text {
     flex-basis: 58px;
   }

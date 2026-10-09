@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reset Pages</title>
+<body style="font:16px system-ui;padding:32px"><h1>Reset Pages</h1><p id="status">Clearing app data…</p>
+<script type="module">
+// A separate document stops application workers before deleting their databases.
+try {
+  for (const registration of await navigator.serviceWorker?.getRegistrations() || []) await registration.unregister();
+  for (const key of await caches.keys()) await caches.delete(key);
+  for (const {name} of await indexedDB.databases()) {
+    await new Promise((resolve,reject) => {
+      const request = indexedDB.deleteDatabase(name);
+      request.onsuccess = resolve; request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(new Error('Close other Pages tabs and reload this page to finish resetting.'));
+    });
+  }
+  localStorage.clear(); sessionStorage.clear();
+  location.replace('/');
+} catch (error) { document.getElementById('status').textContent = error.message; }
+</script></body></html>

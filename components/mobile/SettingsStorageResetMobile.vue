@@ -76,7 +76,24 @@
       </div>
     </section>
 
+    <section class="section">
+      <h2>Start fresh</h2>
+      <div class="surface">
+        <div class="setting-copy"><strong>Reset app</strong><span>Erase your library, reading progress, profile, preferences and downloaded app data. Original files in your phone’s shared folders stay on your phone.</span></div>
+        <button type="button" class="plain-button danger-button" @click="showReset = true">Reset app</button>
+      </div>
+    </section>
+
     <Teleport to="body">
+      <div v-if="showReset" class="sheet-overlay" @click.self="!resetting && (showReset = false)" @keydown.esc="!resetting && (showReset = false)">
+        <section class="result-sheet reset-sheet" role="alertdialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-description">
+          <h3 id="reset-title">Reset Pages and start fresh?</h3>
+          <p id="reset-description">All app data will be permanently erased, including your reading progress, notes, profile and settings. Original PDF and EPUB files in shared phone folders will remain. Pages will close; reopen it to see the first-time setup.</p>
+          <p v-if="resetError" role="alert">{{ resetError }}</p>
+          <button type="button" class="plain-button" :disabled="resetting" @click="showReset = false">Keep my data</button>
+          <button type="button" class="primary-button danger-button" :disabled="resetting" @click="resetApp">{{ resetting ? 'Resetting…' : 'Erase app data and reset' }}</button>
+        </section>
+      </div>
       <div v-if="showDiagnostics || showFailures" class="sheet-overlay" @click.self="showDiagnostics = false; showFailures = false">
         <section class="result-sheet" role="dialog" aria-modal="true" :aria-label="showDiagnostics ? 'Series diagnostics' : 'Unsuccessful metadata lookups'">
           <header><h3>{{ showDiagnostics ? 'Series diagnostics' : 'Unsuccessful lookups' }}</h3><button type="button" aria-label="Close" @click="showDiagnostics = false; showFailures = false"><i class="ri-close-line"></i></button></header>
@@ -99,6 +116,7 @@ import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 import { useBooks } from '~/composables/useBooks'
 import { useBookStorage } from '~/composables/useBookStorage'
 import { useToast } from '~/composables/useToast'
+import { registerPlugin, Capacitor } from '@capacitor/core'
 
 const router = useRouter()
 const { addToast } = useToast()
@@ -107,6 +125,22 @@ const { getStorageSummary } = useBookStorage()
 const { settings, updateSettings } = useBookishSettings()
 const { state: autoMeta } = useAutoMetadata()
 const { state: backfill, start: runLibraryBackfill, stop: stopLibraryBackfill } = useLibraryBackfill()
+const showReset = ref(false)
+const resetting = ref(false)
+const resetError = ref('')
+const resetApp = async () => {
+  if (resetting.value) return
+  resetting.value = true
+  resetError.value = ''
+  try {
+    if (Capacitor.getPlatform() === 'android') await registerPlugin('AppReset').reset({ confirmed: true })
+    else if (!isNativeCapacitorPlatform()) window.location.replace('/reset.html')
+    else throw new Error('Reset is currently available on Android and web.')
+  } catch (error) {
+    resetError.value = error.message || 'Could not reset the app. Please try again.'
+    resetting.value = false
+  }
+}
 
 const hiddenCount = ref(0)
 const totalBookCount = computed(() => (books.value?.length || 0) + hiddenCount.value)
@@ -145,7 +179,7 @@ const scanNowLabel = computed(() => autoMeta.running
   ? `Checking book ${Math.min(autoMeta.batchDone + 1, autoMeta.batchTotal || 1)} of ${autoMeta.batchTotal || 1}.`
   : autoMeta.pending
     ? `${autoMeta.pending} book${autoMeta.pending === 1 ? '' : 's'} waiting for details.`
-    : 'All book details are up to date.')
+    : 'No details checks queued right now.')
 const backfillPercent = computed(() => backfill.total ? Math.round(backfill.current / backfill.total * 100) : 0)
 const showDiagnostics = ref(false)
 const showFailures = ref(false)
@@ -155,9 +189,9 @@ const startBackfill = async () => {
     await runLibraryBackfill({
       books: books.value,
       updateBook,
-      onDone: ({ total, updated, stopped }) => addToast(
-        !total ? 'All books already have their details.'
-          : stopped ? 'Metadata update stopped.' : `Updated ${updated} of ${total} books.`,
+      onDone: ({ total, updated, searched, skipped, failures, stopped }) => addToast(
+        !total ? 'There are no files to check.'
+          : stopped ? 'Metadata update stopped.' : `Updated ${updated} files. Searched ${searched || 0}; skipped ${skipped || 0}; failed ${failures?.length || 0}. See Diagnostics for details.`,
         stopped ? 'info' : 'success',
       ),
     })
@@ -243,5 +277,9 @@ onMounted(() => { refreshStorageSummary(); refreshHiddenCount() })
 .result-sheet li { display: grid; gap: 3px; font-size: 13px; }
 .result-sheet li span { color: var(--color-text-muted); }
 .spin { animation: storage-spin .9s linear infinite; }
+.reset-sheet { display: grid; gap: 16px; }
+.reset-sheet p { margin: 0; line-height: 1.5; font-size: 14px; }
+.danger-button { color: #be3030; }
+.primary-button.danger-button { background: #be3030; color: white; }
 @keyframes storage-spin { to { transform: rotate(360deg); } }
 </style>

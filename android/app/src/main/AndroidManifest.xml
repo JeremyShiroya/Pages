@@ -103,6 +103,7 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <!-- Sideloaded updates: the app downloads its own APK and opens Android's
          installer for it (see ApkInstallerPlugin), instead of handing the user

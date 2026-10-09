@@ -69,6 +69,14 @@
                     </div>
                   </div>
 
+                  <div class="sfp-section">
+                    <div class="sfp-section-header"><i class="ri-file-user-line"></i> File type</div>
+                    <div class="sfp-pills">
+                      <button v-for="type in documentTypeFilters" :key="type.value" type="button" class="sfp-pill"
+                        :class="{ active: selectedDocumentType === type.value }" @click="setDocumentType(type.value)">{{ type.label }}</button>
+                    </div>
+                  </div>
+
                   <!-- Nothing to choose between once the app handles one format. -->
                   <div v-if="formatFilters.length > 1" class="sfp-section">
                     <div class="sfp-section-header">
@@ -181,6 +189,12 @@
           <!-- Library metrics text summary below filter controls -->
           <div v-if="!selectionMode" class="library-metrics-summary">
             <span>{{ libraryMetricsText }}</span>
+          </div>
+
+          <div v-if="reviewCount && !selectionMode" class="document-review-banner" role="status">
+            <i class="ri-file-question-line" aria-hidden="true"></i>
+            <div><strong>{{ reviewCount }} file{{ reviewCount === 1 ? '' : 's' }} need review</strong><span>You can keep reading while you decide.</span></div>
+            <button type="button" @click="router.push('/review-documents')">Review</button>
           </div>
 
         <!-- Grid View -->
@@ -320,6 +334,7 @@ import { useShareBook } from "~/composables/useShareBook";
 import { useLongPress, useMultiSelect } from "~/composables/useMultiSelect";
 import { useDeviceArchitecture } from "~/composables/useDeviceArchitecture";
 import { bookEditLocation, rememberBooksEditScroll, takeBooksEditScroll } from "~/composables/useBookEditNavigation";
+import { newDocumentReviews } from "~/composables/useDocumentReview";
 
 // Reactive data
 import EmptyState from "../shared/EmptyState.vue";
@@ -340,6 +355,7 @@ const { isPhone } = useDeviceArchitecture();
 const collapseBookActions = computed(() => isPhone.value || settings.value.bookActionDisplay === "minimal");
 const { addToast } = useToast();
 const { shareBook } = useShareBook();
+const reviewCount = computed(() => newDocumentReviews(books.value).length);
 
 const isBookActive = (book) =>
   ttsBook.value?.id === book.id && ttsStatus.value !== 'idle'
@@ -394,6 +410,11 @@ const sortDirection = ref(settings.value.librarySortDirection);
 const { filters, setFilter, matches } = useLibraryFilters("books");
 const selectedStatus = computed(() => filters.value.status);
 const selectedFormat = computed(() => filters.value.format);
+const selectedDocumentType = computed(() => filters.value.documentType);
+const documentTypeFilters = [
+  { value: 'all', label: 'All' }, { value: 'book', label: 'Books' },
+  { value: 'personal', label: 'Personal documents' }, { value: 'unclassified', label: 'Undecided' },
+];
 const viewMode = ref(settings.value.libraryView || 'table');
 
 // Modal states
@@ -611,6 +632,7 @@ watch([loading, displayedBooks], restoreEditScroll, { flush: 'post' });
 const hasActiveFilter = computed(() => (
   selectedStatus.value !== "all"
   || selectedFormat.value !== "all"
+  || selectedDocumentType.value !== "all"
   || sortBy.value !== "name"
   || sortDirection.value !== "asc"
 ));
@@ -630,6 +652,10 @@ const setStatus = (value) => {
 
 const setFormat = (value) => {
   setFilter("format", value);
+  filterOpen.value = false;
+};
+const setDocumentType = (value) => {
+  setFilter('documentType', value);
   filterOpen.value = false;
 };
 
@@ -1428,6 +1454,10 @@ onUnmounted(() => {
   border-radius: 14px;
   overflow: hidden;
 }
+.document-review-banner{display:flex;align-items:center;gap:12px;margin:0 var(--mobile-page-padding-inline) 16px;padding:13px;border:1px solid var(--color-brand-primary-muted);border-radius:13px;background:var(--color-brand-primary-faint);color:var(--color-text-primary)}
+.document-review-banner>i{font-size:24px;color:var(--color-brand-primary)}
+.document-review-banner>div{flex:1;min-width:0}.document-review-banner strong,.document-review-banner span{display:block}.document-review-banner strong{font-size:.86rem}.document-review-banner span{font-size:.72rem;color:var(--color-text-secondary);margin-top:2px}
+.document-review-banner button{border:0;border-radius:9px;background:var(--color-brand-primary);color:white;padding:9px 11px;font-weight:700;font-size:.78rem}
 
 :root[data-theme="dark"][data-dark-app-background="dark"] .view-container.is-card {
   background: transparent;

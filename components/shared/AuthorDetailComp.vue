@@ -112,7 +112,7 @@
       <main class="books-main">
         <section v-if="standaloneBooks.length" class="work-section">
           <header class="section-header">
-            <h2>Standalone</h2>
+            <h2>Other books</h2>
             <div class="accent-line"></div>
           </header>
           <div class="books-grid">

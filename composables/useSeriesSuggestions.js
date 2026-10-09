@@ -1,3 +1,4 @@
+import { metadataEligible } from './metadataPolicy'
 // Metadata for the installments of a series the library does not own yet, so
 // the series detail page can show the real cover, title, author, and year of
 // "the book you're missing" rather than a bare number.
@@ -746,16 +747,10 @@ export const rosterCoverage = (installments = {}) => {
   return { max, contiguous }
 }
 
-// Decide the real number of installments from the roster and the stored "N
-// works" total. A contiguous roster is authoritative outright. Otherwise the
-// claimed total wins so a roster page the fetch missed can't hide real books —
-// UNLESS the claim is only a novella or two above the highest book the roster
-// actually names, in which case that excess is the works-count padding (box
-// sets, novellas) and gets trimmed away. Pure so the rule is unit-testable.
+// A partial provider roster can raise a known total but cannot prove it smaller.
 export const reconcileEffectiveTotal = ({ contiguous = false, rosterMax = 0, claimedTotal = 0 } = {}) => {
   const claimed = Number(claimedTotal) || 0
-  if (contiguous) return rosterMax
-  if (rosterMax > 0 && claimed > rosterMax && claimed - rosterMax <= TRAILING_PHANTOM_MARGIN) return rosterMax
+  // Contiguity of a partial result does not prove the series is complete.
   return Math.max(rosterMax, claimed)
 }
 
@@ -952,6 +947,7 @@ export const reconcileSeriesWithLibrary = async ({
 
     const match = allBooks.find((book) => (
       book?.id
+      && metadataEligible(book)
       && !linkedBookIds.has(book.id)
       // Not already correctly placed in this series.
       && !(normalizeSeriesKey(book.series) === key && Number(book.seriesInstallment) === installment)
@@ -992,7 +988,7 @@ export const reconcileSeriesWithLibrary = async ({
   return { linked }
 }
 
-export const realignEntireLibrarySeries = async ({ books = [], seriesList = [], updateBook } = {}) => {
+export const realignEntireLibrarySeries = async ({ books = [], seriesList = [], updateBook, searchFn = fetchBookMetadataResults } = {}) => {
   if (typeof updateBook !== 'function' || !books.length) return { updated: 0 }
   let updatedCount = 0
 
@@ -1026,27 +1022,17 @@ export const realignEntireLibrarySeries = async ({ books = [], seriesList = [], 
     }
   }
 
-  const unmappedBooks = (books || []).filter((b) => !String(b?.series ?? '').trim() && b?.title)
-  const { fetchHardcoverSeriesRoster } = await import('~/server/utils/hardcoverApi')
-
+  const unmappedBooks = (books || []).filter((b) => metadataEligible(b) && !String(b?.series ?? '').trim() && b?.title)
   for (const book of unmappedBooks) {
+    if (isSeriesRepairProtected(book)) continue
     try {
-      if (isSeriesRepairProtected(book)) continue
-      const hardcoverRoster = await fetchHardcoverSeriesRoster(book.title, book.title)
-      if (hardcoverRoster?.series && hardcoverRoster?.books?.length) {
-        const matchingEntry = hardcoverRoster.books.find((entry) => installmentMatchesBook(entry, book))
-        const installment = matchingEntry?.installment || 1
-        const total = hardcoverRoster.total || hardcoverRoster.books.length
-
-        await updateBook({
-          ...book,
-          series: hardcoverRoster.series,
-          seriesInstallment: installment,
-          seriesTotal: total,
-          seriesChecked: false,
-        }, { automaticSeriesRepair: true, source: 'series-realignment' })
-        updatedCount += 1
-      }
+      const results = await searchFn(book.title, book.author || undefined, undefined, { light: true })
+      const match = bestResultForOwnedBook(book, results)
+      if (!match?.series) continue
+      const record = mergeMetadataIntoBook(book, match)
+      if (!record) continue
+      await updateBook(record, { automaticSeriesRepair: true, allowMetadata: true, source: 'series-realignment' })
+      updatedCount += 1
     } catch {}
   }
 

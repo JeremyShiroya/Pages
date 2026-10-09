@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { buildMetadataResults } from './metadataAggregator';
 
 describe('books metadata enrichment', () => {
+  it('never borrows a cover, blurb, rating or series from another title by the same author', () => {
+    const results = buildMetadataResults('The Quiet Shore', 'Mara James', {
+      googleBooksSources: [{ id: 'correct', source: 'googleBooks', title: 'The Quiet Shore', author: 'Mara James' }],
+      goodreadsSources: [{ id: 'wrong', source: 'goodreads', title: 'A Distant Shore', author: 'Mara James', cover: 'https://example.test/wrong.jpg', blurb: 'Wrong story', series: 'Wrong Saga', seriesTotal: '7', webReview: 'Wrong review' }],
+      openLibrarySources: [], internetArchiveSources: [], koboSources: [],
+    } as any)
+    const correct = results.find((result) => result.title === 'The Quiet Shore')
+    expect(correct).toMatchObject({ cover: null, blurb: null, series: null, webReview: null })
+  })
   it('tolerates unavailable optional providers', () => {
     expect(buildMetadataResults('Offline Book', 'Example Author', {
       googleBooksSources: [],

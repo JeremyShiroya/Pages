@@ -21,7 +21,7 @@ describe('missing-details detection', () => {
     publishYear: 2020, cover: 'https://x/cover.jpg', webReview: { rating: 4.2 },
     // A standalone whose series has already been determined — otherwise the
     // unknown series name is itself a gap.
-    seriesChecked: true,
+    seriesChecked: true, seriesStatus: 'standalone',
   }
 
   test('a fully populated standalone book has no gaps', () => {
@@ -69,19 +69,20 @@ describe('missing-details detection', () => {
     expect(missingMetadataFields(filled)).toEqual([])
   })
 
-  test('applying a result that finds no series marks the standalone as checked', () => {
+  test('only an explicit matching standalone result marks it checked', () => {
     const book = { ...complete, series: '', seriesChecked: false }
-    const { record, filled } = applyMetadataResult(book, { title: 'A Book' }, { didLookup: true })
+    const { record, filled } = applyMetadataResult(book, { title: book.title, author: book.author, seriesStatus: 'standalone' }, { didLookup: true })
     expect(record.seriesChecked).toBe(true)
     expect(filled).toBe(false)
-    // ...and a lookup that returned nothing at all does NOT conclude standalone.
+    expect(applyMetadataResult(book, { title: book.title, author: book.author }, { didLookup: true }).record).toBeNull()
+    // Missing series information does not prove standalone status.
     expect(applyMetadataResult(book, null, { didLookup: false }).record).toBeNull()
   })
 
   test('applying a result that finds a series fills it and does not mark checked', () => {
     const book = { ...complete, series: '', seriesChecked: false }
     const { record, filled } = applyMetadataResult(
-      book, { title: 'A Book', series: 'The Saga', seriesInstallment: 1 }, { didLookup: true },
+      book, { title: book.title, author: book.author, series: 'The Saga', seriesInstallment: 1 }, { didLookup: true },
     )
     expect(record.series).toBe('The Saga')
     expect(record.seriesInstallment).toBe(1)
@@ -140,7 +141,7 @@ describe('auto-target selection', () => {
   test('only books with gaps are picked', () => {
     const books = [
       { id: 'a', title: 'Gap', author: '' },
-      { id: 'b', title: 'Full', author: 'Auth', blurb: 'b', genre: 'g', publishYear: 2000, cover: 'http://c', webReview: { rating: 4 }, seriesChecked: true },
+      { id: 'b', title: 'Full', author: 'Auth', blurb: 'b', genre: 'g', publishYear: 2000, cover: 'http://c', webReview: { rating: 4 }, seriesChecked: true, seriesStatus: 'standalone' },
     ]
     expect(pickAutoTargets(books, { now }).map((b) => b.id)).toEqual(['a'])
   })

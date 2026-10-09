@@ -1,7 +1,7 @@
 <template>
   <ResponsiveViewSwitch>
     <template #phone>
-      <div class="app-layout compact-layout phone-layout" :class="{ 'settings-palette': isSettingsPalettePage }">
+      <div class="app-layout compact-layout phone-layout" :class="{ 'settings-palette': isSettingsPalettePage, 'scrollbars-hidden': hideScrollbars }">
         <main class="main-content">
           <div class="page-container" :class="{ 'mobile-sub-page': isMobileSubPage }"><slot /></div>
           <MobilePlayingBar />
@@ -10,7 +10,7 @@
     </template>
 
     <template #tabletPortrait>
-      <div class="app-layout compact-layout tablet-portrait-layout" :class="{ 'settings-palette': isSettingsPalettePage }">
+      <div class="app-layout compact-layout tablet-portrait-layout" :class="{ 'settings-palette': isSettingsPalettePage, 'scrollbars-hidden': hideScrollbars }">
         <main class="main-content">
           <div class="page-container" :class="{ 'mobile-sub-page': isMobileSubPage }"><slot /></div>
           <TabletPlayingBar />
@@ -19,7 +19,7 @@
     </template>
 
     <template #tabletLandscape>
-      <div class="app-layout tablet-landscape-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'settings-palette': isSettingsPalettePage }">
+      <div class="app-layout tablet-landscape-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'settings-palette': isSettingsPalettePage, 'scrollbars-hidden': hideScrollbars }">
         <Sidebar />
         <main class="main-content">
           <div class="page-container"><slot /></div>
@@ -52,11 +52,27 @@ const { collapsed: sidebarCollapsed } = useSidebarState()
 const isMobileSubPage = computed(() => !TAB_ROOT_PATHS.has(route.path))
 const isSettingsPalettePage = computed(() => (
   route.path.startsWith('/settings')
+  || route.path.startsWith('/listen-settings')
   || route.path.startsWith('/editprofilepage')
 ))
+const SCROLLBAR_HIDDEN_ROOTS = new Set(['/', '/books', '/series', '/profile', '/streak', '/editprofilepage'])
+const hideScrollbars = computed(() => SCROLLBAR_HIDDEN_ROOTS.has(route.path)
+  || ['/playlist/', '/series/', '/serie/', '/settings', '/book/'].some((prefix) => route.path.startsWith(prefix)))
 </script>
 
 <style scoped>
+:global(html:has(.scrollbars-hidden)),
+:global(html:has(.scrollbars-hidden) body),
+.scrollbars-hidden,
+.scrollbars-hidden :deep(*) {
+  scrollbar-width: none;
+}
+:global(html:has(.scrollbars-hidden)::-webkit-scrollbar),
+:global(html:has(.scrollbars-hidden) body::-webkit-scrollbar),
+.scrollbars-hidden::-webkit-scrollbar,
+.scrollbars-hidden :deep(*::-webkit-scrollbar) {
+  display: none;
+}
 .app-layout {
   min-height: 100vh;
 }

@@ -74,6 +74,11 @@
       </EmptyState>
 
       <div v-else-if="books.length > 0">
+        <div v-if="reviewCount" class="document-review-banner" role="status">
+          <i class="ri-file-question-line"></i>
+          <span><strong>{{ reviewCount }} file{{ reviewCount === 1 ? '' : 's' }} need review</strong> · You can keep reading while you decide.</span>
+          <button type="button" @click="router.push('/review-documents')">Review</button>
+        </div>
         <div class="view-container" :class="{ 'is-card': viewMode === 'table' }">
           <!-- Controls Row (chips + filters on left, add book + view toggle on right) -->
           <div class="controls-row in-container">
@@ -116,11 +121,20 @@
                 >
                   <i class="ri-filter-3-line"></i>
                   <span class="sort-filter-label-text">Filter</span>
-                  <span v-if="sortBy !== 'name' || sortDirection !== 'asc'" class="sort-active-dot"></span>
+                  <span v-if="sortBy !== 'name' || sortDirection !== 'asc' || selectedDocumentType !== 'all'" class="sort-active-dot"></span>
                   <i class="ri-arrow-down-s-line dropdown-arrow" :class="{ rotated: activeDropdown === 'sort-filter' }"></i>
                 </button>
 
                 <div class="dropdown-menu sort-filter-panel" v-show="activeDropdown === 'sort-filter'">
+                  <div class="sfp-section">
+                    <div class="sfp-section-header"><i class="ri-file-user-line"></i> File type</div>
+                    <div class="sfp-pills">
+                      <button v-for="type in documentTypeFilters" :key="type.value" class="sfp-pill"
+                        :class="{ active: selectedDocumentType === type.value }"
+                        @click="setDocumentType(type.value)">{{ type.label }}</button>
+                    </div>
+                  </div>
+                  <div class="sfp-divider"></div>
 
                   <!-- Title section -->
                   <div class="sfp-section">
@@ -281,7 +295,7 @@
                     {{ book.author || 'Unknown author' }}<span v-if="book.publishYear"> • {{ book.publishYear }}</span>
                   </p>
                   <div class="cell-book-tags">
-                    <span class="cell-chip" :class="{ standalone: !book.series }">{{ book.series || 'Standalone' }}</span>
+                    <span class="cell-chip" :class="{ standalone: !book.series }">{{ seriesDisplayLabel(book) }}</span>
                     <span v-if="book.genre" class="cell-chip genre"><i class="ri-price-tag-3-line"></i>{{ book.genre }}</span>
                   </div>
                 </div>
@@ -323,6 +337,10 @@
                     <button type="button" @click="router.push(bookEditLocation(book.id, route.fullPath))">
                       <i class="ri-edit-line"></i>
                       Edit book
+                    </button>
+                    <button type="button" @click="activeActionsMenu = null; router.push(`/analytics/${book.id}`)">
+                      <i class="ri-bar-chart-line"></i>
+                      View Analytics
                     </button>
                     <button class="danger" type="button" @click="openDeleteModal(book)">
                       <i class="ri-delete-bin-line"></i>
@@ -386,6 +404,7 @@
 </template>
 
 <script setup>
+import { seriesDisplayLabel } from '~/utils/bookSeriesState'
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import DeleteConfirmModal from "../shared/DeleteConfirmModal.vue";
 import BookProgressDisplay from "../shared/BookProgressDisplay.vue";
@@ -395,6 +414,7 @@ import AddToPlaylistModal from "../shared/AddToPlaylistModal.vue";
 import SkeletonLoader from "../shared/SkeletonLoader.vue";
 
 import { useBooks } from "~/composables/useBooks";
+import { newDocumentReviews, documentTypeOf } from "~/composables/useDocumentReview";
 import { getBookRating, RATING_SOURCE_LABELS } from "~/composables/useBookRating";
 import { useTTS } from "~/composables/useTTS";
 import { useBookishSettings } from "~/composables/useBookishSettings";
@@ -431,6 +451,7 @@ const handlePlay = (book) => {
 }
 
 const router = useRouter();
+const reviewCount = computed(() => newDocumentReviews(books.value).length);
 const route = useRoute();
 
 // Filter options
@@ -444,6 +465,11 @@ const sortDirection = ref(settings.value.librarySortDirection);
 // Format has no control in this layout, so it is deliberately not applied here.
 const { filters, setFilter } = useLibraryFilters("books");
 const selectedStatus = computed(() => filters.value.status);
+const selectedDocumentType = computed(() => filters.value.documentType);
+const documentTypeFilters = [
+  { value: 'all', label: 'All' }, { value: 'book', label: 'Books' },
+  { value: 'personal', label: 'Personal documents' }, { value: 'unclassified', label: 'Undecided' },
+];
 const viewMode = ref(settings.value.libraryView);
 
 // Dropdown states
@@ -463,6 +489,9 @@ const filteredBooks = computed(() => {
   // Filter by status
   if (selectedStatus.value !== "all") {
     filtered = filtered.filter((book) => book.status === selectedStatus.value);
+  }
+  if (selectedDocumentType.value !== 'all') {
+    filtered = filtered.filter((book) => documentTypeOf(book) === selectedDocumentType.value);
   }
 
   // Sort books
@@ -659,6 +688,10 @@ const setStatus = (value) => {
   setFilter("status", value);
   activeDropdown.value = null;
 };
+const setDocumentType = (value) => {
+  setFilter('documentType', value);
+  activeDropdown.value = null;
+};
 
 
 const setViewMode = (mode) => {
@@ -749,6 +782,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.document-review-banner{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px 16px;border:1px solid var(--color-brand-primary-muted);border-radius:13px;background:var(--color-brand-primary-faint);color:var(--color-text-primary)}
+.document-review-banner i{color:var(--color-brand-primary);font-size:23px}.document-review-banner span{flex:1}.document-review-banner button{border:0;border-radius:9px;padding:10px 15px;background:var(--color-brand-primary);color:white;font-weight:700}
 .books-container {
   padding: 0rem;
   margin: 0 auto;

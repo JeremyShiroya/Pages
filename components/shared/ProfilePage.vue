@@ -5,7 +5,12 @@
     :data-system-bar-icons="settings.readerTheme === 'dark' ? 'light' : 'dark'"
   >
     <header class="profile-nav" aria-label="Profile navigation">
-      <span class="nav-spacer" aria-hidden="true"></span>
+      <div class="nav-leading">
+        <button type="button" class="notification-button" aria-label="Open notifications" @click="router.push('/notifications')">
+          <i class="ri-notification-3-line"></i>
+          <span v-if="notificationCount" class="notification-dot" aria-hidden="true"></span>
+        </button>
+      </div>
       <h1>Profile</h1>
       <div class="nav-actions">
         <button v-if="showStreak" type="button" class="streak-pill" aria-label="Open streak calendar" @click="router.push('/streak')">
@@ -36,7 +41,7 @@
 
         <div class="profile-details">
           <h2>{{ profile.displayName || 'Reader' }}</h2>
-          <p>{{ dailyCompliment }}</p>
+          <p>{{ profile.profileTextMode === 'bio' && profile.bio ? profile.bio : dailyCompliment }}</p>
           <NuxtLink class="edit-profile-button" to="/editprofilepage">
             <i class="ri-edit-line" aria-hidden="true"></i>
             <span>Edit profile</span>
@@ -182,6 +187,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useBooks } from '~/composables/useBooks'
+import { deferredDocumentReviews } from '~/composables/useDocumentReview'
 import { useBookishSettings } from '~/composables/useBookishSettings'
 import { bookEditLocation } from '~/composables/useBookEditNavigation'
 import { useDailyCompliment } from '~/composables/useDailyCompliment'
@@ -200,6 +206,7 @@ import AvatarSourcePicker from './AvatarSourcePicker.vue'
 
 const router = useRouter()
 const { books, collections, favourites, fetchAllData, toggleFavourite, hideBook, deleteBook } = useBooks()
+const notificationCount = computed(() => deferredDocumentReviews(books.value).length)
 const { settings } = useBookishSettings()
 const { compliment: dailyCompliment, loadDailyCompliment } = useDailyCompliment()
 const { streakCount } = useStreak()
@@ -380,6 +387,9 @@ onMounted(async () => {
 }
 
 .profile-nav h1 { margin: 0; font-size: 1.15rem; font-weight: 600; text-align: center; }
+.nav-leading{display:flex;justify-content:flex-start;align-items:center}
+.notification-button{width:44px;height:44px;position:relative;display:grid;place-items:center;border:0;background:transparent;color:var(--color-text-primary);font-size:22px;cursor:pointer}
+.notification-dot{position:absolute;right:8px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--color-brand-primary);box-shadow:0 0 0 2px var(--color-background-app)}
 .nav-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
 .streak-pill, .menu-button { display: inline-flex; align-items: center; justify-content: center; border: 0; color: var(--color-text-primary); cursor: pointer; }
 .streak-pill { gap: 4px; min-height: 36px; padding: 0 12px; border-radius: 999px; background: var(--color-brand-primary-muted); color: var(--color-brand-primary); }

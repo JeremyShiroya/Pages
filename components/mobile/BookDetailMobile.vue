@@ -26,6 +26,9 @@
             <button type="button" role="menuitem" @click="runDetailAction('edit')">
               <i class="ri-edit-line"></i><span>Edit book</span>
             </button>
+            <button type="button" role="menuitem" @click="runDetailAction('analytics')">
+              <i class="ri-bar-chart-line"></i><span>View Analytics</span>
+            </button>
             <button type="button" role="menuitem" @click="runDetailAction('hide')">
               <i class="ri-eye-off-line"></i><span>Hide book</span>
             </button>
@@ -65,6 +68,11 @@
           <p class="book-author">
             {{ book.author || "Unknown author" }}<span v-if="book.publishYear"> &middot; {{ book.publishYear }}</span>
           </p>
+          <button v-if="book.format === 'pdf'" type="button" class="document-type-link" @click="router.push(bookEditLocation(book.id, route.fullPath))">
+            <i class="ri-file-text-line" aria-hidden="true"></i>
+            <span>{{ book.documentType === 'unclassified' ? 'Review file type' : book.documentType === 'personal' ? 'Personal document' : 'Book' }}</span>
+            <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+          </button>
           <p v-if="book.series" class="book-series">
             {{ book.series }}<span v-if="book.seriesInstallment"> #{{ book.seriesInstallment }}</span>
           </p>
@@ -110,6 +118,9 @@
             </button>
             <button type="button" class="icon-action" title="Edit" @click="router.push(bookEditLocation(book.id, route.fullPath))">
               <i class="ri-edit-line"></i>
+            </button>
+            <button type="button" class="icon-action" title="View Analytics" aria-label="View Analytics" @click="router.push(`/analytics/${book.id}`)">
+              <i class="ri-bar-chart-line"></i>
             </button>
             <button type="button" class="icon-action" title="Hide" @click="handleHide">
               <i class="ri-eye-off-line"></i>
@@ -242,6 +253,7 @@ const runDetailAction = async (action) => {
     return;
   }
   if (action === 'edit') return router.push(bookEditLocation(book.value.id, route.fullPath));
+  if (action === 'analytics') return router.push(`/analytics/${book.value.id}`);
   if (action === 'hide') return handleHide();
   if (action === 'share') return handleShare();
   if (action === 'delete') showDeleteModal.value = true;
@@ -325,6 +337,8 @@ watch(
 </script>
 
 <style scoped>
+.document-type-link{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--color-border-subtle);background:color-mix(in srgb,var(--color-surface-primary) 60%,transparent);color:var(--color-text-secondary);border-radius:999px;padding:5px 9px;font-size:.76rem;font-weight:500;cursor:pointer;margin:4px 0 10px}
+.document-type-link:hover{color:var(--color-text-primary);background:var(--color-surface-secondary)}
 .book-detail-page {
   width: 100%;
   max-width: 100vw;

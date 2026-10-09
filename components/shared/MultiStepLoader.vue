@@ -1,10 +1,6 @@
 <template>
   <div v-if="loading" class="multi-step-loader" role="status" aria-live="polite">
-    <div class="loader-orbit" aria-hidden="true">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+    <SearchingOrb />
 
     <div class="loader-copy">
       <p class="loader-eyebrow">{{ eyebrow }}</p>
@@ -37,6 +33,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import SearchingOrb from './SearchingOrb.vue'
 
 const props = defineProps({
   loadingStates: {
@@ -152,33 +149,6 @@ onBeforeUnmount(stopTimer)
 .multi-step-loader {
   padding: 1.5rem;
   color: var(--color-text-primary);
-}
-
-.loader-orbit {
-  position: relative;
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 1rem;
-}
-
-.loader-orbit span {
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--color-brand-primary);
-  border-radius: 999px;
-  opacity: 0.25;
-  animation: loader-ring 1.9s ease-in-out infinite;
-}
-
-.loader-orbit span:nth-child(2) {
-  animation-delay: 0.25s;
-  transform: scale(0.72);
-}
-
-.loader-orbit span:nth-child(3) {
-  animation-delay: 0.5s;
-  transform: scale(0.44);
-  background: var(--color-brand-primary-faint);
 }
 
 .loader-copy {
@@ -301,17 +271,6 @@ onBeforeUnmount(stopTimer)
   color: var(--color-text-subtle);
   font-size: 0.76rem;
   line-height: 1.3;
-}
-
-@keyframes loader-ring {
-  0%, 100% {
-    transform: scale(0.5);
-    opacity: 0.22;
-  }
-  50% {
-    transform: scale(1);
-    opacity: 0.75;
-  }
 }
 
 @keyframes spin {

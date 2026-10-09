@@ -47,11 +47,11 @@ describe('ensureSeriesTotal', () => {
     expect(total).toBe(6);
     expect(fetchMetadataResults).toHaveBeenCalledWith('Blindsighted', 'Karin Slaughter', undefined);
     expect(updateBook).toHaveBeenCalledTimes(2);
-    expect(updateBook).toHaveBeenCalledWith({ ...books[0], seriesTotal: 6 });
-    expect(updateBook).toHaveBeenCalledWith({ ...books[1], seriesTotal: 6 });
+    expect(updateBook).toHaveBeenCalledWith({ ...books[0], seriesTotal: 6 }, { automaticMetadata: true });
+    expect(updateBook).toHaveBeenCalledWith({ ...books[1], seriesTotal: 6 }, { automaticMetadata: true });
   });
 
-  it('refreshes and corrects a stale stored total', async () => {
+  it('does not shrink a saved total from an incomplete search', async () => {
     const books = [
       { id: '1', title: 'Blindsighted', author: 'Karin Slaughter', series: 'Grant County', seriesTotal: 12 },
     ];
@@ -67,9 +67,9 @@ describe('ensureSeriesTotal', () => {
       updateBook,
     });
 
-    expect(total).toBe(6);
+    expect(total).toBe(12);
     expect(fetchMetadataResults).toHaveBeenCalledTimes(1);
-    expect(updateBook).toHaveBeenCalledWith({ ...books[0], seriesTotal: 6 });
+    expect(updateBook).not.toHaveBeenCalled();
   });
 });
 
@@ -91,8 +91,8 @@ describe('propagateSeriesTotal', () => {
 
     expect(updated).toBe(2);
     expect(updateBook).toHaveBeenCalledTimes(2);
-    expect(updateBook).toHaveBeenCalledWith({ ...books[0], seriesTotal: 6 });
-    expect(updateBook).toHaveBeenCalledWith({ ...books[1], seriesTotal: 6 });
+    expect(updateBook).toHaveBeenCalledWith({ ...books[0], seriesTotal: 6 }, { automaticMetadata: true });
+    expect(updateBook).toHaveBeenCalledWith({ ...books[1], seriesTotal: 6 }, { automaticMetadata: true });
   });
 });
 

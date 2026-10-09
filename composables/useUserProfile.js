@@ -6,6 +6,8 @@ export const DEFAULT_USER_PROFILE = Object.freeze({
   displayName: 'Reader',
   avatarType: 'image',
   avatarValue: '/images/User%20Avatars/default-user.jpeg',
+  profileTextMode: 'compliment',
+  bio: '',
 })
 
 export const BOOKISH_PROFILE_UPDATED_EVENT = 'bookish:profile-updated'
@@ -71,6 +73,8 @@ function normalizeProfile(value) {
     displayName: displayName || DEFAULT_USER_PROFILE.displayName,
     avatarType: 'image',
     avatarValue: avatarValue || DEFAULT_USER_PROFILE.avatarValue,
+    profileTextMode: source.profileTextMode === 'bio' ? 'bio' : 'compliment',
+    bio: String(source.bio ?? '').trim().slice(0, 240),
   }
 }
 

@@ -30,6 +30,7 @@ const androidColor = ({ red, green, blue }) => (
 
 const usesSettingsPalette = (pathname) => (
   pathname.startsWith('/settings')
+  || pathname.startsWith('/listen-settings')
   || pathname.startsWith('/editprofilepage')
 )
 

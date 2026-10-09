@@ -3,9 +3,10 @@
     <div class="cover-modal" @click.stop>
       <div class="cover-modal-header">
         <div>
-          <h3>{{ mode === 'picker' ? 'Select Book Cover' : 'Change Book Cover' }}</h3>
-          <p v-if="mode === 'picker' && !loading">Found {{ visibleImages.length }} cover options</p>
-          <p v-else-if="mode === 'picker'">Searching the web for covers...</p>
+          <h3>{{ mode === 'choice' ? 'Change Book Cover' : searchInProgress ? 'Searching for book covers' : 'Select Book Cover' }}</h3>
+          <p v-if="mode === 'picker' && searchInProgress">{{ checkingImages ? 'Checking cover images...' : 'Searching the web for covers...' }}</p>
+          <p v-else-if="mode === 'picker' && visibleImages.length">Found {{ visibleImages.length }} cover options</p>
+          <p v-else-if="mode === 'picker'">No usable cover options found</p>
           <p v-else>Choose how you want to update the cover</p>
         </div>
         <button class="cover-modal-close" type="button" @click="$emit('close')">
@@ -31,9 +32,9 @@
       </div>
 
       <div v-else class="cover-modal-body">
-        <div v-if="loading" class="cover-picker-loading">
+        <div v-if="searchInProgress" class="cover-picker-loading">
           <MultiStepLoader
-            :loading="loading"
+            :loading="searchInProgress"
             :loading-states="coverLoadingStates"
             :duration="1300"
             :loop="false"
@@ -85,6 +86,7 @@ const props = defineProps({
 const failedImages = ref(new Set())
 const readyImages = ref(new Set())
 const checkingImages = ref(false)
+const searchInProgress = computed(() => props.loading || checkingImages.value)
 let searchGeneration = 0
 
 const coverLoadingStates = [
@@ -154,7 +156,7 @@ watch(() => [props.images, props.visible, props.mode], () => {
     image.onerror = () => finish(false)
     image.src = item.url
   }))).then(() => { if (generation === searchGeneration) checkingImages.value = false })
-}, { immediate: true })
+}, { immediate: true, flush: 'sync' })
 
 const markImageFailed = (url) => {
   const next = new Set(failedImages.value)

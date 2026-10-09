@@ -3,7 +3,7 @@ import { readonly, ref } from 'vue'
 export const BOOKISH_SETTINGS_KEY = 'bookish:settings'
 
 export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
-  settingsVersion: 3,
+  settingsVersion: 4,
   readerTheme: 'light',
   readerZoom: 1.0,
   libraryView: 'table',
@@ -20,14 +20,14 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   // ── Appearance preferences (Settings → Preferences) ──────────────────────
   appBackground: 'white',          // 'white' | 'muted' (#dfe0eb canvas)
   darkAppBackground: 'muted',      // 'dark' (#000) | 'muted' (charcoal canvas)
-  mobileNavStyle: 'standard',       // 'standard' | 'floating'
-  mobileNavSize: 'standard',        // 'standard' | 'compact'
+  mobileNavStyle: 'floating',       // 'standard' | 'floating'
+  mobileNavSize: 'compact',         // 'standard' | 'compact'
   mobileNavOpacity: 95,            // percent, 50–100
   mobileNavBlur: 18,               // backdrop blur in px, 0–30
-  mobileNavMaterial: 'current',     // 'current' | 'frosted'
+  mobileNavMaterial: 'frosted',     // 'current' | 'frosted'
   mobileNavHighlight: 'soft',       // 'soft' | 'none'
   mobileNavActiveIconStyle: 'fill', // 'fill' | 'line'
-  mobileNavProfileDisplay: 'icon',  // 'icon' | 'avatar'
+  mobileNavProfileDisplay: 'avatar',// 'icon' | 'avatar'
   mobileNavShowTitles: true,
   seriesCardBackground: 'blur',    // 'blank' | 'blur'
   seriesCardLayout: 'fan',         // 'fan' (books centered) | 'cover'
@@ -41,6 +41,10 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   personalRatingScale: 10,         // 5 | 10; values remain normalized to ten internally
   readerHighlight: true,           // highlight the section being read
   listenCoverBlur: true,           // blurred cover backdrop in Listen mode
+  listenBackSeconds: 10,           // independent Listen skip intervals, 1–60 seconds
+  listenForwardSeconds: 10,
+  listenBarScope: 'book',           // 'book' | 'chapter'
+  listenSummaryScope: 'book',       // 'book' | 'chapter'
   showStreak: true,                // reading-streak pill in the top nav
   formatFilter: 'all',             // 'all' | 'pdf' | 'epub' — legacy, see useLibraryFilters
   hideContent: false,              // preview the app as though the library were empty
@@ -282,6 +286,16 @@ export function normalizeBookishSettings(value) {
     listenCoverBlur: source.listenCoverBlur === undefined
       ? DEFAULT_BOOKISH_SETTINGS.listenCoverBlur
       : source.listenCoverBlur !== false,
+    listenBackSeconds: Math.round(numberOrDefault(
+      source.listenBackSeconds ?? source.listenSkipSeconds, DEFAULT_BOOKISH_SETTINGS.listenBackSeconds, 1, 60,
+    )),
+    listenForwardSeconds: Math.round(numberOrDefault(
+      source.listenForwardSeconds ?? source.listenSkipSeconds, DEFAULT_BOOKISH_SETTINGS.listenForwardSeconds, 1, 60,
+    )),
+    listenBarScope: ['book', 'chapter'].includes(source.listenBarScope)
+      ? source.listenBarScope : DEFAULT_BOOKISH_SETTINGS.listenBarScope,
+    listenSummaryScope: ['book', 'chapter'].includes(source.listenSummaryScope)
+      ? source.listenSummaryScope : DEFAULT_BOOKISH_SETTINGS.listenSummaryScope,
     showStreak: source.showStreak === undefined
       ? DEFAULT_BOOKISH_SETTINGS.showStreak
       : source.showStreak !== false,
@@ -348,7 +362,32 @@ const resolveStorage = (storage) => {
   return localStorage
 }
 
-export const CURRENT_SETTINGS_VERSION = 3
+export const CURRENT_SETTINGS_VERSION = 4
+
+const LEGACY_NAV_DEFAULTS = Object.freeze({
+  mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95,
+  mobileNavBlur: 18, mobileNavMaterial: 'current', mobileNavHighlight: 'soft',
+  mobileNavActiveIconStyle: 'fill', mobileNavProfileDisplay: 'icon',
+  mobileNavShowTitles: true,
+})
+
+function migrateBottomNav(source) {
+  // A single changed nav preference means the reader customized the whole nav.
+  // Missing fields in older records still meant the former defaults.
+  const previousNav = Object.fromEntries(Object.entries(LEGACY_NAV_DEFAULTS)
+    .map(([key, fallback]) => [key, source?.[key] ?? fallback]))
+  const untouched = Object.entries(LEGACY_NAV_DEFAULTS)
+    .every(([key, value]) => previousNav[key] === value)
+  return {
+    ...previousNav,
+    ...(untouched ? {
+      mobileNavStyle: DEFAULT_BOOKISH_SETTINGS.mobileNavStyle,
+      mobileNavSize: DEFAULT_BOOKISH_SETTINGS.mobileNavSize,
+      mobileNavMaterial: DEFAULT_BOOKISH_SETTINGS.mobileNavMaterial,
+      mobileNavProfileDisplay: DEFAULT_BOOKISH_SETTINGS.mobileNavProfileDisplay,
+    } : {}),
+  }
+}
 
 export function readBookishSettings(storage) {
   const targetStorage = resolveStorage(storage)
@@ -360,8 +399,9 @@ export function readBookishSettings(storage) {
 
     const parsed = JSON.parse(raw)
     const storedVersion = Number(parsed?.settingsVersion || 0)
+    const navMigration = storedVersion < CURRENT_SETTINGS_VERSION ? migrateBottomNav(parsed) : null
 
-    if (storedVersion < CURRENT_SETTINGS_VERSION) {
+    if (storedVersion < 3) {
       // One-time release migration: reset all appearance preferences to the new
       // defaults while preserving the user's format settings (formatFilter and enabledFormats).
       const preservedFormatFilter = parsed?.formatFilter
@@ -385,13 +425,18 @@ export function readBookishSettings(storage) {
         formatFilter: 'all',
         enabledFormats: preservedEnabledFormats !== undefined ? preservedEnabledFormats : DEFAULT_BOOKISH_SETTINGS.enabledFormats,
         formatChoiceMade: preservedFormatChoiceMade !== undefined ? preservedFormatChoiceMade : DEFAULT_BOOKISH_SETTINGS.formatChoiceMade,
+        settingsVersion: 3,
+      })
+      Object.assign(parsed, migrated)
+    }
+
+    if (storedVersion < CURRENT_SETTINGS_VERSION) {
+      const migrated = normalizeBookishSettings({
+        ...parsed,
+        ...navMigration,
         settingsVersion: CURRENT_SETTINGS_VERSION,
       })
-
-      try {
-        targetStorage.setItem(BOOKISH_SETTINGS_KEY, JSON.stringify(migrated))
-      } catch {}
-
+      try { targetStorage.setItem(BOOKISH_SETTINGS_KEY, JSON.stringify(migrated)) } catch {}
       return migrated
     }
 

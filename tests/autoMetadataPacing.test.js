@@ -15,7 +15,7 @@ const complete = {
   title: 'A Book', author: 'An Author', blurb: 'words', genre: 'Fiction',
   publishYear: 2020, cover: 'https://x/cover.jpg', webReview: { rating: 4.2 },
   // A standalone whose series has already been resolved.
-  seriesChecked: true,
+  seriesChecked: true, seriesStatus: 'standalone',
 }
 
 describe('adaptive cooldown', () => {

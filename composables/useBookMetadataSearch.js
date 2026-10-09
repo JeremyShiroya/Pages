@@ -265,7 +265,7 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 export const fetchBookMetadataResults = async (title, author, publisher, options = {}) => {
   const cacheKey = `${normalizeKey(title)}:${normalizeKey(author)}:${normalizeKey(publisher)}:${options.light ? 'light' : 'full'}`;
   const cached = metadataQueryCache.get(cacheKey);
-  if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+  if (!options.force && cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
     return cached.results;
   }
 

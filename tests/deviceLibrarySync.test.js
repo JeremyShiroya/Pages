@@ -6,6 +6,7 @@ import {
   BOOKISH_SCAN_FOLDERS_KEY,
   MAX_DEVICE_IMPORT_BYTES,
   cleanTitleFromFileName,
+  chooseDeviceImportKeeper,
   fileInScanFolders,
   missingImportedBooks,
   isTooLargeError,
@@ -30,6 +31,15 @@ const fakeStorage = (initial = {}) => {
 }
 
 describe('device library sync', () => {
+  test('keeps the readable copy of a duplicate PDF or EPUB', () => {
+    for (const format of ['pdf', 'epub']) {
+      const books = [
+        { id: `${format}-old`, progress: 80, createdAt: '2020-01-01' },
+        { id: `${format}-readable`, progress: 10, createdAt: '2021-01-01' },
+      ]
+      expect(chooseDeviceImportKeeper(books, { [`${format}-readable`]: true }).id).toBe(`${format}-readable`)
+    }
+  })
   test('removes only confirmed missing device imports in scanned internal storage', () => {
     const books = [
       { id: 1, deviceImport: true, deviceImportPath: '/storage/emulated/0/Books/gone.epub' },
@@ -87,8 +97,8 @@ describe('device library sync', () => {
       webReview: null,
     }
     const meta = {
-      title: 'Project Hail Mary (different)',
-      author: 'Somebody Else',
+      title: 'Project Hail Mary',
+      author: 'Andy Weir',
       blurb: 'An astronaut wakes alone.',
       genre: 'Science Fiction',
       publishYear: 2021,
@@ -97,6 +107,7 @@ describe('device library sync', () => {
     }
 
     const updated = mergeMetadataIntoBook(book, meta)
+    expect(mergeMetadataIntoBook(book, { ...meta, author: 'Somebody Else' })).toBeNull()
     expect(updated.title).toBe('Project Hail Mary')
     expect(updated.author).toBe('Andy Weir')
     expect(updated.blurb).toBe('An astronaut wakes alone.')
@@ -254,7 +265,7 @@ describe('publisher crawling is not performed blind', () => {
 
     // Every background caller opts into light mode; the Add/Edit screens do
     // not, so a user watching a spinner still gets the richest result.
-    expect(read('composables/useMetadataBackfill.js')).toContain('{ light: true }')
+    expect(read('composables/useMetadataBackfill.js')).toContain('{ light: false, force: true }')
     expect(read('composables/useDeviceLibrarySync.js')).toContain('{ light: true }')
     for (const page of ['components/mobile/EditBookMobile.vue', 'components/mobile/AddBookMobile.vue']) {
       expect(read(page), page).not.toContain('light: true')

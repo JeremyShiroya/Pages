@@ -47,6 +47,17 @@
           </div>
         </label>
 
+        <fieldset class="profile-text-choice">
+          <legend>Profile message</legend>
+          <label><input v-model="profileTextModeDraft" type="radio" value="compliment" /> Daily compliments</label>
+          <label><input v-model="profileTextModeDraft" type="radio" value="bio" /> My own bio</label>
+        </fieldset>
+        <label v-if="profileTextModeDraft === 'bio'" class="profile-field" for="profile-bio">
+          <span>Bio · {{ bioDraft.length }}/240</span>
+          <textarea id="profile-bio" v-model="bioDraft" maxlength="240" rows="3" placeholder="Write something about yourself and your reading..." />
+        </label>
+        <p v-if="bioError" class="profile-bio-error" role="alert">{{ bioError }}</p>
+
         <div class="profile-actions">
           <button class="profile-action primary" type="button" @click="saveProfileDetails">
             <i class="ri-save-3-line"></i>
@@ -130,6 +141,9 @@ const {
 const avatarSourceOpen = ref(false)
 const avatarModalOpen = ref(false)
 const profileDraftName = ref('Reader')
+const profileTextModeDraft = ref('compliment')
+const bioDraft = ref('')
+const bioError = ref('')
 const selectedAvatar = ref('/images/User%20Avatars/default-user.jpeg')
 
 const profileAvatarSrc = computed(() => {
@@ -142,6 +156,9 @@ const firstName = computed(() => {
 
 const syncProfileDraft = (nextProfile = profile.value) => {
   profileDraftName.value = nextProfile.displayName || 'Reader'
+  profileTextModeDraft.value = nextProfile.profileTextMode || 'compliment'
+  bioDraft.value = nextProfile.bio || ''
+  bioError.value = ''
   selectedAvatar.value = nextProfile.avatarValue || '/images/User%20Avatars/default-user.jpeg'
 }
 
@@ -161,7 +178,17 @@ const persistProfile = async (patch, toastMessage) => {
   }
 }
 
-const saveProfileDetails = () => persistProfile({}, 'Profile updated')
+const saveProfileDetails = () => {
+  if (profileTextModeDraft.value === 'bio' && !bioDraft.value.trim()) {
+    bioError.value = 'Write a bio before selecting My own bio.'
+    return
+  }
+  bioError.value = ''
+  return persistProfile({
+    profileTextMode: profileTextModeDraft.value,
+    bio: bioDraft.value,
+  }, 'Profile updated')
+}
 
 const selectAvatar = async (avatarSrc) => {
   selectedAvatar.value = avatarSrc
@@ -198,6 +225,36 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.profile-text-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem 1rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--color-text-secondary);
+  font-size: .84rem;
+}
+.profile-text-choice legend {
+  width: 100%;
+  margin-bottom: .35rem;
+  color: var(--color-text-muted);
+  font-size: .8rem;
+}
+.profile-text-choice label { display: inline-flex; align-items: center; gap: .4rem; cursor: pointer; }
+.profile-text-choice input { accent-color: var(--color-brand-primary); }
+.profile-field textarea {
+  width: 100%;
+  min-height: 82px;
+  padding: .75rem .9rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 9px;
+  background: var(--color-surface-input);
+  color: var(--color-text-primary);
+  font: inherit;
+  resize: vertical;
+}
+.profile-bio-error { margin: 0; color: var(--color-text-danger, #b42318); font-size: .8rem; }
 .profile-page {
   width: 100%;
   min-height: calc(100vh - 88px - env(safe-area-inset-bottom));

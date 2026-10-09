@@ -1,12 +1,66 @@
 import { IDBFactory } from 'fake-indexeddb'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useLibraryStore } from './useLibraryStore.js'
+import { openLibraryDB, useLibraryStore } from './useLibraryStore.js'
 
 beforeEach(() => {
   globalThis.indexedDB = new IDBFactory()
 })
 
 describe('useLibraryStore — books', () => {
+  it('persists a custom profile bio and preserves it when the avatar changes', async () => {
+    const store = useLibraryStore()
+    await store.saveProfile({ displayName: 'Reader', profileTextMode: 'bio', bio: 'I read mysteries.' })
+    await store.saveProfile({ avatarValue: '/images/User%20Avatars/default-user.jpeg' })
+    expect(await store.getProfile()).toMatchObject({ profileTextMode: 'bio', bio: 'I read mysteries.' })
+    await store.saveProfile({ profileTextMode: 'compliment' })
+    expect(await store.getProfile()).toMatchObject({ profileTextMode: 'compliment', bio: 'I read mysteries.' })
+  })
+  for (const format of ['epub', 'pdf']) {
+    it(`inserts a scanned ${format.toUpperCase()} path only once across concurrent writes`, async () => {
+      const store = useLibraryStore()
+      const document = { title: 'Same file', format, deviceImport: true, deviceImportPath: `/storage/emulated/0/Books/same.${format}` }
+      const results = await Promise.all(Array.from({ length: 3 }, () => store.addDeviceBookIfAbsent(document)))
+      expect(results.filter((result) => result.created)).toHaveLength(1)
+      expect(new Set(results.map((result) => result.book.id)).size).toBe(1)
+      expect(await store.getBooks()).toHaveLength(1)
+    })
+  }
+
+  it('does not recreate a book when delayed metadata arrives after deletion', async () => {
+    const store = useLibraryStore()
+    const book = await store.addBook({ title: 'Removed', format: 'pdf' })
+    await store.deleteBook(book.id)
+    await expect(store.updateBook({ ...book, blurb: 'Late result' })).rejects.toThrow()
+    expect(await store.getBooks()).toEqual([])
+  })
+
+  for (const format of ['epub', 'pdf']) {
+    it(`consolidates old ${format.toUpperCase()} duplicates and keeps playlists and annotations`, async () => {
+      const store = useLibraryStore()
+      const path = `/storage/emulated/0/Books/same.${format}`
+      const first = await store.addBook({ title: 'Same', format, deviceImport: true, deviceImportPath: path, progress: 20 })
+      const second = await store.addBook({ title: 'Same', format, deviceImport: true, deviceImportPath: path, progress: 70, isFavourite: true })
+      const collection = await store.addCollection({ name: 'Saved', bookIds: [second.id] })
+      const db = await openLibraryDB()
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction('annotations', 'readwrite')
+        tx.objectStore('annotations').put({ id: 'note-1', bookId: second.id, text: 'Keep this' })
+        tx.oncomplete = resolve
+        tx.onerror = reject
+      })
+
+      expect(await store.mergeDuplicateDeviceBooks(path, first.id)).toEqual([second.id])
+      expect(await store.getBooks()).toMatchObject([{ id: first.id, progress: 70, isFavourite: true }])
+      expect((await store.getCollections()).find((item) => item.id === collection.id).bookIds).toEqual([first.id])
+      const annotations = await new Promise((resolve, reject) => {
+        const tx = db.transaction('annotations', 'readonly')
+        const request = tx.objectStore('annotations').getAll()
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = reject
+      })
+      expect(annotations).toMatchObject([{ id: 'note-1', bookId: first.id }])
+    })
+  }
   it('returns an empty array when no books exist', async () => {
     const { getBooks } = useLibraryStore()
     expect(await getBooks()).toEqual([])

@@ -122,7 +122,7 @@
                 {{ book.author || 'Unknown author' }}<span v-if="book.publishYear"> &bull; {{ book.publishYear }}</span>
               </p>
               <div class="cell-book-tags">
-                <span class="cell-chip" :class="{ standalone: !book.series }">{{ book.series || 'Standalone' }}</span>
+                <span class="cell-chip" :class="{ standalone: !book.series }">{{ seriesDisplayLabel(book) }}</span>
                 <span v-if="book.genre" class="cell-chip genre"><i class="ri-price-tag-3-line"></i>{{ book.genre }}</span>
               </div>
             </div>
@@ -155,6 +155,9 @@
                 </button>
                 <button type="button" @click="router.push(bookEditLocation(book.id, route.fullPath))">
                   <i class="ri-edit-line"></i> Edit book
+                </button>
+                <button type="button" @click="activeActionsMenu = null; router.push(`/analytics/${book.id}`)">
+                  <i class="ri-bar-chart-line"></i> View Analytics
                 </button>
                 <button type="button" class="danger" @click="handleDeleteBook(book); activeActionsMenu = null">
                   <i class="ri-delete-bin-line"></i> Delete book
@@ -204,6 +207,7 @@
 </template>
 
 <script setup>
+import { seriesDisplayLabel } from '~/utils/bookSeriesState'
 import { computed, ref, watch } from 'vue';
 import AddToPlaylistModal from './AddToPlaylistModal.vue';
 import DeleteConfirmModal from './DeleteConfirmModal.vue';

@@ -44,26 +44,7 @@ const normalize = (value) => String(value ?? '')
   .replace(/[^a-z0-9]+/g, ' ')
   .trim()
 
-export function metadataResultMatchesBook(book, result) {
-  if (!result) return false
-  const bookTitle = normalize(book?.title)
-  const resultTitle = normalize(result.title)
-  if (!bookTitle || !resultTitle) return false
-
-  const titleMatches = bookTitle === resultTitle
-    || bookTitle.includes(resultTitle)
-    || resultTitle.includes(bookTitle)
-  if (!titleMatches) return false
-
-  const bookAuthor = normalize(book?.author)
-  const resultAuthor = normalize(result.author)
-  if (bookAuthor && resultAuthor) {
-    return bookAuthor === resultAuthor
-      || bookAuthor.includes(resultAuthor)
-      || resultAuthor.includes(bookAuthor)
-  }
-  return true
-}
+export { metadataCandidateMatches as metadataResultMatchesBook } from './metadataPolicy'
 // missing, and pure overhead when they aren't.
 //
 // This is deliberately not "use fewer sources for the same field": every field
@@ -136,7 +117,11 @@ const autoState = reactive({
 let _timer = null
 let _deps = null // { getBooks, updateBook, isBackfillRunning, isOnline }
 
-const wait = (ms) => new Promise((resolve) => { _timer = setTimeout(resolve, ms); })
+let wakeWait = null
+const wait = (ms) => new Promise((resolve) => {
+  wakeWait = () => { clearTimeout(_timer); _timer = null; wakeWait = null; resolve() }
+  _timer = setTimeout(wakeWait, ms)
+})
 
 const online = () => (_deps?.isOnline ? _deps.isOnline() : (typeof navigator === 'undefined' || navigator.onLine !== false))
 
@@ -176,7 +161,7 @@ async function fillOne(book) {
     const { record, filled } = applyMetadataResult(book, match, { didLookup: !!match, isLightPass: true })
     const updatedRecord = markMetadataCheck(record || book, { lookedUp: !!match })
     updatedRecord.metaErrorCount = 0
-    await _deps.updateBook(updatedRecord)
+    await _deps.updateBook(updatedRecord, { automaticMetadata: true })
     return filled
   } catch (error) {
     const errorCount = (Number(book.metaErrorCount) || 0) + 1
@@ -184,7 +169,7 @@ async function fillOne(book) {
       ...book,
       metaCheckedAt: Date.now(),
       metaErrorCount: errorCount,
-    })
+    }, { automaticMetadata: true })
     throw error
   }
 }
@@ -270,6 +255,7 @@ export function startAutoMetadata(deps) {
 
 export function stopAutoMetadata() {
   autoState.enabled = false
+  wakeWait?.()
   if (_timer) {
     clearTimeout(_timer)
     _timer = null
@@ -278,6 +264,7 @@ export function stopAutoMetadata() {
 
 export function wakeAutoMetadata() {
   if (!autoState.enabled) return
+  wakeWait?.()
   if (_timer) {
     clearTimeout(_timer)
     _timer = null

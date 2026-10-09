@@ -45,6 +45,9 @@
         <button type="button" role="menuitem" @click="runMenuAction('edit')">
           <i class="ri-edit-line"></i><span>Edit book</span>
         </button>
+        <button type="button" role="menuitem" @click="runMenuAction('analytics')">
+          <i class="ri-bar-chart-line"></i><span>View Analytics</span>
+        </button>
         <button type="button" role="menuitem" @click="runMenuAction('hide')">
           <i class="ri-eye-off-line"></i><span>Hide book</span>
         </button>
@@ -79,7 +82,7 @@
         <span v-if="book.publishYear">&bull; {{ book.publishYear }}</span>
       </p>
       <p class="card-series" :class="{ standalone: !book.series }">
-        {{ book.series || 'Standalone' }}
+        {{ seriesDisplayLabel(book) }}
       </p>
 
       <div v-if="book.genre" class="card-genre" :title="`Genre: ${book.genre}`">
@@ -143,12 +146,14 @@
 </template>
 
 <script setup>
+import { seriesDisplayLabel } from '~/utils/bookSeriesState'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import BookProgressDisplay from './BookProgressDisplay.vue'
 import BookRatingDisplay from './BookRatingDisplay.vue'
 import { useBooks } from '~/composables/useBooks'
 import { useBookishSettings } from '~/composables/useBookishSettings'
 import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   book: {
@@ -196,6 +201,7 @@ const props = defineProps({
 const emit = defineEmits([
   'open', 'play', 'favourite', 'playlist', 'edit', 'hide', 'share', 'delete', 'restore', 'toggle-select',
 ])
+const router = useRouter()
 const { settings } = useBookishSettings()
 const { isTablet } = useDeviceArchitecture()
 const effectiveCollapseActions = computed(() => props.collapseActions || isTablet.value)
@@ -244,6 +250,7 @@ const toggleMenu = async () => {
 
 const runMenuAction = (action) => {
   menuOpen.value = false
+  if (action === 'analytics') return router.push(`/analytics/${props.book.id}`)
   emit(action, props.book)
 }
 

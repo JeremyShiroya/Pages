@@ -27,6 +27,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
 
     // Deep link with no in-app history: fall back to the closest root.
+    if (path.startsWith('/listen-settings/')) {
+      router.replace(`/reader/${encodeURIComponent(String(router.currentRoute.value.params.id))}?mode=listen`)
+      return
+    }
     if (ROOT_PATHS.has(path)) App.minimizeApp()
     else router.replace('/')
   })

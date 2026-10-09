@@ -1,3 +1,4 @@
+import { metadataCandidateMatches } from '../../utils/metadataIdentity'
 export type MetadataSourceName = 'goodreads' | 'googleBooks' | 'openLibrary' | 'internetArchive' | 'kobo' | 'publisher' | 'hardcover' | 'wikidata' | 'openAlex' | 'libraryOfCongress';
 
 export type MetadataSource = {
@@ -202,12 +203,12 @@ function completenessScore(source: MetadataSource) {
 }
 
 function matchSource(primary: MetadataSource, candidates: MetadataSource[]) {
-  const ranked = candidates
+  const ranked = (candidates || [])
     .map((candidate) => ({
       candidate,
       score: scoreSource(primary.title, primary.author, candidate),
     }))
-    .filter((entry) => authorsCompatible(primary.author, entry.candidate.author))
+    .filter((entry) => metadataCandidateMatches(primary, entry.candidate))
     .filter((entry) => entry.score >= 45 || normalizedKey(entry.candidate.title) === normalizedKey(primary.title))
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
@@ -394,7 +395,7 @@ export function buildMetadataResults(
     .map((entry) => entry.source);
 
   const fallbackPrimaries = primaries.length ? primaries : allSources;
-  const targetGoodreads = sources.goodreadsSources
+  const targetGoodreads = goodreadsSources
     .map((source) => ({
       source,
       score: scoreSource(targetTitle, targetAuthor, source),
@@ -408,7 +409,7 @@ export function buildMetadataResults(
       const canUseSearchedGoodreads = !targetAuthor || scoreSource(targetTitle, targetAuthor, primary) >= 90;
       const goodreads = primary.source === 'goodreads'
         ? primary
-        : (matchSource(primary, sources.goodreadsSources) ?? (canUseSearchedGoodreads ? targetGoodreads : null));
+        : (matchSource(primary, sources.goodreadsSources) ?? (canUseSearchedGoodreads && metadataCandidateMatches(primary, targetGoodreads) ? targetGoodreads : null));
       const googleBooks = primary.source === 'googleBooks' ? primary : matchSource(primary, sources.googleBooksSources);
       const openLibrary = primary.source === 'openLibrary' ? primary : matchSource(primary, sources.openLibrarySources);
       const hardcover = primary.source === 'hardcover' ? primary : matchSource(primary, hardcoverSources);
@@ -431,8 +432,7 @@ export function buildMetadataResults(
           ...sources.googleBooksSources,
         ].find((candidate) => (
           candidate?.series
-          && authorsCompatible(primary.author, candidate.author)
-          && (scoreSource(primary.title, primary.author, candidate) >= 30 || normalizedKey(candidate.title) === normalizedKey(primary.title))
+          && metadataCandidateMatches(primary, candidate)
         ));
 
         if (seriesFallback?.series) {

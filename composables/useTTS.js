@@ -7,6 +7,7 @@ import { createNativeSpeechAudio, loadNativeVoices } from '~/composables/tts/nat
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 import { firstChunkForPage } from '~/composables/usePdfManifest'
 import { useBookishSettings } from '~/composables/useBookishSettings'
+import { TTS_WORDS_PER_MIN, chunkIndexAtEstimatedSecond } from '~/composables/tts/timing'
 
 let _currentAudio = null
 let _prefetchChunk = null        // { chunkIdx, audio, boundaries }
@@ -19,7 +20,7 @@ let _onlineListenerBound = false // useTTS() runs per-component; bind the listen
 
 const DEFAULT_SENTENCE_MAX_CHARS = 480
 const AUDIO_CACHE_LIMIT = 8
-const WORDS_PER_MIN = 145
+const WORDS_PER_MIN = TTS_WORDS_PER_MIN
 export const BOOKISH_TTS_SESSION_KEY = 'bookish:tts-session'
 
 const EDGE_VOICES = [
@@ -78,6 +79,7 @@ export function readStoredTtsSession(storage = resolveStorage()) {
       elapsedSeconds: Math.max(0, Number(session.elapsedSeconds) || 0),
       totalSeconds: Math.max(0, Number(session.totalSeconds) || 0),
       currentChunk: typeof session.currentChunk === 'string' ? session.currentChunk : '',
+      dismissed: session.dismissed === true,
       updatedAt: session.updatedAt || null,
     }
   } catch {
@@ -96,6 +98,7 @@ export function writeStoredTtsSession(session, storage = resolveStorage()) {
     elapsedSeconds: Math.max(0, Number(session.elapsedSeconds) || 0),
     totalSeconds: Math.max(0, Number(session.totalSeconds) || 0),
     currentChunk: typeof session.currentChunk === 'string' ? session.currentChunk : '',
+    dismissed: session.dismissed === true,
     updatedAt: session.updatedAt || new Date().toISOString(),
   }
 
@@ -110,6 +113,18 @@ export function writeStoredTtsSession(session, storage = resolveStorage()) {
 
 export function clearStoredTtsSession(storage = resolveStorage()) {
   storage?.removeItem?.(BOOKISH_TTS_SESSION_KEY)
+}
+
+export function dismissStoredTtsSession(bookId, storage = resolveStorage()) {
+  const session = readStoredTtsSession(storage)
+  if (!bookId || String(session?.bookId) !== String(bookId)) return null
+  return writeStoredTtsSession({ ...session, dismissed: true }, storage)
+}
+
+export function savedPlaybackChunk(book, session, totalChunks) {
+  if (!book?.id || String(session?.bookId) !== String(book.id)) return null
+  if (session.totalChunks !== totalChunks || totalChunks < 1) return null
+  return Math.max(0, Math.min(totalChunks - 1, session.chunkIdx))
 }
 
 export function takeMatchingPrefetch(prefetch, chunkIdx, chunkText) {
@@ -1045,6 +1060,9 @@ export const useTTS = () => {
   // ── Public API ─────────────────────────────────────────────────────────────
 
   const play = async (book, options = {}) => {
+    // A dismissed player keeps its listening position without restoring the bar.
+    // Capture it before the new track's first progress update replaces the session.
+    const savedSession = options.ignoreSavedSession ? null : readStoredTtsSession()
     _stopInternal()
     ttsBook.value = book
     ttsStatus.value = 'loading'
@@ -1101,8 +1119,13 @@ export const useTTS = () => {
 
     const contentStart = findContentStart(sentenceChunks)
     const hasRequestedChunkIdx = Number.isFinite(Number(options.startChunkIdx))
+    const savedChunkIdx = options.ignoreSavedSession
+      ? null
+      : savedPlaybackChunk(book, savedSession, sentenceChunks.length)
     const requestedChunkIdx = hasRequestedChunkIdx
       ? Number(options.startChunkIdx)
+      : savedChunkIdx !== null
+        ? savedChunkIdx
       : format === 'pdf' && stored?.pdfManifest
         ? chunkIndexForPdfProgress(book?.progress, stored.pdfManifest, contentStart)
         : chunkIndexForProgress(book?.progress, sectionCounts, contentStart)
@@ -1161,6 +1184,7 @@ export const useTTS = () => {
   }
 
   const stop = () => {
+    const stoppedSession = dismissStoredTtsSession(ttsBook.value?.id)
     _stopInternal()
     ttsStatus.value = 'idle'
     ttsProgress.value = 0
@@ -1170,7 +1194,7 @@ export const useTTS = () => {
     ttsTotalSeconds.value = 0
     ttsBook.value = null
     ttsChapterBoundaries.value = []
-    clearStoredTtsSession()
+    if (!stoppedSession) clearStoredTtsSession()
   }
 
   const setSpeed = (rate) => {
@@ -1338,10 +1362,10 @@ export const useTTS = () => {
   // Seek by wall-clock seconds inside the current sentence when possible.
   // If the seek crosses a sentence boundary, move to the adjacent sentence.
   const skipSeconds = (seconds) => {
-    if (!_chunks.length) return
+    if (!_chunks.length || !Number.isFinite(Number(seconds)) || Number(seconds) === 0) return
 
     if (_currentAudio && Number.isFinite(_currentAudio.duration)) {
-      const target = _currentAudio.currentTime + seconds
+      const target = _currentAudio.currentTime + Number(seconds)
       if (target >= 0 && target < _currentAudio.duration) {
         _currentAudio.currentTime = target
         _syncWordIndexForTime(target)
@@ -1350,14 +1374,24 @@ export const useTTS = () => {
       }
     }
 
-    skipChunks(seconds < 0 ? -1 : 1)
+    // A skip can span several sentences. Locate its destination on the same
+    // estimated timeline used by the player instead of moving only one chunk.
+    const before = _chunks.slice(0, _chunkIdx)
+      .reduce((sum, chunk) => sum + _estimatedChunkSeconds(chunk), 0)
+    const destination = Math.max(0, before + (_currentAudio?.currentTime || 0) + Number(seconds))
+    let targetIdx = chunkIndexAtEstimatedSecond(_chunks, destination, ttsSpeed.value)
+    if (targetIdx === _chunkIdx) targetIdx = Math.max(0, Math.min(_chunks.length - 1, _chunkIdx + (seconds < 0 ? -1 : 1)))
+    _cancelAudio()
+    _chunkIdx = targetIdx
+    _updateProgress()
+    if (ttsStatus.value === 'playing') _speakNextEdge()
   }
 
   const restoreLastSession = (availableBooks = []) => {
     if (ttsBook.value || ttsStatus.value === 'playing' || ttsStatus.value === 'loading') return false
 
     const session = readStoredTtsSession()
-    if (!session?.bookId) return false
+    if (!session?.bookId || session.dismissed) return false
 
     const restoredBook = availableBooks.find(book => String(book.id) === String(session.bookId))
     if (!restoredBook) return false

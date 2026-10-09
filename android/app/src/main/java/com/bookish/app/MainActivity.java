@@ -23,6 +23,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(DeviceBooksPlugin.class);
         registerPlugin(MediaSessionPlugin.class);
         registerPlugin(SystemBarsPlugin.class);
+        registerPlugin(PageSyncPlugin.class);
+        registerPlugin(AppResetPlugin.class);
         super.onCreate(savedInstanceState);
         enableEdgeToEdge();
         installRenderProcessGoneHandler();

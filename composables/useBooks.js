@@ -8,6 +8,9 @@ import { useToast } from '~/composables/useToast';
 import { coverPlaceholder } from '~/composables/useCoverFallback';
 import { getBookRating } from '~/composables/useBookRating';
 import { useLibraryStore } from '~/composables/useLibraryStore';
+import { documentTypeOf } from '~/composables/useDocumentReview';
+import { documentAnalysisDue, runDocumentIntelligence, setDocumentIntelligenceListener } from '~/composables/useDocumentIntelligence';
+import { wakeAutoMetadata } from '~/composables/useAutoMetadata';
 import { useApiEndpoint } from '~/composables/useApiEndpoint';
 import { readBookishSettings, useBookishSettings } from '~/composables/useBookishSettings';
 import { appendSeriesRepairAudit, validateAutomaticSeriesMutation } from '~/composables/seriesMutationGuard';
@@ -77,12 +80,25 @@ export const groupBooksBySeries = (sourceBooks = []) => {
 
 export const useBooks = () => {
   const { apiUrl } = useApiEndpoint()
+  const { getBookText } = useBookStorage()
   const { settings: bookishSettings } = useBookishSettings()
   const books = useState('library:books', () => []);
   const collections = useState('library:collections', () => []);
   const loading = useState('library:loading', () => false);
   const initialized = useState('library:initialized', () => false);
   const error = useState('library:error', () => null);
+
+  setDocumentIntelligenceListener((updated) => {
+    const index = books.value.findIndex((book) => book.id === updated.id)
+    if (index >= 0 && (!books.value[index].updatedAt || books.value[index].updatedAt <= updated.updatedAt)) books.value[index] = updated
+    if (documentTypeOf(updated) === 'book') wakeAutoMetadata()
+  })
+  const analyzeLibraryDocuments = async () => {
+    for (const book of [...books.value].filter((item) => documentAnalysisDue(item))) {
+      try { await runDocumentIntelligence(book.id, { searchEnabled: bookishSettings.value.metadataAutoFill === true }) }
+      catch (error) { console.warn('[DocumentIntelligence] Analysis will retry', book.id, error) }
+    }
+  }
 
   const authors = computed(() => {
     const authorMap = new Map();
@@ -240,6 +256,7 @@ export const useBooks = () => {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       collections.value = hideContent ? [] : collectionsData;
       if (!hideContent) cacheRemoteLibraryCovers();
+      if (!hideContent && import.meta.client) void analyzeLibraryDocuments();
     } catch (fetchError) {
       console.error('Failed to load library:', fetchError);
       error.value = 'Pages could not load your library.';
@@ -425,8 +442,9 @@ export const useBooks = () => {
       };
       const savedBook = await store.addBook(bookToSave);
       books.value.unshift(savedBook);
+      if (documentTypeOf(savedBook) === 'book') wakeAutoMetadata()
       // Fire-and-forget: fetch author bio/details if not already stored
-      if (savedBook.author) fetchAndStoreAuthorDetails(savedBook.author)
+      if (savedBook.author && documentTypeOf(savedBook) === 'book') fetchAndStoreAuthorDetails(savedBook.author)
       return savedBook;
     } catch (err) {
       console.error('Failed to add book:', err);
@@ -434,7 +452,28 @@ export const useBooks = () => {
     }
   };
 
+  const addDeviceBook = async (book) => {
+    const store = useLibraryStore();
+    const normalized = {
+      ...book,
+      series: book?.series ? canonicalLibrarySeriesName(book.series) : book?.series,
+    };
+    const result = await store.addDeviceBookIfAbsent(normalized);
+    if (result.created && !result.book.isHidden && !readBookishSettings().hideContent) {
+      books.value.unshift(result.book);
+      if (documentTypeOf(result.book) === 'book') wakeAutoMetadata()
+      if (result.book.author && documentTypeOf(result.book) === 'book') fetchAndStoreAuthorDetails(result.book.author);
+    }
+    return result;
+  };
+
   const updateBook = async (updatedBook, options = {}) => {
+    if (options.automaticMetadata || options.automaticSeriesRepair) {
+      const result = await useLibraryStore().updateBook(updatedBook, { automaticMetadata: true })
+      const latestIndex = books.value.findIndex((book) => book.id === result.id)
+      if (latestIndex >= 0 && books.value[latestIndex].updatedAt <= result.updatedAt) books.value[latestIndex] = result
+      return result
+    }
     const index = books.value.findIndex(b => b.id === updatedBook.id);
     const normalizedUpdatedBook = {
       ...updatedBook,
@@ -457,7 +496,9 @@ export const useBooks = () => {
     try {
       const store = useLibraryStore();
       // Always write the full merged record so the store has a complete snapshot.
-      const result = await store.updateBook(index !== -1 ? books.value[index] : normalizedUpdatedBook);
+      const result = await store.updateBook(index !== -1 ? books.value[index] : normalizedUpdatedBook, {
+        automaticMetadata: options.automaticMetadata === true || options.automaticSeriesRepair === true,
+      });
       if (index !== -1) books.value[index] = result;
       if (options.automaticSeriesRepair) {
         appendSeriesRepairAudit({
@@ -637,6 +678,7 @@ export const useBooks = () => {
     listHiddenBooks,
     restoreHiddenBook,
     addBook,
+    addDeviceBook,
     updateBook,
     deleteBook,
     createPlaylist,

@@ -1,11 +1,17 @@
 import { registerPlugin } from '@capacitor/core'
 import { Filesystem } from '@capacitor/filesystem'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
-import { enabledExtensionPattern, useBookishSettings } from '~/composables/useBookishSettings'
+import { enabledExtensionPattern, useBookishSettings, readBookishSettings } from '~/composables/useBookishSettings'
 import { useBooks } from '~/composables/useBooks'
 import { useBookStorage } from '~/composables/useBookStorage'
+import { useLibraryStore } from '~/composables/useLibraryStore'
 import { useDevicePermissionPrompt } from '~/composables/useDevicePermissionPrompt'
 import { useToast } from '~/composables/useToast'
+import { collectDocumentEvidence, createIntelligenceSnapshot } from '~/composables/documentIntelligence'
+import { useDocumentIntelligenceStore } from '~/composables/useDocumentIntelligenceStore'
+import { metadataEligible as canApplyCatalogMetadata, metadataCandidateMatches } from '~/composables/metadataPolicy'
+import { runDocumentIntelligence } from '~/composables/useDocumentIntelligence'
+import { sourceDocumentIdentity } from '~/composables/sourceBookIdentity'
 
 // ReadERA-style device library sync for the native app.
 //
@@ -26,6 +32,7 @@ export const DEFAULT_SCAN_FOLDERS = Object.freeze(['/storage/emulated/0'])
 const DeviceBooks = registerPlugin('DeviceBooks')
 
 let _syncInFlight = false
+let _queuedSync = null
 
 const resolveStorage = () => (typeof localStorage === 'undefined' ? null : localStorage)
 
@@ -177,7 +184,8 @@ export function cleanTitleFromFileName(name) {
 
 // Fields the background pass may fill — only ever writes over empty values.
 export function mergeMetadataIntoBook(book, meta) {
-  if (!meta) return null
+  if (!canApplyCatalogMetadata(book)) return null
+  if (!meta || !metadataCandidateMatches(book, meta)) return null
   const updated = { ...book }
   let changed = false
   const provenance = Array.isArray(updated.provenance) ? [...updated.provenance] : []
@@ -299,7 +307,7 @@ async function readDeviceFileBase64(path) {
 // persists its content. Used by the startup device scan (which passes the
 // on-disk path) and by the system "Open with" flow (which has no path — the
 // document may come from Drive, mail, a browser download, etc.).
-export async function importDocumentFile(documentFile, extension, { addBook, saveBookContent, deviceImportPath = null }) {
+export async function importDocumentFile(documentFile, extension, { addBook, addDeviceBook, updateBook, deleteBook, saveBookContent, deviceImportPath = null, deviceCreatedAt = null, existingBook = null }) {
   let extracted = {}
   let source = null
   if (extension === 'epub') {
@@ -312,10 +320,17 @@ export async function importDocumentFile(documentFile, extension, { addBook, sav
     source = extracted.source ?? await documentFile.arrayBuffer()
   }
 
-  const title = extracted.title || cleanTitleFromFileName(documentFile.name)
-  const savedBook = await addBook({
+  const evidence = collectDocumentEvidence({ format: extension, fileName: documentFile.name,
+    path: deviceImportPath, content: extracted.content, pages: extracted.pages,
+    embeddedTitle: extracted.embeddedTitle || extracted.title,
+    embeddedAuthor: extracted.embeddedAuthor || extracted.author, tocItems: extracted.tocItems })
+  const snapshot = createIntelligenceSnapshot(evidence)
+  const sourceIdentity = sourceDocumentIdentity(documentFile.name, evidence)
+  const title = extension === 'epub' ? extracted.title || cleanTitleFromFileName(documentFile.name)
+    : sourceIdentity.title || cleanTitleFromFileName(documentFile.name)
+  const details = {
     title,
-    author: extracted.author || '',
+    author: extension === 'epub' ? extracted.author || '' : snapshot.kind === 'book' ? sourceIdentity.author : '',
     format: extension,
     pages: extracted.pages || 0,
     progress: 0,
@@ -329,38 +344,80 @@ export async function importDocumentFile(documentFile, extension, { addBook, sav
     seriesTotal: null,
     deviceImport: !!deviceImportPath,
     deviceImportPath,
-  })
+    sourceFileName: documentFile.name,
+    fileCreatedAt: Number(deviceCreatedAt) > 0 ? new Date(Number(deviceCreatedAt)).toISOString() : null,
+    documentType: snapshot.kind,
+    intelligence: snapshot,
+    documentTypeClassificationVersion: 4,
+    documentTypeChosenByUser: false,
+    reviewState: snapshot.review === 'conflict' ? 'new' : null,
+  }
+  const inserted = existingBook
+    ? { book: existingBook, created: false }
+    : deviceImportPath && addDeviceBook
+      ? await addDeviceBook(details)
+      : { book: await addBook(details), created: true }
+  const savedBook = inserted.book
 
-  if (savedBook?.id && (extracted.content || source)) {
-    await saveBookContent(savedBook.id, {
-      content: extracted.content ?? null,
-      pages: savedBook.pages || 0,
-      tocTitles: extracted.tocTitles ?? [],
-      source,
-      tocItems: extracted.tocItems ?? [],
-      format: extension,
-      pdfTocChecked: extension === 'pdf',
-      pdfTextMapVersion: extension === 'pdf' ? 2 : undefined,
-      pdfManifest: extracted.pdfManifest ?? null,
-    })
+  try {
+    if (savedBook?.id && (extracted.content || source)) {
+      await saveBookContent(savedBook.id, {
+        content: extracted.content ?? null,
+        pages: extracted.pages || savedBook.pages || 0,
+        tocTitles: extracted.tocTitles ?? [],
+        source,
+        tocItems: extracted.tocItems ?? [],
+        format: extension,
+        pdfTocChecked: extension === 'pdf',
+        pdfTextMapVersion: extension === 'pdf' ? 2 : undefined,
+        pdfManifest: extracted.pdfManifest ?? null,
+      })
+    }
+    if (existingBook && updateBook) {
+      await updateBook({
+        ...existingBook,
+        pages: extracted.pages || existingBook.pages || 0,
+        deviceImport: true,
+        deviceImportPath,
+        fileCreatedAt: details.fileCreatedAt || existingBook.fileCreatedAt || null,
+        sourceFileName: existingBook.sourceFileName || documentFile.name,
+      })
+    }
+    if (savedBook?.id) {
+      try { await useDocumentIntelligenceStore().saveEvidence(savedBook.id, evidence) }
+      catch (error) { console.warn('[DocumentIntelligence] Could not cache evidence', error) }
+      if (extension === 'pdf') void runDocumentIntelligence(savedBook.id, { searchEnabled: readBookishSettings().metadataAutoFill === true })
+        .catch((error) => console.warn('[DocumentIntelligence] Import analysis will retry', error))
+    }
+  } catch (error) {
+    // A failed content write must not leave a newly created, unreadable book.
+    if (inserted.created && deleteBook) {
+      try { await deleteBook(savedBook.id, { skipDeviceFile: true }) } catch {}
+    }
+    throw error
   }
 
   return savedBook
 }
 
-async function importDeviceFile(file, { addBook, saveBookContent }) {
+async function importDeviceFile(file, { addBook, addDeviceBook, updateBook, deleteBook, saveBookContent, existingBook }) {
   const extension = file.name.split('.').pop().toLowerCase()
   const data = await readDeviceFileBase64(file.path)
   const documentFile = base64ToFile(data, file.name, extension)
   return importDocumentFile(documentFile, extension, {
     addBook,
+    addDeviceBook,
+    updateBook,
+    deleteBook,
     saveBookContent,
     deviceImportPath: file.path,
+    deviceCreatedAt: file.created,
+    existingBook,
   })
 }
 
 async function backfillBookMetadata(importedBooks, { updateBook, addToast }) {
-  const targets = importedBooks.filter(Boolean)
+  const targets = importedBooks.filter((book) => book && canApplyCatalogMetadata(book))
   if (!targets.length) return
 
   addToast(`Fetching book details for ${targets.length} imported book${targets.length === 1 ? '' : 's'} in the background…`, 'info')
@@ -376,7 +433,7 @@ async function backfillBookMetadata(importedBooks, { updateBook, addToast }) {
       const match = bestMetadataResultForBook(book, results)
       const updated = mergeMetadataIntoBook(book, match)
       if (updated || match) {
-        await updateBook(markMetadataCheck(updated || book, { lookedUp: !!match }))
+        await updateBook(markMetadataCheck(updated || book, { lookedUp: !!match }), { automaticMetadata: true })
       }
       if (updated) {
         updatedCount += 1
@@ -397,15 +454,24 @@ async function backfillBookMetadata(importedBooks, { updateBook, addToast }) {
 // `silent: true` is the repeating background rescan: no toasts, and never any
 // permission prompting — if access isn't already granted it just waits for the
 // next foreground scan. `announce: false` also quiets permission-capable scans.
-export async function syncDeviceLibrary({ silent = false, announce = !silent } = {}) {
-  if (!import.meta.client || !isNativeCapacitorPlatform() || _syncInFlight) return
+export async function syncDeviceLibrary({ silent = false, announce = !silent, backfillImported = true } = {}) {
+  if (!import.meta.client || !isNativeCapacitorPlatform()) return
+  if (_syncInFlight) {
+    return new Promise((resolve) => {
+      if (!_queuedSync) _queuedSync = { silent, announce, backfillImported, resolve: [] }
+      _queuedSync.silent = _queuedSync.silent && silent
+      _queuedSync.announce = _queuedSync.announce || announce
+      _queuedSync.backfillImported = _queuedSync.backfillImported && backfillImported
+      _queuedSync.resolve.push(resolve)
+    })
+  }
   _syncInFlight = true
 
   const { addToast: realToast } = useToast()
   const sessionToast = silent ? () => {} : realToast
   const addToast = announce ? sessionToast : () => {}
-  const { books, addBook, updateBook, deleteBook, fetchAllData, initialized } = useBooks()
-  const { saveBookContent } = useBookStorage()
+  const { books, addBook, addDeviceBook, updateBook, deleteBook, fetchAllData, initialized } = useBooks()
+  const { saveBookContent, getBookContent } = useBookStorage()
   const { ask } = useDevicePermissionPrompt()
   const { settings } = useBookishSettings()
 
@@ -461,6 +527,69 @@ export async function syncDeviceLibrary({ silent = false, announce = !silent } =
     }
 
     const registry = readImportRegistry()
+    const libraryStore = useLibraryStore()
+    let allStoredBooks = await libraryStore.getBooks()
+    const byPath = new Map()
+    for (const book of allStoredBooks) {
+      if (!book.deviceImportPath) continue
+      const group = byPath.get(book.deviceImportPath) || []
+      group.push(book)
+      byPath.set(book.deviceImportPath, group)
+    }
+    let duplicatesRemoved = 0
+    for (const [path, group] of byPath) {
+      if (group.length < 2) continue
+      const contentById = {}
+      for (const book of group) {
+        try {
+          const stored = await getBookContent(book.id)
+          contentById[book.id] = !!(stored?.source || stored?.content)
+        } catch { contentById[book.id] = false }
+      }
+      const keeper = chooseDeviceImportKeeper(group, contentById)
+      const removedIds = await libraryStore.mergeDuplicateDeviceBooks(path, keeper.id)
+      if (!removedIds.length) continue
+      duplicatesRemoved += removedIds.length
+      for (const id of removedIds) {
+        try { await useBookStorage().deleteBookContent(id) } catch (error) {
+          console.warn('[DeviceSync] Could not remove duplicate cached content:', error)
+        }
+      }
+      for (const entry of Object.values(registry)) {
+        if (removedIds.includes(entry?.bookId)) entry.bookId = keeper.id
+      }
+      const scannedFile = inFolders.find((file) => file.path === path)
+      registry[path] = {
+        ...(registry[path] || {}),
+        ...(scannedFile ? { size: scannedFile.size, modified: scannedFile.modified } : {}),
+        bookId: keeper.id,
+      }
+    }
+    if (duplicatesRemoved) {
+      writeImportRegistry(registry)
+      await fetchAllData(true)
+      allStoredBooks = await libraryStore.getBooks()
+      addToast(`Consolidated ${duplicatesRemoved} duplicate device book${duplicatesRemoved === 1 ? '' : 's'}.`, 'info')
+    }
+    const existingByPath = new Map(allStoredBooks
+      .filter((book) => book?.deviceImportPath)
+      .map((book) => [book.deviceImportPath, book]))
+    // A scan also refreshes filesystem creation dates for files already in
+    // the library; otherwise only newly imported files would show the date.
+    for (const file of inFolders) {
+      const existing = existingByPath.get(file.path)
+      if (!existing || !Number(file.created)) continue
+      const fileCreatedAt = new Date(Number(file.created)).toISOString()
+      if (existing.fileCreatedAt === fileCreatedAt) continue
+      const updated = { ...existing, fileCreatedAt, sourceFileName: existing.sourceFileName || file.name }
+      await updateBook(updated)
+      existingByPath.set(file.path, updated)
+    }
+    // A crash or an older release may have left a registry entry pointing at
+    // a record that no longer exists. Keep explicit user deletions tombstoned.
+    for (const [path, entry] of Object.entries(registry)) {
+      if (entry?.bookId && !entry.deletedByUser && !existingByPath.has(path)) delete registry[path]
+    }
     const newFiles = selectNewDeviceFiles(inFolders, registry, settings.value.enabledFormats)
     if (!newFiles.length) {
       addToast('Device scan complete — no new books found.', 'success')
@@ -472,9 +601,21 @@ export async function syncDeviceLibrary({ silent = false, announce = !silent } =
     const importedBooks = []
     let skippedTooLarge = 0
     for (const file of newFiles) {
+      if (!enabledExtensionPattern(settings.value.enabledFormats).test(file.path)) continue
       try {
-        const saved = await importDeviceFile(file, { addBook, saveBookContent })
-        if (saved) importedBooks.push(saved)
+        const existingBook = existingByPath.get(file.path) || null
+        const previous = registry[file.path]
+        if (existingBook && !previous) {
+          const stored = await getBookContent(existingBook.id)
+          if (stored && (stored.content || stored.source)) {
+            registry[file.path] = { size: file.size, modified: file.modified, bookId: existingBook.id }
+            writeImportRegistry(registry)
+            continue
+          }
+        }
+        const saved = await importDeviceFile(file, { addBook, addDeviceBook, updateBook, deleteBook, saveBookContent, existingBook })
+        if (saved && !existingBook && !allStoredBooks.some((book) => book.id === saved.id)) importedBooks.push(saved)
+        if (saved) existingByPath.set(file.path, saved)
         registry[file.path] = { size: file.size, modified: file.modified, bookId: saved?.id ?? null }
       } catch (error) {
         console.warn('[DeviceSync] Could not import', file.path, error)
@@ -513,10 +654,42 @@ export async function syncDeviceLibrary({ silent = false, announce = !silent } =
 
     addToast(`Imported ${importedBooks.length} book${importedBooks.length === 1 ? '' : 's'} from your device.`, 'success')
 
-    await backfillBookMetadata(importedBooks, { updateBook, addToast })
+    // Network metadata can take minutes; it must never block the next scan.
+    if (backfillImported) {
+      void backfillBookMetadata(importedBooks, { updateBook, addToast }).catch((error) => {
+        console.warn('[DeviceSync] Metadata backfill failed:', error)
+      })
+    }
   } catch (error) {
     console.warn('[DeviceSync] Device library sync failed:', error)
   } finally {
     _syncInFlight = false
+    if (_queuedSync) {
+      const queued = _queuedSync
+      _queuedSync = null
+      void syncDeviceLibrary({ silent: queued.silent, announce: queued.announce, backfillImported: queued.backfillImported })
+        .then((result) => queued.resolve.forEach((resolve) => resolve(result)))
+    }
   }
+}
+
+export function chooseDeviceImportKeeper(books, contentById = {}) {
+  return [...books].sort((a, b) => {
+    const content = Number(!!contentById[b.id]) - Number(!!contentById[a.id])
+    if (content) return content
+    const progress = (Number(b.progress) || 0) - (Number(a.progress) || 0)
+    if (progress) return progress
+    return String(a.createdAt || '').localeCompare(String(b.createdAt || ''))
+  })[0] || null
+}
+
+// Older or interrupted imports can have a library record but no stored PDF
+// source. Restore the original pages from the file already on the phone.
+export async function repairDevicePdfSource(book) {
+  if (!book?.deviceImportPath || String(book.format).toLowerCase() !== 'pdf'
+    || !isNativeCapacitorPlatform()) return false
+  const data = await readDeviceFileBase64(book.deviceImportPath)
+  const file = base64ToFile(data, book.deviceImportPath.split('/').pop(), 'pdf')
+  await useBookStorage().savePdfSource(book.id, await file.arrayBuffer())
+  return true
 }

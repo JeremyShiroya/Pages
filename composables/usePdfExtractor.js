@@ -1,4 +1,28 @@
 import { buildPdfManifest } from './usePdfManifest.js'
+import { selectPdfEvidencePages, collectDocumentEvidence } from './documentIntelligence.js'
+
+// Intelligence reads a bounded set of real pages independently of reading-text
+// extraction. Preserve their original page numbers for verification.
+export async function extractPdfEvidence(source, { fileName = '', path = '' } = {}) {
+  const pdf = await loadPdfDocument(source)
+  if (!pdf) throw new Error('PDF source unavailable')
+  try {
+    let metadata = null
+    try { metadata = await pdf.getMetadata() } catch {}
+    const tocItems = await extractPdfOutline(pdf)
+    const parts = []
+    for (const pageNumber of selectPdfEvidencePages(pdf.numPages, tocItems)) {
+      const page = await pdf.getPage(pageNumber)
+      try {
+        const text = await page.getTextContent()
+        const lines = bucketTextLines(text.items).map((line) => `<p>${escapeHtml(line.text)}</p>`).join('')
+        parts.push(`<div data-pdf-page="${pageNumber}">${lines}</div>`)
+      } finally { page.cleanup() }
+    }
+    return collectDocumentEvidence({ format: 'pdf', content: parts.join(''), pages: pdf.numPages,
+      fileName, path, tocItems, embeddedTitle: metadata?.info?.Title, embeddedAuthor: metadata?.info?.Author })
+  } finally { await pdf.destroy() }
+}
 
 const escapeHtml = (str) =>
   str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -325,10 +349,12 @@ export async function extractPdfTocFromSource(source) {
 export async function extractPdf(file) {
   const arrayBuffer = await file.arrayBuffer()
   const source = arrayBuffer.slice(0)
-
+  let pdf = null
   try {
-    const pdf = await loadPdfDocument(arrayBuffer)
+    pdf = await loadPdfDocument(arrayBuffer)
     const numPages = pdf.numPages
+    let embedded = null
+    try { embedded = await pdf.getMetadata?.() } catch {}
     let tocItems = await extractPdfOutline(pdf)
     const pageRecords = await collectPdfPageRecords(pdf)
     const pageLinesForToc = pageRecords.map(record => ({
@@ -340,11 +366,12 @@ export async function extractPdf(file) {
 
     const html = buildPdfPagesHtml(pageParagraphsFromRecords(pageRecords))
     const pdfManifest = buildPdfManifest(pageRecords)
-    return { content: html || null, pages: numPages, source, tocItems, pdfManifest }
+    return { content: html || null, pages: numPages, source, tocItems, pdfManifest,
+      embeddedTitle: embedded?.info?.Title || '', embeddedAuthor: embedded?.info?.Author || '' }
   } catch (error) {
     console.warn('[PDF] Text extraction failed; preserving original PDF source for page rendering.', error)
     return { content: null, pages: 0, source, tocItems: [] }
-  }
+  } finally { if (pdf) await pdf.destroy() }
 }
 
 export async function extractPdfContentFromSource(source) {
@@ -397,7 +424,7 @@ export async function extractPdfFiguresFromSource(source, options = {}) {
 export async function extractPdfTextFromSource(source) {
   const pdf = await loadPdfDocument(source)
   if (!pdf) return ''
-
+  try {
   const pages = []
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -415,4 +442,5 @@ export async function extractPdfTextFromSource(source) {
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
+  } finally { await pdf.destroy() }
 }
