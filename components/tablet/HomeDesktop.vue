@@ -5,7 +5,7 @@
         <i class="ri-search-line" aria-hidden="true"></i>
         <input v-model.trim="query" type="search" placeholder="Search books, series, authors…" aria-label="Search library" />
       </label>
-      <NuxtLink to="/profile" class="profile-link" aria-label="Open profile"><img :src="profileAvatar" alt="" /></NuxtLink>
+      <h1 class="home-brand">Pages</h1>
     </header>
 
     <HomeSkeleton v-if="loading && !initialized" />
@@ -59,11 +59,10 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBooks } from '~/composables/useBooks'
 import { useTTS } from '~/composables/useTTS'
-import { useUserProfile } from '~/composables/useUserProfile'
 import BookProgressDisplay from '../shared/BookProgressDisplay.vue'
 import SeriesCollageCard from '../shared/SeriesCollageCard.vue'
 import EmptyState from '../shared/EmptyState.vue'
@@ -73,8 +72,6 @@ const router = useRouter()
 const query = ref('')
 const { books, recentlyAddedBooks, recentlyReadBooks, seriesList, loading, initialized, error, fetchAllData } = useBooks()
 const { play, togglePlay, ttsBook, ttsStatus } = useTTS()
-const { profile, activeAvatarPreset, loadProfile } = useUserProfile()
-const profileAvatar = computed(() => profile.value.avatarValue || activeAvatarPreset.value.src)
 const normalizedQuery = computed(() => query.value.toLocaleLowerCase())
 const matches = (...values) => !normalizedQuery.value || values.some(value => String(value || '').toLocaleLowerCase().includes(normalizedQuery.value))
 const currentBook = computed(() => recentlyReadBooks.value.find(book => matches(book.title, book.author)) || null)
@@ -87,7 +84,6 @@ const openReader = book => router.push(`/reader/${book.id}?mode=read`)
 const openSeries = group => router.push(`/serie/${group.id}`)
 const isBookPlaying = book => ttsBook.value?.id === book.id && ttsStatus.value !== 'idle' && ttsStatus.value !== 'paused'
 const handlePlay = (book) => { if (ttsBook.value?.id === book.id && ttsStatus.value !== 'idle') togglePlay(); else play(book) }
-onMounted(loadProfile)
 </script>
 
 <style scoped>
@@ -95,7 +91,7 @@ onMounted(loadProfile)
 .home-toolbar,.section-heading{display:flex;align-items:center;justify-content:space-between}.home-toolbar{margin-bottom:1.15rem}
 .home-search{display:flex;width:min(280px,45vw);min-height:34px;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--color-border-card);border-radius:11px;background:var(--color-surface-card);color:var(--color-text-muted)}
 .home-search input{width:100%;border:0;outline:0;background:transparent;color:var(--color-text-primary);font:inherit;font-size:12px}
-.profile-link,.profile-link img{width:36px;height:36px;border-radius:50%}.profile-link{padding:3px;background:var(--color-brand-primary-soft)}.profile-link img{display:block;width:100%;height:100%;object-fit:cover}
+.home-brand{margin:0;color:var(--color-brand-primary);font-size:1.6rem;font-weight:700;letter-spacing:-.045em}
 .home-columns{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(245px,1fr);gap:26px;align-items:start}.home-library-column{min-width:0}.home-section+.home-section{margin-top:1.2rem}
 .home-section h1,.series-column h1{margin:0 0 .65rem;font-size:1.05rem;font-weight:500;color:var(--color-text-primary)}.section-heading h1{margin-bottom:0}.section-heading{margin-bottom:.65rem}.section-heading a{color:var(--color-text-muted);font-size:.75rem;text-decoration:none}
 .current-card{position:relative;display:grid;grid-template-columns:112px minmax(0,1fr);gap:18px;min-height:190px;overflow:hidden;padding:16px;border-radius:18px;color:#fff;cursor:pointer}

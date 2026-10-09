@@ -795,3 +795,53 @@ textarea {
 .favourite-heart-icon {
   color: var(--color-status-danger-bright, #dc2626) !important;
 }
+
+/* The metadata and cover searches share one frosted surface. Header, body, and
+   actions remain transparent so the dialog reads as a single sheet. */
+.metadata-modal-overlay .metadata-modal-container.metadata-search-glass,
+.cover-modal-overlay .cover-modal.search-dialog-glass {
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 13%, transparent);
+  background: linear-gradient(155deg, rgba(255, 255, 255, .2), transparent 46%),
+    color-mix(in srgb, var(--color-surface-primary) 89%, transparent);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .52), 0 22px 64px rgba(13, 18, 32, .25);
+  -webkit-backdrop-filter: blur(26px) saturate(135%);
+  backdrop-filter: blur(26px) saturate(135%);
+}
+
+.metadata-modal-container.metadata-search-glass > .metadata-modal-header,
+.metadata-modal-container.metadata-search-glass > .metadata-modal-body,
+.cover-modal.search-dialog-glass > .cover-modal-header,
+.cover-modal.search-dialog-glass > .cover-modal-body {
+  background: transparent;
+}
+
+.metadata-modal-container.metadata-search-glass .metadata-progress-actions {
+  margin-top: 1rem;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.cover-modal.search-dialog-glass .cover-choice-btn {
+  background: color-mix(in srgb, var(--color-surface-primary) 60%, transparent);
+}
+
+:root[data-theme="dark"] .metadata-modal-overlay .metadata-modal-container.metadata-search-glass,
+:root[data-theme="dark"] .cover-modal-overlay .cover-modal.search-dialog-glass {
+  border-color: color-mix(in srgb, white 17%, transparent);
+  background: linear-gradient(155deg, rgba(255, 255, 255, .07), transparent 44%),
+    color-mix(in srgb, var(--color-surface-primary) 88%, transparent);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .12), 0 24px 72px rgba(0, 0, 0, .48);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .metadata-modal-overlay .metadata-modal-container.metadata-search-glass,
+  .cover-modal-overlay .cover-modal.search-dialog-glass {
+    background: var(--color-surface-primary);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

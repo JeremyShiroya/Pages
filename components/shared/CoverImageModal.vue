@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="cover-modal-overlay" @click="$emit('close')">
-    <div class="cover-modal" @click.stop>
+    <div class="cover-modal search-dialog-glass" @click.stop>
       <div class="cover-modal-header">
         <div>
           <h3>{{ mode === 'choice' ? 'Change Book Cover' : searchInProgress ? 'Searching for book covers' : 'Select Book Cover' }}</h3>

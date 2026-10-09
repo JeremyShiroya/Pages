@@ -72,8 +72,12 @@
           </div>
         </div>
 
-        <NuxtLink class="pref-destination" to="/settings/preferences/bottom-navigation">
-          <span class="pref-destination-icon"><i class="ri-layout-bottom-line" aria-hidden="true"></i></span>
+        <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/top-navigation">
+          <span><strong>Top navigation</strong><small>Title, logo, or your avatar and greeting</small></span>
+          <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+        </NuxtLink>
+
+        <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/bottom-navigation">
           <span><strong>Bottom navigation</strong><small>Layout, frosted glass, selected tab, opacity and blur</small></span>
           <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
         </NuxtLink>
@@ -742,6 +746,7 @@ const confirmFormatMode = async () => {
 }
 
 .pref-destination { display: grid; grid-template-columns: 40px minmax(0, 1fr) 20px; align-items: center; gap: 12px; min-height: 64px; padding: 10px; border-radius: 16px; background: var(--color-surface-card); color: var(--color-text-primary); text-decoration: none; }
+.nav-pref-destination { grid-template-columns: minmax(0, 1fr) 20px; padding: 12px 16px; }
 .pref-destination-icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 12px; background: var(--color-brand-primary-faint); color: var(--color-brand-primary); font-size: 20px; }
 .pref-destination strong, .pref-destination small { display: block; }
 .pref-destination small { margin-top: 3px; color: var(--color-text-muted); font-size: 12px; line-height: 1.3; }

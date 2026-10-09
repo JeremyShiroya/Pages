@@ -35,8 +35,8 @@
             <span class="listen-setting-hint">Show time for the book or current chapter.</span>
           </div>
           <div class="listen-setting-options" role="group" aria-label="Progress bar scope">
-            <button type="button" :class="{ active: settings.listenBarScope === 'book' }" :aria-pressed="settings.listenBarScope === 'book'" @click="updateSettings({ listenBarScope: 'book' })">Full book</button>
-            <button type="button" :class="{ active: settings.listenBarScope === 'chapter' }" :aria-pressed="settings.listenBarScope === 'chapter'" @click="updateSettings({ listenBarScope: 'chapter' })">Chapter</button>
+            <button type="button" :class="{ active: settings.listenBarScope === 'book' }" :aria-pressed="settings.listenBarScope === 'book'" @click="setProgressScope('book')">Full book</button>
+            <button type="button" :class="{ active: settings.listenBarScope === 'chapter' }" :aria-pressed="settings.listenBarScope === 'chapter'" @click="setProgressScope('chapter')">Chapter</button>
           </div>
         </div>
         <div class="listen-setting-block">
@@ -45,8 +45,8 @@
             <span class="listen-setting-hint">The time shown below the author.</span>
           </div>
           <div class="listen-setting-options" role="group" aria-label="Time summary scope">
-            <button type="button" :class="{ active: settings.listenSummaryScope === 'book' }" :aria-pressed="settings.listenSummaryScope === 'book'" @click="updateSettings({ listenSummaryScope: 'book' })">Full book</button>
-            <button type="button" :class="{ active: settings.listenSummaryScope === 'chapter' }" :aria-pressed="settings.listenSummaryScope === 'chapter'" @click="updateSettings({ listenSummaryScope: 'chapter' })">Chapter</button>
+            <button type="button" :class="{ active: settings.listenSummaryScope === 'book' }" :aria-pressed="settings.listenSummaryScope === 'book'" @click="setProgressScope('book')">Full book</button>
+            <button type="button" :class="{ active: settings.listenSummaryScope === 'chapter' }" :aria-pressed="settings.listenSummaryScope === 'chapter'" @click="setProgressScope('chapter')">Chapter</button>
           </div>
         </div>
       </section>
@@ -64,6 +64,7 @@ const readerPath = computed(() => `/reader/${encodeURIComponent(String(route.par
 const { settings, updateSettings } = useBookishSettings()
 const listenBackSeconds = computed(() => settings.value.listenBackSeconds)
 const listenForwardSeconds = computed(() => settings.value.listenForwardSeconds)
+const setProgressScope = (scope) => updateSettings({ listenBarScope: scope, listenSummaryScope: scope })
 
 const changeListenSkip = (direction, delta) => {
   const key = direction === 'back' ? 'listenBackSeconds' : 'listenForwardSeconds'

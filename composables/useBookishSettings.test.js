@@ -91,6 +91,16 @@ describe('useBookishSettings storage helpers', () => {
     expect(normalizeBookishSettings({ darkAppBackground: 'invalid' }).darkAppBackground).toBe('muted')
   })
 
+  it('defaults the shared mobile header to logo and title and persists each display choice', () => {
+    const storage = createMemoryStorage()
+    expect(normalizeBookishSettings({}).mobileTopNavDisplay).toBe('logo-title')
+    for (const display of ['title', 'logo', 'logo-title', 'greeting']) {
+      writeBookishSettings({ mobileTopNavDisplay: display }, storage)
+      expect(readBookishSettings(storage).mobileTopNavDisplay).toBe(display)
+    }
+    expect(normalizeBookishSettings({ mobileTopNavDisplay: 'unknown' }).mobileTopNavDisplay).toBe('logo-title')
+  })
+
   it('validates bottom navigation style, opacity, and blur', () => {
     expect(normalizeBookishSettings({})).toMatchObject({ mobileNavStyle: 'floating', mobileNavSize: 'compact', mobileNavOpacity: 95, mobileNavBlur: 18 })
     expect(normalizeBookishSettings({ mobileNavStyle: 'standard', mobileNavOpacity: 35, mobileNavBlur: 50 }))

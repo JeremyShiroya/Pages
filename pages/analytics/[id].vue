@@ -98,7 +98,7 @@ const daysTaken = computed(() => calendarDaysBetween(activity.value?.firstAt, ac
 const streak = computed(() => bookStreak(activity.value?.days, today.value))
 
 function formatTime(seconds) {
-  if (seconds < 60) return '<1 min'
+  if (seconds < 60) return `${Math.round(seconds)} sec`
   const minutes = Math.round(seconds / 60)
   if (minutes < 60) return `${minutes} min`
   const hours = Math.floor(minutes / 60)
@@ -146,7 +146,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.analytics-page { min-height: 100%; background: var(--color-background-page, #fff); color: var(--color-text-primary, #24232a); }
+.analytics-page { min-height: 100dvh; background: var(--color-background-app, #fff); color: var(--color-text-primary, #24232a); }
 .analytics-shell { width: min(100%, 780px); margin: 0 auto; padding: 24px 22px calc(var(--mobile-bottom-nav-height, 72px) + 38px); }
 .desktop-back { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 28px; color: var(--color-text-secondary, #334155); font-size: .85rem; text-decoration: none; }
 .desktop-back:hover { text-decoration: underline; }

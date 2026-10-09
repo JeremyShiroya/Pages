@@ -20,6 +20,7 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   // ── Appearance preferences (Settings → Preferences) ──────────────────────
   appBackground: 'white',          // 'white' | 'muted' (#dfe0eb canvas)
   darkAppBackground: 'muted',      // 'dark' (#000) | 'muted' (charcoal canvas)
+  mobileTopNavDisplay: 'logo-title',// 'title' | 'logo' | 'logo-title' | 'greeting' on Home, Books, and Series
   mobileNavStyle: 'floating',       // 'standard' | 'floating'
   mobileNavSize: 'compact',         // 'standard' | 'compact'
   mobileNavOpacity: 95,            // percent, 50–100
@@ -103,6 +104,7 @@ export const CARD_BACKGROUND_OPTIONS = Object.freeze(['blank', 'blur'])
 export const APP_BACKGROUND_OPTIONS = Object.freeze(['white', 'muted'])
 export const DARK_APP_BACKGROUND_OPTIONS = Object.freeze(['dark', 'muted'])
 export const MOBILE_NAV_STYLE_OPTIONS = Object.freeze(['standard', 'floating'])
+export const MOBILE_TOP_NAV_DISPLAY_OPTIONS = Object.freeze(['title', 'logo', 'logo-title', 'greeting'])
 export const MOBILE_NAV_SIZE_OPTIONS = Object.freeze(['standard', 'compact'])
 export const MOBILE_NAV_MATERIAL_OPTIONS = Object.freeze(['current', 'frosted'])
 export const MOBILE_NAV_HIGHLIGHT_OPTIONS = Object.freeze(['soft', 'none'])
@@ -233,6 +235,9 @@ export function normalizeBookishSettings(value) {
     darkAppBackground: DARK_APP_BACKGROUND_OPTIONS.includes(source.darkAppBackground)
       ? source.darkAppBackground
       : DEFAULT_BOOKISH_SETTINGS.darkAppBackground,
+    mobileTopNavDisplay: MOBILE_TOP_NAV_DISPLAY_OPTIONS.includes(source.mobileTopNavDisplay)
+      ? source.mobileTopNavDisplay
+      : DEFAULT_BOOKISH_SETTINGS.mobileTopNavDisplay,
     mobileNavStyle: MOBILE_NAV_STYLE_OPTIONS.includes(source.mobileNavStyle)
       ? source.mobileNavStyle
       : DEFAULT_BOOKISH_SETTINGS.mobileNavStyle,

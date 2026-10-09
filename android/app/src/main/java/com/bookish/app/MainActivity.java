@@ -1,6 +1,8 @@
 package com.bookish.app;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -26,6 +28,11 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(PageSyncPlugin.class);
         registerPlugin(AppResetPlugin.class);
         super.onCreate(savedInstanceState);
+        // Phones stay in portrait when tilted; tablets keep the responsive
+        // portrait/landscape layouts that are designed for their larger screens.
+        if (getResources().getConfiguration().smallestScreenWidthDp < 600) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
         enableEdgeToEdge();
         installRenderProcessGoneHandler();
         // Cold start from the system "Open with" sheet: the web layer isn't

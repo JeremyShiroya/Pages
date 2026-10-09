@@ -42,8 +42,8 @@
              the check button beside the name input, which did what Save does. -->
         <fieldset class="profile-text-choice">
           <legend>Profile message</legend>
-          <label><input v-model="profileTextModeDraft" type="radio" value="compliment" /> Daily compliments</label>
-          <label><input v-model="profileTextModeDraft" type="radio" value="bio" /> My own bio</label>
+          <label><input v-model="profileTextModeDraft" type="radio" value="compliment" @change="chooseProfileTextMode" /> Daily compliments</label>
+          <label><input v-model="profileTextModeDraft" type="radio" value="bio" @change="chooseProfileTextMode" /> My own bio</label>
         </fieldset>
         <label v-if="profileTextModeDraft === 'bio'" class="profile-field" for="profile-bio">
           <span>Bio · {{ bioDraft.length }}/240</span>
@@ -52,7 +52,7 @@
         <p v-if="bioError" class="profile-bio-error" role="alert">{{ bioError }}</p>
 
         <div class="profile-actions">
-          <button class="profile-action primary" type="button" @click="saveProfileDetails">
+          <button class="profile-action primary" type="button" :disabled="!canSaveProfile" @click="saveProfileDetails">
             <i class="ri-save-3-line"></i>
             <span>Save profile</span>
           </button>
@@ -63,7 +63,7 @@
     <section class="appearance-panel" aria-labelledby="appearance-title">
       <div>
         <h2 id="appearance-title">Appearance</h2>
-        <p>This is how your profile appears in the mobile header.</p>
+        <p>This is how your profile appears when Avatar and greeting is selected.</p>
       </div>
 
       <div class="profile-preview-card">
@@ -114,6 +114,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useToast } from '~/composables/useToast'
 import { useUserProfile } from '~/composables/useUserProfile'
+import { canSaveProfileDraft, profileDraftChanged } from '~/utils/profileDraft'
 import AvatarSourcePicker from '~/components/shared/AvatarSourcePicker.vue'
 
 const { addToast } = useToast()
@@ -131,7 +132,10 @@ const profileDraftName = ref('Reader')
 const profileTextModeDraft = ref('compliment')
 const bioDraft = ref('')
 const bioError = ref('')
+const savingProfile = ref(false)
 const selectedAvatar = ref('/images/User%20Avatars/default-user.jpeg')
+const savedProfile = ref({ ...profile.value })
+const draftInitialized = ref(false)
 
 const profileAvatarSrc = computed(() => {
   return selectedAvatar.value || activeAvatarPreset.value.src
@@ -141,7 +145,16 @@ const firstName = computed(() => {
   return profileDraftName.value.trim().split(/\s+/)[0] || 'Reader'
 })
 
+const profileDraft = computed(() => ({
+  displayName: profileDraftName.value,
+  profileTextMode: profileTextModeDraft.value,
+  bio: bioDraft.value,
+  avatarValue: selectedAvatar.value,
+}))
+const canSaveProfile = computed(() => !savingProfile.value && canSaveProfileDraft(profileDraft.value, savedProfile.value))
+
 const syncProfileDraft = (nextProfile = profile.value) => {
+  savedProfile.value = { ...nextProfile }
   profileDraftName.value = nextProfile.displayName || 'Reader'
   profileTextModeDraft.value = nextProfile.profileTextMode || 'compliment'
   bioDraft.value = nextProfile.bio || ''
@@ -150,6 +163,7 @@ const syncProfileDraft = (nextProfile = profile.value) => {
 }
 
 const persistProfile = async (patch, toastMessage) => {
+  savingProfile.value = true
   try {
     await updateProfile({
       displayName: profileDraftName.value,
@@ -162,10 +176,13 @@ const persistProfile = async (patch, toastMessage) => {
   } catch (error) {
     console.error('[Profile] Failed to save profile:', error)
     addToast(error?.message || 'Could not save profile', 'error')
+  } finally {
+    savingProfile.value = false
   }
 }
 
 const saveProfileDetails = () => {
+  if (!canSaveProfile.value) return
   if (profileTextModeDraft.value === 'bio' && !bioDraft.value.trim()) {
     bioError.value = 'Write a bio before selecting My own bio.'
     return
@@ -175,6 +192,23 @@ const saveProfileDetails = () => {
     profileTextMode: profileTextModeDraft.value,
     bio: bioDraft.value,
   }, 'Profile updated')
+}
+
+const chooseProfileTextMode = async () => {
+  const mode = profileTextModeDraft.value
+  if (savingProfile.value || mode === savedProfile.value.profileTextMode) return
+  if (mode === 'bio' && !bioDraft.value.trim()) return
+  savingProfile.value = true
+  try {
+    await updateProfile({ profileTextMode: mode })
+    savedProfile.value = { ...profile.value }
+    bioError.value = ''
+  } catch (error) {
+    profileTextModeDraft.value = savedProfile.value.profileTextMode
+    addToast(error?.message || 'Could not update profile message', 'error')
+  } finally {
+    savingProfile.value = false
+  }
 }
 
 const selectAvatar = async (avatarSrc) => {
@@ -189,20 +223,28 @@ const openPresetPicker = () => {
 }
 
 const saveGalleryAvatar = async (cropped) => {
+  savingProfile.value = true
   try {
     await updateProfile({ displayName: profileDraftName.value, avatarType: 'image', avatarValue: cropped })
-    selectedAvatar.value = cropped
+    syncProfileDraft(profile.value)
     avatarSourceOpen.value = false
     addToast('Profile photo updated', 'success')
   } catch (error) {
     addToast(error?.message || 'Could not update profile photo', 'error')
+  } finally {
+    savingProfile.value = false
   }
 }
 
-watch(profile, syncProfileDraft, { immediate: true })
+watch(profile, (nextProfile) => {
+  const preserveDraft = draftInitialized.value && profileDraftChanged(profileDraft.value, savedProfile.value)
+  savedProfile.value = { ...nextProfile }
+  if (!preserveDraft) syncProfileDraft(nextProfile)
+  draftInitialized.value = true
+}, { immediate: true })
 
 onMounted(async () => {
-  syncProfileDraft(await loadProfile())
+  await loadProfile()
 })
 </script>
 
@@ -406,6 +448,13 @@ onMounted(async () => {
   border-color: var(--color-brand-primary);
   background: var(--color-brand-primary);
   color: var(--color-text-on-brand);
+}
+.profile-action.primary:disabled {
+  border-color: var(--color-border-subtle);
+  background: var(--color-surface-secondary);
+  color: var(--color-text-muted);
+  cursor: default;
+  box-shadow: none;
 }
 
 .appearance-panel {

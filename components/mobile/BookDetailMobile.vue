@@ -337,7 +337,7 @@ watch(
 </script>
 
 <style scoped>
-.document-type-link{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--color-border-subtle);background:color-mix(in srgb,var(--color-surface-primary) 60%,transparent);color:var(--color-text-secondary);border-radius:999px;padding:5px 9px;font-size:.76rem;font-weight:500;cursor:pointer;margin:4px 0 10px}
+.document-type-link{display:inline-flex;align-self:flex-start;flex:0 0 auto;align-items:center;gap:5px;width:fit-content;max-width:100%;border:1px solid var(--color-border-subtle);background:color-mix(in srgb,var(--color-surface-primary) 60%,transparent);color:var(--color-text-secondary);border-radius:999px;padding:5px 9px;font-size:.76rem;font-weight:500;cursor:pointer;margin:4px 0 10px}
 .document-type-link:hover{color:var(--color-text-primary);background:var(--color-surface-secondary)}
 .book-detail-page {
   width: 100%;

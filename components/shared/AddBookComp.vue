@@ -12,7 +12,7 @@
     <div v-if="showMetadataModal" class="metadata-modal-overlay" @click="closeMetadataModal">
       <div class="metadata-modal-container metadata-search-glass" @click.stop>
         <div class="metadata-modal-header">
-          <h2>Select Metadata</h2>
+          <h2>{{ isFetchingMetadata ? 'Searching for metadata' : showMetadataProgress ? 'Metadata search complete' : 'Select Metadata' }}</h2>
           <button class="close-button" @click="closeMetadataModal">
             <i class="ri-close-line"></i>
           </button>
@@ -181,7 +181,7 @@
 
       <!-- Details Section -->
       <div class="details-column">
-        <div class="form-group"><label>This file is</label><DocumentTypePicker :model-value="newBook.documentType" @update:model-value="chooseDocumentType" /></div>
+        <div v-if="newBook.format === 'pdf'" class="form-group"><label>This file is</label><DocumentTypePicker :model-value="newBook.documentType" @update:model-value="chooseDocumentType" /></div>
         <!-- Web Fetch CTA -->
         <div v-if="newBook.documentType === 'book'" class="fetch-metadata-card">
           <div class="fetch-info">
@@ -233,18 +233,8 @@
         </div>
 
         <div v-if="newBook.documentType === 'book'" class="form-group">
-          <label>Book Type</label>
-          <div class="radio-group">
-            <label class="radio-option" :class="{ active: bookKind === 'unknown' }"><input type="radio" value="unknown" v-model="bookKind" @change="handleBookKindChange" /><span>Not sure yet</span></label>
-            <label class="radio-option" :class="{ active: bookKind === 'standalone' }">
-              <input type="radio" value="standalone" v-model="bookKind" @change="handleBookKindChange" />
-              <span>Standalone</span>
-            </label>
-            <label class="radio-option" :class="{ active: bookKind === 'series' }">
-              <input type="radio" value="series" v-model="bookKind" />
-              <span>Series</span>
-            </label>
-          </div>
+          <label>Series membership</label>
+          <SeriesMembershipPicker :model-value="bookKind" @update:model-value="setBookKind" />
         </div>
 
         <div class="form-row" v-if="newBook.documentType === 'book' && bookKind === 'series'">
@@ -367,6 +357,8 @@ import GoodreadsRatingDisplay from './GoodreadsRatingDisplay.vue'
 import BookRatingDisplay from './BookRatingDisplay.vue'
 import PersonalRatingInput from './PersonalRatingInput.vue'
 import MultiStepLoader from './MultiStepLoader.vue'
+import DocumentTypePicker from './DocumentTypePicker.vue'
+import SeriesMembershipPicker from './SeriesMembershipPicker.vue'
 
 const router = useRouter()
 const { addBook, books, updateBook } = useBooks()
@@ -794,6 +786,7 @@ const selectMetadata = (result) => {
   }
 }
 
+const setBookKind = (value) => { bookKind.value = value; handleBookKindChange() }
 const handleBookKindChange = () => {
   seriesChoiceChanged.value = true
   if (bookKind.value !== 'series') {
@@ -1395,19 +1388,6 @@ const saveBook = async () => {
   flex-direction: column;
   box-shadow: var(--shadow-modal);
   overflow: hidden;
-}
-
-.metadata-search-glass {
-  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
-  background: linear-gradient(160deg, rgba(255, 255, 255, .2), transparent 54%),
-    color-mix(in srgb, var(--color-surface-primary) 67%, transparent);
-  box-shadow: inset 0 1px rgba(255, 255, 255, .36), 0 18px 48px rgba(15, 23, 42, .22);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  backdrop-filter: blur(18px) saturate(140%);
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .metadata-search-glass { background: var(--color-surface-primary); backdrop-filter: none; }
 }
 
 .metadata-modal-body {
