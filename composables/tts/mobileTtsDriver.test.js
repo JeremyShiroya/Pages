@@ -14,7 +14,7 @@ vi.mock('~/composables/tts/nativeSpeech', () => ({
   nativeSpeechSupported: () => nativeSpeechSupported(),
 }))
 
-const { synthesizeMobileSpeech, resetMobileTtsDriver, mobileTtsEdgeDisabled } =
+const { synthesizeMobileSpeech, resetMobileTtsDriver, mobileTtsEdgeDisabled, edgeTimeoutForText } =
   await import('~/composables/tts/mobileTtsDriver')
 
 const EDGE_AUDIO = { audio: 'data:audio/mp3;base64,AAA', boundaries: [] }
@@ -33,6 +33,16 @@ const setHidden = (hidden) => {
 }
 
 describe('mobileTtsDriver Edge resilience', () => {
+  it('allows a long PDF sentence enough time to finish streaming', async () => {
+    synthesizeEdgeSpeechInBrowser.mockResolvedValue(EDGE_AUDIO)
+    const text = 'A'.repeat(480)
+    expect(edgeTimeoutForText(text)).toBeGreaterThan(40000)
+    await speak({ text })
+    expect(synthesizeEdgeSpeechInBrowser).toHaveBeenCalledWith(expect.objectContaining({
+      text,
+      timeoutMs: edgeTimeoutForText(text),
+    }))
+  })
   beforeEach(() => {
     resetMobileTtsDriver()
     synthesizeEdgeSpeechInBrowser.mockReset()
@@ -49,23 +59,17 @@ describe('mobileTtsDriver Edge resilience', () => {
     expect(mobileTtsEdgeDisabled()).toBe(false)
   })
 
-  // Regression: ONE failure used to permanently switch the narrator to the
-  // device voice for the rest of the session.
-  it('retries the chunk instead of switching voice on a single failure', async () => {
+  it('quickly uses a phone voice after a failed Edge handshake', async () => {
     synthesizeEdgeSpeechInBrowser.mockRejectedValueOnce(new Error('socket timeout'))
-    await expect(speak()).rejects.toThrow('socket timeout')
-    expect(mobileTtsEdgeDisabled()).toBe(false)
+    await expect(speak()).resolves.toMatchObject({ native: true })
+    expect(mobileTtsEdgeDisabled()).toBe(true)
   })
 
-  it('falls back to the device voice only after repeated consecutive failures', async () => {
+  it('does not retry a rejected Edge handshake for each PDF sentence', async () => {
     synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('handshake 403'))
-    await expect(speak()).rejects.toThrow()
-    await expect(speak()).rejects.toThrow()
-    expect(mobileTtsEdgeDisabled()).toBe(false)
-
-    // Third consecutive failure crosses the limit → device voice.
-    const result = await speak()
-    expect(result).toMatchObject({ native: true })
+    await expect(speak()).resolves.toMatchObject({ native: true })
+    await expect(speak()).resolves.toMatchObject({ native: true })
+    expect(synthesizeEdgeSpeechInBrowser).toHaveBeenCalledTimes(1)
     expect(mobileTtsEdgeDisabled()).toBe(true)
   })
 
@@ -77,8 +81,6 @@ describe('mobileTtsDriver Edge resilience', () => {
       apiUrl: (path) => `https://pages.example${path}`,
     }
 
-    await expect(speak(options)).rejects.toThrow('handshake failed')
-    await expect(speak(options)).rejects.toThrow('handshake failed')
     await expect(speak(options)).resolves.toMatchObject({ native: true })
     expect($fetch).toHaveBeenCalledWith(
       'https://pages.example/api/tts',
@@ -96,16 +98,12 @@ describe('mobileTtsDriver Edge resilience', () => {
     })).resolves.toEqual(EDGE_AUDIO)
   })
 
-  it('a success resets the failure streak', async () => {
+  it('can probe Edge again after an explicit reset', async () => {
     synthesizeEdgeSpeechInBrowser.mockRejectedValueOnce(new Error('blip'))
-    await expect(speak()).rejects.toThrow()
+    await expect(speak()).resolves.toMatchObject({ native: true })
+    resetMobileTtsDriver()
     synthesizeEdgeSpeechInBrowser.mockResolvedValueOnce(EDGE_AUDIO)
     await expect(speak()).resolves.toEqual(EDGE_AUDIO)
-
-    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('blip'))
-    await expect(speak()).rejects.toThrow()
-    await expect(speak()).rejects.toThrow()
-    // Streak restarted after the success, so Edge is still enabled.
     expect(mobileTtsEdgeDisabled()).toBe(false)
   })
 
@@ -125,7 +123,7 @@ describe('mobileTtsDriver Edge resilience', () => {
     synthesizeEdgeSpeechInBrowser.mockResolvedValue(EDGE_AUDIO)
     await speak()
     expect(synthesizeEdgeSpeechInBrowser).toHaveBeenCalledWith(
-      expect.objectContaining({ timeoutMs: 30000, attempts: 2 }),
+      expect.objectContaining({ timeoutMs: 30000, attempts: 1 }),
     )
 
     // Foreground gets two short attempts, so one stalled handshake retries in
@@ -133,19 +131,8 @@ describe('mobileTtsDriver Edge resilience', () => {
     setHidden(false)
     await speak()
     expect(synthesizeEdgeSpeechInBrowser).toHaveBeenLastCalledWith(
-      expect.objectContaining({ timeoutMs: 6000, attempts: 2 }),
+      expect.objectContaining({ timeoutMs: 15000, attempts: 1 }),
     )
-  })
-
-  // Regression (the unprovoked mid-sentence voice switch): the engine keeps the
-  // playing chunk plus two prefetches in flight, so ONE blip rejects all three
-  // at once. That burst must count as a single failure, not three.
-  it('treats a burst of simultaneous failures as one failure', async () => {
-    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('one blip'))
-
-    const results = await Promise.allSettled([speak(), speak(), speak()])
-    expect(results.every((r) => r.status === 'rejected')).toBe(true)
-    expect(mobileTtsEdgeDisabled()).toBe(false)
   })
 
   // Regression: the fallback used to latch for the whole session, so the
@@ -154,12 +141,10 @@ describe('mobileTtsDriver Edge resilience', () => {
     vi.useFakeTimers()
     try {
       synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('dead'))
-      await expect(speak()).rejects.toThrow()
-      await expect(speak()).rejects.toThrow()
       await speak()
       expect(mobileTtsEdgeDisabled()).toBe(true)
 
-      vi.advanceTimersByTime(61_000)
+      vi.advanceTimersByTime(301_000)
       expect(mobileTtsEdgeDisabled()).toBe(false)
 
       synthesizeEdgeSpeechInBrowser.mockResolvedValue(EDGE_AUDIO)
@@ -171,8 +156,6 @@ describe('mobileTtsDriver Edge resilience', () => {
 
   it('once disabled, keeps using the device voice without calling Edge again', async () => {
     synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('dead'))
-    await expect(speak()).rejects.toThrow()
-    await expect(speak()).rejects.toThrow()
     await speak()
     expect(mobileTtsEdgeDisabled()).toBe(true)
 

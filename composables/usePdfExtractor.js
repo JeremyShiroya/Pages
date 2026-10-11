@@ -321,12 +321,54 @@ export function extractVisiblePdfToc(pageLines) {
   return tocItems
 }
 
+// Some books have chapter headings but neither bookmarks nor a printed TOC.
+// Only use strong, standalone headings near the start of a page: ordinary body
+// text and printed TOC entries must not become navigation targets.
+export function inferPdfChapterToc(pageLines = []) {
+  const candidates = []
+  const numberWords = new Set('one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty'.split(' '))
+  const heading = /^(?:(?:chapter|part|book|section)\s+(?:\d+|[ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)(?:\s*[:.\-–—]\s*|\s+)?(?:.{1,75})?|prologue|epilogue|introduction|preface|afterword|conclusion)$/i
+  for (const { page, lines = [] } of pageLines) {
+    const firstLines = lines.map(line => String(line).replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, 10)
+    let title = null
+    for (let i = 0; i < firstLines.length; i++) {
+      const line = firstLines[i]
+      if (line.length > 90 || /\.{2,}\s*\d+$/.test(line)) continue
+      const compact = /^[A-Z](?:\s+[A-Z]){1,20}$/i.test(line) ? line.replace(/\s+/g, '').toLowerCase() : ''
+      const label = numberWords.has(compact)
+        ? `Chapter ${compact[0].toUpperCase()}${compact.slice(1)}`
+        : compact === 'epilogue' ? 'Epilogue'
+          : compact === 'prologue' ? 'Prologue'
+            : compact === 'inthebeginning' ? 'In the Beginning' : null
+      if (label || heading.test(line)) {
+        const next = firstLines[i + 1] || ''
+        const subtitle = next.length <= 75 && /^[A-Z][A-Z\s,'’:\-–—]+$/.test(next) && !/^\d+$/.test(next)
+          ? next.toLowerCase().replace(/(^|[\s\-–—])\p{L}/gu, match => match.toUpperCase())
+          : ''
+        title = `${label || line}${subtitle ? ` — ${subtitle}` : ''}`
+        break
+      }
+    }
+    if (title) candidates.push({ title, page: Number(page), level: 0 })
+  }
+  // A single apparent heading could be a cover or running header.
+  if (candidates.length < 2) return []
+  const seen = new Set()
+  return candidates.filter(item => {
+    const key = item.title.toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return Number.isInteger(item.page) && item.page > 0
+  })
+}
+
 export async function extractPdfTocFromDocument(pdf, pageLines = null) {
   const outlineItems = await extractPdfOutline(pdf)
   if (outlineItems.length) return outlineItems
 
   const lines = pageLines ?? await collectPdfPageLines(pdf)
-  return extractVisiblePdfToc(lines)
+  const printedToc = extractVisiblePdfToc(lines)
+  return printedToc.length ? printedToc : inferPdfChapterToc(lines)
 }
 
 export async function extractPdfTocFromSource(source) {
@@ -363,6 +405,7 @@ export async function extractPdf(file) {
     }))
 
     if (!tocItems.length) tocItems = extractVisiblePdfToc(pageLinesForToc)
+    if (!tocItems.length) tocItems = inferPdfChapterToc(pageLinesForToc)
 
     const html = buildPdfPagesHtml(pageParagraphsFromRecords(pageRecords))
     const pdfManifest = buildPdfManifest(pageRecords)

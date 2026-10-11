@@ -15,6 +15,7 @@
         :zoom-level="zoomLevel"
         :pdf-manifest="pdfManifest"
         :active-tts-chunk-index="activeTtsChunkIndex"
+        :narration-compatible="narrationCompatible"
         :active-word-range="activeWordRange"
         :has-cover="hasCover"
         :chapter-list="mobileChapterList"
@@ -64,6 +65,7 @@
         :zoom-level="zoomLevel"
         :pdf-manifest="pdfManifest"
         :active-tts-chunk-index="activeTtsChunkIndex"
+        :narration-compatible="narrationCompatible"
         :active-word-range="activeWordRange"
         :has-cover="hasCover"
         :chapter-list="mobileChapterList"
@@ -113,6 +115,7 @@
         :zoom-level="zoomLevel"
         :pdf-manifest="pdfManifest"
         :active-tts-chunk-index="activeTtsChunkIndex"
+        :narration-compatible="narrationCompatible"
         :active-word-range="activeWordRange"
         :has-cover="hasCover"
         :chapter-list="mobileChapterList"
@@ -347,7 +350,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch } from 'v
 import { createMobileReaderDomState } from '~/architectures/mobile/readerDomState'
 import { createTabletReaderDomState } from '~/architectures/tablet/readerDomState'
 import { useBooks } from '~/composables/useBooks'
-import { isRenderableSection, buildReadableChunks, useTTS } from '~/composables/useTTS'
+import { isRenderableSection, buildReadableChunks, buildReadableSectionChunks, useTTS } from '~/composables/useTTS'
 import { useBookStorage } from '~/composables/useBookStorage'
 import { recordBookActivity } from '~/composables/useBookAnalytics'
 import { useBookishSettings } from '~/composables/useBookishSettings'
@@ -364,6 +367,7 @@ import {
   extractPdfFiguresFromSource,
   extractPdfTocFromSource,
   formatPdfTocTitle,
+  inferPdfChapterToc,
   pdfSourceToBytes,
 } from '~/composables/usePdfExtractor'
 import { PDF_MANIFEST_VERSION, firstChunkForPage, pageForChunk } from '~/composables/usePdfManifest'
@@ -394,6 +398,7 @@ const {
   ttsBook,
   ttsChunkIdx,
   ttsPlayingChunkIdx,
+  ttsChunkSource,
   ttsStatus,
   ttsWordIdx,
   ttsBoundaries,
@@ -575,6 +580,8 @@ const isPdfRenderable = computed(() => (
 // path for chapters, chunking, narration, highlights and position — one code
 // path, not a parallel PDF-shaped copy of it.
 const readsAsEpub = computed(() => !isPdfBook.value || usePdfReflowView.value)
+const playbackSource = computed(() => usePdfReflowView.value ? 'pdf-reflow' : bookFormat.value)
+const narrationCompatible = computed(() => !ttsChunkSource.value || ttsChunkSource.value === playbackSource.value)
 
 function hasCoverVal() {
   const cover = book.value?.cover
@@ -680,69 +687,25 @@ const chapterList = computed(() => {
   }))
 })
 
-// ── Progressive section mounting (mobile) ──────────────────────────────────
-//
-// Parsing a whole book's HTML into the DOM at once froze mobile WebViews for
-// many seconds. The mobile reader instead receives a windowed view: only the
-// sections around the reading position carry HTML; the rest are placeholders
-// with an estimated height. The remainder mounts during idle time (or as soon
-// as a placeholder approaches the viewport). Desktop keeps the full render.
-
+// Keep scroll text mounted. Rendering placeholders races the compositor during
+// flings; sentence mapping remains time-sliced independently of visible text.
 const mountedSections = ref([])
-let _mountIdleId = null
-let _mountTimerId = null
-let _mountCursor = 0
-
-function estimateSectionHeight(html) {
-  // Estimate rendered column height from the visible text length. Tuned for the
-  // reader's 17px / 1.62 line-height body so placeholders are close to the real
-  // height, minimising the scroll jump when a section mounts. Each image adds a
-  // rough block so image-heavy chapters don't collapse to a tiny placeholder.
-  const raw = html || ''
-  const textLen = raw.replace(/<[^>]+>/g, '').length
-  const imageCount = (raw.match(/<img\b|<image\b|<svg\b/gi) || []).length
-  // ~0.9px of column height per character, measured against the reader's own
-  // typography at mobile width. The old 0.62 understated sections by a third,
-  // which showed up as the document growing under the reader as it scrolled.
-  return Math.max(360, Math.min(40000, Math.round(textLen * 0.9) + imageCount * 300))
-}
-
-// Placeholder heights are expensive to compute (regex per chapter) and never
-// change once the content is parsed. Precompute them ONCE per chapter list so
-// mobileChapterList — which recomputes on every single section mount — doesn't
-// re-scan every chapter's HTML each time (that O(n²) work froze the reader).
-const _sectionHeights = computed(() => chapterList.value.map((c) => estimateSectionHeight(c.html)))
-
-// Two stable arrays — mounted and placeholder — built once per chapter list.
-// mobileChapterList then only picks between them, so a mount never allocates a
-// fresh object and Vue can skip re-patching every untouched section.
-//
-// estHeight rides on BOTH variants. It used to be attached only to
-// placeholders, so once a section mounted it lost its estimate — and since the
-// mounted section reserves space through `contain-intrinsic-size`, every
-// section fell back to a flat 600px guess against a real height nearer 2900px.
-// That understated the document by ~5x and made the scrollbar lurch while
-// reading.
-const _mountedSectionViews = computed(() => (
-  chapterList.value.map((chapter, index) => ({ ...chapter, estHeight: _sectionHeights.value[index] }))
-))
-
-const _placeholderSectionViews = computed(() => (
-  _mountedSectionViews.value.map((chapter) => ({ ...chapter, html: null }))
-))
-
-const mobileChapterList = computed(() => {
-  const mounted = mountedSections.value
-  return _mountedSectionViews.value.map((chapter, index) => (
-    mounted[index] ? chapter : _placeholderSectionViews.value[index]
-  ))
-})
+const mobileChapterList = computed(() => chapterList.value)
+const _cancelIdleSectionMounting = () => {}
 
 // The chunk this book should open at. Narration wins while it is playing;
 // otherwise it is the saved reading position, which both surfaces write.
 function initialReadingChunk() {
-  if (ttsBook.value?.id === book.value?.id && ttsStatus.value !== 'idle') {
+  if (narrationCompatible.value && ttsBook.value?.id === book.value?.id && ttsStatus.value !== 'idle') {
     return Math.max(0, Number(ttsChunkIdx.value) || 0)
+  }
+  if (isPdfBook.value && book.value?.readingPdfView !== mobileReaderPrefs.value.pdfViewMode) {
+    const page = book.value?.readingPdfPage || Math.round((Number(book.value?.progress) || 0) / 100 * Math.max(0, totalPages.value - 1)) + 1
+    if (usePdfReflowView.value) {
+      const section = chapterList.value.findIndex(section => section.page >= page)
+      return sectionStartChunk(Math.max(0, section))
+    }
+    return firstChunkForPage(pdfManifest.value, page)?.id || 0
   }
   return resolveStartChunk(book.value, allReadableChunks.value.length)
 }
@@ -764,114 +727,37 @@ function initialSectionIndex() {
   return Math.max(0, Math.min(total - 1, Math.round((progress / 100) * (total - 1))))
 }
 
-function _cancelIdleSectionMounting() {
-  if (_mountIdleId !== null && typeof cancelIdleCallback === 'function') {
-    cancelIdleCallback(_mountIdleId)
-  }
-  if (_mountTimerId !== null) clearTimeout(_mountTimerId)
-  _mountIdleId = null
-  _mountTimerId = null
-}
-
-async function _onAllSectionsMounted() {
-  await nextTick()
-  observeChapters()
-  _scheduleChunkMapBuild()
-}
-
-// Fill the REST of the book in, starting from the reading position.
-//
-// This used to mount 4 sections per requestIdleCallback slice, which on a busy
-// main thread meant ~4 sections every 350ms — a 600-section EPUB needed the
-// better part of a minute to finish, so any determined scroll outran it and
-// landed on an unmounted section. Nothing tunable about that loop could win the
-// race, because the reader can always scroll faster than a fixed drip.
-//
-// So the race is gone: every section is mounted within a few hundred ms, in
-// time-boxed batches that keep each frame under budget. Off-screen sections
-// cost almost nothing to keep mounted because `.reader-mobile-section` carries
-// `content-visibility: auto` — the browser skips their layout and paint
-// natively, on its own schedule, with no JS in the scroll path.
-// One batch per frame-ish, each capped to a slice of the frame budget. Pacing
-// matters in both directions: too small a batch and scrolling outruns it (the
-// original bug), too small a GAP and the mounting loop starves the renderer it
-// is feeding — a chain of setTimeout(…, 0) pegs the main thread just as badly
-// as one giant mount.
-const MOUNT_BATCH_BUDGET_MS = 8
-const MOUNT_BATCH_INTERVAL_MS = 16
-
-function _startIdleSectionMounting(startIdx) {
-  _cancelIdleSectionMounting()
-
-  const step = () => {
-    _mountIdleId = null
-    _mountTimerId = null
-    const flags = mountedSections.value
-    const deadline = performance.now() + MOUNT_BATCH_BUDGET_MS
-
-    // Sweep outward from the reading position — forward first, then backward —
-    // holding a cursor rather than rescanning from startIdx every time (that
-    // rescan was itself O(n²) over a long book).
-    let done = false
-    while (performance.now() < deadline) {
-      let next = -1
-      for (let i = _mountCursor; i < flags.length; i += 1) {
-        if (!flags[i]) { next = i; break }
-        _mountCursor = i + 1
-      }
-      if (next === -1) {
-        for (let i = startIdx - 1; i >= 0; i -= 1) {
-          if (!flags[i]) { next = i; break }
-        }
-      }
-      if (next === -1) { done = true; break }
-      flags[next] = true
-    }
-
-    if (done) _onAllSectionsMounted()
-    else schedule()
-  }
-
-  // A plain timer, not requestIdleCallback: idle callbacks are exactly what
-  // gets starved while the user is scrolling, which is precisely when the
-  // remaining sections are needed most. (Not rAF either — it is suspended in a
-  // backgrounded WebView, which would strand the book half-mounted.)
-  const schedule = () => {
-    _mountTimerId = setTimeout(step, MOUNT_BATCH_INTERVAL_MS)
-  }
-
-  _mountCursor = startIdx
-  schedule()
-}
-
 function initializeSectionMounting() {
-  const total = chapterList.value.length
-  if (!total) {
-    mountedSections.value = []
-    _cancelIdleSectionMounting()
-    return
-  }
-
-  const startIdx = initialSectionIndex()
-  const flags = new Array(total).fill(false)
-  for (let i = startIdx - 1; i <= startIdx + 2; i += 1) {
-    if (i >= 0 && i < total) flags[i] = true
-  }
-  flags[0] = true
-  mountedSections.value = flags
-  _startIdleSectionMounting(startIdx)
+  mountedSections.value = new Array(chapterList.value.length).fill(true)
 }
 
 function mountSection(index) {
-  const flags = mountedSections.value
-  const target = Number(index)
-  if (Number.isNaN(target) || target < 0 || target >= flags.length) return
-  flags[target] = true
+  mountedSections.value[index] = true
 }
 
 const pdfTocItems = computed(() => {
   if (readsAsEpub.value) return []
-  return tocItems.value || []
+  if (tocItems.value?.length) return tocItems.value
+  // Older imports may have been marked "TOC checked" before chapter inference
+  // existed. Their stored manifest already contains the complete page text.
+  const pages = (pdfManifest.value?.pages || []).map(page => {
+    const lines = []
+    let line = ''
+    let previousY = null
+    for (const item of page.items || []) {
+      const y = Number(item.transform?.[5])
+      if (line && Number.isFinite(y) && previousY !== null && Math.abs(y - previousY) > 3) {
+        lines.push(line)
+        line = ''
+      }
+      line += `${line ? ' ' : ''}${item.str || ''}`
+      if (Number.isFinite(y)) previousY = y
+      if (item.hasEOL) { lines.push(line); line = '' }
+    }
+    if (line) lines.push(line)
+    return { page: page.page, lines }
+  })
+  return inferPdfChapterToc(pages)
 })
 
 const displayTocItems = computed(() => {
@@ -885,9 +771,10 @@ const displayTocItems = computed(() => {
       }))
   }
 
-  return (tocTitles.value || [])
-    .map((title, index) => ({ title, index, level: 0, type: 'chapter' }))
+  return chapterList.value
+    .map((chapter, index) => ({ title: tocTitles.value[index] || chapter.title, index, level: 0, type: 'chapter' }))
     .filter(item => item.title && item.title.trim())
+    .filter(item => !/^Page \d+$/i.test(item.title))
 })
 
 const tocEmptyMessage = computed(() => {
@@ -903,7 +790,7 @@ const tocEmptyMessage = computed(() => {
 const highlightEnabled = computed(() => settings.value.readerHighlight !== false)
 
 const currentNarrationChunkIndex = computed(() => {
-  if (ttsBook.value?.id !== book.value?.id || ttsStatus.value === 'idle') return -1
+  if (!narrationCompatible.value || ttsBook.value?.id !== book.value?.id || ttsStatus.value === 'idle') return -1
   return ttsPlayingChunkIdx.value
 })
 
@@ -921,13 +808,16 @@ const activeWordRange = computed(() => {
 })
 
 const isCurrentBookNarrating = computed(() => (
-  ttsBook.value?.id === book.value?.id && ttsStatus.value !== 'idle'
+  narrationCompatible.value && ttsBook.value?.id === book.value?.id && ttsStatus.value !== 'idle'
 ))
 
 // Canonical chunk data: the flat chunk list (TTS playback order) plus the
 // per-section chunk counts. Built section-by-section so indices line up with
 // the reader's `ch-N` sections, the highlight spans, and the chapter splits.
-const readableChunkData = computed(() => buildReadableChunks(rawContent.value || ''))
+const readableChunkData = computed(() => {
+  if (!usePdfReflowView.value) return buildReadableChunks(rawContent.value || '')
+  return buildReadableSectionChunks(chapterList.value)
+})
 const epubSectionCounts = computed(() => readableChunkData.value.sectionCounts)
 const allReadableChunks = computed(() => (
   !readsAsEpub.value
@@ -1197,7 +1087,9 @@ async function confirmReadFromHere() {
   await playTTS(book.value, {
     startChunkIdx: pendingReadFromHereChunk.value,
     ignoreSavedSession: true,
-    chunks: !readsAsEpub.value ? allReadableChunks.value : undefined,
+    chunks: allReadableChunks.value,
+    sectionCounts: readsAsEpub.value ? epubSectionCounts.value : [],
+    chunkSource: playbackSource.value,
   })
   if (isPdfRenderable.value) {
     currentPdfPage.value = targetPage
@@ -1645,6 +1537,12 @@ async function saveReadingProgress(position) {
   if (!next) return
 
   const updated = { ...book.value, ...next }
+  if (isPdfBook.value) {
+    updated.readingPdfView = mobileReaderPrefs.value.pdfViewMode
+    updated.readingPdfPage = usePdfReflowView.value
+      ? chapterList.value[currentChapterIdx.value]?.page || currentPdfPage.value
+      : currentPdfPage.value
+  }
   book.value = updated
   try {
     await updateBook(updated)
@@ -1754,7 +1652,7 @@ function handlePdfLoaded(payload) {
     restoredInitialPdfScroll.value = true
     const targetPage = Math.max(1, Math.min(
       totalPages.value,
-      Math.round((book.value.progress / 100) * Math.max(1, totalPages.value - 1)) + 1
+      book.value.readingPdfPage || Math.round((book.value.progress / 100) * Math.max(1, totalPages.value - 1)) + 1
     ))
     currentPdfPage.value = targetPage
     nextTick(() => pdfViewerRef.value?.scrollToPage(targetPage, 'instant'))
@@ -1950,7 +1848,7 @@ function scrollToChunk(chunkIndex) {
   })
 }
 
-watch(rawContent, async () => {
+watch([rawContent, pdfReflow], async () => {
   await nextTick()
   await nextTick()
   _scheduleChunkMapBuild()

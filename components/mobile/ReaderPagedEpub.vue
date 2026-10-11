@@ -459,7 +459,8 @@ watch(() => props.layoutHash, async () => {
   await renderPendingOrSection(section.value, page.value);
 });
 
-watch(() => props.sections.length, async (length) => {
+watch(() => props.sections, async (sections) => {
+  const length = sections.length;
   if (!length) return;
   await renderPendingOrSection(Math.min(section.value, length - 1), page.value);
 });
@@ -568,7 +569,7 @@ defineExpose({ nextPage, prevPage, goToSection, goToSectionPage, goToChunk, getP
   text-justify: inter-word;
   hyphens: auto;
   -webkit-hyphens: auto;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: break-word;
   /* See ReaderMobile: native selection powers the highlight/note menu. */
   -webkit-user-select: text;

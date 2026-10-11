@@ -9,8 +9,8 @@
 // enough of the HTMLAudioElement surface the TTS engine uses (`play()`→Promise,
 // `pause()`, `stop()`, `volume`, `currentTime`, `onended`, `onerror`) so the
 // shared engine drives device voices through the exact same code path it uses
-// for <audio> playback. Its monotonic currentTime lets the shared engine drive
-// estimated word boundaries when the native plugin cannot report exact ones.
+// for <audio> playback. Word highlighting follows the engine's actual range
+// events, rather than estimating speech progress from wall-clock time.
 
 import { Capacitor } from '@capacitor/core'
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
@@ -237,7 +237,7 @@ function langForEdgeVoice(edgeVoiceId) {
 // voice: prefer an exact BCP-47 language match, then the base language, biasing
 // toward a matching gender when the OS voice name hints at one. Returns -1 to
 // let the engine use the platform default for the language.
-export function pickNativeVoiceIndex(voices, edgeVoiceId) {
+export function pickNativeVoiceIndex(voices, edgeVoiceId, { preferNetwork = false } = {}) {
   if (!Array.isArray(voices) || !voices.length) return -1
 
   const fullLang = langForEdgeVoice(edgeVoiceId)
@@ -249,11 +249,16 @@ export function pickNativeVoiceIndex(voices, edgeVoiceId) {
   const lang = (v) => String(v?.lang || '').replace('_', '-').toLowerCase()
   const exact = voices.map((v, i) => ({ v, i })).filter(({ v }) => lang(v) === fullLang.toLowerCase())
   const base = voices.map((v, i) => ({ v, i })).filter(({ v }) => lang(v).startsWith(baseLang))
-  const pool = exact.length ? exact : base
+  const usEnglish = voices.map((v, i) => ({ v, i })).filter(({ v }) => lang(v) === 'en-us')
+  const pool = exact.length ? exact : usEnglish.length ? usEnglish : base
 
   if (!pool.length) return -1
-  const gendered = pool.find(({ v }) => deviceVoiceGender(v).gender === wantsGender)
-  return (gendered || pool[0]).i
+  const preferred = pool.filter(({ v }) => !!v.localService !== preferNetwork)
+  const candidates = preferred.length ? preferred : pool
+  const realVoices = candidates.filter(({ v }) => !/-language$/i.test(voiceKey(v)))
+  const ranked = realVoices.length ? realVoices : candidates
+  const gendered = ranked.find(({ v }) => deviceVoiceGender(v).gender === wantsGender)
+  return (gendered || ranked[0]).i
 }
 
 function clampRate(speed) {
@@ -294,6 +299,7 @@ function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVo
   const player = {
     onended: null,
     onerror: null,
+    onboundary: null,
     volume,
     get currentTime() {
       return startedAt ? Math.max(0, (Date.now() - startedAt) / 1000) : 0
@@ -325,6 +331,14 @@ function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVo
         ended = true
         activeUtterance = null
         player.onended?.()
+      }
+      utterance.onboundary = (event) => {
+        if (utterance !== activeUtterance || stopped || paused || ended) return
+        const start = event.charIndex
+        const length = event.charLength || utteranceText.slice(start).match(/^\S+/)?.[0]?.length || 0
+        if (Number.isInteger(start) && length > 0) {
+          player.onboundary?.({ charIndex: start, word: utteranceText.slice(start, start + length) })
+        }
       }
       utterance.onerror = (event) => {
         if (utterance !== activeUtterance || stopped || paused || ended) return
@@ -359,7 +373,7 @@ function createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVo
 // Build an <audio>-lookalike backed by the native TTS plugin. The plugin's
 // speak() resolves when the utterance FINISHES, which we translate into the
 // engine's `onended` so it advances to the next chunk.
-export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, voices = [], nativeVoiceIndex = -1 }) {
+export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, voices = [], nativeVoiceIndex = -1, preferNetwork = false }) {
   if (!capacitorSpeechSupported() && browserSpeechSupported()) {
     return createBrowserSpeechAudio({ text, voice, speed, volume, voices, nativeVoiceIndex })
   }
@@ -368,7 +382,7 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
   // An explicit device-voice choice (the offline narrator picker) wins; other-
   // wise map the selected Edge voice onto the closest device voice.
   const explicit = Number.isInteger(nativeVoiceIndex) && nativeVoiceIndex >= 0 && nativeVoiceIndex < voices.length
-  const voiceIndex = explicit ? nativeVoiceIndex : pickNativeVoiceIndex(voices, voice)
+  const voiceIndex = explicit ? nativeVoiceIndex : pickNativeVoiceIndex(voices, voice, { preferNetwork })
   const rate = clampRate(speed)
   const vol = clamp01(volume)
   const utterance = String(text || '')
@@ -378,6 +392,12 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
   let paused = false
   let stopped = false
   let startedAt = 0
+  let rangeListener = null
+  let playGeneration = 0
+  const removeRangeListener = () => {
+    rangeListener?.remove().catch(() => {})
+    rangeListener = null
+  }
   const clearWatchdog = () => { if (watchdog) { clearTimeout(watchdog); watchdog = null } }
 
   const armWatchdog = () => {
@@ -386,6 +406,7 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
     watchdog = setTimeout(() => {
       if (ended || paused || stopped) return
       ended = true
+      removeRangeListener()
       TextToSpeech.stop().catch(() => {})
       player.onended?.()
     }, budget)
@@ -394,6 +415,7 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
   const player = {
     onended: null,
     onerror: null,
+    onboundary: null,
     volume,
     get currentTime() {
       return startedAt ? Math.max(0, (Date.now() - startedAt) / 1000) : 0
@@ -401,8 +423,9 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
     _started: false,
     _native: true,
 
-    play() {
-      return new Promise((resolve) => {
+    async play() {
+        const generation = ++playGeneration
+        removeRangeListener()
         // The plugin can't resume mid-utterance, so a resume re-speaks the
         // current chunk from the start.
         paused = false
@@ -410,6 +433,22 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
         ended = false
         player._started = true
         startedAt = Date.now()
+
+        try {
+          const listener = await TextToSpeech.addListener('onRangeStart', ({ start, end, spokenWord }) => {
+            if (generation !== playGeneration || ended || paused || stopped) return
+            if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end <= start || end > utterance.length) return
+            const word = utterance.slice(start, end)
+            if (spokenWord && spokenWord !== word) return
+            player.onboundary?.({ charIndex: start, word })
+          })
+          if (generation !== playGeneration || paused || stopped) {
+            await listener.remove()
+            return
+          }
+          rangeListener = listener
+        } catch { /* Engines without range events retain sentence highlighting. */ }
+        if (generation !== playGeneration || paused || stopped) return
 
         const options = {
           text: utterance,
@@ -421,27 +460,40 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
         if (voiceIndex >= 0) options.voice = voiceIndex
 
         armWatchdog()
-        TextToSpeech.speak(options)
+        const speakWithLocalRetry = async () => {
+          try {
+            await TextToSpeech.speak(options)
+          } catch (error) {
+            const localIndex = !explicit && voiceIndex >= 0 && voices[voiceIndex]?.localService === false
+              ? pickNativeVoiceIndex(voices, voice)
+              : -1
+            if (localIndex < 0 || localIndex === voiceIndex || stopped || paused || generation !== playGeneration) throw error
+            await TextToSpeech.speak({ ...options, voice: localIndex })
+          }
+        }
+        speakWithLocalRetry()
           .then(() => {
-            if (stopped || paused || ended) return
+            if (stopped || paused || ended || generation !== playGeneration) return
             ended = true
             clearWatchdog()
+            removeRangeListener()
             player.onended?.()
           })
           .catch((error) => {
             // stop() during a normal pause / chunk-switch settles speak() — not
             // a real failure.
-            if (stopped || paused || ended) return
+            if (stopped || paused || ended || generation !== playGeneration) return
             ended = true
             clearWatchdog()
+            removeRangeListener()
             player.onerror?.(error)
           })
-        resolve()
-      })
     },
 
     pause() {
       paused = true
+      playGeneration++
+      removeRangeListener()
       startedAt = 0
       clearWatchdog()
       TextToSpeech.stop().catch(() => {})
@@ -449,6 +501,8 @@ export function createNativeSpeechAudio({ text, voice, speed = 1, volume = 1, vo
 
     stop() {
       stopped = true
+      playGeneration++
+      removeRangeListener()
       ended = true
       startedAt = 0
       clearWatchdog()

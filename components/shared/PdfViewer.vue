@@ -1,5 +1,5 @@
 <template>
-  <div class="pdf-viewer" :class="{ 'is-paged': pageMode === 'page', 'is-zoomed': zoom > 1 }" ref="viewerRef">
+  <div class="pdf-viewer" :class="{ 'is-zoomed': zoom > 1 }" ref="viewerRef">
     <div v-if="pdfError" class="pdf-error">
       <i class="ri-file-damage-line"></i>
       <p>Could not render PDF.</p>
@@ -23,10 +23,15 @@
           class="pdf-page-content"
           :style="{ width: `${page.width}px`, height: `${page.height}px` }"
         >
+          <svg v-if="!paintedPages.has(page.number)" class="pdf-preview" :viewBox="`0 0 ${page.width} ${page.height}`" aria-label="Page text preview">
+            <text v-for="(item, index) in previewItems(page.number)" :key="index" :x="item.x" :y="item.y" :font-size="item.size" fill="currentColor">{{ item.text }}</text>
+          </svg>
+          <div v-if="!paintedPages.has(page.number) && !previewItems(page.number).length" class="pdf-render-status" role="status">Rendering page {{ page.number }}…</div>
           <canvas
             :ref="el => setPageCanvas(el, page.number)"
             class="pdf-canvas"
           ></canvas>
+          <div :ref="el => setTextLayer(el, page.number)" class="pdf-text-metrics" aria-hidden="true"></div>
           <div class="pdf-highlight-layer" aria-hidden="true">
             <span
               v-for="(highlight, index) in highlightsByPage[page.number] || []"
@@ -60,8 +65,9 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch, computed } from 'vue'
 import { chunkHighlightRects, chunkSubRangeRects, pagesToRender, scrollTargetForChunk } from '~/composables/usePdfGeometry'
+import { wordSpansWithinChunk } from '~/composables/usePdfManifest'
 import SkeletonLoader from './SkeletonLoader.vue'
 
 const props = defineProps({
@@ -72,10 +78,6 @@ const props = defineProps({
   // reach the edges — a hardcoded 32 here (on top of the container's own
   // padding) is what left mobile PDFs rendering at ~86% of the screen width.
   widthInset: { type: Number, default: 32 },
-  // 'scroll' is the continuous strip of pages; 'page' snaps one whole PDF page
-  // to the screen at a time, which is what a fixed-layout document usually
-  // wants on a phone.
-  pageMode: { type: String, default: 'scroll' },
   manifest: { type: Object, default: null },
   activeChunkId: { type: Number, default: -1 },
   activeWord: { type: Object, default: null },
@@ -85,11 +87,34 @@ const emit = defineEmits(['page-change', 'loaded'])
 
 const viewerRef = ref(null)
 const pages = ref([])
+const selectedPage = ref(1)
+const paintedPages = ref(new Set())
+const previewByPage = computed(() => {
+  const result = new Map()
+  for (const record of pages.value) {
+  const number = record.number
+  const page = props.manifest?.pages?.find(page => page.page === number)
+  const transform = viewportTransforms.get(number)
+  if (!page || !transform) continue
+  result.set(number, (page.items || []).filter(item => item.str?.trim()).map(item => {
+    const t = item.transform || [1, 0, 0, 1, 0, 0]
+    return { text: item.str, x: transform[0] * t[4] + transform[2] * t[5] + transform[4], y: transform[1] * t[4] + transform[3] * t[5] + transform[5], size: Math.hypot(t[2], t[3]) * Math.abs(transform[0]) }
+  }))
+  }
+  return result
+})
+const previewItems = number => previewByPage.value.get(number) || []
 const ready = ref(false)
 const pdfError = ref(false)
 const highlightsByPage = ref({})
 
 const pageCanvases = new Map()
+const textLayerContainers = new Map()
+const textLayers = new Map()
+let TextLayer = null
+const setTextLayer = (element, number) => {
+  if (element) textLayerContainers.set(number, element)
+}
 const pageWraps = new Map()
 const viewportTransforms = new Map()
 const renderedPages = new Set()
@@ -133,10 +158,14 @@ const setPageWrap = (element, pageNumber) => {
 }
 
 const resetPageRefs = () => {
+  for (const layer of textLayers.values()) layer.cancel()
+  textLayers.clear()
+  textLayerContainers.clear()
   pageCanvases.clear()
   pageWraps.clear()
   viewportTransforms.clear()
   renderedPages.clear()
+  paintedPages.value = new Set()
   _visiblePages.clear()
 }
 
@@ -150,43 +179,103 @@ const renderPage = async (pageNumber, baseScale, generation) => {
   const canvas = pageCanvases.get(pageNumber)
   if (!canvas) return
 
-  const dpr = window.devicePixelRatio || 1
-  canvas.width = Math.floor(viewport.width * dpr)
-  canvas.height = Math.floor(viewport.height * dpr)
-  canvas.style.width = `${viewport.width}px`
-  canvas.style.height = `${viewport.height}px`
-
-  const context = canvas.getContext('2d')
+  // Render offscreen, then commit atomically. A stale job must never clear a
+  // visible canvas or contend with another pdf.js render on the same canvas.
+  const buffer = document.createElement('canvas')
+  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+  buffer.width = Math.floor(viewport.width * dpr)
+  buffer.height = Math.floor(viewport.height * dpr)
+  const context = buffer.getContext('2d')
   context.setTransform(dpr, 0, 0, dpr, 0, 0)
   await page.render({ canvasContext: context, viewport }).promise
+  if (generation !== renderGeneration) return
+  canvas.width = buffer.width
+  canvas.height = buffer.height
+  canvas.style.width = `${viewport.width}px`
+  canvas.style.height = `${viewport.height}px`
+  canvas.getContext('2d').drawImage(buffer, 0, 0)
+  paintedPages.value = new Set([...paintedPages.value, pageNumber])
+  const container = textLayerContainers.get(pageNumber)
+  if (container && TextLayer) {
+    textLayers.get(pageNumber)?.cancel()
+    container.replaceChildren()
+    container.style.setProperty('--total-scale-factor', String(viewport.scale))
+    const textContentSource = await page.getTextContent()
+    if (generation !== renderGeneration) return
+    const layer = new TextLayer({ textContentSource, container, viewport })
+    textLayers.set(pageNumber, layer)
+    await layer.render()
+    if (generation !== renderGeneration) return
+    updateHighlights()
+    updateWordHighlights()
+  }
 }
 
+const pendingRenders = new Map()
 const renderPageIfNeeded = async (pageNumber, generation = renderGeneration) => {
   if (!pdfDocument || renderedPages.has(pageNumber)) return
-  renderedPages.add(pageNumber)
-  await renderPage(pageNumber, _baseScale, generation)
+  const key = `${generation}:${pageNumber}`
+  if (pendingRenders.has(key)) return pendingRenders.get(key)
+  const job = renderPage(pageNumber, _baseScale, generation).then(() => {
+    if (generation === renderGeneration) renderedPages.add(pageNumber)
+  }).catch(error => console.warn('PDF page render failed:', error)).finally(() => pendingRenders.delete(key))
+  pendingRenders.set(key, job)
+  return job
 }
 
+let windowRequest = 0
 const renderWindow = async (visiblePages) => {
+  const request = ++windowRequest
   const generation = renderGeneration
-  const target = pagesToRender(visiblePages, pdfDocument?.numPages || 0, 2)
-
-  // Evict canvases outside the window to cap memory on large documents.
-  for (const pageNumber of [...renderedPages]) {
-    if (!target.includes(pageNumber)) {
-      const canvas = pageCanvases.get(pageNumber)
-      if (canvas) {
-        canvas.width = 0
-        canvas.height = 0
-      }
-      renderedPages.delete(pageNumber)
-    }
-  }
-
-  for (const pageNumber of target) {
-    if (generation !== renderGeneration) return
+  const target = pagesToRender(visiblePages, pdfDocument?.numPages || 0, 3)
+  // Visible pages first; never leave them behind speculative neighbours.
+  const ordered = [...new Set([...visiblePages, ...target])]
+  for (const pageNumber of ordered) {
+    if (generation !== renderGeneration || request !== windowRequest) return
     await renderPageIfNeeded(pageNumber, generation)
   }
+  if (request !== windowRequest) return
+  for (const pageNumber of [...renderedPages]) {
+    if (target.includes(pageNumber)) continue
+    const canvas = pageCanvases.get(pageNumber)
+    if (canvas) { canvas.width = 0; canvas.height = 0 }
+    textLayers.get(pageNumber)?.cancel()
+    textLayers.delete(pageNumber)
+    textLayerContainers.get(pageNumber)?.replaceChildren()
+    renderedPages.delete(pageNumber)
+    const painted = new Set(paintedPages.value)
+    painted.delete(pageNumber)
+    paintedPages.value = painted
+  }
+}
+
+// DOM ranges use PDF.js's font layout, so narrow letters and wide letters no
+// longer get identical widths. Fall back to item geometry until a page renders.
+const measuredSpanRects = (pageNumber, spans) => {
+  const layer = textLayers.get(pageNumber)
+  const container = textLayerContainers.get(pageNumber)
+  if (!layer || !container || !spans?.length) return null
+  const page = props.manifest?.pages?.find(entry => entry.page === pageNumber)
+  const origin = container.getBoundingClientRect()
+  const scale = origin.width / container.offsetWidth || 1
+  const rects = []
+  for (const span of spans) {
+    const div = layer.textDivs[span.itemIndex]
+    const node = div?.firstChild
+    if (!node || node.nodeType !== Node.TEXT_NODE || node.textContent !== page?.items?.[span.itemIndex]?.str) return null
+    const range = document.createRange()
+    range.setStart(node, Math.min(node.length, span.start))
+    range.setEnd(node, Math.min(node.length, span.end))
+    for (const rect of range.getClientRects()) {
+      if (rect.width > 0 && rect.height > 0) rects.push({
+        left: (rect.left - origin.left) / scale,
+        top: (rect.top - origin.top) / scale,
+        width: rect.width / scale,
+        height: rect.height / scale,
+      })
+    }
+  }
+  return rects.length ? rects : null
 }
 
 const updateHighlights = () => {
@@ -198,7 +287,7 @@ const updateHighlights = () => {
   }
 
   highlightsByPage.value = {
-    [chunk.page]: chunkHighlightRects(props.manifest, chunk.id, viewportTransform)
+    [chunk.page]: (measuredSpanRects(chunk.page, chunk.spans) || chunkHighlightRects(props.manifest, chunk.id, viewportTransform))
       .map(rect => ({
         left: Math.max(0, rect.left - 1.5),
         top: Math.max(0, rect.top - 1),
@@ -220,7 +309,7 @@ const updateWordHighlights = () => {
   }
 
   wordHighlightsByPage.value = {
-    [chunk.page]: chunkSubRangeRects(props.manifest, chunk.id, range.start, range.end, viewportTransform)
+    [chunk.page]: (measuredSpanRects(chunk.page, wordSpansWithinChunk(props.manifest, chunk.id, range.start, range.end)) || chunkSubRangeRects(props.manifest, chunk.id, range.start, range.end, viewportTransform))
       .map(rect => ({
         left: Math.max(0, rect.left - 1),
         top: Math.max(0, rect.top - 1),
@@ -305,13 +394,14 @@ const relayout = async () => {
     }
   }
   renderedPages.clear()
+  paintedPages.value = new Set()
 
   pages.value = pageRecords
   await nextTick()
   for (const wrap of pageWraps.values()) {
     wrap.scrollLeft = Math.max(0, (wrap.scrollWidth - wrap.clientWidth) / 2)
   }
-  await renderWindow(_visiblePages.size ? [..._visiblePages] : [1])
+  await renderWindow(_visiblePages.size ? [..._visiblePages] : [selectedPage.value])
   refreshHighlights()
 }
 
@@ -319,6 +409,7 @@ const renderPdf = async () => {
   if (!props.src) return
   const generation = ++renderGeneration
   ready.value = false
+  selectedPage.value = 1
   pdfError.value = false
   pages.value = []
   highlightsByPage.value = {}
@@ -326,6 +417,7 @@ const renderPdf = async () => {
 
   try {
     const pdfjsLib = await import('pdfjs-dist')
+    TextLayer = pdfjsLib.TextLayer
     pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
       'pdfjs-dist/build/pdf.worker.mjs',
       import.meta.url
@@ -379,13 +471,13 @@ const setupPageObserver = () => {
     }
 
     const currentPage = pageAtAnchor()
-    if (currentPage) emit('page-change', currentPage)
+    if (currentPage) { selectedPage.value = currentPage; emit('page-change', currentPage) }
 
-    const visible = _visiblePages.size ? [..._visiblePages] : (currentPage ? [currentPage] : [1])
+    const visible = [...new Set([currentPage || 1, ..._visiblePages])]
     renderWindow(visible)
   }, {
     root: null,
-    rootMargin: '200px 0px 200px 0px',
+    rootMargin: '1600px 0px 1600px 0px',
     threshold: [0, 0.1, 0.3, 0.5, 0.7],
   })
   for (const wrap of pageWraps.values()) pageObserver.observe(wrap)
@@ -404,7 +496,9 @@ const getVisiblePage = () => {
 }
 
 const scrollToPage = (pageNumber, behavior = 'smooth', block = 'start') => {
-  renderPageIfNeeded(Number(pageNumber))
+  selectedPage.value = Math.max(1, Math.min(pages.value.length, Number(pageNumber)))
+  emit('page-change', selectedPage.value)
+  renderWindow([selectedPage.value])
   pageWraps.get(Number(pageNumber))?.scrollIntoView({ behavior, block })
 }
 
@@ -433,7 +527,7 @@ const onViewerScroll = () => {
   _anchorRaf = requestAnimationFrame(() => {
     _anchorRaf = null
     const page = pageAtAnchor()
-    if (page) emit('page-change', page)
+    if (page) { selectedPage.value = page; emit('page-change', page) }
   })
 }
 
@@ -442,6 +536,9 @@ onMounted(() => {
   window.addEventListener('scroll', onViewerScroll, { passive: true })
 })
 onUnmounted(() => {
+  renderGeneration += 1
+  windowRequest += 1
+  pdfDocument?.destroy?.()
   pageObserver?.disconnect()
   window.removeEventListener('scroll', onViewerScroll)
   if (_anchorRaf !== null) cancelAnimationFrame(_anchorRaf)
@@ -489,29 +586,38 @@ watch(() => props.activeWord, updateWordHighlights)
   position: relative;
 }
 
-/* Page mode: one PDF page per screen.
- *
- * Built on scroll-snap rather than a bespoke swipe pager, so page rendering,
- * canvas eviction and scrollToPage all keep working exactly as they do in the
- * continuous view — the only change is where scrolling is allowed to stop. */
-.pdf-viewer.is-paged {
-  height: 100dvh;
-  gap: 0;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-  overscroll-behavior-y: contain;
-  padding-bottom: 0;
-}
-
-.pdf-viewer.is-paged .pdf-page-wrap {
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-  margin: auto 0;
-}
+.pdf-preview { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--color-text-primary); background: var(--color-surface-primary); }
+.pdf-render-status { position: absolute; inset: 0; display: grid; place-items: center; color: var(--color-text-muted); }
 
 .pdf-canvas {
   display: block;
   background: var(--color-surface-primary);
+}
+
+.pdf-text-metrics {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  text-align: initial;
+  text-size-adjust: none;
+  transform-origin: 0 0;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+.pdf-text-metrics :deep(span), .pdf-text-metrics :deep(br) {
+  position: absolute;
+  white-space: pre;
+  transform-origin: 0% 0%;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
 }
 
 .pdf-highlight-layer {

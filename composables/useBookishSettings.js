@@ -104,7 +104,7 @@ export const CARD_BACKGROUND_OPTIONS = Object.freeze(['blank', 'blur'])
 export const APP_BACKGROUND_OPTIONS = Object.freeze(['white', 'muted'])
 export const DARK_APP_BACKGROUND_OPTIONS = Object.freeze(['dark', 'muted'])
 export const MOBILE_NAV_STYLE_OPTIONS = Object.freeze(['standard', 'floating'])
-export const MOBILE_TOP_NAV_DISPLAY_OPTIONS = Object.freeze(['title', 'logo', 'logo-title', 'greeting'])
+export const MOBILE_TOP_NAV_DISPLAY_OPTIONS = Object.freeze(['logo-title', 'greeting'])
 export const MOBILE_NAV_SIZE_OPTIONS = Object.freeze(['standard', 'compact'])
 export const MOBILE_NAV_MATERIAL_OPTIONS = Object.freeze(['current', 'frosted'])
 export const MOBILE_NAV_HIGHLIGHT_OPTIONS = Object.freeze(['soft', 'none'])
@@ -255,12 +255,8 @@ export function normalizeBookishSettings(value) {
       ? source.mobileNavProfileDisplay : DEFAULT_BOOKISH_SETTINGS.mobileNavProfileDisplay,
     mobileNavShowTitles: typeof source.mobileNavShowTitles === 'boolean'
       ? source.mobileNavShowTitles : DEFAULT_BOOKISH_SETTINGS.mobileNavShowTitles,
-    seriesCardBackground: CARD_BACKGROUND_OPTIONS.includes(source.seriesCardBackground)
-      ? source.seriesCardBackground
-      : DEFAULT_BOOKISH_SETTINGS.seriesCardBackground,
-    seriesCardLayout: SERIES_CARD_LAYOUT_OPTIONS.includes(source.seriesCardLayout)
-      ? source.seriesCardLayout
-      : DEFAULT_BOOKISH_SETTINGS.seriesCardLayout,
+    seriesCardBackground: 'blur',
+    seriesCardLayout: 'fan',
     favouritesCardBackground: CARD_BACKGROUND_OPTIONS.includes(source.favouritesCardBackground)
       ? source.favouritesCardBackground
       : DEFAULT_BOOKISH_SETTINGS.favouritesCardBackground,
@@ -270,12 +266,8 @@ export function normalizeBookishSettings(value) {
     profileFavouritesLayout: FAVOURITES_CARD_LAYOUT_OPTIONS.includes(source.profileFavouritesLayout)
       ? source.profileFavouritesLayout
       : DEFAULT_BOOKISH_SETTINGS.profileFavouritesLayout,
-    playlistCardBackground: CARD_BACKGROUND_OPTIONS.includes(source.playlistCardBackground)
-      ? source.playlistCardBackground
-      : DEFAULT_BOOKISH_SETTINGS.playlistCardBackground,
-    playlistCardLayout: PLAYLIST_CARD_LAYOUT_OPTIONS.includes(source.playlistCardLayout)
-      ? source.playlistCardLayout
-      : DEFAULT_BOOKISH_SETTINGS.playlistCardLayout,
+    playlistCardBackground: 'blur',
+    playlistCardLayout: 'fan',
     bookActionDisplay: BOOK_ACTION_DISPLAY_OPTIONS.includes(source.bookActionDisplay)
       ? source.bookActionDisplay
       : DEFAULT_BOOKISH_SETTINGS.bookActionDisplay,
@@ -415,10 +407,10 @@ export function readBookishSettings(storage) {
 
       const migrated = normalizeBookishSettings({
         ...parsed,
-        seriesCardBackground: DEFAULT_BOOKISH_SETTINGS.seriesCardBackground,
-        seriesCardLayout: DEFAULT_BOOKISH_SETTINGS.seriesCardLayout,
-        playlistCardBackground: DEFAULT_BOOKISH_SETTINGS.playlistCardBackground,
-        playlistCardLayout: DEFAULT_BOOKISH_SETTINGS.playlistCardLayout,
+        seriesCardBackground: 'blur',
+        seriesCardLayout: 'fan',
+        playlistCardBackground: 'blur',
+        playlistCardLayout: 'fan',
         bookActionDisplay: DEFAULT_BOOKISH_SETTINGS.bookActionDisplay,
         ratingSource: DEFAULT_BOOKISH_SETTINGS.ratingSource,
         personalRatingScale: DEFAULT_BOOKISH_SETTINGS.personalRatingScale,

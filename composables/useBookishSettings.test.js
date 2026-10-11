@@ -94,7 +94,7 @@ describe('useBookishSettings storage helpers', () => {
   it('defaults the shared mobile header to logo and title and persists each display choice', () => {
     const storage = createMemoryStorage()
     expect(normalizeBookishSettings({}).mobileTopNavDisplay).toBe('logo-title')
-    for (const display of ['title', 'logo', 'logo-title', 'greeting']) {
+    for (const display of ['logo-title', 'greeting']) {
       writeBookishSettings({ mobileTopNavDisplay: display }, storage)
       expect(readBookishSettings(storage).mobileTopNavDisplay).toBe(display)
     }
@@ -227,4 +227,11 @@ describe('useBookishSettings storage helpers', () => {
       libraryTableItemsPerPage: 30,
     })
   })
+})
+
+
+it('migrates removed header and card choices to the fixed defaults', () => {
+  for (const mobileTopNavDisplay of ['title', 'logo']) {
+    expect(normalizeBookishSettings({ mobileTopNavDisplay, seriesCardLayout: 'cover', playlistCardLayout: 'cover', seriesCardBackground: 'blank', playlistCardBackground: 'blank' })).toMatchObject({ mobileTopNavDisplay: 'logo-title', seriesCardLayout: 'fan', playlistCardLayout: 'fan', seriesCardBackground: 'blur', playlistCardBackground: 'blur' })
+  }
 })

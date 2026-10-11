@@ -14,6 +14,7 @@ let _prefetchChunk = null        // { chunkIdx, audio, boundaries }
 let _prefetchGeneration = 0      // incremented on cancel to invalidate in-flight pre-fetches
 let _chunks = []
 let _chunkIdx = 0
+let _chunkTimeOffsets = [0]
 let _currentBoundaries = []      // word boundaries for the currently playing chunk
 let _rafId = null                // requestAnimationFrame handle for word-highlight loop
 let _onlineListenerBound = false // useTTS() runs per-component; bind the listener once
@@ -21,6 +22,19 @@ let _onlineListenerBound = false // useTTS() runs per-component; bind the listen
 const DEFAULT_SENTENCE_MAX_CHARS = 480
 const AUDIO_CACHE_LIMIT = 8
 const WORDS_PER_MIN = TTS_WORDS_PER_MIN
+
+// Prefix durations keep a PDF's start/seek and every following sentence O(1).
+// Recounting every word in a large book for each progress update could block
+// the WebView while audio was loading.
+export function chunkTimeOffsets(chunks, speed = 1) {
+  const offsets = [0]
+  const wordsPerMinute = WORDS_PER_MIN * (Number(speed) || 1)
+  for (const chunk of chunks) {
+    const words = (String(chunk || '').match(/\S+/g) || []).length || 1
+    offsets.push(offsets[offsets.length - 1] + words * 60 / wordsPerMinute)
+  }
+  return offsets
+}
 export const BOOKISH_TTS_SESSION_KEY = 'bookish:tts-session'
 
 const EDGE_VOICES = [
@@ -47,6 +61,7 @@ const LEGACY_EDGE_VOICE_REPLACEMENTS = Object.freeze({
 
 let _audioCache = new Map()
 let _prewarmCache = new Map()
+let _prewarmInFlight = new Map()
 const PREWARM_CACHE_LIMIT = 4
 
 const isKokoroVoice = (voiceId) => String(voiceId || '').startsWith(KOKORO_VOICE_PREFIX)
@@ -295,6 +310,13 @@ export function buildReadableChunks(html) {
     for (const chunk of partChunks) chunks.push(chunk)
   }
   return { chunks, sectionCounts }
+}
+
+// Keep figure-only sections in the index: filtering them would shift every
+// later page's selection and narration anchor.
+export function buildReadableSectionChunks(sections = []) {
+  const parts = sections.map(section => buildReadableChunks(section.html || '').chunks)
+  return { chunks: parts.flat(), sectionCounts: parts.map(chunks => chunks.length) }
 }
 
 export function resolvePlaybackChunks({
@@ -575,6 +597,7 @@ export const useTTS = () => {
   // Wi-Fi with no working internet still claimed to be online, so the picker
   // kept listing Edge voices the device could not reach.
   const ttsUsingDeviceVoice = useState('tts:usingDeviceVoice', () => false)
+  const ttsChunkSource = useState('tts:chunkSource', () => '')
   const ttsCurrentChunk = useState('tts:currentChunk', () => '')
   const ttsPlayingChunkIdx = useState('tts:playingChunkIdx', () => -1)
   const ttsPlayingChunkText = useState('tts:playingChunkText', () => '')
@@ -603,21 +626,6 @@ export const useTTS = () => {
   const _estimatedChunkSeconds = (chunk) => {
     const words = (chunk?.match(/\S+/g) || []).length || 1
     return (words / WORDS_PER_MIN) * 60 / ttsSpeed.value
-  }
-
-  // Native Android TTS does not expose word-boundary callbacks. Give its
-  // audio-like clock evenly spaced boundaries so the Listen screen can still
-  // reveal words in time with the selected speaking rate. Edge voices replace
-  // these with their exact server-provided boundaries.
-  const _estimatedWordBoundaries = (text) => {
-    const source = String(text || '')
-    const secondsPerWord = 60 / (WORDS_PER_MIN * ttsSpeed.value)
-    return [...source.matchAll(/\S+/g)].map((match, index) => ({
-      word: match[0],
-      charIndex: match.index ?? 0,
-      offset: index * secondsPerWord,
-      duration: secondsPerWord,
-    }))
   }
 
   const _persistSession = () => {
@@ -649,10 +657,8 @@ export const useTTS = () => {
   const _updateProgress = () => {
     ttsChunkIdx.value = _chunkIdx
     ttsCurrentChunk.value = _chunks[_chunkIdx] || ''
-    ttsElapsedSeconds.value = _chunks
-      .slice(0, Math.max(0, _chunkIdx))
-      .reduce((sum, chunk) => sum + _estimatedChunkSeconds(chunk), 0)
-    ttsTotalSeconds.value = _chunks.reduce((sum, chunk) => sum + _estimatedChunkSeconds(chunk), 0)
+    ttsElapsedSeconds.value = _chunkTimeOffsets[Math.max(0, Math.min(_chunkIdx, _chunks.length))] || 0
+    ttsTotalSeconds.value = _chunkTimeOffsets[_chunks.length] || 0
     ttsProgress.value = ttsTotalChunks.value > 0
       ? Math.round((_chunkIdx / ttsTotalChunks.value) * 100)
       : 0
@@ -688,12 +694,12 @@ export const useTTS = () => {
     return null
   }
 
-  const _clearAudioCache = () => {
+  const _clearAudioCache = (preservePrewarm = false) => {
     for (const item of _audioCache.values()) {
       if (item?.objectUrl) URL.revokeObjectURL(item.audio)
     }
     _audioCache.clear()
-    _prewarmCache.clear()
+    if (!preservePrewarm) _prewarmCache.clear()
   }
 
   // ── Background keep-alive ──────────────────────────────────────────────────
@@ -799,6 +805,7 @@ export const useTTS = () => {
 
     const voice = normalizeAvailableVoice(ttsVoiceId.value)
     const prewarmKey = ttsPrewarmKey(chunk, voice, ttsSpeed.value)
+    if (_prewarmInFlight.has(prewarmKey)) await _prewarmInFlight.get(prewarmKey)
     const prewarmed = _prewarmCache.get(prewarmKey)
     if (prewarmed) {
       _prewarmCache.delete(prewarmKey)
@@ -830,6 +837,7 @@ export const useTTS = () => {
         native: !!data.native,
         nativeText: data.native ? (data.text ?? chunk) : undefined,
         nativeVoice: data.native ? data.voice : undefined,
+        preferNetwork: !!data.preferNetwork,
       }
       _cacheAudio(chunkIdx, result)
       return result
@@ -842,6 +850,7 @@ export const useTTS = () => {
   // rAF loop: maps audio.currentTime → the current word boundary index
   const _startWordLoop = (wordBoundaries) => {
     if (_rafId !== null) { cancelAnimationFrame(_rafId); _rafId = null }
+    if (_currentAudio?._native) return
     if (!wordBoundaries.length) return
     const loop = () => {
       if (!_currentAudio || ttsStatus.value !== 'playing') { _rafId = null; return }
@@ -927,6 +936,7 @@ export const useTTS = () => {
         native: !!prefetched.native,
         nativeText: prefetched.nativeText,
         nativeVoice: prefetched.nativeVoice,
+        preferNetwork: prefetched.preferNetwork,
       }
       _prefetchChunk = null
     } else {
@@ -979,8 +989,16 @@ export const useTTS = () => {
         volume: ttsVolume.value,
         voices,
         nativeVoiceIndex: ttsNativeVoiceIdx.value,
+        preferNetwork: !!chunkData.preferNetwork,
       })
-      chunkData.boundaries = _estimatedWordBoundaries(requestedChunkText)
+      chunkData.boundaries = []
+      audio.onboundary = (boundary) => {
+        if (_currentAudio !== audio || ttsStatus.value !== 'playing') return
+        if (_chunkIdx !== requestedChunkIdx || _prefetchGeneration !== myGen) return
+        _currentBoundaries = [{ ...boundary, offset: audio.currentTime, duration: 0 }]
+        ttsBoundaries.value = _currentBoundaries
+        ttsWordIdx.value = 0
+      }
     } else {
       ttsUsingDeviceVoice.value = false
       audio = new Audio(chunkData.audio)
@@ -1048,7 +1066,7 @@ export const useTTS = () => {
   const _stopInternal = () => {
     _cancelAudio()
     _stopKeepAlive()
-    _clearAudioCache()
+    _clearAudioCache(true)
     _chunks = []
     _chunkIdx = 0
     ttsCurrentChunk.value = ''
@@ -1069,7 +1087,7 @@ export const useTTS = () => {
     ttsVoiceId.value = normalizeAvailableVoice(ttsVoiceId.value)
 
     let stored = null
-    if (!book?.content || !book?.tocTitles) {
+    if ((!book?.content || !book?.tocTitles) && !options.chunks?.length) {
       try {
         stored = await getBookContent(book.id)
       } catch (e) {
@@ -1081,16 +1099,18 @@ export const useTTS = () => {
     let sentenceChunks = []
     let sectionCounts = []
     const format = String(book?.format || stored?.format || '').toLowerCase()
+    ttsChunkSource.value = options.chunkSource || format
     const storedPdfChunks = stored?.pdfManifest?.chunks?.map(chunk => chunk.text) || []
     const explicitPdfChunks = Array.isArray(options.chunks) && options.chunks.length
       ? options.chunks
       : storedPdfChunks
-    if (format === 'pdf' && explicitPdfChunks.length) {
+    if (explicitPdfChunks.length) {
       sentenceChunks = resolvePlaybackChunks({
-        format,
+        format: 'pdf',
         html,
         explicitChunks: explicitPdfChunks,
       })
+      sectionCounts = options.sectionCounts || []
     } else if (stripHtml(html).trim() && format !== 'pdf') {
       // EPUB / HTML: chunk section-by-section so chunk indices stay aligned
       // with chapter boundaries and the reader's highlight spans.
@@ -1130,10 +1150,11 @@ export const useTTS = () => {
         ? chunkIndexForPdfProgress(book?.progress, stored.pdfManifest, contentStart)
         : chunkIndexForProgress(book?.progress, sectionCounts, contentStart)
     _chunks = sentenceChunks
+    _chunkTimeOffsets = chunkTimeOffsets(_chunks, ttsSpeed.value)
     const startChunkIdx = Math.max(0, Math.min(_chunks.length - 1, requestedChunkIdx ?? contentStart))
     _chunkIdx = hasRequestedChunkIdx ? startChunkIdx : Math.max(contentStart, startChunkIdx)
     ttsTotalChunks.value = _chunks.length
-    ttsChapterBoundaries.value = buildChapterBoundariesFromHtml(
+    ttsChapterBoundaries.value = format === 'pdf' ? [] : buildChapterBoundariesFromHtml(
       book?.content || stored?.content || '',
       _chunks.length,
       book?.tocTitles || stored?.tocTitles || [],
@@ -1200,6 +1221,7 @@ export const useTTS = () => {
   const setSpeed = (rate) => {
     const nextSettings = updateSettings({ ttsSpeed: Number(rate) })
     ttsSpeed.value = nextSettings.ttsSpeed
+    _chunkTimeOffsets = chunkTimeOffsets(_chunks, ttsSpeed.value)
     _clearAudioCache()
     if (_chunks.length) _updateProgress()
     else _persistSession()
@@ -1257,20 +1279,28 @@ export const useTTS = () => {
   // caller can say so rather than silently failing again.
   const retryOnlineVoices = async () => {
     if (typeof navigator !== 'undefined' && navigator.onLine === false) return false
-
-    ttsUsingDeviceVoice.value = false
-    _clearAudioCache()
-    _prefetchChunk = null
-    _prefetchGeneration += 1
-
+    const text = _chunks[_chunkIdx]
+    if (!text) return false
+    resetMobileTtsDriver()
+    let probe
+    try {
+      probe = await synthesizeSpeech({
+        text, voice: normalizeAvailableVoice(ttsVoiceId.value),
+        speed: ttsSpeed.value, apiUrl, apiBaseUrl,
+      })
+    } catch {
+      return false
+    }
+    if (!probe?.audio) return false
+    const key = ttsPrewarmKey(text, normalizeAvailableVoice(ttsVoiceId.value), ttsSpeed.value)
+    _prewarmCache.set(key, { audio: probe.audio, boundaries: probe.boundaries ?? [] })
+    _clearAudioCache(true)
     if (ttsStatus.value === 'playing') {
       _cancelAudio()
       await _speakNextEdge()
-    } else if (ttsStatus.value === 'paused') {
-      _cancelAudio()
     }
-    // The fallback re-arms itself if the very next fetch fails again.
-    return !ttsUsingDeviceVoice.value
+    ttsUsingDeviceVoice.value = false
+    return true
   }
 
   // Pick a specific device voice by its index in ttsNativeVoices (the offline
@@ -1309,22 +1339,29 @@ export const useTTS = () => {
     const voice = normalizeAvailableVoice(ttsVoiceId.value)
     const key = ttsPrewarmKey(value, voice, ttsSpeed.value)
     if (_prewarmCache.has(key)) return
-    try {
-      const data = await synthesizeSpeech({
+    if (_prewarmInFlight.has(key)) return _prewarmInFlight.get(key)
+    const request = (async () => {
+      try {
+        const data = await synthesizeSpeech({
         text: value,
         voice,
         speed: ttsSpeed.value,
         apiUrl,
         apiBaseUrl,
-      })
-      if (!data?.audio) return
-      _prewarmCache.set(key, { audio: data.audio, boundaries: data.boundaries ?? [] })
-      while (_prewarmCache.size > PREWARM_CACHE_LIMIT) {
-        _prewarmCache.delete(_prewarmCache.keys().next().value)
+        })
+        if (!data?.audio) return
+        _prewarmCache.set(key, { audio: data.audio, boundaries: data.boundaries ?? [] })
+        while (_prewarmCache.size > PREWARM_CACHE_LIMIT) {
+          _prewarmCache.delete(_prewarmCache.keys().next().value)
+        }
+      } catch {
+        // Prewarm is best-effort; normal fetch will run at play time.
+      } finally {
+        _prewarmInFlight.delete(key)
       }
-    } catch {
-      // Prewarm is best-effort; normal fetch will run at play time.
-    }
+    })()
+    _prewarmInFlight.set(key, request)
+    return request
   }
 
   const seekToProgress = (pct) => {
@@ -1427,7 +1464,7 @@ export const useTTS = () => {
     ttsElapsedSeconds, ttsTotalSeconds,
     ttsSpeed, ttsVolume, ttsVoiceId, ttsVoices, ttsCurrentChunk,
     ttsNativeVoices, ttsNativeVoiceIdx, ttsUsingDeviceVoice,
-    ttsPlayingChunkIdx, ttsPlayingChunkText,
+    ttsPlayingChunkIdx, ttsPlayingChunkText, ttsChunkSource,
     ttsWordIdx, ttsBoundaries, ttsChapterBoundaries,
     elapsedTime, totalTime,
     play, pause, resume, togglePlay, stop, restart, restoreLastSession,

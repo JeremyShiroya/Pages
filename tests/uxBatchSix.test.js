@@ -176,7 +176,7 @@ describe('PDF Original View controls', () => {
     // Out-of-range values are clamped, not accepted.
     expect(normalizeMobileReaderPrefs({ pdfZoom: 99 }).pdfZoom).toBe(PDF_ZOOM_MAX)
     expect(normalizeMobileReaderPrefs({ pdfZoom: 0.1 }).pdfZoom).toBe(PDF_ZOOM_MIN)
-    expect(normalizeMobileReaderPrefs({ pdfPageMode: 'nope' }).pdfPageMode).toBe('page')
+    expect(normalizeMobileReaderPrefs({ pdfPageMode: 'page' }).pdfPageMode).toBe('scroll')
   })
 
   test('fit-to-width really fits the width on mobile', () => {
@@ -188,16 +188,16 @@ describe('PDF Original View controls', () => {
 
     const reader = read('components/mobile/ReaderMobile.vue')
     expect(reader).toContain(':width-inset="0"')
-    expect(reader).toContain('prefs.pdfZoom')
+    expect(reader).toContain('mobilePdfZoom')
     // And the PDF container no longer adds side padding of its own.
     expect(reader).toMatch(/\.reader-mobile-content\.is-pdf-reader\s*\{[^}]*\+ 10px\) 0/s)
   })
 
-  test('page mode snaps one PDF page to the screen', () => {
+  test('original PDF only offers continuous pages', () => {
     const viewer = read('components/shared/PdfViewer.vue')
-    expect(viewer).toContain('is-paged')
-    expect(viewer).toContain('scroll-snap-type: y mandatory')
-    expect(viewer).toContain('scroll-snap-stop: always')
+    expect(viewer).not.toContain('is-paged')
+    expect(viewer).not.toContain('pdf-page-nav')
+    expect(read('components/mobile/ReaderMobile.vue')).not.toContain('pdfPageMode')
   })
 })
 

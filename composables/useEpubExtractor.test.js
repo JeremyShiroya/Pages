@@ -23,8 +23,8 @@ async function buildMinimalEpub() {
   </spine>
 </package>`)
 
-  zip.file('OEBPS/chapter1.html', `<html><body><p>Hello from chapter one.</p></body></html>`)
-  zip.file('OEBPS/chapter2.html', `<html><body><p>Hello from chapter two.</p></body></html>`)
+  zip.file('OEBPS/chapter1.html', `<html><body><h1>Chapter One</h1><p>Hello from chapter one.</p></body></html>`)
+  zip.file('OEBPS/chapter2.html', `<html><body><h1>Chapter Two</h1><p>Hello from chapter two.</p></body></html>`)
 
   const blob = await zip.generateAsync({ type: 'blob' })
   return new File([blob], 'test.epub', { type: 'application/epub+zip' })
@@ -34,11 +34,12 @@ describe('useEpubExtractor', () => {
   it('extracts chapter HTML from a valid epub in spine order', async () => {
     const { extractEpub } = await import('./useEpubExtractor.js')
     const file = await buildMinimalEpub()
-    const { content: html } = await extractEpub(file)
+    const { content: html, tocTitles } = await extractEpub(file)
     expect(html).toContain('Hello from chapter one.')
     expect(html).toContain('Hello from chapter two.')
     // chapter one must appear before chapter two
     expect(html.indexOf('chapter one')).toBeLessThan(html.indexOf('chapter two'))
+    expect(tocTitles).toEqual(['Chapter One', 'Chapter Two'])
   })
 
   it('throws a descriptive error for a non-epub file', async () => {

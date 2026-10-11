@@ -262,75 +262,7 @@
         </div>
       </article>
 
-      <article id="appearance" class="settings-panel">
-        <div class="panel-heading">
-          <i class="ri-layout-masonry-line"></i>
-          <div>
-            <h2>Appearance</h2>
-            <p>How series and playlist cards are drawn.</p>
-          </div>
-        </div>
-
-        <div
-          v-for="group in cardGroups"
-          :key="group.key"
-          class="card-group"
-        >
-          <h3 class="card-group-title">{{ group.title }}</h3>
-
-          <div class="setting-block">
-            <div class="setting-copy">
-              <h3>Layout</h3>
-              <p>Fanned covers, or the playlist-style card.</p>
-            </div>
-            <div class="option-grid">
-              <button
-                v-for="option in seriesLayoutOptions"
-                :key="`${group.key}-layout-${option.value}`"
-                type="button"
-                class="option"
-                :class="{ active: settings[group.layoutKey] === option.value }"
-                @click="set(group.layoutKey, option.value)"
-              >
-                <span class="option-preview">
-                  <SeriesPreview :layout="option.value" :background="settings[group.backgroundKey]" />
-                </span>
-                <span class="option-label">
-                  {{ option.label }}
-                  <i v-if="settings[group.layoutKey] === option.value" class="ri-check-line"></i>
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div class="setting-block">
-            <div class="setting-copy">
-              <h3>Background</h3>
-              <p>Plain surface, or a blurred cover image.</p>
-            </div>
-            <div class="option-grid">
-              <button
-                v-for="option in backgroundOptions"
-                :key="`${group.key}-bg-${option.value}`"
-                type="button"
-                class="option"
-                :class="{ active: settings[group.backgroundKey] === option.value }"
-                @click="set(group.backgroundKey, option.value)"
-              >
-                <span class="option-preview">
-                  <SeriesPreview :layout="settings[group.layoutKey]" :background="option.value" />
-                </span>
-                <span class="option-label">
-                  {{ option.label }}
-                  <i v-if="settings[group.backgroundKey] === option.value" class="ri-check-line"></i>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article id="metadata" class="settings-panel">
+<article id="metadata" class="settings-panel">
         <div class="panel-heading">
           <i class="ri-file-search-line"></i>
           <div>
@@ -432,7 +364,6 @@ import SettingsStoragePanel from '../shared/SettingsStoragePanel.vue'
 import ReadingPreview from '../shared/previews/ReadingPreview.vue'
 // Playlist cards offer the same two layouts as series cards, so they share the
 // same preview mockup.
-import SeriesPreview from '../shared/previews/SeriesCardPreview.vue'
 
 const { books, authors, collections, genres, recentlyAddedBooks, fetchAndStoreAuthorDetails } = useBooks()
 const { settings, updateSettings } = useBookishSettings()
@@ -456,7 +387,6 @@ const settingsSections = [
   { id: 'reading', label: 'Reading', icon: 'ri-book-read-line' },
   { id: 'audio', label: 'Audio', icon: 'ri-headphone-line' },
   { id: 'library', label: 'Library', icon: 'ri-archive-line' },
-  { id: 'appearance', label: 'Appearance', icon: 'ri-palette-line' },
   { id: 'metadata', label: 'Metadata', icon: 'ri-database-2-line' },
   { id: 'storage', label: 'Storage', icon: 'ri-hard-drive-2-line' },
 ]
@@ -567,16 +497,8 @@ const backgroundOptions = [
   { value: 'blank', label: 'Default' },
   { value: 'blur', label: 'Blur image' },
 ]
-const seriesLayoutOptions = [
-  { value: 'fan', label: 'Fanned' },
-  { value: 'cover', label: 'Playlist style' },
-]
 // Series and playlist cards each get the same pair of choices, so the panel
 // renders one group per card type.
-const cardGroups = [
-  { key: 'series', title: 'Series cards', layoutKey: 'seriesCardLayout', backgroundKey: 'seriesCardBackground' },
-  { key: 'playlist', title: 'Playlist cards', layoutKey: 'playlistCardLayout', backgroundKey: 'playlistCardBackground' },
-]
 // Highlight is a boolean, but it's presented as a picture choice like the card
 // sections rather than as a bare switch.
 const toggleOptions = [

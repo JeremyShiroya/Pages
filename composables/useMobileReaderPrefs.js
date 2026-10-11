@@ -12,7 +12,7 @@ export const READING_MODE_OPTIONS = Object.freeze(['page', 'scroll'])
 export const PDF_VIEW_MODE_OPTIONS = Object.freeze(['original', 'reflow'])
 // Original View only: 'scroll' is the continuous strip of pages, 'page' snaps
 // one whole PDF page to the screen at a time.
-export const PDF_PAGE_MODE_OPTIONS = Object.freeze(['scroll', 'page'])
+export const PDF_PAGE_MODE_OPTIONS = Object.freeze(['scroll'])
 // Fit-to-width is 1.0; readers can zoom out to see the full page with breathing
 // room, or zoom in and pan without the canvas being clipped.
 export const PDF_ZOOM_MIN = 0.5
@@ -43,7 +43,7 @@ export const READER_FONT_SIZE_MAX = 24
 export const DEFAULT_MOBILE_READER_PREFS = Object.freeze({
   readingMode: 'page',      // 'page' (ReadEra-style page turns) | 'scroll'
   pdfViewMode: 'original',  // PDFs: 'original' (fixed page) | 'reflow'
-  pdfPageMode: 'page',      // Original View: 'page' (one page per screen) | 'scroll'
+  pdfPageMode: 'scroll',    // Original PDF pages always scroll continuously
   pdfZoom: 1.0,             // 1.0 = the page fills the screen width
   background: 'default',    // 'default' (theme) | 'sepia' (book brown)
   fontSize: 17,             // px

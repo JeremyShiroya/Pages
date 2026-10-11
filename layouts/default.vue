@@ -53,6 +53,7 @@ const isMobileSubPage = computed(() => !TAB_ROOT_PATHS.has(route.path))
 const isSettingsPalettePage = computed(() => (
   route.path.startsWith('/settings')
   || route.path.startsWith('/listen-settings')
+  || route.path.startsWith('/read-settings')
   || route.path.startsWith('/editprofilepage')
 ))
 const SCROLLBAR_HIDDEN_ROOTS = new Set(['/', '/books', '/series', '/profile', '/streak', '/editprofilepage'])

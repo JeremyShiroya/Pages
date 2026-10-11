@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   stripHtml, splitToChunks, groupChunks, formatDuration, findContentStart,
-  buildReadableChunks, buildChapterBoundariesFromHtml,
+  buildReadableChunks, buildReadableSectionChunks, buildChapterBoundariesFromHtml, chunkTimeOffsets,
   chunkIndexForPdfProgress, chunkIndexForProgress,
   resolvePlaybackChunks, takeMatchingPrefetch, ttsPrewarmKey,
 } from './useTTS.js'
@@ -347,5 +347,31 @@ describe('ttsPrewarmKey', () => {
 
   it('matches for identical text, voice, and speed', () => {
     expect(ttsPrewarmKey('Hi.', 'v', 1)).toBe(ttsPrewarmKey('Hi.', 'v', 1))
+  })
+})
+
+
+describe('reflow section chunk alignment', () => {
+  it('uses displayed text and keeps an empty figure page between text pages', () => {
+    const data = buildReadableSectionChunks([
+      { html: '<h2>A heading.</h2><p>First page.</p>' },
+      { html: '<figure><img src="chart.png"></figure>' },
+      { html: '<p>Third page.</p>' },
+    ])
+    expect(data.sectionCounts).toEqual([2, 0, 1])
+    expect(data.chunks).toEqual(['A heading.', 'First page.', 'Third page.'])
+    expect(resolvePlaybackChunks({ format: 'pdf', html: '<p>Old extraction.</p>', explicitChunks: data.chunks })).toEqual(data.chunks)
+  })
+})
+
+describe('large PDF playback timing', () => {
+  it('precomputes elapsed time at each chunk and updates for speed changes', () => {
+    const chunks = ['One two.', 'Three four five.', 'Six.']
+    const normal = chunkTimeOffsets(chunks, 1)
+    const faster = chunkTimeOffsets(chunks, 2)
+    expect(normal).toHaveLength(chunks.length + 1)
+    expect(normal[0]).toBe(0)
+    expect(normal[2]).toBeGreaterThan(normal[1])
+    expect(faster[3]).toBeCloseTo(normal[3] / 2)
   })
 })

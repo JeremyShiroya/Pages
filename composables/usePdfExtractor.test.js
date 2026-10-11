@@ -5,6 +5,7 @@ import {
   extractPdfOutline,
   extractPdfTocFromDocument,
   extractVisiblePdfToc,
+  inferPdfChapterToc,
   formatPdfTocTitle,
 } from './usePdfExtractor.js'
 
@@ -103,6 +104,31 @@ describe('extractVisiblePdfToc', () => {
     ])
 
     expect(toc).toEqual([])
+  })
+
+  it('infers navigation from repeated chapter headings without a dedicated TOC', () => {
+    const pages = [
+      { page: 1, lines: ['Novel title', 'By Someone'] },
+      { page: 3, lines: ['Chapter One', 'It was a bright morning.'] },
+      { page: 8, lines: ['A long paragraph mentions chapter two within body text.'] },
+      { page: 12, lines: ['CHAPTER TWO: The Journey', 'The train departed.'] },
+    ]
+    expect(inferPdfChapterToc(pages)).toEqual([
+      { title: 'Chapter One', page: 3, level: 0 },
+      { title: 'CHAPTER TWO: The Journey', page: 12, level: 0 },
+    ])
+  })
+
+  it('reads letter-spaced chapter numbers from real book layouts', () => {
+    expect(inferPdfChapterToc([
+      { page: 10, lines: ['10', 'O N E', 'PERFECT STRANGERS', 'The story begins.'] },
+      { page: 101, lines: ['101', 'S I x', 'NO SALVATION', 'Another chapter begins.'] },
+      { page: 265, lines: ['265', 'S I x T E E N', 'HANGING IN THE BALANCE'] },
+    ])).toEqual([
+      { title: 'Chapter One — Perfect Strangers', page: 10, level: 0 },
+      { title: 'Chapter Six — No Salvation', page: 101, level: 0 },
+      { title: 'Chapter Sixteen — Hanging In The Balance', page: 265, level: 0 },
+    ])
   })
 
   it('returns no TOC when the PDF has no outline and no explicit contents heading', async () => {

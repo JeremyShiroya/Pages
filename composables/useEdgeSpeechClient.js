@@ -7,13 +7,16 @@
 // Response shape matches /api/tts exactly: { audio: dataUrl, boundaries }.
 
 const TRUSTED_CLIENT_TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4'
-const WSS_URL = 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1'
+const WSS_URL = 'wss://api.msedgeservices.com/tts/cognitiveservices/websocket/v1'
 const SEC_MS_GEC_VERSION = '1-143.0.3650.96'
 const AUDIO_PATH_DELIMITER = 'Path:audio\r\n'
 const HEADER_BODY_DELIMITER = '\r\n\r\n'
 const DEFAULT_TIMEOUT_MS = 20000
 const DEFAULT_ATTEMPTS = 2
 const RETRY_DELAY_MS = 350
+let speechSocket = null
+let socketIdleTimer = null
+let synthesisQueue = Promise.resolve()
 
 export const EDGE_TTS_RATE_MAP = Object.freeze({
   '0.75': '-25%',
@@ -127,10 +130,12 @@ function audioPartsToDataUrl(parts) {
 async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
   const requestId = randomRequestId()
   const secMsGec = await generateSecMsGec()
-  const url = `${WSS_URL}?TrustedClientToken=${TRUSTED_CLIENT_TOKEN}&Sec-MS-GEC=${secMsGec}&Sec-MS-GEC-Version=${SEC_MS_GEC_VERSION}&ConnectionId=${requestId}`
+  const url = `${WSS_URL}?Ocp-Apim-Subscription-Key=${TRUSTED_CLIENT_TOKEN}&Sec-MS-GEC=${secMsGec}&Sec-MS-GEC-Version=${SEC_MS_GEC_VERSION}&ConnectionId=${requestId}`
 
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(url)
+    clearTimeout(socketIdleTimer)
+    const ws = speechSocket?.readyState === WebSocket.OPEN ? speechSocket : new WebSocket(url)
+    speechSocket = ws
     ws.binaryType = 'arraybuffer'
 
     const audioParts = []
@@ -138,13 +143,20 @@ async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
     const searchState = { lowerText: String(text).toLowerCase(), searchFrom: 0 }
     let settled = false
 
-    const cleanup = () => {
+    const cleanup = (keepConnection = false) => {
       clearTimeout(timer)
+      clearTimeout(handshakeTimer)
       ws.onopen = null
       ws.onmessage = null
       ws.onerror = null
       ws.onclose = null
-      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+      if (keepConnection && ws.readyState === WebSocket.OPEN) {
+        socketIdleTimer = setTimeout(() => {
+          if (speechSocket === ws) speechSocket = null
+          ws.close()
+        }, 45000)
+      } else if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+        if (speechSocket === ws) speechSocket = null
         try { ws.close() } catch { /* already closing */ }
       }
     }
@@ -159,7 +171,7 @@ async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
     const finish = async () => {
       if (settled) return
       settled = true
-      cleanup()
+      cleanup(true)
       if (!audioParts.length) {
         reject(new Error('Edge TTS returned no audio data'))
         return
@@ -172,11 +184,15 @@ async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
     }
 
     const timer = setTimeout(() => fail(new Error('Edge TTS timed out')), timeoutMs)
+    const handshakeTimer = setTimeout(() => fail(new Error('Edge TTS connection timed out')), 6000)
 
-    ws.onopen = () => {
+    const sendRequest = () => {
+      clearTimeout(handshakeTimer)
       ws.send(`X-Timestamp:${new Date().toISOString()}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config${HEADER_BODY_DELIMITER}{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`)
       ws.send(`X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml${HEADER_BODY_DELIMITER}${buildEdgeSsml({ text, voice, rate })}`)
     }
+    ws.onopen = sendRequest
+    if (ws.readyState === WebSocket.OPEN) queueMicrotask(sendRequest)
 
     ws.onmessage = (event) => {
       if (event.data instanceof ArrayBuffer) {
@@ -204,7 +220,7 @@ async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
   })
 }
 
-export async function synthesizeEdgeSpeechInBrowser({
+async function synthesizeQueuedSpeech({
   text,
   voice,
   speed = 1,
@@ -216,12 +232,21 @@ export async function synthesizeEdgeSpeechInBrowser({
 
   const rate = edgeRateForSpeed(speed)
   let lastError
+  let reconnected = false
 
   for (let attempt = 1; attempt <= Math.max(1, attempts); attempt += 1) {
+    const reusedConnection = speechSocket?.readyState === WebSocket.OPEN
     try {
       return await synthesizeOnce({ text: value, voice, rate, timeoutMs })
     } catch (error) {
       lastError = error
+      // A server can close an idle socket just as the next turn is sent.
+      // Reconnect once without changing narrator or spending a retry delay.
+      if (reusedConnection && !reconnected) {
+        reconnected = true
+        attempt -= 1
+        continue
+      }
       if (attempt < attempts) {
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt))
       }
@@ -229,4 +254,12 @@ export async function synthesizeEdgeSpeechInBrowser({
   }
 
   throw lastError
+}
+
+// A socket handles one turn at a time. Sharing it avoids three simultaneous
+// handshakes when playback and two prefetch requests start together.
+export function synthesizeEdgeSpeechInBrowser(options = {}) {
+  const request = synthesisQueue.then(() => synthesizeQueuedSpeech(options))
+  synthesisQueue = request.catch(() => {})
+  return request
 }

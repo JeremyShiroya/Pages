@@ -72,15 +72,16 @@
           </div>
         </div>
 
-        <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/top-navigation">
-          <span><strong>Top navigation</strong><small>Title, logo, or your avatar and greeting</small></span>
-          <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
-        </NuxtLink>
-
-        <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/bottom-navigation">
-          <span><strong>Bottom navigation</strong><small>Layout, frosted glass, selected tab, opacity and blur</small></span>
-          <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
-        </NuxtLink>
+        <div class="navigation-links">
+          <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/top-navigation">
+            <span><strong>Top navigation</strong><small>Logo and title, or your avatar and greeting</small></span>
+            <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+          </NuxtLink>
+          <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/bottom-navigation">
+            <span><strong>Bottom navigation</strong><small>Layout, frosted glass, selected tab, opacity and blur</small></span>
+            <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+          </NuxtLink>
+        </div>
       </section>
 
       <section class="pref-group ratings-group">
@@ -208,59 +209,6 @@
         </div>
       </section>
 
-      <!-- Series cards -->
-      <section class="pref-group">
-        <h2 class="pref-group-title">Series cards</h2>
-
-        <!--LAYOUT-->
-
-        <div class="pref-block">
-          <div class="pref-copy">
-            <span class="pref-label">Layout</span>
-            <span class="pref-hint">Fanned covers, or the playlist-style card.</span>
-          </div>
-          <div class="option-grid">
-            <button
-              v-for="opt in seriesLayoutOptions"
-              :key="opt.value"
-              type="button"
-              class="option"
-              :class="{ active: settings.seriesCardLayout === opt.value }"
-              @click="set('seriesCardLayout', opt.value)"
-            >
-              <span class="preview">
-                <SeriesPreview :layout="opt.value" :background="settings.seriesCardBackground" />
-              </span>
-              <span class="option-label">{{ opt.label }}<i v-if="settings.seriesCardLayout === opt.value" class="ri-check-line"></i></span>
-            </button>
-          </div>
-        </div>
-
-        <!--BACKGROUND-->
-
-        <div class="pref-block">
-          <div class="pref-copy">
-            <span class="pref-label">Background</span>
-            <span class="pref-hint">Plain surface, or a blurred cover image.</span>
-          </div>
-          <div class="option-grid">
-            <button
-              v-for="opt in backgroundOptions"
-              :key="opt.value"
-              type="button"
-              class="option"
-              :class="{ active: settings.seriesCardBackground === opt.value }"
-              @click="set('seriesCardBackground', opt.value)"
-            >
-              <span class="preview">
-                <SeriesPreview layout="fan" :background="opt.value" />
-              </span>
-              <span class="option-label">{{ opt.label }}<i v-if="settings.seriesCardBackground === opt.value" class="ri-check-line"></i></span>
-            </button>
-          </div>
-        </div>
-      </section>
-
       <!-- Series suggestions -->
       <section class="pref-group">
         <h2 class="pref-group-title">Series suggestions</h2>
@@ -285,60 +233,6 @@
             <span class="knob"></span>
           </button>
         </div>
-      </section>
-
-      <!-- Playlist cards — the same card and the same options as Series cards. -->
-      <section class="pref-group">
-        <h2 class="pref-group-title">Playlist cards</h2>
-
-        <!--LAYOUT-->
-
-        <div class="pref-block">
-          <div class="pref-copy">
-            <span class="pref-label">Layout</span>
-            <span class="pref-hint">Fanned covers, or the playlist-style card.</span>
-          </div>
-          <div class="option-grid">
-            <button
-              v-for="opt in seriesLayoutOptions"
-              :key="opt.value"
-              type="button"
-              class="option"
-              :class="{ active: settings.playlistCardLayout === opt.value }"
-              @click="set('playlistCardLayout', opt.value)"
-            >
-              <span class="preview">
-                <SeriesPreview :layout="opt.value" :background="settings.playlistCardBackground" />
-              </span>
-              <span class="option-label">{{ opt.label }}<i v-if="settings.playlistCardLayout === opt.value" class="ri-check-line"></i></span>
-            </button>
-          </div>
-        </div>
-        
-        <!--BACKGROUND-->
-
-        <div class="pref-block">
-          <div class="pref-copy">
-            <span class="pref-label">Background</span>
-            <span class="pref-hint">Plain surface, or a blurred cover image.</span>
-          </div>
-          <div class="option-grid">
-            <button
-              v-for="opt in backgroundOptions"
-              :key="opt.value"
-              type="button"
-              class="option"
-              :class="{ active: settings.playlistCardBackground === opt.value }"
-              @click="set('playlistCardBackground', opt.value)"
-            >
-              <span class="preview">
-                <SeriesPreview layout="fan" :background="opt.value" />
-              </span>
-              <span class="option-label">{{ opt.label }}<i v-if="settings.playlistCardBackground === opt.value" class="ri-check-line"></i></span>
-            </button>
-          </div>
-        </div>
-
       </section>
 
       <!-- Reading — same visual-example treatment as the card sections above -->
@@ -518,7 +412,6 @@ import BookRatingDisplay from '../shared/BookRatingDisplay.vue'
 import ReadingPreview from '../shared/previews/ReadingPreview.vue'
 // Playlist cards offer the same two layouts as series cards, so they share the
 // same preview mockup.
-import SeriesPreview from '../shared/previews/SeriesCardPreview.vue'
 
 const { settings, updateSettings } = useBookishSettings()
 const { isTablet } = useDeviceArchitecture()
@@ -587,10 +480,6 @@ const toggleHideContent = async () => {
 const backgroundOptions = [
   { value: 'blank', label: 'Default' },
   { value: 'blur', label: 'Blur image' },
-]
-const seriesLayoutOptions = [
-  { value: 'fan', label: 'Fanned' },
-  { value: 'cover', label: 'Playlist style' },
 ]
 const profileFavouritesLayoutOptions = [
   { value: 'grid', label: 'Grid' },
@@ -746,7 +635,8 @@ const confirmFormatMode = async () => {
 }
 
 .pref-destination { display: grid; grid-template-columns: 40px minmax(0, 1fr) 20px; align-items: center; gap: 12px; min-height: 64px; padding: 10px; border-radius: 16px; background: var(--color-surface-card); color: var(--color-text-primary); text-decoration: none; }
-.nav-pref-destination { grid-template-columns: minmax(0, 1fr) 20px; padding: 12px 16px; }
+.navigation-links { display: grid; gap: 6px; }
+.nav-pref-destination { border: 1px solid var(--color-border-card); border-radius: 14px; background: var(--color-surface-secondary); grid-template-columns: minmax(0, 1fr) 20px; padding: 12px 16px; }
 .pref-destination-icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 12px; background: var(--color-brand-primary-faint); color: var(--color-brand-primary); font-size: 20px; }
 .pref-destination strong, .pref-destination small { display: block; }
 .pref-destination small { margin-top: 3px; color: var(--color-text-muted); font-size: 12px; line-height: 1.3; }

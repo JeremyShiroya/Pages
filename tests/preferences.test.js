@@ -62,7 +62,7 @@ describe('appearance preferences', () => {
       formatFilter: 'epub',
     })
     expect(ok.seriesCardBackground).toBe('blur')
-    expect(ok.seriesCardLayout).toBe('cover')
+    expect(ok.seriesCardLayout).toBe('fan')
     expect(ok.favouritesCardBackground).toBe('blank')
     expect(ok.favouritesCardLayout).toBe('list')
     expect(ok.profileFavouritesLayout).toBe('list')
@@ -98,7 +98,7 @@ describe('appearance preferences', () => {
     expect(settings).not.toMatch(/Preferences[^}]*comingSoon/)
 
     const prefs = read('components/mobile/PreferencesMobile.vue')
-    for (const key of ['appBackground', 'darkAppBackground', 'bookActionDisplay', 'seriesCardBackground', 'seriesCardLayout', 'playlistCardBackground', 'playlistCardLayout', 'readerHighlight', 'listenCoverBlur', 'showStreak', 'seriesSuggestions']) {
+    for (const key of ['appBackground', 'darkAppBackground', 'bookActionDisplay', 'readerHighlight', 'listenCoverBlur', 'showStreak', 'seriesSuggestions']) {
       expect(prefs, key).toContain(key)
     }
 

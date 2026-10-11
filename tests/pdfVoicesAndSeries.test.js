@@ -6,6 +6,7 @@ import { buildPdfManifest } from '../composables/usePdfManifest.js'
 import {
   describeDeviceVoice,
   deviceVoiceGender,
+  pickNativeVoiceIndex,
   offeredDeviceVoices,
   DEVICE_VOICE_LOCALES,
 } from '../composables/tts/nativeSpeech.js'
@@ -77,7 +78,7 @@ describe('reader chrome retires on its own', () => {
       reader.indexOf('const scheduleChromeAutoHide'),
       reader.indexOf('const toggleChrome'),
     )
-    for (const guard of ['selectionMenu', 'noteEditor', 'mediaOpen', 'resumeChoice']) {
+    for (const guard of ['selectionMenu', 'noteEditor', 'tocModalOpen', 'resumeChoice']) {
       expect(fn, guard).toContain(guard)
     }
   })
@@ -178,6 +179,17 @@ describe('device voices', () => {
     expect(dupes[offered[0].index].voiceURI).toBe('en-us-x-sfg#female_1-local')
   })
 
+  test('automatic narration prefers a matching online phone voice over a generic local language voice', () => {
+    const voices = [
+      androidVoice('en-AU-language', 'en-AU', true),
+      androidVoice('en-us-x-sfg-network', 'en-US', false),
+      androidVoice('en-us-x-sfg-local', 'en-US', true),
+    ]
+    expect(pickNativeVoiceIndex(voices, 'en-US-AvaNeural', { preferNetwork: true })).toBe(1)
+    expect(pickNativeVoiceIndex(voices, 'en-US-AvaNeural')).toBe(2)
+    expect(pickNativeVoiceIndex(voices, 'en-CA-LiamNeural', { preferNetwork: true })).toBe(1)
+  })
+
   test('identical platform entries are collapsed even without a voiceURI', () => {
     const offered = offeredDeviceVoices([
       { name: 'English United States', lang: 'en-US' },
@@ -200,19 +212,17 @@ describe('device voices', () => {
 })
 
 describe('recovering the natural voices', () => {
-  test('the engine can be told to stop using the fallback', () => {
+  test('Edge recovery verifies real audio before claiming success', () => {
     const tts = read('composables/useTTS.js')
     expect(tts).toContain('const retryOnlineVoices')
-    // Clears the fallback flag and the device audio it cached.
-    expect(tts).toMatch(/ttsUsingDeviceVoice\.value = false\s*\n\s*_clearAudioCache\(\)/)
-    // Reports whether it actually worked.
-    expect(tts).toContain('return !ttsUsingDeviceVoice.value')
+    expect(tts).toContain('if (!probe?.audio) return false')
+    expect(tts).toContain('return true')
   })
 
   test('the narrator sheet offers it while the fallback is in force', () => {
     const reader = read('components/mobile/ReaderMobile.vue')
     expect(reader).toContain('retry-online-voices')
-    expect(reader).toContain('Use natural voices again')
+    expect(reader).toContain('Try Edge voices again')
     expect(reader).toContain('retryNaturalVoices')
     expect(reader).toMatch(/v-if="useOfflineVoice"[\s\S]{0,220}retry-online-voices/)
   })

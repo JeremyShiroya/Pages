@@ -23,9 +23,7 @@
             @click="updateSettings({ mobileTopNavDisplay: choice.value })"
           >
             <span class="choice-art" aria-hidden="true">
-              <strong v-if="choice.value === 'title'" class="art-title">Pages</strong>
-              <img v-else-if="choice.value === 'logo'" class="art-logo" src="/images/P Logo.png" alt="" />
-              <span v-else-if="choice.value === 'logo-title'" class="art-logo-title">
+              <span v-if="choice.value === 'logo-title'" class="art-logo-title">
                 <img class="art-logo" src="/images/P Logo.png" alt="" />
                 <strong class="art-title">Pages</strong>
               </span>
@@ -55,8 +53,6 @@ const { profile, activeAvatarPreset } = useUserProfile()
 const profileAvatarSrc = computed(() => profile.value.avatarType === 'image' ? profile.value.avatarValue : activeAvatarPreset.value.src)
 const firstName = computed(() => profile.value.displayName.trim().split(/\s+/)[0] || 'Reader')
 const displayChoices = [
-  { value: 'title', label: 'Title text' },
-  { value: 'logo', label: 'Logo' },
   { value: 'logo-title', label: 'Logo and title' },
   { value: 'greeting', label: 'Avatar and greeting' },
 ]

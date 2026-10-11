@@ -45,18 +45,10 @@
         <button
           type="button"
           class="reader-nav-btn"
-          aria-label="Audio and voice options"
-          @click="mediaOpen = true"
+          aria-label="Read settings"
+          @click="openReadSettings"
         >
-          <i class="ri-headphone-fill"></i>
-        </button>
-        <button
-          type="button"
-          class="reader-nav-btn"
-          aria-label="Display settings"
-          @click="displayOpen = true"
-        >
-          <i class="ri-equalizer-line"></i>
+          <i class="ri-settings-3-line"></i>
         </button>
       </div>
       <div v-else class="reader-top-actions">
@@ -233,7 +225,6 @@
       class="reader-mobile-content"
       :class="{
         'is-pdf-reader': isPdfRenderable,
-        'is-paged-pdf': isPdfRenderable && prefs.pdfPageMode === 'page',
       }"
     >
       <div v-if="loading || contentLoading" class="reader-state">
@@ -262,7 +253,6 @@
             :src="pdfSource"
             :zoom="mobilePdfZoom"
             :width-inset="0"
-            :page-mode="prefs.pdfPageMode"
             :manifest="pdfManifest"
             :active-chunk-id="activeTtsChunkIndex"
             :active-word="activeWordRange"
@@ -277,6 +267,9 @@
             <div
               v-if="pdfReadHere.visible"
               class="read-here-menu"
+              @touchstart.stop
+              @touchend.stop
+              @touchmove.stop
               :style="{ left: `${pdfReadHere.x}px`, top: `${pdfReadHere.y}px` }"
             >
               <button type="button" @click.stop="readFromPressedPage">
@@ -457,303 +450,9 @@
       <i :class="isPlaying ? 'ri-pause-fill' : 'ri-play-fill'"></i>
     </button>
 
-    <Teleport to="body">
-      <div v-if="mediaOpen" class="reader-media-layer">
-        <button
-          class="reader-media-backdrop"
-          type="button"
-          aria-label="Close audio controls"
-          @click="mediaOpen = false"
-        ></button>
-        <section
-          class="reader-media-sheet"
-          :class="readerTheme"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Audio controls"
-        >
-          <div class="sheet-grabber"></div>
-          <h2>{{ chapterLabel }}</h2>
 
-          <button
-            type="button"
-            class="narrator-btn"
-            :class="{ open: voicePickerOpen }"
-            @click="voicePickerOpen = !voicePickerOpen"
-          >
-            {{ currentVoiceName }}
-            <i :class="voicePickerOpen ? 'ri-arrow-down-s-line' : 'ri-arrow-right-s-line'"></i>
-          </button>
 
-          <div v-if="voicePickerOpen" class="voice-list" role="listbox" aria-label="Narrator voices">
-            <button
-              v-for="voice in displayVoices"
-              :key="voice.id"
-              type="button"
-              class="voice-option"
-              :class="{ active: voice.id === activeVoiceId }"
-              role="option"
-              :aria-selected="voice.id === activeVoiceId"
-              @click="chooseVoice(voice.id)"
-            >
-              <span>{{ voice.name }}</span>
-              <i v-if="voice.id === activeVoiceId" class="ri-check-line"></i>
-            </button>
-          </div>
 
-          <div class="media-buttons">
-            <button type="button" aria-label="Previous" @click="skipChunks(-1)">
-              <i class="ri-skip-back-fill"></i>
-            </button>
-            <button
-              type="button"
-              class="media-play"
-              aria-label="Play or pause"
-              @click="toggleMediaPlay"
-            >
-              <i :class="isPlaying ? 'ri-pause-fill' : 'ri-play-fill'"></i>
-            </button>
-            <button type="button" aria-label="Next" @click="skipChunks(1)">
-              <i class="ri-skip-forward-fill"></i>
-            </button>
-          </div>
-
-          <div class="media-progress-row">
-            <span>{{ elapsedTime || "00:00" }}</span>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              :value="ttsProgress || 0"
-              :style="{ '--fill': `${ttsProgress || 0}%` }"
-              aria-label="Audio progress"
-              @input="seekToProgress(Number($event.target.value))"
-            />
-            <span>{{ totalTime || "00:00" }}</span>
-          </div>
-
-          <button
-            type="button"
-            class="speed-btn"
-            aria-label="Playback speed"
-            @click="cycleSpeed"
-          >
-            {{ speedLabel }}
-          </button>
-        </section>
-      </div>
-    </Teleport>
-
-    <Teleport to="body">
-      <div v-if="displayOpen" class="reader-media-layer">
-        <button
-          class="reader-media-backdrop"
-          type="button"
-          aria-label="Close display settings"
-          @click="displayOpen = false"
-        ></button>
-        <section
-          class="reader-media-sheet reader-display-sheet"
-          :class="readerTheme"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Display settings"
-        >
-          <div class="sheet-grabber"></div>
-          <h2>Display</h2>
-
-          <!-- PDFs only. Original View is the fixed page as the publisher laid
-               it out; Reflow rebuilds the text to fit the phone, which is what
-               unlocks every control below it. -->
-          <div v-if="isPdfDocument" class="display-row">
-            <span class="display-label">PDF view</span>
-            <div class="seg-group">
-              <button
-                v-for="mode in ['original', 'reflow']"
-                :key="mode"
-                type="button"
-                class="seg-btn"
-                :class="{ active: prefs.pdfViewMode === mode }"
-                :disabled="mode === 'reflow' && !pdfReflowAvailable"
-                @click="updatePrefs({ pdfViewMode: mode })"
-              >
-                {{ mode === 'original' ? 'Original' : 'Reflow' }}
-              </button>
-            </div>
-          </div>
-          <p v-if="isPdfDocument && !pdfReflowAvailable" class="display-note">
-            This PDF is a scan with no text layer, so it can only be shown as the
-            original page.
-          </p>
-          <p v-else-if="pdfFiguresLoading" class="display-note">
-            Collecting images and tables… {{ pdfFiguresProgress }}%
-          </p>
-
-          <!-- Original View only. Reflow is text, so it uses the type controls
-               below instead of a page zoom. -->
-          <template v-if="isPdfDocument && prefs.pdfViewMode === 'original'">
-            <div class="display-row">
-              <span class="display-label">Pages</span>
-              <div class="seg-group">
-                <button
-                  v-for="mode in ['page', 'scroll']"
-                  :key="mode"
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.pdfPageMode === mode }"
-                  @click="updatePrefs({ pdfPageMode: mode })"
-                >
-                  {{ mode === 'page' ? 'One page' : 'Continuous' }}
-                </button>
-              </div>
-            </div>
-
-            <div class="display-row">
-              <span class="display-label">Zoom</span>
-              <div class="size-stepper">
-                <button
-                  type="button"
-                  aria-label="Zoom out"
-                  :disabled="prefs.pdfZoom <= pdfZoomMin"
-                  @click="stepPdfZoom(-1)"
-                >−</button>
-                <span>{{ Math.round(prefs.pdfZoom * 100) }}%</span>
-                <button
-                  type="button"
-                  aria-label="Zoom in"
-                  :disabled="prefs.pdfZoom >= pdfZoomMax"
-                  @click="stepPdfZoom(1)"
-                >+</button>
-              </div>
-            </div>
-          </template>
-
-          <template v-if="!isPdfBook">
-            <div class="display-row">
-              <span class="display-label">Reading mode</span>
-              <div class="seg-group">
-                <button
-                  v-for="mode in ['page', 'scroll']"
-                  :key="mode"
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.readingMode === mode }"
-                  @click="updatePrefs({ readingMode: mode })"
-                >
-                  {{ mode === 'page' ? 'Pages' : 'Scroll' }}
-                </button>
-              </div>
-            </div>
-
-            <div class="display-row">
-              <span class="display-label">Background</span>
-              <div class="seg-group">
-                <button
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.background === 'default' }"
-                  @click="updatePrefs({ background: 'default' })"
-                >
-                  Default
-                </button>
-                <button
-                  type="button"
-                  class="seg-btn seg-sepia"
-                  :class="{ active: prefs.background === 'sepia' }"
-                  @click="updatePrefs({ background: 'sepia' })"
-                >
-                  Book brown
-                </button>
-              </div>
-            </div>
-
-            <div class="display-row">
-              <span class="display-label">Font size</span>
-              <div class="size-stepper">
-                <button type="button" aria-label="Smaller text" @click="stepFontSize(-1)">A−</button>
-                <span>{{ prefs.fontSize }}</span>
-                <button type="button" aria-label="Larger text" @click="stepFontSize(1)">A+</button>
-              </div>
-            </div>
-
-            <div class="display-row">
-              <span class="display-label">Font</span>
-              <div class="seg-group">
-                <button
-                  v-for="font in fontOptions"
-                  :key="font.id"
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.fontFamily === font.id }"
-                  @click="updatePrefs({ fontFamily: font.id })"
-                >
-                  {{ font.label }}
-                </button>
-              </div>
-            </div>
-
-            <div class="display-row">
-              <span class="display-label">Thickness</span>
-              <div class="seg-group">
-                <button
-                  v-for="weight in weightOptions"
-                  :key="weight.id"
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.fontWeight === weight.id }"
-                  @click="updatePrefs({ fontWeight: weight.id })"
-                >
-                  {{ weight.label }}
-                </button>
-              </div>
-            </div>
-
-            <div class="display-row">
-              <span class="display-label">Line spacing</span>
-              <div class="seg-group">
-                <button
-                  v-for="spacing in lineSpacingOptions"
-                  :key="spacing"
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.lineSpacing === spacing }"
-                  @click="updatePrefs({ lineSpacing: spacing })"
-                >
-                  {{ spacing }}
-                </button>
-              </div>
-            </div>
-
-            <div class="display-row">
-              <span class="display-label">Alignment</span>
-              <div class="seg-group">
-                <button
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.textAlign === 'justify' }"
-                  @click="updatePrefs({ textAlign: 'justify' })"
-                >
-                  Justify
-                </button>
-                <button
-                  type="button"
-                  class="seg-btn"
-                  :class="{ active: prefs.textAlign === 'left' }"
-                  @click="updatePrefs({ textAlign: 'left' })"
-                >
-                  Left
-                </button>
-              </div>
-            </div>
-          </template>
-
-          <p v-else class="display-pdf-note">
-            Display settings apply to EPUB books. PDF pages render exactly as
-            published.
-          </p>
-        </section>
-      </div>
-    </Teleport>
 
     <!-- Narrator picker (opened from the Listen controls) -->
     <Teleport to="body">
@@ -785,7 +484,7 @@
             @click="retryNaturalVoices"
           >
             <i :class="retryingOnlineVoices ? 'ri-loader-4-line spin' : 'ri-refresh-line'"></i>
-            {{ retryingOnlineVoices ? 'Reconnecting…' : 'Use natural voices again' }}
+            {{ retryingOnlineVoices ? 'Checking Edge voices…' : 'Try Edge voices again' }}
           </button>
 
           <div class="voice-list" role="listbox" aria-label="Narrator voices">
@@ -935,6 +634,7 @@ const props = defineProps({
   isPdfBook: { type: Boolean, default: false },
   pdfSource: { type: null, default: null },
   zoomLevel: { type: Number, default: 1 },
+  narrationCompatible: { type: Boolean, default: true },
   pdfManifest: { type: Object, default: null },
   activeTtsChunkIndex: { type: Number, default: -1 },
   activeWordRange: { type: Object, default: null },
@@ -1019,8 +719,8 @@ const {
 
 const SPEED_OPTIONS = [0.75, 1, 1.25, 1.5, 2];
 
-const mediaOpen = ref(false);
-const displayOpen = ref(false);
+
+
 const voicePickerOpen = ref(false);
 const narratorOpen = ref(false);
 const narratorButton = ref(null);
@@ -1097,7 +797,7 @@ const usePagedReader = computed(() => !props.isPdfBook && prefs.value.readingMod
 // because it reads through the EPUB surfaces. The PDF-view control needs the
 // FILE's format instead, so it stays on screen once Reflow is chosen.
 const isPdfDocument = computed(() => String(props.book?.format || "").toLowerCase() === "pdf");
-const layoutHash = computed(() => readerPrefsLayoutHash(prefs.value));
+const layoutHash = computed(() => `${readerPrefsLayoutHash(prefs.value)}|${prefs.value.pdfViewMode}|${props.sectionCounts.join(",")}`);
 
 const readerStyleVars = computed(() => ({
   "--mr-font-size": `${prefs.value.fontSize}px`,
@@ -1297,7 +997,7 @@ const buildPageMap = async () => {
 watch(
   () => [
     props.book?.id,
-    (props.fullSections || []).length,
+    props.fullSections,
     layoutHash.value,
     pageGeometry.value.width,
     pageGeometry.value.height,
@@ -1359,7 +1059,7 @@ const dockLabel = computed(() => {
 // being offered Edge voices it could never load. ttsUsingDeviceVoice is the
 // ground truth — the engine sets it when narration actually comes out of the
 // phone's own TTS engine.
-const OFFLINE_VOICE = { id: "__offline_device__", name: "Device voice (auto)" };
+const OFFLINE_VOICE = { id: "__offline_device__", name: "Phone voice (online when available)" };
 const useOfflineVoice = computed(() => (
   isNativeCapacitorPlatform() && (isOffline.value || ttsUsingDeviceVoice.value)
 ));
@@ -1381,7 +1081,7 @@ const activeVoiceId = computed(() =>
 );
 let lastScrollY = 0;
 const isPlaying = computed(
-  () => ttsBook.value?.id === props.book?.id && ttsStatus.value === "playing",
+  () => props.narrationCompatible && ttsBook.value?.id === props.book?.id && ttsStatus.value === "playing",
 );
 
 // 1.0 means "the page fills the screen width". It used to be hardcoded, and the
@@ -1435,6 +1135,7 @@ const setPdfViewer = (el) => {
 // Which measured page a flat chunk index falls on, or null while the page map
 // is still being built.
 const pageForChunkLocal = (chunk) => {
+  if (props.isPdfRenderable) return pageForChunk(props.pdfManifest, chunk);
   const pages = pageMap.value?.chunkPages;
   if (!pages || !Number.isFinite(chunk) || chunk < 0) return null;
   const page = pages[chunk];
@@ -1560,6 +1261,7 @@ const closeFigureViewer = () => {
 
 const readFromPressedPage = () => {
   const page = pdfReadHere.value.page;
+  if (!(page > 0)) return;
   hidePdfReadHere();
   const chunk = firstChunkForPage(props.pdfManifest, page);
   if (Number.isFinite(chunk?.id)) emit("read-from-chunk", chunk.id);
@@ -1618,20 +1320,13 @@ const playFromHere = () => {
     return;
   }
   const chunk = chunkAtVisiblePage();
-  if (usePagedReader.value && chunk !== null) {
+  if (chunk !== null) {
     emit("read-from-chunk", chunk);
     return;
   }
   emit("read-current-position");
 };
 
-const toggleMediaPlay = () => {
-  if (ttsBook.value?.id === props.book?.id && ttsStatus.value !== "idle") {
-    togglePlay();
-    return;
-  }
-  emit("read-current-position");
-};
 
 // ── Listen mode ─────────────────────────────────────────────────────────────
 //
@@ -1644,6 +1339,8 @@ const READER_MODE_KEY = "bookish:reader-mode";
 
 const { settings: appSettings } = useBookishSettings();
 const router = useRouter();
+const openReadSettings = () => router.push(`/read-settings/${encodeURIComponent(String(props.book.id))}?format=${isPdfDocument.value ? "pdf" : "epub"}&reflow=${props.pdfReflowAvailable ? "1" : "0"}`);
+
 const openListenSettings = () => router.push(`/listen-settings/${encodeURIComponent(String(props.book.id))}`);
 const listenSummaryMode = ref("remaining");
 const listenBackSeconds = computed(() => appSettings.value.listenBackSeconds);
@@ -1711,7 +1408,7 @@ const scheduleChromeAutoHide = () => {
     // still using it.
     if (readerMode.value !== "read") return;
     if (selectionMenu.value.visible || noteEditor.value.visible) return;
-    if (mediaOpen.value || displayOpen.value || tocModalOpen.value || narratorOpen.value) return;
+    if (tocModalOpen.value || narratorOpen.value) return;
     if (resumeChoice.value.visible) return;
     chromeHidden.value = true;
   }, CHROME_AUTOHIDE_MS);
@@ -1791,7 +1488,7 @@ const setReaderMode = (mode) => {
 };
 
 const isThisBookNarrating = computed(
-  () => ttsBook.value?.id === props.book?.id && ttsStatus.value !== "idle",
+  () => props.narrationCompatible && ttsBook.value?.id === props.book?.id && ttsStatus.value !== "idle",
 );
 
 const listenByline = computed(() => {
@@ -1962,7 +1659,7 @@ const listenSourceText = computed(() => props.tabletMode && activeListenChunk.va
   : ((props.readableChunks || [])[listenDisplayChunkIndex.value] || ''));
 const listenSpokenWordIndex = computed(() => {
   const boundaryIndex = activeListenChunk.value >= 0 ? Number(ttsWordIdx.value) : -1;
-  if (!props.tabletMode || boundaryIndex < 0) return boundaryIndex;
+  if (boundaryIndex < 0) return boundaryIndex;
   const charIndex = Number(ttsBoundaries.value?.[boundaryIndex]?.charIndex);
   if (!Number.isFinite(charIndex) || charIndex < 0) return boundaryIndex;
   const starts = [...String(listenSourceText.value).matchAll(/\S+/g)].map(match => match.index || 0);
@@ -1977,7 +1674,7 @@ const listenCurrentChunk = computed(() => isThisBookNarrating.value
 const listenCurrentChunkFraction = computed(() => {
   if (!isThisBookNarrating.value || ttsWordIdx.value < 0) return 0;
   const words = String(props.readableChunks[listenCurrentChunk.value] || "").trim().split(/\s+/).filter(Boolean).length;
-  return words ? Math.min(1, (ttsWordIdx.value + 1) / words) : 0;
+  return words ? Math.min(1, (listenSpokenWordIndex.value + 1) / words) : 0;
 });
 const listenTimeline = computed(() => estimatedListenTimeline(props.readableChunks, ttsSpeed.value));
 const listenChapterRange = computed(() => {
@@ -2288,10 +1985,10 @@ const retryNaturalVoices = async () => {
   try {
     const restored = await retryOnlineVoices();
     if (restored) {
-      addToast("Natural voices are back.", "success");
+      addToast("Edge voice restored.", "success");
       narratorOpen.value = false;
     } else {
-      addToast("Still can't reach the natural voices — check your connection.", "error");
+      addToast("Edge voices are unavailable. Phone narration will continue.", "error");
     }
   } finally {
     retryingOnlineVoices.value = false;
@@ -2309,10 +2006,7 @@ const cycleSpeed = () => {
   setSpeed(next);
 };
 
-watch(mediaOpen, (open) => {
-  if (!open) voicePickerOpen.value = false;
-  else if (useOfflineVoice.value) loadDeviceVoices();
-});
+
 
 // Make sure the device-voice list is loaded whenever a narrator picker opens
 // offline, and as soon as the device goes offline while the reader is open.
@@ -3517,12 +3211,6 @@ onUnmounted(() => {
     calc(env(safe-area-inset-bottom) + 96px);
 }
 
-/* Page mode owns the whole screen: the page is sized to it, so the content
-   wrapper must not add bands above and below. */
-.reader-mobile-content.is-pdf-reader.is-paged-pdf {
-  padding: 0;
-}
-
 .reader-mobile-pdf {
   width: 100%;
 }
@@ -3583,7 +3271,7 @@ onUnmounted(() => {
   text-justify: inter-word;
   hyphens: auto;
   -webkit-hyphens: auto;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: break-word;
   /* Selection is deliberately ENABLED: long-pressing a word gives the
      browser's own selection handles, which is what lets a reader extend the

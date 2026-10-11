@@ -6,6 +6,16 @@ function parseXml(text) {
   return new DOMParser().parseFromString(text, 'application/xml')
 }
 
+export function inferEpubSectionTitle(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const heading = doc.querySelector('h1, h2, h3, .chapter-title, .chaptertitle')
+  const firstParagraph = doc.querySelector('body > p, body > div > p')
+  const candidate = heading?.textContent || firstParagraph?.textContent || ''
+  const text = candidate.replace(/\s+/g, ' ').trim()
+  if (!heading && !/^(?:chapter|part|book|section)\s+(?:\d+|[ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten)\b|^(?:prologue|epilogue|introduction|preface)$/i.test(text)) return null
+  return text && text.length <= 100 ? text : null
+}
+
 // Resolve a relative path against a base file path (POSIX-style)
 function resolvePath(basePath, relPath) {
   if (!relPath) return basePath
@@ -350,8 +360,9 @@ export async function extractEpub(file) {
     // ── 8. Assemble final self-contained HTML ──────────────────────────────
     // Filter sections and their TOC titles TOGETHER so tocTitles stays
     // index-aligned with the chapter-break sections in the joined content.
+    const hasDedicatedToc = tocTitles.some(title => title?.trim())
     const sections = chapters
-      .map((html, i) => ({ html, title: tocTitles[i] ?? null }))
+      .map((html, i) => ({ html, title: tocTitles[i] || (!hasDedicatedToc ? inferEpubSectionTitle(html) : null) }))
       .filter(section => isRenderableSection(section.html))
     const bodyHtml = sections.map(section => section.html).join('\n<hr class="chapter-break"/>\n')
     const styleTag = scopedCss ? `<style>${scopedCss}</style>` : ''

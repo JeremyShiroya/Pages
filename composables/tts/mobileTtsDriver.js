@@ -24,13 +24,13 @@ const hasUsableAudio = (result) => (
 // used to switch the narrator's voice mid-book for the rest of the session —
 // most often because the app was backgrounded and Android throttled the socket,
 // not because Edge was actually unreachable.
-const EDGE_FAILURE_LIMIT = 3
+const EDGE_FAILURE_LIMIT = 1
 
 // Falling back to the device voice is a temporary degradation, not a verdict.
 // It used to latch for the whole session, so one hiccup on a train left the
 // narrator on the phone's voice until the app was restarted — even after the
 // connection came back. Edge is re-probed once the cooldown expires.
-const EDGE_COOLDOWN_MS = 60_000
+const EDGE_COOLDOWN_MS = 5 * 60_000
 
 let _edgeDisabledUntil = 0
 let _consecutiveEdgeFailures = 0
@@ -67,6 +67,14 @@ function noteEdgeFailure(requestSeq) {
 
 const documentHidden = () => typeof document !== 'undefined' && document.visibilityState === 'hidden'
 
+// The timeout covers the entire streamed utterance, not just the handshake.
+// PDF extraction often yields long (up to 480-character) sentences; 6 seconds
+// routinely expired while valid audio was still arriving.
+export function edgeTimeoutForText(text, hidden = false) {
+  const estimatedMs = Math.ceil(String(text || '').length / 11) * 1000
+  return Math.max(hidden ? 30000 : 15000, Math.min(60000, estimatedMs))
+}
+
 export async function synthesizeMobileSpeech({ text, voice, speed, apiUrl, apiBaseUrl }) {
   if (!mobileTtsEdgeDisabled()) {
     // Backgrounded WebViews get their timers and sockets throttled by Android,
@@ -82,8 +90,8 @@ export async function synthesizeMobileSpeech({ text, voice, speed, apiUrl, apiBa
         // Foreground: two short attempts rather than one long one. A single
         // stalled handshake used to hold the sentence for a full 12s before
         // anything retried — the "long load" mid-book.
-        attempts: 2,
-        timeoutMs: hidden ? 30000 : 6000,
+        attempts: 1,
+        timeoutMs: edgeTimeoutForText(text, hidden),
       })
       _consecutiveEdgeFailures = 0
       _lastCountedFailureSeq = -1
@@ -131,7 +139,7 @@ export async function synthesizeMobileSpeech({ text, voice, speed, apiUrl, apiBa
   // Native device-voice fallback. The engine plays this live (no pre-synth
   // audio), so we just hand back a marker describing what to speak.
   if (nativeSpeechSupported()) {
-    return { native: true, text, voice, speed }
+    return { native: true, text, voice, speed, preferNetwork: typeof navigator !== 'undefined' && navigator.onLine !== false }
   }
 
   throw new Error('No TTS available: Edge synthesis failed and device speech is unsupported')

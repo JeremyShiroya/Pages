@@ -327,7 +327,7 @@ export function blocksToHtml(blocks) {
       const tag = block.ordered ? 'ol' : 'ul'
       if (list && list.tag !== tag) closeList()
       if (!list) list = { tag, items: [] }
-      list.items.push(`<li>${escapeHtml(block.text)}</li>`)
+      list.items.push(`<li>${escapeHtml(block.text.replace(/[\u00a0\u202f]/g, ' ').replace(/\u00ad/g, ''))}</li>`)
       continue
     }
 
@@ -341,9 +341,9 @@ export function blocksToHtml(blocks) {
       continue
     }
     if (block.type === 'heading') {
-      out.push(`<h${block.level}>${escapeHtml(block.text)}</h${block.level}>`)
+      out.push(`<h${block.level}>${escapeHtml(block.text.replace(/[\u00a0\u202f]/g, ' ').replace(/\u00ad/g, ''))}</h${block.level}>`)
     } else {
-      out.push(`<p>${escapeHtml(block.text)}</p>`)
+      out.push(`<p>${escapeHtml(block.text.replace(/[\u00a0\u202f]/g, ' ').replace(/\u00ad/g, ''))}</p>`)
     }
   }
 
