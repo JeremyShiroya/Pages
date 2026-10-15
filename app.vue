@@ -2,6 +2,7 @@
   <NuxtLayout>
     <NuxtPage />
     <ToastComp />
+    <SpeechDownloadStatus />
     <DevicePermissionModal />
     <AppUpdateModal />
     <!-- First boot only: picks which formats the app handles at all, before the
@@ -16,6 +17,7 @@ import AppUpdateModal from '~/components/shared/AppUpdateModal.vue'
 import DevicePermissionModal from '~/components/shared/DevicePermissionModal.vue'
 import FormatChoiceModal from '~/components/shared/FormatChoiceModal.vue'
 import ToastComp from '~/components/shared/ToastComp.vue'
+import SpeechDownloadStatus from '~/components/shared/SpeechDownloadStatus.vue'
 import { useFormatEnablement } from '~/composables/useFormatEnablement'
 
 // Read on the client only: settings come from localStorage, so deciding on the

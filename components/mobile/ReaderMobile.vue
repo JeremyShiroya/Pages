@@ -305,6 +305,7 @@
           :layout-hash="layoutHash"
           :start-section="currentChapterIdx"
           :start-chunk="openToChunk"
+          :start-position="readerRefs.resumeLocation?.value"
           @position-change="onPagedPosition"
           @long-press="onPagedLongPress"
           @toggle-chrome="toggleChrome"
@@ -498,7 +499,10 @@
               :aria-selected="voice.id === activeVoiceId"
               @click="chooseNarrator(voice.id)"
             >
-              <span>{{ voice.name }}</span>
+              <span class="voice-label">
+                {{ voice.name }}
+                <i v-if="featuredNarrators.has(voice.id)" class="ri-star-fill voice-star" aria-hidden="true"></i>
+              </span>
               <i v-if="voice.id === activeVoiceId" class="ri-check-line"></i>
             </button>
           </div>
@@ -574,6 +578,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { registerPlugin } from "@capacitor/core";
+import { isLocalTtsVoice } from '~/composables/tts/localTtsDriver';
 import { findPageSyncMatch } from "~/composables/usePageSyncMatch";
 import { onCoverError } from "~/composables/useCoverFallback";
 import { offeredDeviceVoices } from "~/composables/tts/nativeSpeech";
@@ -1061,7 +1066,7 @@ const dockLabel = computed(() => {
 // phone's own TTS engine.
 const OFFLINE_VOICE = { id: "__offline_device__", name: "Phone voice (online when available)" };
 const useOfflineVoice = computed(() => (
-  isNativeCapacitorPlatform() && (isOffline.value || ttsUsingDeviceVoice.value)
+  isNativeCapacitorPlatform() && !isLocalTtsVoice(ttsVoiceId.value) && (isOffline.value || ttsUsingDeviceVoice.value)
 ));
 
 // Device voices as picker options: id "native:<index>" into ttsNativeVoices.
@@ -1075,7 +1080,11 @@ const deviceVoiceOptions = computed(() => [
   })),
 ]);
 
-const displayVoices = computed(() => (useOfflineVoice.value ? deviceVoiceOptions.value : ttsVoices.value));
+const displayVoices = computed(() => (useOfflineVoice.value ? [...ttsVoices.value.filter(v => isLocalTtsVoice(v.id)), ...deviceVoiceOptions.value] : ttsVoices.value));
+const featuredNarrators = new Set([
+  'en-CA-LiamNeural', 'pocket:charles', 'en-GB-RyanNeural',
+  'en-GB-SoniaNeural', 'kokoro:af_nicole',
+]);
 const activeVoiceId = computed(() =>
   useOfflineVoice.value ? `native:${ttsNativeVoiceIdx.value}` : ttsVoiceId.value,
 );
@@ -3954,6 +3963,9 @@ onUnmounted(() => {
 .voice-option i {
   font-size: 16px;
 }
+
+.voice-label { display: inline-flex; align-items: center; gap: 6px; }
+.voice-option .voice-star { color: #e7aa35; font-size: 14px; }
 
 .media-buttons {
   display: flex;

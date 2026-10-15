@@ -374,10 +374,11 @@ import { PDF_MANIFEST_VERSION, firstChunkForPage, pageForChunk } from '~/composa
 import { reflowPdfManifest } from '~/composables/usePdfReflow'
 import { useMobileReaderPrefs } from '~/composables/useMobileReaderPrefs'
 import { pdfProgressForPage } from '~/composables/useReaderPosition'
+import { openReadingPosition, POSITION_FIELDS } from '~/composables/readingPositionStore'
+import { buildLocationIndex, textAnchor, resolveTextAnchor, validReadingLocation } from '~/utils/readingLocation'
+import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 import {
-  READING_POSITION_SAVE_DELAY_MS,
   progressForChunk,
-  readingPositionUpdate,
   resolveStartChunk,
   statusForProgress,
 } from '~/composables/useReadingPosition'
@@ -391,7 +392,7 @@ const mobileReaderComponent = ReaderMobile
 const tabletPortraitReaderComponent = ReaderTabletPortrait
 const route = useRoute()
 const router = useRouter()
-const { books, initialized, fetchAllData, fetchBookById, updateBook } = useBooks()
+const { books, initialized, fetchAllData, fetchBookById } = useBooks()
 const { getBookContent, saveBookContent } = useBookStorage()
 const { settings, updateSettings } = useBookishSettings()
 const {
@@ -418,6 +419,13 @@ const tocNavRef = ref(null)
 const chunkMapVersion = ref(0)
 const pagedRef = ref(null)
 const positionTrackingReady = ref(false)
+const resumeLocation = ref(null)
+let positionWriter = null
+let readerDisposed = false
+let positionErrorShown = false
+const positionToast = useToast()
+let nativePauseListener = null
+const locationIndex = computed(() => buildLocationIndex(allReadableChunks.value))
 
 const mobileReaderRefs = {
   readerPageRef,
@@ -425,6 +433,7 @@ const mobileReaderRefs = {
   pdfViewerRef,
   pagedRef,
   chunkMapVersion,
+  resumeLocation,
 }
 
 const book = ref(null)
@@ -696,7 +705,8 @@ const _cancelIdleSectionMounting = () => {}
 // The chunk this book should open at. Narration wins while it is playing;
 // otherwise it is the saved reading position, which both surfaces write.
 function initialReadingChunk() {
-  if (narrationCompatible.value && ttsBook.value?.id === book.value?.id && ttsStatus.value !== 'idle') {
+  if (openToChunk >= 0) return openToChunk
+  if (narrationCompatible.value && ttsBook.value?.id === book.value?.id && ttsStatus.value === 'playing') {
     return Math.max(0, Number(ttsChunkIdx.value) || 0)
   }
   if (isPdfBook.value && book.value?.readingPdfView !== mobileReaderPrefs.value.pdfViewMode) {
@@ -706,6 +716,9 @@ function initialReadingChunk() {
       return sectionStartChunk(Math.max(0, section))
     }
     return firstChunkForPage(pdfManifest.value, page)?.id || 0
+  }
+  if (validReadingLocation(resumeLocation.value)) {
+    return resolveTextAnchor(locationIndex.value, resumeLocation.value.text, resumeLocation.value.chunk).chunk
   }
   return resolveStartChunk(book.value, allReadableChunks.value.length)
 }
@@ -881,6 +894,7 @@ function handleMobilePosition(position) {
   if (Number.isFinite(chunk) && chunk >= 0 && chunk !== currentReadingChunk.value) {
     currentReadingChunk.value = chunk
   }
+  queueProgressSave()
 }
 
 // Page Sync commits the located page as the shared reading position. The
@@ -1521,48 +1535,49 @@ function readingProgressSnapshot({ pdfPage } = {}) {
 
 let _progressSaveTimer = null
 
-async function saveReadingProgress(position) {
-  if (!readerReady.value || !book.value) return
-
-  const snapshot = readingProgressSnapshot(position)
-  const next = readingPositionUpdate(book.value, {
-    chunk: currentPositionChunk(position),
-    totalChunks: allReadableChunks.value.length,
-    progress: snapshot.progress,
-    status: snapshot.status,
-  })
-  // Nothing moved. Note this compares the CHUNK too, so turning pages inside one
-  // chapter is a real change — the old percentage-only guard swallowed those and
-  // with them the lastReadAt stamp "Currently Reading" depends on.
-  if (!next) return
-
-  const updated = { ...book.value, ...next }
-  if (isPdfBook.value) {
-    updated.readingPdfView = mobileReaderPrefs.value.pdfViewMode
-    updated.readingPdfPage = usePdfReflowView.value
-      ? chapterList.value[currentChapterIdx.value]?.page || currentPdfPage.value
-      : currentPdfPage.value
+function positionSaveError(error) {
+  console.error('[Reader] Position persistence failed:', error)
+  if (!positionErrorShown && !readerDisposed) {
+    positionErrorShown = true
+    positionToast.addToast('Your reading position could not be saved. Please reopen the book if this continues.', 'error')
   }
-  book.value = updated
-  try {
-    await updateBook(updated)
-    recordBookActivity(updated.id, {
-      page: isPdfBook.value ? currentPdfPage.value : undefined,
-      chapter: readsAsEpub.value ? currentChapterIdx.value + 1 : undefined,
-      completed: updated.status === 'Read',
-    })
-  } catch (err) {
-    console.error('[Reader] Failed to save reading progress:', err)
+}
+
+function captureReadingLocation(position) {
+  const chunk = currentPositionChunk(position)
+  const paged = usePagedReader.value ? mobileReaderRefs.pagedRef?.value?.getPosition?.() : null
+  const pdf = isPdfRenderable.value ? pdfViewerRef.value?.getPosition?.() : null
+  const targetChunk = paged?.firstChunkOfPage ?? chunk
+  const span = !paged && readsAsEpub.value ? _readerDom().chunkEls[targetChunk] : null
+  const rect = span?.getBoundingClientRect()
+  const pdfPage = position?.pdfPage ?? pdf?.pdfPage ?? (usePdfReflowView.value
+    ? chapterList.value[currentChapterIdx.value]?.page : currentPdfPage.value)
+  return {
+    version: 1, format: isPdfBook.value ? 'pdf' : 'epub',
+    view: isPdfBook.value ? mobileReaderPrefs.value.pdfViewMode : 'epub',
+    chunk: Math.max(0, targetChunk), section: Math.max(0, currentChapterIdx.value),
+    text: textAnchor(locationIndex.value, targetChunk, paged?.charOffset || 0),
+    ...(paged ? { pageInSection: paged.pageInSection, layout: paged.layout, charOffset: paged.charOffset } : {}),
+    ...(!paged && rect ? { scrollFraction: Math.round(Math.max(0, Math.min(1, (80 - rect.top) / Math.max(1, rect.height))) * 1000) / 1000 } : {}),
+    ...(isPdfBook.value ? { pdfPage: Math.max(1, pdfPage || 1),
+      pdfOffset: position?.pdfPage ? 0 : (pdf?.pdfOffset || 0), pdfHorizontal: pdf?.pdfHorizontal || 0 } : {}),
+  }
+}
+
+async function saveReadingProgress(position) {
+  if (readerDisposed || !readerReady.value || !positionTrackingReady.value || _scrollRestoringPosition || !book.value || !positionWriter) return
+  const location = captureReadingLocation(position)
+  const snapshot = readingProgressSnapshot({ pdfPage: location.pdfPage })
+  if (positionWriter.capture(location, snapshot)) {
+    recordBookActivity(book.value.id, { page: location.pdfPage,
+      chapter: readsAsEpub.value ? location.section + 1 : undefined, completed: snapshot.status === 'Read' })
   }
 }
 
 function queueProgressSave() {
   if (!readerReady.value || !positionTrackingReady.value) return
-  if (_progressSaveTimer) clearTimeout(_progressSaveTimer)
-  _progressSaveTimer = setTimeout(() => {
-    _progressSaveTimer = null
-    saveReadingProgress()
-  }, READING_POSITION_SAVE_DELAY_MS)
+  // Capture synchronously; the writer coalesces I/O, never user activity.
+  void saveReadingProgress()
 }
 
 async function flushPendingSave(position) {
@@ -1571,6 +1586,7 @@ async function flushPendingSave(position) {
     _progressSaveTimer = null
   }
   await saveReadingProgress(position)
+  try { await positionWriter?.flush() } catch (error) { positionSaveError(error) }
 }
 
 function updateBookEdge() {
@@ -1637,6 +1653,10 @@ function onReaderScroll() {
   _scrollRaf = requestAnimationFrame(() => {
     _scrollRaf = null
     updateCurrentChapterFromScroll()
+    if (!_progressSaveTimer) _progressSaveTimer = setTimeout(() => {
+      _progressSaveTimer = null
+      queueProgressSave()
+    }, 250)
   })
 }
 
@@ -1644,21 +1664,24 @@ function handlePdfPageChange(page) {
   currentPdfPage.value = page
 }
 
-function handlePdfLoaded(payload) {
+async function handlePdfLoaded(payload) {
   totalPages.value = payload.pages || totalPages.value || book.value?.pages || 0
   updateBookEdge()
 
-  if (!restoredInitialPdfScroll.value && book.value?.progress > 0 && totalPages.value > 0) {
+  if (!restoredInitialPdfScroll.value && totalPages.value > 0) {
     restoredInitialPdfScroll.value = true
     const targetPage = Math.max(1, Math.min(
       totalPages.value,
-      book.value.readingPdfPage || Math.round((book.value.progress / 100) * Math.max(1, totalPages.value - 1)) + 1
+      resumeLocation.value?.pdfPage || book.value.readingPdfPage || Math.round(((Number(book.value.progress) || 0) / 100) * Math.max(1, totalPages.value - 1)) + 1
     ))
     currentPdfPage.value = targetPage
-    nextTick(() => pdfViewerRef.value?.scrollToPage(targetPage, 'instant'))
+    await nextTick()
+    await pdfViewerRef.value?.restorePosition?.({ ...resumeLocation.value, pdfPage: targetPage })
   }
 
+  if (readerDisposed) return
   readerReady.value = true
+  positionTrackingReady.value = true
 }
 
 function applyStoredReaderContent(stored) {
@@ -1681,6 +1704,7 @@ function applyStoredReaderContent(stored) {
 
 async function loadBook(id) {
   readerReady.value = false
+  positionTrackingReady.value = false
   restoredInitialPdfScroll.value = false
   _sanitizeCache = new Map()
   const cached = books.value.find(b => String(b.id) === String(id))
@@ -1698,12 +1722,24 @@ async function loadBook(id) {
     loading.value = false
   }
 
-  if (!initialized.value) {
-    fetchAllData().then(() => {
-      const latest = fetchBookById(id)
-      if (latest) book.value = { ...book.value, ...latest }
+  try {
+    positionWriter = await openReadingPosition(book.value.id, {
+      onSaved(saved) {
+        if (readerDisposed || saved.id !== book.value?.id) return
+        const patch = Object.fromEntries([...POSITION_FIELDS, 'progress', 'status', 'lastReadAt', 'updatedAt']
+          .filter(field => field in saved).map(field => [field, saved[field]]))
+        book.value = { ...book.value, ...patch }
+        const index = books.value.findIndex(item => item.id === saved.id)
+        if (index >= 0) books.value[index] = { ...books.value[index], ...patch }
+        positionErrorShown = false
+      },
+      onError: positionSaveError,
     })
-  }
+    if (readerDisposed) { await positionWriter.close(); return }
+    book.value = { ...book.value, ...positionWriter.book }
+    resumeLocation.value = validReadingLocation(book.value.readingPosition) ? book.value.readingPosition
+      : validReadingLocation(book.value.previousReadingPosition) ? book.value.previousReadingPosition : null
+  } catch (error) { positionSaveError(error) }
 
   const prewarmed = getPrewarmedReaderContent(id)
   const prewarmedContent = prewarmed?.content ?? null
@@ -1717,6 +1753,35 @@ async function loadBook(id) {
     let stored = appliedPrewarmedContent ? prewarmedContent : null
     if (!stored && prewarmed?.promise) stored = await prewarmed.promise
     if (!stored && !appliedPrewarmedContent) stored = await getBookContent(id)
+    if (bookFormat.value === 'epub' && !parseChapters(stored?.content || '').length) {
+      try {
+        let recovered = null
+        if (book.value?.deviceImportPath) {
+          const { repairDeviceEpubContent } = await import('~/composables/useDeviceLibrarySync')
+          recovered = await repairDeviceEpubContent(book.value)
+        } else if (stored?.source) {
+          const source = stored.source
+          const bytes = typeof source === 'string'
+            ? await (await fetch(source)).arrayBuffer()
+            : source
+          const { extractEpub } = await import('~/composables/useEpubExtractor')
+          recovered = await extractEpub(new File([bytes], `${id}.epub`, { type: 'application/epub+zip' }))
+        }
+        if (recovered && parseChapters(recovered.content).length) {
+          await saveBookContent(id, {
+            content: recovered.content,
+            pages: recovered.pages,
+            tocTitles: recovered.tocTitles,
+            format: 'epub',
+            ...(stored?.source ? {} : { source: recovered.source }),
+          })
+          stored = { ...stored, content: recovered.content, pages: recovered.pages, tocTitles: recovered.tocTitles }
+          applyStoredReaderContent(stored)
+        }
+      } catch (error) {
+        console.warn('[Reader] Could not recover EPUB content from its original file:', error)
+      }
+    }
     if (bookFormat.value === 'pdf' && !stored?.source && book.value?.deviceImportPath) {
       try {
         const { repairDevicePdfSource } = await import('~/composables/useDeviceLibrarySync')
@@ -1767,12 +1832,17 @@ async function loadBook(id) {
 
   await nextTick()
   await nextTick()
+  if (readerDisposed) return
   _scheduleChunkMapBuild()
   observeChapters()
   updateBookEdge()
   ensurePdfToc(id)
 
-  const hasSavedPosition = Number(book.value?.readingChunk) > 0 || book.value?.progress > 0
+  const hasSavedPosition = !!resumeLocation.value || Number(book.value?.readingChunk) >= 0 || book.value?.progress > 0 || openToChunk >= 0
+  if (resumeLocation.value?.text) {
+    const resolved = resolveTextAnchor(locationIndex.value, resumeLocation.value.text, resumeLocation.value.chunk)
+    resumeLocation.value = { ...resumeLocation.value, charOffset: resolved.charOffset }
+  }
 
   if (readsAsEpub.value && chapterList.value.length > 0
     && (hasSavedPosition || isCurrentBookNarrating.value)) {
@@ -1784,10 +1854,12 @@ async function loadBook(id) {
     if (!usePagedReader.value) {
       _scrollRestoringPosition = true
       await scrollToChunk(targetChunk)
-      await new Promise(resolve => setTimeout(resolve, 50))
       const targetElRefined = _readerDom().chunkEls[targetChunk]
       if (targetElRefined?.isConnected) {
         targetElRefined.scrollIntoView({ behavior: 'instant', block: 'start' })
+        if (openToChunk < 0 && resumeLocation.value?.scrollFraction) {
+          window.scrollBy({ top: targetElRefined.getBoundingClientRect().height * resumeLocation.value.scrollFraction - 80, behavior: 'instant' })
+        }
       }
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -1796,10 +1868,10 @@ async function loadBook(id) {
       })
     } else {
       await nextTick()
-      await mobileReaderRefs.pagedRef?.value?.goToChunk?.(targetChunk)
+      await mobileReaderRefs.pagedRef?.value?.goToChunk?.(targetChunk, openToChunk < 0 ? resumeLocation.value : null)
     }
 
-    if (isCurrentBookNarrating.value) {
+    if (isCurrentBookNarrating.value && ttsStatus.value === 'playing') {
       setTimeout(() => {
         if (isCurrentBookNarrating.value) jumpToNarration()
       }, 200)
@@ -1811,7 +1883,7 @@ async function loadBook(id) {
     if (!_scrollRestoringPosition) updateCurrentChapterFromScroll()
   }
 
-  positionTrackingReady.value = true
+  if (!isPdfRenderable.value) positionTrackingReady.value = true
 }
 
 // Scroll mode's counterpart to the paged reader's goToChunk: mount the owning
@@ -1838,7 +1910,11 @@ function scrollToChunk(chunkIndex) {
       }
     }
 
-    nextTick(() => {
+    nextTick(async () => {
+      await document.fonts?.ready
+      const sectionElement = _sectionElement(section)
+      if (sectionElement) await Promise.allSettled([...sectionElement.querySelectorAll('img')].map(img => img.decode?.()))
+      if (readerDisposed) return resolve(false)
       if (_sectionElement(section)) {
         executeScroll()
       } else {
@@ -1988,6 +2064,7 @@ onBeforeRouteLeave(async (to, from, next) => {
 })
 
 let _windowUnloadHandler = null
+let _visibilityHandler = null
 
 onMounted(async () => {
   lastReadingActivityAt = Date.now()
@@ -1996,6 +2073,16 @@ onMounted(async () => {
   if (import.meta.client) {
     window.addEventListener('beforeunload', _windowUnloadHandler)
     window.addEventListener('pagehide', _windowUnloadHandler)
+    _visibilityHandler = () => { if (document.visibilityState === 'hidden') void flushPendingSave() }
+    document.addEventListener('visibilitychange', _visibilityHandler)
+    if (isNativeCapacitorPlatform()) {
+      try {
+      const { App } = await import('@capacitor/app')
+      const listener = await App.addListener('pause', () => { void flushPendingSave() })
+      if (readerDisposed) await listener.remove()
+      else nativePauseListener = listener
+      } catch (error) { console.warn('[Reader] Native pause listener unavailable:', error) }
+    }
   }
   window.addEventListener('keydown', onKeydown)
   window.addEventListener('resize', updateBookEdge)
@@ -2017,6 +2104,8 @@ onMounted(async () => {
 })
 
 onUnmounted(async () => {
+  readerDisposed = true
+  if (_progressSaveTimer) clearTimeout(_progressSaveTimer)
   saveReadingActivity()
   if (readingActivityTimer) clearInterval(readingActivityTimer)
   if (import.meta.client && _windowUnloadHandler) {
@@ -2024,6 +2113,8 @@ onUnmounted(async () => {
     window.removeEventListener('pagehide', _windowUnloadHandler)
     _windowUnloadHandler = null
   }
+  if (_visibilityHandler) document.removeEventListener('visibilitychange', _visibilityHandler)
+  void nativePauseListener?.remove()
   window.removeEventListener('keydown', onKeydown)
   window.removeEventListener('resize', updateBookEdge)
   window.removeEventListener('scroll', onReaderScroll)
@@ -2035,8 +2126,7 @@ onUnmounted(async () => {
   if (import.meta.client && CSS?.highlights) CSS.highlights.delete('tts-word')
   _ttsWordHighlight = null
 
-  if (!book.value) return
-  await flushPendingSave()
+  try { await positionWriter?.close() } catch (error) { console.error('[Reader] Final position checkpoint:', error) }
 })
 </script>
 

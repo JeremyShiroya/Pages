@@ -1,11 +1,15 @@
 
 import { mergeAutomaticMetadata } from './metadataPolicy'
 import { recoverLegacyMetadata } from './metadataRecovery'
+import { READING_POSITION_FIELDS } from '../utils/readingLocation'
 export const LIBRARY_DB_NAME = 'bookish-library'
 const DB_NAME = LIBRARY_DB_NAME
 // v4 adds document intelligence records. Version bumps must only ever
 // ADD stores here — existing ones hold the user's whole library.
-const DB_VERSION = 4
+export const LIBRARY_DB_VERSION = 4
+const DB_VERSION = LIBRARY_DB_VERSION
+export const LIBRARY_STORE_NAMES = Object.freeze(['books', 'collections', 'profiles', 'annotations',
+  'documentEvidence', 'documentDecisions', 'metadataCandidates', 'intelligenceJobs'])
 export const PROFILE_ID = 'local'
 export const DEFAULT_PROFILE = Object.freeze({
   id: PROFILE_ID,
@@ -189,14 +193,21 @@ export const useLibraryStore = () => {
         removedIds = losers.map((book) => book.id)
         const merged = { ...keeper }
         const keepFields = new Set(['id', 'deviceImportPath', 'createdAt', 'updatedAt', 'progress', 'status', 'lastReadAt', 'isFavourite', 'isHidden'])
+          for (const field of READING_POSITION_FIELDS) keepFields.add(field)
         for (const loser of losers) {
           for (const [field, value] of Object.entries(loser)) {
             if (keepFields.has(field) || value === null || value === undefined || value === '') continue
             if (merged[field] === null || merged[field] === undefined || merged[field] === '') merged[field] = value
           }
-          if ((Number(loser.progress) || 0) > (Number(merged.progress) || 0)) {
+            if (String(loser.lastReadAt || '') > String(merged.lastReadAt || '')
+              || (!loser.lastReadAt && !merged.lastReadAt && !merged.readingPosition
+                && (Number(loser.progress) || 0) > (Number(merged.progress) || 0))) {
             merged.progress = loser.progress
             merged.status = loser.status
+              for (const field of READING_POSITION_FIELDS) {
+                if (field in loser) merged[field] = loser[field]
+                else delete merged[field]
+              }
           }
           if (String(loser.lastReadAt || '') > String(merged.lastReadAt || '')) merged.lastReadAt = loser.lastReadAt
           merged.isFavourite = !!(merged.isFavourite || loser.isFavourite)
@@ -246,6 +257,21 @@ export const useLibraryStore = () => {
           const current = request.result
           if (book.updatedAt && book.updatedAt !== current.updatedAt) { tx.abort(); return }
           updated = toPlainRecord({ ...mergeAutomaticMetadata(current, book), updatedAt: nextTimestamp(current.updatedAt) })
+        }
+        // Reader checkpoints have their own transaction and session ordering.
+        // A slow cover edit or metadata form must not write an older position.
+        const current = request.result
+        if (current.readingPositionEpoch) {
+          const stale = book.readingPositionEpoch !== current.readingPositionEpoch
+            || book.readingPositionSequence !== current.readingPositionSequence
+          for (const field of READING_POSITION_FIELDS) {
+            if (field in current) updated[field] = current[field]
+            else delete updated[field]
+          }
+          if (stale) {
+            for (const field of ['progress', 'status', 'lastReadAt']) updated[field] = current[field]
+          }
+          updated.updatedAt = nextTimestamp(current.updatedAt)
         }
         store.put(updated)
       }

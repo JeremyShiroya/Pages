@@ -1,19 +1,19 @@
 import { BOOKISH_SETTINGS_KEY, readBookishSettings, writeBookishSettings } from '~/composables/useBookishSettings'
 import { BOOKISH_TTS_SESSION_KEY, readStoredTtsSession, writeStoredTtsSession } from '~/composables/useTTS'
+import { openLibraryDB, LIBRARY_STORE_NAMES } from './useLibraryStore'
+import { clearReadingPositionJournals, flushReadingPositions } from './readingPositionStore'
 
 const BACKUP_VERSION = 1
 const LIBRARY_DB_NAME = 'bookish-library'
-// Must track useLibraryStore's version. Opening with a lower one throws
-// VersionError once that store has upgraded, which takes backup/restore down
-// with it — so this constant and the schema below are kept in step by hand.
-const LIBRARY_DB_VERSION = 3
+// Library schema and opening are shared with useLibraryStore.
 const STORAGE_DB_NAME = 'bookish-storage'
 const STORAGE_DB_VERSION = 2
 
-const LIBRARY_STORES = ['books', 'collections', 'profiles', 'annotations']
+const LIBRARY_STORES = LIBRARY_STORE_NAMES
 const STORAGE_STORES = ['book-content', 'book-pdf-source']
 
 function openBookishDB(name, version) {
+  if (name === LIBRARY_DB_NAME) return openLibraryDB()
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(name, version)
     request.onupgradeneeded = (event) => {
@@ -185,11 +185,12 @@ function normalizeBackup(input) {
 
 export const useLibraryBackup = () => {
   const exportBookishData = async () => {
+    await flushReadingPositions()
     if (typeof indexedDB === 'undefined') {
       throw new Error('IndexedDB is not available in this browser.')
     }
 
-    const libraryDb = await openBookishDB(LIBRARY_DB_NAME, LIBRARY_DB_VERSION)
+    const libraryDb = await openLibraryDB()
     const storageDb = await openBookishDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
 
     const [library, storage] = await Promise.all([
@@ -212,9 +213,14 @@ export const useLibraryBackup = () => {
 
   const importBookishData = async (backupInput) => {
     const backup = normalizeBackup(backupInput)
-    const libraryDb = await openBookishDB(LIBRARY_DB_NAME, LIBRARY_DB_VERSION)
+    const libraryDb = await openLibraryDB()
     const storageDb = await openBookishDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
 
+    const previous = await readAllRecords(libraryDb, ['books'])
+    await clearReadingPositionJournals([...new Set([
+      ...previous.books.map(book => book.key),
+      ...(backup.indexedDB?.[LIBRARY_DB_NAME]?.books || []).map(book => book.key),
+    ])])
     await replaceStores(libraryDb, backup.indexedDB?.[LIBRARY_DB_NAME] || {}, LIBRARY_STORES)
     await replaceStores(storageDb, backup.indexedDB?.[STORAGE_DB_NAME] || {}, STORAGE_STORES)
     writeBookishSettings(backup.settings || {})
@@ -224,9 +230,11 @@ export const useLibraryBackup = () => {
   }
 
   const wipeBookishData = async () => {
-    const libraryDb = await openBookishDB(LIBRARY_DB_NAME, LIBRARY_DB_VERSION)
+    const libraryDb = await openLibraryDB()
     const storageDb = await openBookishDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
 
+    const previous = await readAllRecords(libraryDb, ['books'])
+    await clearReadingPositionJournals(previous.books.map(book => book.key))
     await Promise.all([
       clearStores(libraryDb, LIBRARY_STORES),
       clearStores(storageDb, STORAGE_STORES),

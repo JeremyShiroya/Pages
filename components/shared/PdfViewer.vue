@@ -66,6 +66,7 @@
 
 <script setup>
 import { nextTick, onMounted, onUnmounted, ref, watch, computed } from 'vue'
+import { pdfViewportLocation } from '~/utils/readingLocation'
 import { chunkHighlightRects, chunkSubRangeRects, pagesToRender, scrollTargetForChunk } from '~/composables/usePdfGeometry'
 import { wordSpansWithinChunk } from '~/composables/usePdfManifest'
 import SkeletonLoader from './SkeletonLoader.vue'
@@ -363,6 +364,8 @@ const buildPages = async () => {
 
 const relayout = async () => {
   if (!pdfDocument) return
+  const savedPosition = getPosition()
+  layoutPosition = savedPosition
   const generation = ++renderGeneration
 
   const firstPage = await pdfDocument.getPage(1)
@@ -403,9 +406,12 @@ const relayout = async () => {
   }
   await renderWindow(_visiblePages.size ? [..._visiblePages] : [selectedPage.value])
   refreshHighlights()
+  await restorePosition(savedPosition)
+  layoutPosition = null
 }
 
 const renderPdf = async () => {
+  layoutPosition = null
   if (!props.src) return
   const generation = ++renderGeneration
   ready.value = false
@@ -483,6 +489,7 @@ const setupPageObserver = () => {
   for (const wrap of pageWraps.values()) pageObserver.observe(wrap)
 }
 
+let layoutPosition = null
 const getVisiblePage = () => {
   const anchorY = 56
   const records = [...pageWraps.entries()].map(([page, element]) => {
@@ -493,6 +500,33 @@ const getVisiblePage = () => {
   if (atAnchor) return atAnchor.page
   records.sort((a, b) => Math.abs(a.top - anchorY) - Math.abs(b.top - anchorY))
   return records[0]?.page || 1
+}
+
+const getPosition = () => {
+  if (layoutPosition) return layoutPosition
+  const page = getVisiblePage()
+  const wrap = pageWraps.get(page)
+  if (!wrap) return { pdfPage: page, pdfOffset: 0, pdfHorizontal: 0 }
+  const position = pdfViewportLocation(page, wrap.getBoundingClientRect(), 56, wrap.scrollLeft, wrap.scrollWidth, wrap.clientWidth)
+  position.pdfOffset = Math.round(position.pdfOffset * 10000) / 10000
+  position.pdfHorizontal = Math.round(position.pdfHorizontal * 10000) / 10000
+  return position
+}
+
+const restorePosition = async (position) => {
+  if (!pages.value.length) return false
+  const page = Math.max(1, Math.min(pages.value.length, Number(position?.pdfPage) || 1))
+  await nextTick()
+  const wrap = pageWraps.get(page)
+  if (!wrap) return false
+  const offset = Math.max(0, Math.min(1, Number(position?.pdfOffset) || 0))
+  const rect = wrap.getBoundingClientRect()
+  window.scrollTo({ top: Math.max(0, window.scrollY + rect.top + rect.height * offset - 56), behavior: 'instant' })
+  wrap.scrollLeft = Math.max(0, wrap.scrollWidth - wrap.clientWidth) * Math.max(0, Math.min(1, Number(position?.pdfHorizontal) || 0))
+  selectedPage.value = page
+  await renderWindow([page])
+  emit('page-change', page)
+  return true
 }
 
 const scrollToPage = (pageNumber, behavior = 'smooth', block = 'start') => {
@@ -516,7 +550,7 @@ const scrollToChunk = (chunkId, behavior = 'smooth') => {
   window.scrollTo({ top: Math.max(0, top), behavior })
 }
 
-defineExpose({ getVisiblePage, scrollToPage, scrollToChunk })
+defineExpose({ getVisiblePage, getPosition, restorePosition, scrollToPage, scrollToChunk })
 
 // Between observer threshold crossings (e.g. zoomed out with whole pages on
 // screen) the anchor can cross a page edge without any ratio change — follow

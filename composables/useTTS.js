@@ -1,4 +1,6 @@
 import { computed } from 'vue'
+import { Capacitor } from '@capacitor/core'
+import { LOCAL_TTS_VOICES, isLocalTtsVoice, synthesizeLocalSpeech, prepareLocalSpeech, cancelLocalSpeech } from '~/composables/tts/localTtsDriver'
 import { useState } from '#app'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
 import { synthesizeDesktopSpeech } from '~/composables/tts/desktopTtsDriver'
@@ -49,7 +51,6 @@ const EDGE_VOICES = [
 ]
 
 const DEFAULT_TTS_VOICE = EDGE_VOICES[0].id
-const KOKORO_VOICE_PREFIX = 'kokoro:'
 const LEGACY_EDGE_VOICE_REPLACEMENTS = Object.freeze({
   'en-US-ChristopherNeural': 'en-CA-LiamNeural',
   'en-US-GuyNeural': 'en-US-BrianNeural',
@@ -64,11 +65,10 @@ let _prewarmCache = new Map()
 let _prewarmInFlight = new Map()
 const PREWARM_CACHE_LIMIT = 4
 
-const isKokoroVoice = (voiceId) => String(voiceId || '').startsWith(KOKORO_VOICE_PREFIX)
 const normalizeAvailableVoice = (voiceId) => {
   const savedVoice = String(voiceId || '').trim()
   const nextVoice = LEGACY_EDGE_VOICE_REPLACEMENTS[savedVoice] || savedVoice
-  if (isKokoroVoice(nextVoice)) return DEFAULT_TTS_VOICE
+  if (isLocalTtsVoice(nextVoice)) return nextVoice
   return EDGE_VOICES.some(voice => voice.id === nextVoice) ? nextVoice : DEFAULT_TTS_VOICE
 }
 
@@ -565,6 +565,7 @@ export function findContentStart(chunks) {
 // The two drivers are isolated so a change to one platform never affects the
 // other. Returns either { audio, boundaries } or { native, text, voice, speed }.
 async function synthesizeSpeech({ text, voice, speed, apiUrl, apiBaseUrl }) {
+  if (isLocalTtsVoice(voice)) return synthesizeLocalSpeech({ text, voice })
   if (isNativeCapacitorPlatform()) {
     return synthesizeMobileSpeech({ text, voice, speed, apiUrl, apiBaseUrl })
   }
@@ -585,7 +586,12 @@ export const useTTS = () => {
   const ttsSpeed        = useState('tts:speed',        () => settings.value.ttsSpeed)
   const ttsVolume       = useState('tts:volume',       () => settings.value.ttsVolume)
   const ttsVoiceId      = useState('tts:voice',        () => normalizeAvailableVoice(settings.value.ttsVoice))
-  const ttsVoices       = useState('tts:voices',       () => EDGE_VOICES)
+  const ttsVoices       = useState('tts:voices',       () => EDGE_VOICES.flatMap(voice => {
+    if (Capacitor.getPlatform() !== 'android') return [voice]
+    if (voice.id === 'en-CA-LiamNeural') return [voice, LOCAL_TTS_VOICES[0]]
+    if (voice.id === 'en-GB-SoniaNeural') return [voice, LOCAL_TTS_VOICES[1]]
+    return [voice]
+  }))
   // The phone's built-in TTS voices (offline). Loaded on demand so the narrator
   // picker can offer real device voices when Edge is unavailable.
   const ttsNativeVoices = useState('tts:nativeVoices', () => [])
@@ -669,9 +675,8 @@ export const useTTS = () => {
     `${ttsBook.value?.id || ''}:${chunkIdx}:${ttsVoiceId.value}:${ttsSpeed.value}`
   )
 
-  const _cacheAudio = (chunkIdx, data) => {
+  const _cacheAudio = (chunkIdx, data, key = _audioCacheKey(chunkIdx)) => {
     if (!data?.audio) return
-    const key = _audioCacheKey(chunkIdx)
     if (_audioCache.has(key)) {
       const old = _audioCache.get(key)
       if (old?.objectUrl) URL.revokeObjectURL(old.audio)
@@ -798,6 +803,8 @@ export const useTTS = () => {
 
   // Returns { audio: dataUrl, boundaries: [...] } or null
   const _fetchChunkAudio = async (chunkIdx) => {
+    const cacheKey = _audioCacheKey(chunkIdx)
+    const generation = _prefetchGeneration
     const chunk = _chunks[chunkIdx]
     if (!chunk) return null
     const cached = _getCachedAudio(chunkIdx, chunk)
@@ -815,7 +822,7 @@ export const useTTS = () => {
         audio: prewarmed.audio,
         boundaries: prewarmed.boundaries ?? [],
       }
-      _cacheAudio(chunkIdx, result)
+      if (generation === _prefetchGeneration) _cacheAudio(chunkIdx, result, cacheKey)
       return result
     }
 
@@ -839,7 +846,7 @@ export const useTTS = () => {
         nativeVoice: data.native ? data.voice : undefined,
         preferNetwork: !!data.preferNetwork,
       }
-      _cacheAudio(chunkIdx, result)
+      if (generation === _prefetchGeneration) _cacheAudio(chunkIdx, result, cacheKey)
       return result
     } catch (err) {
       console.warn('[TTS] fetch error:', err)
@@ -963,7 +970,7 @@ export const useTTS = () => {
       }
 
       const { addToast } = useToast()
-      addToast('TTS failed — check your connection.', 'error')
+      addToast(isLocalTtsVoice(ttsVoiceId.value) ? 'Voice playback failed. Check the voice download and available storage.' : 'TTS failed — check your connection.', 'error')
       ttsPlayingChunkIdx.value = -1
       ttsPlayingChunkText.value = ''
       ttsStatus.value = 'idle'
@@ -1002,6 +1009,7 @@ export const useTTS = () => {
     } else {
       ttsUsingDeviceVoice.value = false
       audio = new Audio(chunkData.audio)
+      if (isLocalTtsVoice(ttsVoiceId.value)) audio.playbackRate = ttsSpeed.value
     }
     audio.volume = ttsVolume.value
     _currentAudio = audio
@@ -1044,7 +1052,7 @@ export const useTTS = () => {
       ttsPlayingChunkIdx.value = -1
       ttsPlayingChunkText.value = ''
       const { addToast } = useToast()
-      addToast('TTS failed — check your connection.', 'error')
+      addToast(isLocalTtsVoice(ttsVoiceId.value) ? 'Voice playback failed. Check the voice download and available storage.' : 'TTS failed — check your connection.', 'error')
       ttsStatus.value = 'idle'
       _stopKeepAlive()
     }
@@ -1222,6 +1230,12 @@ export const useTTS = () => {
     const nextSettings = updateSettings({ ttsSpeed: Number(rate) })
     ttsSpeed.value = nextSettings.ttsSpeed
     _chunkTimeOffsets = chunkTimeOffsets(_chunks, ttsSpeed.value)
+    if (isLocalTtsVoice(ttsVoiceId.value)) {
+      if (_currentAudio) _currentAudio.playbackRate = ttsSpeed.value
+      if (_chunks.length) _updateProgress()
+      else _persistSession()
+      return
+    }
     _clearAudioCache()
     if (_chunks.length) _updateProgress()
     else _persistSession()
@@ -1250,6 +1264,9 @@ export const useTTS = () => {
     resetMobileTtsDriver()
     _clearAudioCache()
     _persistSession()
+    void cancelLocalSpeech().then(() => {
+      if (isLocalTtsVoice(ttsVoiceId.value)) return prepareLocalSpeech(ttsVoiceId.value)
+    }).catch(error => { console.warn('[TTS] Voice preparation:', error) })
     if (ttsStatus.value === 'playing') {
       _cancelAudio()
       _speakNextEdge()
@@ -1402,7 +1419,8 @@ export const useTTS = () => {
     if (!_chunks.length || !Number.isFinite(Number(seconds)) || Number(seconds) === 0) return
 
     if (_currentAudio && Number.isFinite(_currentAudio.duration)) {
-      const target = _currentAudio.currentTime + Number(seconds)
+      const rate = isLocalTtsVoice(ttsVoiceId.value) ? ttsSpeed.value : 1
+      const target = _currentAudio.currentTime + Number(seconds) * rate
       if (target >= 0 && target < _currentAudio.duration) {
         _currentAudio.currentTime = target
         _syncWordIndexForTime(target)
@@ -1415,7 +1433,8 @@ export const useTTS = () => {
     // estimated timeline used by the player instead of moving only one chunk.
     const before = _chunks.slice(0, _chunkIdx)
       .reduce((sum, chunk) => sum + _estimatedChunkSeconds(chunk), 0)
-    const destination = Math.max(0, before + (_currentAudio?.currentTime || 0) + Number(seconds))
+    const destination = Math.max(0, before + (_currentAudio?.currentTime || 0)
+      / (isLocalTtsVoice(ttsVoiceId.value) ? ttsSpeed.value : 1) + Number(seconds))
     let targetIdx = chunkIndexAtEstimatedSecond(_chunks, destination, ttsSpeed.value)
     if (targetIdx === _chunkIdx) targetIdx = Math.max(0, Math.min(_chunks.length - 1, _chunkIdx + (seconds < 0 ? -1 : 1)))
     _cancelAudio()

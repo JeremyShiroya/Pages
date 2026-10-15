@@ -136,6 +136,8 @@ export const LIBRARY_GRID_ITEMS_PER_PAGE_OPTIONS = Object.freeze([6, 8, 10, 12])
 export const LIBRARY_TABLE_ITEMS_PER_PAGE_OPTIONS = Object.freeze([8, 10, 20, 30, 50, 100])
 
 const TTS_VOICE_IDS = new Set([
+  'pocket:charles',
+  'kokoro:af_nicole',
   'en-CA-LiamNeural',
   'en-US-EmmaNeural',
   'en-US-AvaNeural',

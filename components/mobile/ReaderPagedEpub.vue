@@ -33,7 +33,7 @@
 // unmounted sections used to freeze the reader mid-scroll.
 
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { mapSectionChunks } from "~/composables/useChunkSpans";
+import { mapSectionChunks, buildTextIndex, resolveRangePoint } from "~/composables/useChunkSpans";
 
 const props = defineProps({
   bookId: { type: [String, Number], default: "" },
@@ -53,6 +53,7 @@ const props = defineProps({
   // (see useReadingPosition) — which is how switching out of scroll mode lands
   // on the sentence that was on screen rather than at the top of the chapter.
   startChunk: { type: Number, default: -1 },
+  startPosition: { type: Object, default: null },
 });
 
 const emit = defineEmits([
@@ -151,7 +152,8 @@ const emitPosition = () => {
     sectionPages: sectionPages.value,
     chunk: firstChunkOnCurrentPage(),
   });
-  persistPosition();
+  // The parent journals this location before starting its database write.
+  // The old section/page localStorage key is migration-only now.
 };
 
 // Mount one section's HTML, wrap its sentence chunks, measure its pages.
@@ -177,6 +179,8 @@ const renderSection = async (index, targetPage = 0) => {
   }
 
   await nextTick();
+  await document.fonts?.ready;
+  await Promise.allSettled([...el.querySelectorAll('img')].map(img => img.decode?.()));
   if (token !== renderToken) return;
 
   section.value = safeIndex;
@@ -193,6 +197,7 @@ const renderSection = async (index, targetPage = 0) => {
 };
 
 const setPage = (target) => {
+  _landed = true;
   const next = Math.max(0, Math.min(sectionPages.value - 1, target));
   if (next === page.value) return;
   animate.value = true;
@@ -202,6 +207,7 @@ const setPage = (target) => {
 };
 
 const nextPage = () => {
+  _landed = true;
   if (page.value < sectionPages.value - 1) {
     setPage(page.value + 1);
   } else if (section.value < props.sections.length - 1) {
@@ -211,6 +217,7 @@ const nextPage = () => {
 };
 
 const prevPage = () => {
+  _landed = true;
   if (page.value > 0) {
     setPage(page.value - 1);
   } else if (section.value > 0) {
@@ -220,6 +227,7 @@ const prevPage = () => {
 };
 
 const goToSection = (index) => {
+  _landed = true;
   if (index === section.value) return;
   trackingReady.value = true;
   renderSection(index, 0);
@@ -228,19 +236,35 @@ const goToSection = (index) => {
 // Land on the page that holds a specific chunk. Used by "Open in book" from the
 // highlights and notes screens, so it turns to the passage rather than to the
 // last place the reader left off.
-const goToChunk = async (chunkIdx) => {
+const goToChunk = async (chunkIdx, savedPosition = null) => {
   if (!Number.isFinite(chunkIdx) || chunkIdx < 0) return;
+  trackingReady.value = false;
   const targetSection = sectionForChunk(chunkIdx);
   if (targetSection !== section.value || !chunkEls.size) {
     await renderSection(targetSection, 0);
   }
   const chunkPage = pageForChunkEl(chunkEls.get(chunkIdx));
-  if (chunkPage === null) return;
   // Land instantly, not with a page-turn animation: this is a jump to a
   // passage, and the transition from the freshly rendered page-0 to a deep page
   // could be caught mid-flight by the initial layout settling.
   animate.value = false;
-  page.value = Math.max(0, Math.min(sectionPages.value - 1, chunkPage));
+  page.value = Math.max(0, Math.min(sectionPages.value - 1, chunkPage ?? 0));
+  const saved = savedPosition;
+  if (saved?.charOffset > 0 && chunkEls.has(chunkIdx)) {
+    const { map } = buildTextIndex(chunkEls.get(chunkIdx));
+    const point = resolveRangePoint(map, Math.min(map.length - 1, saved.charOffset), 1);
+    if (point) {
+      const range = document.createRange();
+      range.setStart(point.node, point.offset);
+      range.setEnd(point.node, Math.min(point.node.length, point.offset + 1));
+      const rect = range.getBoundingClientRect();
+      const base = contentRef.value.getBoundingClientRect();
+      page.value = Math.max(0, Math.min(sectionPages.value - 1, Math.floor((rect.left - base.left + 2) / stride.value)));
+    }
+  }
+  if (saved?.section === targetSection && saved?.layout === currentLayout()) {
+    page.value = Math.max(0, Math.min(sectionPages.value - 1, Number(saved.pageInSection) || 0));
+  }
   trackingReady.value = true;
   emitPosition();
 };
@@ -255,14 +279,49 @@ const getPosition = () => ({
   pageInSection: page.value,
   sectionPages: sectionPages.value,
   firstChunkOfPage: firstChunkOnCurrentPage(),
+  charOffset: firstVisibleCharacter(),
+  layout: currentLayout(),
 });
+const currentLayout = () => `${props.layoutHash}|${props.geometry.width}|${props.geometry.height}|${props.geometry.gap}`;
+const currentPageRect = () => {
+  const content = contentRef.value?.getBoundingClientRect();
+  const viewport = viewportRef.value?.getBoundingClientRect();
+  if (!content || !viewport) return null;
+  const left = content.left + page.value * stride.value;
+  return { left, right: left + props.geometry.width, top: viewport.top, bottom: viewport.bottom, width: props.geometry.width };
+};
+
+const firstVisibleCharacter = () => {
+  const el = chunkEls.get(firstChunkOnCurrentPage());
+  const viewport = currentPageRect();
+  if (!el || !viewport) return 0;
+  const { map } = buildTextIndex(el);
+  const range = document.createRange();
+  for (let i = 0; i < map.length; i++) {
+    const point = map[i];
+    if (point.synthetic) continue;
+    range.setStart(point.node, point.offset);
+    range.setEnd(point.node, point.offset + 1);
+    const rect = range.getBoundingClientRect();
+    if (rect.right > viewport.left + 1 && rect.left < viewport.right - 1 && rect.bottom > viewport.top && rect.top < viewport.bottom) return i;
+  }
+  return 0;
+};
 
 // First chunk whose span starts on (or after) the visible page — where
 // "play from here" should begin.
 const firstChunkOnCurrentPage = () => {
   let best = -1;
   let fallback = -1;
+  const viewport = currentPageRect();
   for (const [chunkIdx, el] of chunkEls) {
+    // A sentence can continue onto the next CSS column. Its starting column
+    // alone would skip that entire visible sentence on resume.
+    if (viewport?.width && [...el.getClientRects()].some(rect => rect.right > viewport.left + 1
+      && rect.left < viewport.right - 1 && rect.bottom > viewport.top && rect.top < viewport.bottom)) {
+      if (best === -1 || chunkIdx < best) best = chunkIdx;
+      continue;
+    }
     const chunkPage = pageForChunkEl(el);
     if (chunkPage === page.value && (best === -1 || chunkIdx < best)) best = chunkIdx;
     if (chunkPage > page.value && (fallback === -1 || chunkIdx < fallback)) fallback = chunkIdx;
@@ -439,7 +498,7 @@ const openJumpPending = () => !_landed && props.startChunk >= 0;
 
 const renderPendingOrSection = async (fallbackSection, fallbackPage) => {
   if (openJumpPending() && props.sections.length) {
-    await goToChunk(props.startChunk);
+    await goToChunk(props.startChunk, props.startPosition);
     // Once the geometry has settled, the landing page is final; stop overriding.
     if (_geometrySettled) _landed = true;
     return;
@@ -452,11 +511,23 @@ watch(() => props.geometry, async () => {
   // Viewport or typography change: re-lay-out the current section and keep the
   // reader on the same page (clamped to the new count) — unless the open-jump
   // is still pending, in which case land it now at the real geometry.
-  await renderPendingOrSection(section.value, page.value);
+  if (openJumpPending()) await renderPendingOrSection(section.value, page.value);
+  else {
+    const chunk = firstChunkOnCurrentPage();
+    trackingReady.value = false;
+    await renderSection(section.value, 0);
+    await goToChunk(chunk);
+  }
 }, { deep: true });
 
 watch(() => props.layoutHash, async () => {
-  await renderPendingOrSection(section.value, page.value);
+  if (openJumpPending()) await renderPendingOrSection(section.value, page.value);
+  else {
+    const chunk = firstChunkOnCurrentPage();
+    trackingReady.value = false;
+    await renderSection(section.value, 0);
+    await goToChunk(chunk);
+  }
 });
 
 watch(() => props.sections, async (sections) => {
@@ -467,7 +538,7 @@ watch(() => props.sections, async (sections) => {
 
 onMounted(async () => {
   if (openJumpPending() && props.sections.length) {
-    await goToChunk(props.startChunk);
+    await goToChunk(props.startChunk, props.startPosition);
     trackingReady.value = true;
     return;
   }
@@ -476,7 +547,7 @@ onMounted(async () => {
   const startAt = restored?.section ?? props.startSection;
   await renderSection(startAt, restored?.page ?? 0);
   if (props.startChunk >= 0 && props.sections.length) {
-    await goToChunk(props.startChunk);
+    await goToChunk(props.startChunk, props.startPosition);
     trackingReady.value = true;
   }
 });
@@ -485,7 +556,7 @@ onMounted(async () => {
 // asynchronously) still gets honoured, once.
 watch(() => props.startChunk, async (chunk) => {
   if (_landed || chunk < 0 || !props.sections.length) return;
-  await goToChunk(chunk);
+  await goToChunk(chunk, props.startPosition);
   if (_geometrySettled) _landed = true;
 });
 

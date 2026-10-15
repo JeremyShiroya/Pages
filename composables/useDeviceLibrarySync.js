@@ -693,3 +693,14 @@ export async function repairDevicePdfSource(book) {
   await useBookStorage().savePdfSource(book.id, await file.arrayBuffer())
   return true
 }
+
+// Recover a device-imported EPUB whose library record survived but whose
+// extracted reading HTML was lost or could not be rendered.
+export async function repairDeviceEpubContent(book) {
+  if (!book?.deviceImportPath || String(book.format).toLowerCase() !== 'epub'
+    || !isNativeCapacitorPlatform()) return null
+  const data = await readDeviceFileBase64(book.deviceImportPath)
+  const file = base64ToFile(data, book.deviceImportPath.split('/').pop(), 'epub')
+  const { extractEpub } = await import('~/composables/useEpubExtractor.js')
+  return extractEpub(file)
+}

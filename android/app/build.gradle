@@ -1,6 +1,7 @@
 import groovy.json.JsonSlurper
 
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 // ── App version ──────────────────────────────────────────────────────────────
 // The APK's version is DERIVED, never hand-written, so it can't drift from what
@@ -145,7 +146,7 @@ android {
         // getPackageName(), so both follow the suffix. The Capacitor strings
         // that DO name the package are overridden in src/debug/res.
         debug {
-            applicationIdSuffix ".debug"
+            applicationIdSuffix (project.findProperty('bookishTestSuffix') ?: ".debug")
             versionNameSuffix "-dev"
         }
 
@@ -166,6 +167,10 @@ repositories {
 }
 
 dependencies {
+    implementation files('libs/sherpa-onnx-1.13.8.aar')
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.2.0'
+    implementation 'org.apache.commons:commons-compress:1.27.1'
+    implementation 'com.google.ai.edge.litert:litert:2.1.6'
     implementation 'com.google.mlkit:text-recognition:16.0.1'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"

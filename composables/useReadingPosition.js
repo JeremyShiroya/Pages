@@ -37,7 +37,8 @@ export function statusForProgress(progress) {
 // Where a book should open. `readingChunk` is authoritative; `progress` is the
 // migration path for books saved before chunk positions existed.
 export function resolveStartChunk(book, totalChunks) {
-  const saved = Number(book?.readingChunk)
+  const value = book?.readingChunk
+  const saved = value === null || value === undefined || value === '' ? NaN : Number(value)
   if (Number.isFinite(saved) && saved >= 0) {
     return Math.max(0, Math.min(Math.max(0, totalChunks - 1), Math.floor(saved)))
   }
@@ -54,7 +55,7 @@ export function resolveStartChunk(book, totalChunks) {
  * inside one chapter wrote nothing at all — which is why silent reading never
  * reached "Currently Reading".
  */
-export function readingPositionUpdate(book, { chunk, totalChunks, progress, status } = {}) {
+export function readingPositionUpdate(book, { chunk, totalChunks, progress, status, pdfPage, pdfView } = {}) {
   if (!book) return null
 
   const nextChunk = Math.max(0, Math.floor(Number(chunk) || 0))
@@ -64,12 +65,16 @@ export function readingPositionUpdate(book, { chunk, totalChunks, progress, stat
   const chunkUnchanged = Number(book.readingChunk) === nextChunk
   const progressUnchanged = Number(book.progress || 0) === nextProgress
   const statusUnchanged = (book.status || 'Unread') === nextStatus
-  if (chunkUnchanged && progressUnchanged && statusUnchanged) return null
+  const pageUnchanged = pdfPage === undefined || Number(book.readingPdfPage) === Number(pdfPage)
+  const viewUnchanged = pdfView === undefined || book.readingPdfView === pdfView
+  if (chunkUnchanged && progressUnchanged && statusUnchanged && pageUnchanged && viewUnchanged) return null
 
   return {
     readingChunk: nextChunk,
     progress: nextProgress,
     status: nextStatus,
     lastReadAt: new Date().toISOString(),
+    ...(pdfPage === undefined ? {} : { readingPdfPage: Math.max(1, Math.floor(Number(pdfPage) || 1)) }),
+    ...(pdfView === undefined ? {} : { readingPdfView: pdfView }),
   }
 }
