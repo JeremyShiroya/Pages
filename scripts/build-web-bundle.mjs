@@ -82,7 +82,14 @@ const nativeDepsAt = (commit, names) => {
 }
 
 export const computeMinNativeCode = () => {
-  const dirty = git('status', '--porcelain', '--', ...NATIVE_PATHS, 'package.json')
+  // Real content changes only: `npx cap sync` rewrites android/capacitor.*.gradle
+  // with different line endings on every sync, which `git status` reports as
+  // modified even though nothing changed. Untracked files still count.
+  const paths = ['--', ...NATIVE_PATHS, 'package.json']
+  const dirty = [
+    git('diff', '--name-only', '--ignore-cr-at-eol', 'HEAD', ...paths),
+    git('ls-files', '--others', '--exclude-standard', ...paths),
+  ].filter(Boolean).join('\n')
   if (dirty && !allowDirty) {
     fail(`Uncommitted native changes — commit them first, so the APK and this bundle agree:\n${dirty}`)
   }
