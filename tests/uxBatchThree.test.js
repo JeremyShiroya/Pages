@@ -137,7 +137,7 @@ describe('open-in-book lands on the annotation', () => {
     // The open-jump wins over the restored position.
     expect(paged).toContain('openJumpPending()')
     // And it lands instantly rather than animating a page-turn across the book.
-    expect(paged).toMatch(/animate\.value = false;\s*\n\s*page\.value = Math\.max/)
+    expect(paged).toMatch(/animate\.value = false;\s*\n\s*page\.value = pageForTarget\(/)
   })
 })
 

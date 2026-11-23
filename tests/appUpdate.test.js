@@ -35,6 +35,7 @@ describe('update manifest validation', () => {
       apkUrl: 'https://github.com/JeremyShiroya/Bookish/releases/download/v1.3.0/bookish.apk',
       notes: '',
       mandatory: false,
+      web: null,
     })
   })
 

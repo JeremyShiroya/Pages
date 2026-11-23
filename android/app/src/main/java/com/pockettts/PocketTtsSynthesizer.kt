@@ -111,6 +111,19 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
             ?.toSet() ?: emptySet()
 
     private val forceCpu = overrideSet("force_cpu.txt")
+
+    // Benchmark hook: gpu_opts.txt with e.g. "precision=FP16,storage=BUFFER,priority=HIGH,backend=OPENCL".
+    private fun gpuOverrides(): CompiledModel.GpuOptions? {
+        val raw = File(modelDir, "gpu_opts.txt").takeIf { it.exists() }?.readText() ?: return null
+        val kv = raw.split(',', '\n').mapNotNull { it.trim().split('=').takeIf { p -> p.size == 2 } }.associate { it[0].trim() to it[1].trim() }
+        return CompiledModel.GpuOptions(null, null, null,
+            kv["precision"]?.let { CompiledModel.GpuOptions.Precision.valueOf(it) },
+            kv["storage"]?.let { CompiledModel.GpuOptions.BufferStorageType.valueOf(it) },
+            null, null, null, null, null, null, null,
+            kv["backend"]?.let { CompiledModel.GpuOptions.Backend.valueOf(it) },
+            kv["priority"]?.let { CompiledModel.GpuOptions.Priority.valueOf(it) },
+            null)
+    }
     private val forceFp32 = overrideSet("force_fp32.txt")
 
     /** Compile on GPU; fall back to CPU (fp16 weights dequantize to fp32 there). */
@@ -126,7 +139,9 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
                     CompiledModel.GpuOptions(precision = CompiledModel.GpuOptions.Precision.FP32)
                 CompiledModel.create(p, opts, null) to "GPU32"
             } else {
-                CompiledModel.create(p, CompiledModel.Options(Accelerator.GPU), null) to "GPU"
+                val opts = CompiledModel.Options(Accelerator.GPU)
+                gpuOverrides()?.let { opts.gpuOptions = it }
+                CompiledModel.create(p, opts, null) to "GPU"
             }
         } catch (e: Throwable) {
             CompiledModel.create(p, CompiledModel.Options(Accelerator.CPU), null) to "CPU"
@@ -143,10 +158,16 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
     private val forceGpu = overrideSet("force_gpu.txt")
 
     private val lmP = load(LM, "lm")
+    // XNNPack defaults to ONE thread; the decoder transformer measured ~690 ms
+    // per block on an Exynos phone that way. Big cores are idle while the GPU
+    // runs the language model, so give it four.
+    private fun cpuOptions() = CompiledModel.Options(Accelerator.CPU).apply {
+        cpuOptions = CompiledModel.CpuOptions(4, null, null)
+    }
+
     private val dectxP =
         if ("dectx" in forceGpu) load(DEC_TX, "dectx")
-        else CompiledModel.create(
-            path(DEC_TX).absolutePath, CompiledModel.Options(Accelerator.CPU), null) to "CPU"
+        else CompiledModel.create(path(DEC_TX).absolutePath, cpuOptions(), null) to "CPU4"
     private val deconlyP = load(DECONLY, "dec")
     private val lm = lmP.first
     private val dectx = dectxP.first
@@ -256,6 +277,13 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
 
     private val zeroNoise = FloatArray(LDIM)
 
+    // Per-sentence timing breakdown (logcat "PocketTTS"), nanoseconds.
+    private var tWrite = 0L; private var tRun = 0L; private var tRead = 0L; private var tHost = 0L
+    private var steps = 0; private var tDecode = 0L
+    private fun resetTimings() { tWrite = 0; tRun = 0; tRead = 0; tHost = 0; steps = 0; tDecode = 0 }
+    fun timingSummary(): String =
+        "steps=$steps write=${tWrite / 1_000_000}ms run=${tRun / 1_000_000}ms read=${tRead / 1_000_000}ms host=${tHost / 1_000_000}ms decode=${tDecode / 1_000_000}ms"
+
     /**
      * One fused frame: flow-LM step + flow head in a single invocation.
      * Output layout: eos(1) | latent(32) | new-k(96*64) | new-v(96*64).
@@ -264,6 +292,7 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
      */
     private fun step(emb: FloatArray, noise: FloatArray): Pair<FloatArray, Float> {
         check(pos < PMAX) { "KV cache overflow at $pos" }
+        val t0 = System.nanoTime()
         ropeFill(pos)
         lmIn[0].writeFloat(emb)
         lmIn[1].writeFloat(cosArr)
@@ -272,8 +301,11 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
         lmIn[4].writeFloat(pk)
         lmIn[5].writeFloat(pv)
         lmIn[6].writeFloat(noise)
+        val t1 = System.nanoTime()
         lm.run(lmIn, lmOut)
+        val t2 = System.nanoTime()
         val out = lmOut[0].readFloat()
+        val t3 = System.nanoTime()
         val eos = out[0]
         val latent = out.copyOfRange(1, 1 + LDIM)
         val kvBase = 1 + LDIM
@@ -283,7 +315,30 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
         }
         for (h in 0 until NH) mask[h * (PMAX + 1) + pos] = 0f
         pos++
+        val t4 = System.nanoTime()
+        tWrite += t1 - t0; tRun += t2 - t1; tRead += t3 - t2; tHost += t4 - t3; steps++
         return latent to eos
+    }
+
+    /**
+     * Streaming variant: hands each internal piece (<=50 tokens) to `onAudio`
+     * as soon as it is decoded, so playback can start before the whole
+     * sentence is synthesized. `onAudio` returns false to stop early.
+     */
+    fun synthesizeStreaming(text: String, voice: String, onAudio: java.util.function.Predicate<FloatArray>) {
+        loadVoice(voice)
+        resetTimings()
+        val started = System.nanoTime()
+        for (chunk in splitIntoBestSentences(text)) {
+            val (prepared, eosGuess) = prepareTextPrompt(chunk)
+            val latents = generateChunk(tokenizer.encode(prepared), framesAfterEos = eosGuess + 2)
+            if (latents.isEmpty()) continue
+            val d0 = System.nanoTime()
+            val audio = decode(latents)
+            tDecode += System.nanoTime() - d0
+            if (!onAudio.test(audio)) return
+        }
+        android.util.Log.i("PocketTTS", "timing total=${(System.nanoTime() - started) / 1_000_000}ms " + timingSummary() + " lastDecTx=${lastDecodeTxMs}ms lastDecOnly=${lastDecodeOnlyMs}ms")
     }
 
     /** Generate speech for `text` with the currently loaded voice. */
@@ -333,9 +388,48 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
         return latents
     }
 
+    /**
+     * All latent frames for one sentence (every internal <=50-token piece),
+     * without decoding. Pairs with decodeFrames for batched decoding.
+     */
+    fun generateFrames(text: String, voice: String): List<FloatArray> {
+        loadVoice(voice)
+        val frames = ArrayList<FloatArray>()
+        for (chunk in splitIntoBestSentences(text)) {
+            val (prepared, eosGuess) = prepareTextPrompt(chunk)
+            frames.addAll(generateChunk(tokenizer.encode(prepared), framesAfterEos = eosGuess + 2))
+        }
+        return frames
+    }
+
+    /**
+     * Decode any number of frames. The decoder graph always processes a fixed
+     * 256-frame (20 s) window and costs ~2 s per call on a mid-range phone no
+     * matter how few frames are real, so callers batch several sentences into
+     * one call. Longer inputs are decoded in consecutive windows; each window
+     * carries the previous frame as context so the seams are continuous.
+     */
+    fun decodeFrames(frames: List<FloatArray>): FloatArray {
+        if (frames.isEmpty()) return FloatArray(0)
+        val out = FloatArray(frames.size * SPF)
+        var start = 0
+        while (start < frames.size) {
+            val end = minOf(frames.size, start + DEC_FRAMES)
+            val context = if (start == 0) neutral else frames[start - 1]
+            val audio = decode(frames.subList(start, end), context)
+            System.arraycopy(audio, 0, out, start * SPF, audio.size)
+            start = end
+        }
+        return out
+    }
+
+    var lastDecodeTxMs = 0L
+    var lastDecodeOnlyMs = 0L
+
     /** Mimi decode: overlapped dec_tx blocks -> one-shot SEANet window. */
-    private fun decode(latents: List<FloatArray>): FloatArray {
+    private fun decode(latents: List<FloatArray>, firstContext: FloatArray = neutral): FloatArray {
         val t = minOf(latents.size, DEC_FRAMES)
+        val d0 = System.nanoTime()
         val feat = FloatArray(MIMI_D * S_DEC)
         val blk = FloatArray((1 + F_BLK) * LDIM)
 
@@ -350,7 +444,7 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
             return dectxOut[0].readFloat()               // [512 * 1024]
         }
 
-        var out = runBlock(neutral, 0)
+        var out = runBlock(firstContext, 0)
         val n0 = minOf(F_BLK, t)
         for (c in 0 until MIMI_D)
             System.arraycopy(out, c * S_BLK, feat, c * S_DEC, n0 * UPS)
@@ -365,9 +459,12 @@ class PocketTtsSynthesizer(context: Context) : Closeable {
             kept += n - F_HOP
         }
 
+        val d1 = System.nanoTime()
         deconlyIn[0].writeFloat(feat)
         deconly.run(deconlyIn, deconlyOut)
         val wav = deconlyOut[0].readFloat()
+        lastDecodeTxMs = (d1 - d0) / 1_000_000
+        lastDecodeOnlyMs = (System.nanoTime() - d1) / 1_000_000
         return FloatArray(t * SPF) { wav[it].coerceIn(-1f, 1f) }
     }
 

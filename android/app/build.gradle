@@ -105,6 +105,14 @@ android {
         versionCode project.ext.resolveVersionCode()
         versionName project.ext.resolveVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Phones only. The speech engines (sherpa-onnx, LiteRT) and ML Kit OCR
+        // ship a native build per CPU type; the x86/x86_64 copies exist only
+        // for emulators and some Chromebooks and were ~100 MB of the APK.
+        // armeabi-v7a stays for 32-bit phones (Android Go and older budget
+        // devices run a 32-bit userspace even on 64-bit chips).
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
+        }
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -128,6 +136,18 @@ android {
                 enableV2Signing true
                 enableV3Signing true
             }
+        }
+    }
+
+    packaging {
+        jniLibs {
+            // Store native libraries compressed in the APK (they are extracted
+            // once at install). Uncompressed storage is the modern default and
+            // made every .so count at full size against the download.
+            useLegacyPackaging = true
+            // sherpa-onnx's C and C++ API wrappers are for C/C++ callers; the
+            // JNI library the app uses links only libonnxruntime.so.
+            excludes += ['**/libsherpa-onnx-c-api.so', '**/libsherpa-onnx-cxx-api.so']
         }
     }
 

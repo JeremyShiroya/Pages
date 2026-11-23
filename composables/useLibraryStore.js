@@ -73,7 +73,21 @@ export function openLibraryDB() {
       }
     }
     request.onsuccess = (e) => resolve(e.target.result)
-    request.onerror = (e) => reject(e.target.error)
+    request.onerror = (e) => {
+      const error = e.target.error
+      // The database was created by a NEWER release (an older APK installed
+      // over it, or a backup restored from a newer phone). Asking for a lower
+      // version is refused outright, which used to leave the whole library
+      // unreadable. Versions only ever add stores, so open it as it is.
+      if (error?.name === 'VersionError') {
+        e.preventDefault?.()
+        const current = indexedDB.open(DB_NAME)
+        current.onsuccess = (event) => resolve(event.target.result)
+        current.onerror = (event) => reject(event.target.error)
+        return
+      }
+      reject(error)
+    }
   })
 }
 

@@ -245,6 +245,37 @@ and attaches it to that release. It fails loudly if the tag disagrees with
 `package.json`, or if the APK asset is missing — a manifest pointing at a
 missing download would make the app prompt and then open a 404.
 
+### Silent web (OTA) updates
+
+Most releases change only the web layer. Those can reach phones **silently**: the
+app downloads a signed zip of the new web build in the background and switches
+to it on the next launch, with no prompt and no APK install. Releases that change
+native code (`android/`, `capacitor.config.ts`, Capacitor plugin packages) still
+go out through the APK prompt above — the app decides per phone.
+
+To add a web update to a release, after building the APK from the release commit:
+
+```bash
+npm run release:web
+```
+
+and attach both outputs, `release/bookish-web-<version>.zip` and `.json`, to the
+release next to the APK **before publishing it** (or re-run the workflow from the
+Actions tab afterwards). The workflow verifies them and adds them to
+`version.json`; a release without them simply stays APK-only.
+
+How it stays safe:
+
+- **Signed.** Bundles are signed with `android/live-update-private.pem` (never
+  committed — back it up with the release keystore). The APK only accepts
+  bundles matching `LiveUpdate.publicKey` in `capacitor.config.ts`.
+- **Native-aware.** `release:web` records `minNativeCode`, the oldest APK that
+  contains every native change the bundle needs. Older APKs get the APK prompt.
+- **Self-healing.** A bundle that doesn't reach a healthy startup within 15s
+  rolls back to the APK's own build and is never offered to that phone again.
+- **Reset by APKs.** Installing a newer APK always switches back to its built-in
+  web build.
+
 Optional build number override:
 
 ```env

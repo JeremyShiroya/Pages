@@ -89,9 +89,78 @@ describe('durable reader checkpoints', () => {
     spy.mockImplementation(original)
     await writer.flush()
     expect((await read()).readingPdfPage).toBe(50)
-    expect(onError).toHaveBeenCalled()
+    // Two failed attempts that then recover are not worth interrupting reading.
+    expect(onError).not.toHaveBeenCalled()
     await writer.close()
     spy.mockRestore()
+  })
+
+  it('does not report a single transient failure, only a persistent one, and only once', async () => {
+    const b = await book()
+    const onError = vi.fn()
+    const writer = await openReadingPosition(b.id, { storage: local, mirror: null, onError })
+    const original = indexedDB.open.bind(indexedDB)
+    const spy = vi.spyOn(indexedDB, 'open').mockImplementationOnce(() => { throw new Error('Storage hiccup') })
+    writer.capture(location(5), summary)
+    await writer.flush()
+    expect(onError).not.toHaveBeenCalled()
+    expect((await read()).readingPdfPage).toBe(5)
+
+    spy.mockImplementation(() => { throw new Error('Storage gone') })
+    for (let page = 6; page < 12; page++) {
+      writer.capture(location(page), summary)
+      await writer.flush().catch(() => {})
+    }
+    expect(onError).toHaveBeenCalledTimes(1)
+    spy.mockImplementation(original)
+    await writer.close()
+    expect((await read()).readingPdfPage).toBe(11)
+    spy.mockRestore()
+  })
+
+  it('stops silently when a newer reader session owns the book', async () => {
+    const b = await book()
+    const onError = vi.fn()
+    const old = await openReadingPosition(b.id, { storage: local, mirror: null, onError })
+    const current = await openReadingPosition(b.id, { storage: local, mirror: null })
+    current.capture(location(30), summary)
+    await current.flush()
+    for (let page = 1; page < 6; page++) {
+      old.capture(location(page), summary)
+      await old.flush().catch(() => {})
+    }
+    expect(onError).not.toHaveBeenCalled()
+    expect(old.stopped).toBe('superseded')
+    expect(old.capture(location(7), summary)).toBe(false)
+    expect((await read()).readingPdfPage).toBe(30)
+    await current.close()
+  })
+
+  it('keeps saving when the recovery journal is out of space', async () => {
+    const b = await book()
+    const onError = vi.fn()
+    const full = { ...local, length: 0, key: () => null, setItem: () => { throw new DOMException('full', 'QuotaExceededError') } }
+    const writer = await openReadingPosition(b.id, { storage: full, mirror: null, onError })
+    for (let page = 1; page <= 20; page++) writer.capture(location(page), summary)
+    await writer.close()
+    expect(onError).not.toHaveBeenCalled()
+    expect((await read()).readingPdfPage).toBe(20)
+  })
+
+  it('frees rebuildable caches when the journal hits the quota', async () => {
+    const b = await book()
+    const values = new Map([['bookish:page-map:other:1x1:h:1', 'x'.repeat(50)]])
+    const capped = {
+      get length() { return values.size },
+      key: i => [...values.keys()][i] ?? null,
+      getItem: k => values.get(k) ?? null,
+      removeItem: k => values.delete(k),
+      setItem(k, v) { if (values.has('bookish:page-map:other:1x1:h:1')) throw new DOMException('full', 'QuotaExceededError'); values.set(k, v) },
+    }
+    const writer = await openReadingPosition(b.id, { storage: capped, mirror: null })
+    writer.capture(location(3), summary)
+    expect(JSON.parse(capped.getItem(POSITION_PREFIX + b.id)).position.pdfPage).toBe(3)
+    await writer.close()
   })
 
   it('coalesces a long uninterrupted burst, preserving the last page and one bounded journal', async () => {

@@ -9,6 +9,10 @@
 //     --apk-url https://github.com/<owner>/<repo>/releases/download/v1.3.0/bookish-1.3.0.apk \
 //     --notes "Fixed playlist layout" \
 //     [--mandatory] [--out version.json]
+//     [--web-meta release/bookish-web-1.3.0.json --web-url https://…/bookish-web-1.3.0.zip]
+//
+// --web-meta / --web-url add a silent web (OTA) update (see
+// scripts/build-web-bundle.mjs and composables/useLiveUpdate.js).
 //
 // With --apk-url omitted the url is derived from the git remote and the version
 // (printed below, so it can be checked before publishing).
@@ -17,7 +21,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { normalizeUpdateManifest } from '../composables/appUpdateManifest.js'
+import { normalizeUpdateManifest, normalizeWebBundle } from '../composables/appUpdateManifest.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -95,6 +99,26 @@ if (!apkUrl) {
   derived = true
 }
 
+let web
+if (args.webMeta || args.webUrl) {
+  if (!args.webMeta || !args.webUrl) fail('--web-meta and --web-url must be passed together.')
+  const meta = JSON.parse(readFileSync(resolve(root, args.webMeta), 'utf8'))
+  web = {
+    versionCode: meta.versionCode,
+    minNativeCode: meta.minNativeCode,
+    url: args.webUrl,
+    sha256: meta.sha256,
+    signature: meta.signature,
+    size: meta.size,
+  }
+  if (!normalizeWebBundle(web)) fail(`The web bundle metadata in ${args.webMeta} is invalid.`)
+  // The app only takes a web bundle that IS this release; anything else would
+  // be offered as the wrong version.
+  if (Number(web.versionCode) !== Number(versionCode)) {
+    fail(`Web bundle is versionCode ${web.versionCode}, but this release is ${versionCode}. Rebuild it from the release commit.`)
+  }
+}
+
 const manifest = {
   versionCode: Number(versionCode),
   versionName,
@@ -102,6 +126,7 @@ const manifest = {
   notes: args.notes || '',
   mandatory: args.mandatory,
   releasedAt: new Date().toISOString(),
+  ...(web ? { web } : {}),
 }
 
 // Validate with the app's own rules: if this fails, the app would silently
@@ -125,6 +150,7 @@ console.log(`
     versionName  ${manifest.versionName}      (package.json)
     versionCode  ${manifest.versionCode}${' '.repeat(Math.max(1, 10 - String(manifest.versionCode).length))}(git commit count)
     mandatory    ${manifest.mandatory}
+    web update   ${web ? `yes — silent for APKs ≥ ${web.minNativeCode}` : 'no (APK prompt only)'}
     apkUrl       ${manifest.apkUrl}${derived ? '\n                 ^ derived — check this matches the asset you upload' : ''}
 
   Upload this file AND the APK to the release, so the manifest url stays stable.

@@ -42,3 +42,9 @@ android/signing-lineage.bin
 # Scratch & temporary diagnostic dumps
 scratch/
 android/app/libs/sherpa-onnx-*.aar
+
+# Live-update (OTA) bundle signing key. Back it up next to the release keystore:
+# losing it means web updates cannot ship until a new APK carries a new public key.
+android/live-update-private.pem
+# Release outputs from scripts/build-web-bundle.mjs
+release/

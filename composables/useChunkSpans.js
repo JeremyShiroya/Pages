@@ -36,7 +36,7 @@ export function buildTextIndex(container) {
     map.push({ node, offset: Math.min(offset, node.nodeValue.length), synthetic: true })
   }
 
-  const walker = document.createTreeWalker(
+  const walker = (container.ownerDocument || document).createTreeWalker(
     container,
     NodeFilter.SHOW_TEXT,
     {
@@ -118,18 +118,22 @@ export function mapSectionChunks(sectionEl, chunks, baseIdx, registerSpan) {
   }
 
   // Apply in reverse so wrapping earlier ranges doesn't invalidate later offsets.
+  // ONE Range, reused: every live Range in a document is updated on every DOM
+  // mutation, so a fresh Range per sentence made wrapping quadratic — measured
+  // at ~9 ms per sentence (2.5 s per chapter) on a mid-range phone.
+  const doc = sectionEl.ownerDocument || document
+  const range = doc.createRange()
   for (let i = ranges.length - 1; i >= 0; i--) {
     const info = ranges[i]
     const startPt = resolveRangePoint(map, info.start, 1)
     const endPt = resolveRangePoint(map, info.end, -1)
     if (!startPt || !endPt) continue
 
-    const range = document.createRange()
     const endOffset = Math.min(endPt.node.nodeValue.length, endPt.offset + 1)
     try {
       range.setStart(startPt.node, startPt.offset)
       range.setEnd(endPt.node, endOffset)
-      const span = document.createElement('span')
+      const span = doc.createElement('span')
       span.dataset.ttsChunk = String(info.chunkIdx)
       span.appendChild(range.extractContents())
       range.insertNode(span)
@@ -138,4 +142,72 @@ export function mapSectionChunks(sectionEl, chunks, baseIdx, registerSpan) {
       // Overlapping or detached range — skip this chunk's highlight.
     }
   }
+}
+
+// ── Offscreen wrapping ─────────────────────────────────────────────────────
+//
+// Wrapping sentences inside the LIVE page edits a fully laid-out document a
+// few hundred times per chapter; each edit invalidates style/layout and every
+// live Range. On a phone that was multi-second main-thread freezes (taps not
+// responding, blank areas while scrolling). The same work in a fresh, inert
+// offscreen document takes a few milliseconds; the result is swapped into the
+// page with ONE innerHTML assignment.
+const WRAP_CACHE_LIMIT = 80
+const wrapCache = new Map()
+
+// A fresh document per section: inert (no image loads, no scripts) and free of
+// the main page's accumulated live Ranges (~8 ms per chapter on a phone). Some
+// DOM emulators cannot run Ranges in such a document; there an inert <template>
+// is used instead. Probed once.
+let offscreenMode = null
+function freshDocumentRoot() {
+  const doc = document.implementation.createHTMLDocument('')
+  const root = doc.createElement('div')
+  doc.body.appendChild(root)
+  return root
+}
+function templateRoot() {
+  const template = document.createElement('template')
+  template.innerHTML = '<div></div>'
+  return template.content.firstChild
+}
+function offscreenRoot() {
+  if (!offscreenMode) {
+    offscreenMode = 'template'
+    try {
+      const probe = freshDocumentRoot()
+      probe.innerHTML = '<p>ab cd</p>'
+      mapSectionChunks(probe, ['ab cd'], 0)
+      if (probe.querySelector('span[data-tts-chunk]')?.textContent === 'ab cd') offscreenMode = 'document'
+    } catch {}
+  }
+  return offscreenMode === 'document' ? freshDocumentRoot() : templateRoot()
+}
+
+export function wrapSectionHtml(html, chunks, baseIdx) {
+  const source = String(html || '')
+  if (!import.meta.client || !source || !chunks?.length) return source
+  const key = `${baseIdx}:${chunks.length}:${source.length}`
+  const hit = wrapCache.get(key)
+  if (hit && hit.source === source && hit.first === chunks[0]) return hit.html
+  const root = offscreenRoot()
+  root.innerHTML = source
+  mapSectionChunks(root, chunks, baseIdx)
+  const wrapped = root.innerHTML
+  wrapCache.set(key, { source, first: chunks[0], html: wrapped })
+  while (wrapCache.size > WRAP_CACHE_LIMIT) wrapCache.delete(wrapCache.keys().next().value)
+  return wrapped
+}
+
+// Register the spans already present in a container (from wrapSectionHtml).
+export function collectChunkSpans(container, registerSpan) {
+  if (!container) return 0
+  let count = 0
+  for (const span of container.querySelectorAll('span[data-tts-chunk]')) {
+    const idx = Number(span.dataset.ttsChunk)
+    if (!Number.isFinite(idx)) continue
+    registerSpan?.(idx, span)
+    count += 1
+  }
+  return count
 }

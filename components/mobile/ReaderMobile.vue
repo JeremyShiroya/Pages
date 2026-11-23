@@ -228,7 +228,7 @@
       }"
     >
       <div v-if="loading || contentLoading" class="reader-state">
-        <SkeletonLoader variant="reader" />
+        <SkeletonLoader v-if="showLoadingSkeleton" variant="reader" />
       </div>
 
       <div v-else-if="!book" class="reader-state reader-error">
@@ -489,22 +489,41 @@
           </button>
 
           <div class="voice-list" role="listbox" aria-label="Narrator voices">
-            <button
-              v-for="voice in displayVoices"
-              :key="voice.id"
-              type="button"
-              class="voice-option"
-              :class="{ active: voice.id === activeVoiceId }"
-              role="option"
-              :aria-selected="voice.id === activeVoiceId"
-              @click="chooseNarrator(voice.id)"
-            >
-              <span class="voice-label">
-                {{ voice.name }}
-                <i v-if="featuredNarrators.has(voice.id)" class="ri-star-fill voice-star" aria-hidden="true"></i>
-              </span>
-              <i v-if="voice.id === activeVoiceId" class="ri-check-line"></i>
-            </button>
+            <div v-for="voice in displayVoices" :key="voice.id" class="voice-row">
+              <button
+                type="button"
+                class="voice-option"
+                :class="{ active: voice.id === activeVoiceId, 'needs-download': needsDownload(voice.id) }"
+                role="option"
+                :aria-selected="voice.id === activeVoiceId"
+                @click="chooseNarrator(voice.id)"
+              >
+                <span class="voice-label">
+                  {{ voice.name }}
+                  <i v-if="featuredNarrators.has(voice.id)" class="ri-star-fill voice-star" aria-hidden="true"></i>
+                </span>
+                <i v-if="voice.id === activeVoiceId" class="ri-check-line"></i>
+              </button>
+              <!-- On-device narrators are not bundled with the app: each is a
+                   one-time download, started here. -->
+              <button
+                v-if="needsDownload(voice.id)"
+                type="button"
+                class="voice-download"
+                :disabled="!!localVoiceDownloading && localVoiceDownloading !== voice.id"
+                :aria-label="localVoiceDownloading === voice.id ? `Downloading ${voice.name}` : `Download ${voice.name} (${voiceDownloadSize(voice.id)} MB)`"
+                @click="startVoiceDownload(voice.id)"
+              >
+                <template v-if="localVoiceDownloading === voice.id">
+                  <i class="ri-loader-4-line spin" aria-hidden="true"></i>
+                  <span>{{ voiceDownloadPercent(voice.id) }}</span>
+                </template>
+                <template v-else>
+                  <i class="ri-download-2-line" aria-hidden="true"></i>
+                  <span>{{ voiceDownloadSize(voice.id) }} MB</span>
+                </template>
+              </button>
+            </div>
           </div>
         </section>
       </div>
@@ -578,7 +597,15 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { registerPlugin } from "@capacitor/core";
-import { isLocalTtsVoice } from '~/composables/tts/localTtsDriver';
+import {
+  isLocalTtsVoice,
+  LOCAL_TTS_VOICES,
+  localSpeechStatus,
+  localVoiceDownloading,
+  localVoicesInstalled,
+  refreshLocalVoices,
+  downloadLocalVoice,
+} from '~/composables/tts/localTtsDriver';
 import { findPageSyncMatch } from "~/composables/usePageSyncMatch";
 import { onCoverError } from "~/composables/useCoverFallback";
 import { offeredDeviceVoices } from "~/composables/tts/nativeSpeech";
@@ -590,7 +617,7 @@ import { formatDuration, useTTS } from "~/composables/useTTS";
 import { estimatedListenTimeline, scopedListenProgress } from "~/composables/useListenProgress";
 import { isNativeCapacitorPlatform } from "~/composables/useNativePlatform";
 import { useBookishSettings } from "~/composables/useBookishSettings";
-import { mapSectionChunks } from "~/composables/useChunkSpans";
+import { wrapSectionHtml, collectChunkSpans } from "~/composables/useChunkSpans";
 import {
   PDF_ZOOM_MAX,
   PDF_ZOOM_MIN,
@@ -653,6 +680,7 @@ const props = defineProps({
   sanitizeHtml: { type: Function, required: true },
   resolveChunkAtPoint: { type: Function, default: null },
   prewarmChunk: { type: Function, default: null },
+  prebufferNarration: { type: Function, default: null },
   // Flat readable-chunk texts (TTS playback order) + per-section counts, so the
   // Listen view can show the sentences of the page/chapter being narrated.
   readableChunks: { type: Array, default: () => [] },
@@ -952,18 +980,14 @@ const buildPageMap = async () => {
     if (token !== _pageMapToken) return;
 
     const html = props.sanitizeHtml(sections[index]?.html || "");
-    el.innerHTML = html;
     const chunkBase = sectionStartChunkLocal(index);
     const count = (props.sectionCounts || [])[index] || 0;
+    // Same offscreen wrapping the readers use (and share through its cache).
+    el.innerHTML = count > 0
+      ? wrapSectionHtml(html, (props.readableChunks || []).slice(chunkBase, chunkBase + count), chunkBase)
+      : html;
     const spans = new Map();
-    if (count > 0) {
-      mapSectionChunks(
-        el,
-        (props.readableChunks || []).slice(chunkBase, chunkBase + count),
-        chunkBase,
-        (chunkIdx, span) => spans.set(chunkIdx, span),
-      );
-    }
+    collectChunkSpans(el, (chunkIdx, span) => spans.set(chunkIdx, span));
 
     const pagesInSection = Math.max(1, Math.round((el.scrollWidth + gap) / stride));
     for (const [chunkIdx, span] of spans) {
@@ -1081,10 +1105,58 @@ const deviceVoiceOptions = computed(() => [
 ]);
 
 const displayVoices = computed(() => (useOfflineVoice.value ? [...ttsVoices.value.filter(v => isLocalTtsVoice(v.id)), ...deviceVoiceOptions.value] : ttsVoices.value));
-const featuredNarrators = new Set([
-  'en-CA-LiamNeural', 'pocket:charles', 'en-GB-RyanNeural',
-  'en-GB-SoniaNeural', 'kokoro:af_nicole',
-]);
+// Only the two on-device narrators are starred.
+// Opening a book usually takes well under a third of a second. A skeleton
+// flashed for that long reads as flicker; show the plain page until loading is
+// genuinely slow.
+const showLoadingSkeleton = ref(false);
+let skeletonTimer = null;
+watch(
+  () => props.loading || props.contentLoading,
+  (busy) => {
+    clearTimeout(skeletonTimer);
+    showLoadingSkeleton.value = false;
+    if (busy) skeletonTimer = setTimeout(() => { showLoadingSkeleton.value = true; }, 350);
+  },
+  { immediate: true },
+);
+onUnmounted(() => clearTimeout(skeletonTimer));
+
+const featuredNarrators = new Set(['pocket:charles', 'kokoro:af_nicole']);
+
+// A local narrator needs its one-time download until the device confirms it is
+// installed. Before the first answer arrives the button stays hidden rather
+// than flashing a download prompt for a voice that is already there.
+const needsDownload = (voiceId) => (
+  isLocalTtsVoice(voiceId) && localVoicesInstalled.value?.[voiceId] === false
+);
+const voiceDownloadSize = (voiceId) => LOCAL_TTS_VOICES.find((voice) => voice.id === voiceId)?.downloadMB ?? '';
+const voiceDownloadPercent = (voiceId) => {
+  const status = localSpeechStatus.value;
+  if (status?.voice !== voiceId) return '…';
+  if (status.phase === 'installing') return 'Installing';
+  return `${Math.max(0, Math.min(100, Number(status.percent) || 0))}%`;
+};
+
+// Downloads, then (if the user picked this narrator to listen with) switches
+// to it once it is ready.
+let selectAfterDownload = null;
+const startVoiceDownload = async (voiceId) => {
+  const voice = LOCAL_TTS_VOICES.find((item) => item.id === voiceId);
+  try {
+    await downloadLocalVoice(voiceId);
+    addToast(`${voice?.name || "Voice"} downloaded. It now works offline.`, "success");
+    if (selectAfterDownload === voiceId) applyVoiceChoice(voiceId);
+  } catch (error) {
+    addToast(`${voice?.name || "Voice"} could not be downloaded. Check your connection and free storage, then try again.`, "error");
+  } finally {
+    if (selectAfterDownload === voiceId) selectAfterDownload = null;
+  }
+};
+
+watch(narratorOpen, (open) => { if (open) void refreshLocalVoices(); });
+
+onMounted(() => { void refreshLocalVoices(); });
 const activeVoiceId = computed(() =>
   useOfflineVoice.value ? `native:${ttsNativeVoiceIdx.value}` : ttsVoiceId.value,
 );
@@ -1390,6 +1462,19 @@ const repaintAnnotations = async () => {
 const listenBlurEnabled = computed(() => appSettings.value.listenCoverBlur !== false);
 
 const readerMode = ref("listen");
+
+// Listen screen + an on-device narrator: begin synthesizing ahead now, so the
+// play button resumes audio that already exists.
+let prebufferTimer = null;
+watch(
+  () => [readerMode.value, ttsVoiceId.value, ttsStatus.value, localVoicesInstalled.value?.[ttsVoiceId.value]],
+  ([mode, voice, status, installed]) => {
+    clearTimeout(prebufferTimer);
+    if (mode !== "listen" || !isLocalTtsVoice(voice) || status !== "idle" || installed !== true) return;
+    prebufferTimer = setTimeout(() => props.prebufferNarration?.(), 400);
+  },
+);
+onUnmounted(() => clearTimeout(prebufferTimer));
 
 // Read mode is a full-page book: the top bar and chapter dock hide so nothing
 // sits over the text, and a tap in the middle of the page brings them back.
@@ -1977,6 +2062,13 @@ const onPageSyncFile = async (event) => {
 // Narrator picker opened from the Listen controls (mirrors the media sheet's
 // voice list, so it uses the same offline-aware voice state and setter).
 const chooseNarrator = (voiceId) => {
+  // Picking a narrator that is not downloaded yet starts its download and
+  // switches to it when it is ready; narration carries on meanwhile.
+  if (needsDownload(voiceId)) {
+    selectAfterDownload = voiceId;
+    if (localVoiceDownloading.value !== voiceId) void startVoiceDownload(voiceId);
+    return;
+  }
   applyVoiceChoice(voiceId);
   narratorOpen.value = false;
 };
@@ -3964,6 +4056,26 @@ onUnmounted(() => {
   font-size: 16px;
 }
 
+.voice-row { display: flex; align-items: center; gap: 6px; }
+.voice-row .voice-option { flex: 1; min-width: 0; }
+.voice-option.needs-download { opacity: 0.72; }
+.voice-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sheet-option-active-bg);
+  color: var(--color-brand-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.voice-download:disabled { opacity: 0.45; cursor: default; }
+.voice-download i { font-size: 15px; }
 .voice-label { display: inline-flex; align-items: center; gap: 6px; }
 .voice-option .voice-star { color: #e7aa35; font-size: 14px; }
 

@@ -18,16 +18,16 @@
     "semantic_hash": "c3680fc576fd18fb779c503b08967dc2"
   },
   "android/app/build.gradle": {
-    "mtime": 1785571966.3636198,
-    "seen": 1789126705.927163,
-    "ast_hash": "2a90228c3ef53618c1ddd159a9844052",
-    "semantic_hash": "2a90228c3ef53618c1ddd159a9844052"
+    "mtime": 1795381656.8942432,
+    "seen": 1795382314.4501476,
+    "ast_hash": "26e6acc4b517afc042c8e694fedad0f4",
+    "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1789978486.4281318,
-    "seen": 1789978997.0052502,
-    "ast_hash": "9d7ac48553a5fbe2dabfa1d735929c47",
-    "semantic_hash": "9d7ac48553a5fbe2dabfa1d735929c47"
+    "mtime": 1795422069.8181612,
+    "seen": 1795422337.078648,
+    "ast_hash": "dd205cf8dcda283a9614db073900f03f",
+    "semantic_hash": ""
   },
   "android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java": {
     "mtime": 1781859670.0,
@@ -42,16 +42,16 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/DeviceBooksPlugin.java": {
-    "mtime": 1784991629.876187,
-    "seen": 1789126705.9271805,
-    "ast_hash": "f25529cbaf987903b2997807d1349716",
-    "semantic_hash": "f25529cbaf987903b2997807d1349716"
+    "mtime": 1791455121.4996853,
+    "seen": 1791998142.7449317,
+    "ast_hash": "8d322000493c5a898ca4a8ce5dbd226f",
+    "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/MainActivity.java": {
-    "mtime": 1785531914.8669517,
-    "seen": 1789126705.9271834,
-    "ast_hash": "ee71c6c240df11daac56d65e65f021b6",
-    "semantic_hash": "ee71c6c240df11daac56d65e65f021b6"
+    "mtime": 1792008225.8378444,
+    "seen": 1792052200.5982366,
+    "ast_hash": "0dd326731993e1ac58beaf0754b57c87",
+    "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/MediaSessionPlugin.java": {
     "mtime": 1783509421.73524,
@@ -78,16 +78,16 @@
     "semantic_hash": "e91b4501c14da821682fa5c26a16d616"
   },
   "android/build.gradle": {
-    "mtime": 1781859670.0,
-    "seen": 1789126705.927201,
-    "ast_hash": "682315a426653617c6a74fc12bef55b6",
-    "semantic_hash": "682315a426653617c6a74fc12bef55b6"
+    "mtime": 1792053551.1114018,
+    "seen": 1792054255.9669468,
+    "ast_hash": "fb8a9d27660a708eda953deac0748118",
+    "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1789978486.4281318,
-    "seen": 1789978997.005285,
-    "ast_hash": "27774e912a23b4f9786f7934cdc87d9e",
-    "semantic_hash": "27774e912a23b4f9786f7934cdc87d9e"
+    "mtime": 1795422069.8171594,
+    "seen": 1795422337.085842,
+    "ast_hash": "68c47d8fe55c8ae39da1b247a51e1216",
+    "semantic_hash": ""
   },
   "android/gradlew": {
     "mtime": 1781859670.0,
@@ -108,21 +108,21 @@
     "semantic_hash": "4b3fce8ea2a515a9d2e47e74757172ec"
   },
   "app.vue": {
-    "mtime": 1785488883.9597847,
-    "seen": 1789126705.927218,
-    "ast_hash": "091cf133fe2772f40dbeb98e17e6c3f2",
-    "semantic_hash": "091cf133fe2772f40dbeb98e17e6c3f2"
+    "mtime": 1792008377.9312294,
+    "seen": 1792052200.6073225,
+    "ast_hash": "3a244a0dc6e5d684865189e702b6551f",
+    "semantic_hash": ""
   },
   "capacitor.config.ts": {
-    "mtime": 1784991630.1000955,
-    "seen": 1789126705.927221,
-    "ast_hash": "10a8a9a6c3d912f08cdf367958fdf128",
-    "semantic_hash": "10a8a9a6c3d912f08cdf367958fdf128"
+    "mtime": 1795420429.13598,
+    "seen": 1795422337.0895202,
+    "ast_hash": "6cad615a4fa564aebcf3bca6672f1b15",
+    "semantic_hash": ""
   },
   "components/mobile/AddBookMobile.vue": {
-    "mtime": 1789944561.5076888,
-    "seen": 1789947801.4734967,
-    "ast_hash": "6c15e965bc4f93dc4668a810a13cfff0",
+    "mtime": 1791545412.6714005,
+    "seen": 1791998142.7499511,
+    "ast_hash": "3a19fafb13e8ea498c83959bfe98ba98",
     "semantic_hash": ""
   },
   "components/mobile/AnnotationListMobile.vue": {
@@ -132,27 +132,27 @@
     "semantic_hash": "cbec7466171c8f14c3a4bfd40bf538cb"
   },
   "components/mobile/BookDetailMobile.vue": {
-    "mtime": 1789735993.7353334,
-    "seen": 1789947801.4735062,
-    "ast_hash": "2fc2d7c9e7252548d0d948f166ec222c",
+    "mtime": 1791544381.068507,
+    "seen": 1791998142.7503095,
+    "ast_hash": "80d3d78b96ba4b49d8a493b9bee33a56",
     "semantic_hash": ""
   },
   "components/mobile/BooksMobile.vue": {
-    "mtime": 1789944540.3405528,
-    "seen": 1789947801.47351,
-    "ast_hash": "903f557b5efb5d180a2c3e3ec9057e27",
+    "mtime": 1791454977.7725255,
+    "seen": 1791998142.750313,
+    "ast_hash": "d804d5636e9c6ea5460967ddd34fd9df",
     "semantic_hash": ""
   },
   "components/mobile/EditBookMobile.vue": {
-    "mtime": 1789944565.7121305,
-    "seen": 1789947801.4735146,
-    "ast_hash": "457e1f94265a0fdba9cfe4952646761a",
+    "mtime": 1791545413.3734589,
+    "seen": 1791998142.7503204,
+    "ast_hash": "2a9836d833bbf809cc74ed997cbf5f03",
     "semantic_hash": ""
   },
   "components/mobile/FavouritesMobile.vue": {
-    "mtime": 1789936074.8172693,
-    "seen": 1789947801.4735188,
-    "ast_hash": "dbbb21d9479710898fa682860828c6b0",
+    "mtime": 1790470658.9979146,
+    "seen": 1791998142.7503238,
+    "ast_hash": "c939c9530ba6c0ee04a13985d4f6d1f3",
     "semantic_hash": ""
   },
   "components/mobile/HiddenBooksMobile.vue": {
@@ -162,27 +162,27 @@
     "semantic_hash": ""
   },
   "components/mobile/HomeMobile.vue": {
-    "mtime": 1789978624.4544466,
-    "seen": 1789978997.005344,
-    "ast_hash": "e4a3bbb0ad994241296a54f77471ea51",
+    "mtime": 1791550776.350698,
+    "seen": 1791998142.7508037,
+    "ast_hash": "e4e8e40e66848be9e860931d09c61abc",
     "semantic_hash": ""
   },
   "components/mobile/MobileBottomNav.vue": {
-    "mtime": 1789130986.3370516,
-    "seen": 1789216826.465573,
-    "ast_hash": "614f1a16d93df57aa8e8e39316121486",
+    "mtime": 1791040562.555167,
+    "seen": 1791998142.7508075,
+    "ast_hash": "623902142c254604d6a410aa86ba0bc9",
     "semantic_hash": ""
   },
   "components/mobile/MobilePlayingBar.vue": {
-    "mtime": 1789130416.4363751,
-    "seen": 1789216826.4655783,
-    "ast_hash": "590ba0c6608d267a13f0d89473ba5fe5",
+    "mtime": 1790468472.168608,
+    "seen": 1791998142.7508106,
+    "ast_hash": "e454343c86732efac274c435da5eb901",
     "semantic_hash": ""
   },
   "components/mobile/MobileSettingsNav.vue": {
-    "mtime": 1789329373.2646377,
-    "seen": 1789468091.5716712,
-    "ast_hash": "b661bb84a20b7a246f953a3591e3f62d",
+    "mtime": 1790947186.6018238,
+    "seen": 1791998142.7508144,
+    "ast_hash": "2113e53f3798940e19304701ed52e7d7",
     "semantic_hash": ""
   },
   "components/mobile/MobileSkeleton.vue": {
@@ -192,15 +192,15 @@
     "semantic_hash": "10605cbd276a15c02ffe87941971889d"
   },
   "components/mobile/MobileTopNav.vue": {
-    "mtime": 1789947235.4700475,
-    "seen": 1789947801.4735541,
-    "ast_hash": "1765d9b6459faaf7c097f1336fa9ffe8",
+    "mtime": 1791552956.8601582,
+    "seen": 1791998142.7512167,
+    "ast_hash": "7f15c59fc046e54bd805ae8ce675ce69",
     "semantic_hash": ""
   },
   "components/mobile/PlaylistDetailMobile.vue": {
-    "mtime": 1789936460.6010475,
-    "seen": 1789947801.4735582,
-    "ast_hash": "be45f9a4936f17e543688e6ccb580db9",
+    "mtime": 1791034538.6627378,
+    "seen": 1791998142.7512221,
+    "ast_hash": "6dffa7a4d4a6446bf9875c9e303b7f14",
     "semantic_hash": ""
   },
   "components/mobile/PlaylistsMobile.vue": {
@@ -210,15 +210,15 @@
     "semantic_hash": "08d9ed05478623c19186d1cb0c36fff0"
   },
   "components/mobile/PreferencesMobile.vue": {
-    "mtime": 1789944557.2980702,
-    "seen": 1789947801.4735684,
-    "ast_hash": "ded396dee39d60d2988c29fed372a96c",
+    "mtime": 1791631666.9863057,
+    "seen": 1791998142.7518828,
+    "ast_hash": "de3d75edad611795883c40edfb7e045f",
     "semantic_hash": ""
   },
   "components/mobile/ProfileMobile.vue": {
-    "mtime": 1789978624.4650147,
-    "seen": 1789978997.005372,
-    "ast_hash": "c787b93af5e033163345809d3bdf0cbf",
+    "mtime": 1791552979.5080214,
+    "seen": 1791998142.751887,
+    "ast_hash": "ebe1c9148e249b5565afa61b69f48532",
     "semantic_hash": ""
   },
   "components/mobile/ReaderFigureViewer.vue": {
@@ -228,9 +228,9 @@
     "semantic_hash": "b1ea933a896e0ec17f08f7b3b3c54e10"
   },
   "components/mobile/ReaderMobile.vue": {
-    "mtime": 1789633254.7287881,
-    "seen": 1789634651.7704275,
-    "ast_hash": "f083e9b6d4c84de32aed9cbda6172322",
+    "mtime": 1795389435.314462,
+    "seen": 1795391789.578545,
+    "ast_hash": "3c813400e2cf90d11681abcf8c1cf1ce",
     "semantic_hash": ""
   },
   "components/mobile/ReaderNoteEditor.vue": {
@@ -240,10 +240,10 @@
     "semantic_hash": "16748463913306b507168eb37e7ef926"
   },
   "components/mobile/ReaderPagedEpub.vue": {
-    "mtime": 1786694256.8478384,
-    "seen": 1789126705.9273083,
-    "ast_hash": "02ccdef7fc7d4674d681a978df7c867a",
-    "semantic_hash": "02ccdef7fc7d4674d681a978df7c867a"
+    "mtime": 1795385768.9667897,
+    "seen": 1795391789.5788891,
+    "ast_hash": "e47f32ef01e3b4e903ca71f1c50b58a4",
+    "semantic_hash": ""
   },
   "components/mobile/ReaderSelectionMenu.vue": {
     "mtime": 1784991630.159241,
@@ -252,9 +252,9 @@
     "semantic_hash": "93de9886f7b3e6115e742cc5315f2878"
   },
   "components/mobile/SeriesDetailMobile.vue": {
-    "mtime": 1789936456.5099263,
-    "seen": 1789947801.4736037,
-    "ast_hash": "7eb39392ab079ef916b4967b94b31685",
+    "mtime": 1791495514.1518059,
+    "seen": 1791998142.7529685,
+    "ast_hash": "96b4499d9c125c742b886e8bef6444f9",
     "semantic_hash": ""
   },
   "components/mobile/SeriesMobile.vue": {
@@ -264,9 +264,9 @@
     "semantic_hash": ""
   },
   "components/mobile/SettingsMobile.vue": {
-    "mtime": 1789241968.5375004,
-    "seen": 1789468091.5741057,
-    "ast_hash": "5bca829965573040b50ebd73dc1e552f",
+    "mtime": 1790942734.2359276,
+    "seen": 1791998142.7533107,
+    "ast_hash": "ff61b1e6cfb095d983f81c2fb99437a3",
     "semantic_hash": ""
   },
   "components/mobile/SettingsStorageMobile.vue": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "components/shared/AddBookComp.vue": {
-    "mtime": 1789944570.0285091,
-    "seen": 1789947801.4736323,
-    "ast_hash": "a7f4e70c4e1ed979f99f70a68e744532",
+    "mtime": 1791545414.129381,
+    "seen": 1791998142.7540126,
+    "ast_hash": "56fb6fb76cab8eec6b95157075346177",
     "semantic_hash": ""
   },
   "components/shared/AddToPlaylistModal.vue": {
@@ -300,9 +300,9 @@
     "semantic_hash": "a4665be90394773b20792440d6a6bde4"
   },
   "components/shared/AuthorDetailComp.vue": {
-    "mtime": 1789736042.8649983,
-    "seen": 1789947801.4736469,
-    "ast_hash": "21fcc3c4b0b7f300e054aac14491a034",
+    "mtime": 1791529563.5568202,
+    "seen": 1791998142.7547202,
+    "ast_hash": "6658011ea1947c5107004ff594e66a11",
     "semantic_hash": ""
   },
   "components/shared/AuthorImageModal.vue": {
@@ -318,9 +318,9 @@
     "semantic_hash": ""
   },
   "components/shared/BookGroupDetail.vue": {
-    "mtime": 1789735787.487528,
-    "seen": 1789947801.4736612,
-    "ast_hash": "8b5ad2cd730ab073a377e0491b872b75",
+    "mtime": 1791529457.198392,
+    "seen": 1791998142.755423,
+    "ast_hash": "c2d7e8e319430a50b389d7e3a960d53f",
     "semantic_hash": ""
   },
   "components/shared/BookishSelect.vue": {
@@ -342,16 +342,16 @@
     "semantic_hash": ""
   },
   "components/shared/CoverImageModal.vue": {
-    "mtime": 1789941579.3542058,
-    "seen": 1789947801.4736896,
-    "ast_hash": "3efe3115b7810ebb3685b48e97a0d842",
+    "mtime": 1791544499.7244935,
+    "seen": 1791998142.7569368,
+    "ast_hash": "f2fa338b7173d46af2a5998d5f467a9d",
     "semantic_hash": ""
   },
   "components/shared/DeleteConfirmModal.vue": {
-    "mtime": 1784991630.1798854,
-    "seen": 1789126705.9273596,
-    "ast_hash": "883cce59ea9d50af3004e7981e4e909f",
-    "semantic_hash": "883cce59ea9d50af3004e7981e4e909f"
+    "mtime": 1791037103.0556645,
+    "seen": 1791998142.7569404,
+    "ast_hash": "0d14dbde38c107cb0678fa0965f101ca",
+    "semantic_hash": ""
   },
   "components/shared/DevicePermissionModal.vue": {
     "mtime": 1784991630.1819227,
@@ -360,9 +360,9 @@
     "semantic_hash": "971ec7c9579477532cae73c725a80756"
   },
   "components/shared/EditBookComp.vue": {
-    "mtime": 1789944574.3037722,
-    "seen": 1789947801.4737039,
-    "ast_hash": "2d9c5ffe79568d6648d1e6dfd9ba97ac",
+    "mtime": 1791545414.9521532,
+    "seen": 1791998142.7572875,
+    "ast_hash": "64d137f16f41b75f47b082913f398a01",
     "semantic_hash": ""
   },
   "components/shared/EditBookModal.vue": {
@@ -389,12 +389,6 @@
     "ast_hash": "ce6fe4263f3cae1957288a29ea5badcd",
     "semantic_hash": "ce6fe4263f3cae1957288a29ea5badcd"
   },
-  "components/shared/GenresComp.vue": {
-    "mtime": 1779734123.0904953,
-    "seen": 1789126705.9274075,
-    "ast_hash": "e009f3e9d71b24575d34a3e8bcf66817",
-    "semantic_hash": "e009f3e9d71b24575d34a3e8bcf66817"
-  },
   "components/shared/GoodreadsIcon.vue": {
     "mtime": 1780843951.6637318,
     "seen": 1789126705.9274113,
@@ -420,9 +414,9 @@
     "semantic_hash": ""
   },
   "components/shared/HomeContinueReadingCard.vue": {
-    "mtime": 1789945849.192161,
-    "seen": 1789947801.4737864,
-    "ast_hash": "e745f65e4e877efae7e413f6d6e85d37",
+    "mtime": 1791529457.1887915,
+    "seen": 1791998142.7599869,
+    "ast_hash": "c5ea0e7a8d89c54c3989e9f35291aa2e",
     "semantic_hash": ""
   },
   "components/shared/HomeSkeleton.vue": {
@@ -432,9 +426,9 @@
     "semantic_hash": "c31ca18fb8a369d60046f3d48c933878"
   },
   "components/shared/LibraryBookCard.vue": {
-    "mtime": 1789944624.7693777,
-    "seen": 1789947801.4737968,
-    "ast_hash": "3f96a4d754d71afd7d1f4246d7d8eb78",
+    "mtime": 1791529457.186286,
+    "seen": 1791998142.7603214,
+    "ast_hash": "fdf4cbdc57f4fa9104b2c186724dceff",
     "semantic_hash": ""
   },
   "components/shared/LibraryControlsRow.vue": {
@@ -450,22 +444,22 @@
     "semantic_hash": "65700e82d70247e0f0f74fb424e20b2c"
   },
   "components/shared/MultiStepLoader.vue": {
-    "mtime": 1780297166.4041505,
-    "seen": 1789126705.9274435,
-    "ast_hash": "eb264f88a927fc66564f3f5e29070d0b",
-    "semantic_hash": "eb264f88a927fc66564f3f5e29070d0b"
+    "mtime": 1791533053.660157,
+    "seen": 1791998142.7609923,
+    "ast_hash": "6056a528ee60163f824773570637e090",
+    "semantic_hash": ""
   },
   "components/shared/PdfViewer.vue": {
-    "mtime": 1788997219.5512104,
-    "seen": 1789126705.9274466,
-    "ast_hash": "0a884588cbf0fef19942bd611f87f9ca",
-    "semantic_hash": "0a884588cbf0fef19942bd611f87f9ca"
+    "mtime": 1792007980.2952352,
+    "seen": 1792052200.6701696,
+    "ast_hash": "bcb409ea5f21aee3b977ad5426583028",
+    "semantic_hash": ""
   },
   "components/shared/PlayingBar.vue": {
-    "mtime": 1782815176.6615074,
-    "seen": 1789126705.9274492,
-    "ast_hash": "df1f53049b6e561e35a08785412ac355",
-    "semantic_hash": "df1f53049b6e561e35a08785412ac355"
+    "mtime": 1791034498.0856795,
+    "seen": 1791998142.7613358,
+    "ast_hash": "f2f6623ace9ab6d0cccae4850cf8bb61",
+    "semantic_hash": ""
   },
   "components/shared/PlaylistComp.vue": {
     "mtime": 1789215354.61946,
@@ -492,16 +486,16 @@
     "semantic_hash": ""
   },
   "components/shared/SelectionActionsBar.vue": {
-    "mtime": 1784991630.1931655,
-    "seen": 1789126705.9274683,
-    "ast_hash": "e2039a33c6e6139075c016f1ac0a7ea0",
-    "semantic_hash": "e2039a33c6e6139075c016f1ac0a7ea0"
+    "mtime": 1791034584.7573974,
+    "seen": 1791998142.763049,
+    "ast_hash": "9a7484daf29a55b53a2b8945669f1ae9",
+    "semantic_hash": ""
   },
   "components/shared/SeriesCollageCard.vue": {
-    "mtime": 1784991630.196547,
-    "seen": 1789126705.9274714,
-    "ast_hash": "6c3493093a2c8e487acf98d52e77e3aa",
-    "semantic_hash": "6c3493093a2c8e487acf98d52e77e3aa"
+    "mtime": 1790945010.495626,
+    "seen": 1791998142.7630517,
+    "ast_hash": "ac67046efd7bcf12321b7fa07ee7e4b6",
+    "semantic_hash": ""
   },
   "components/shared/SeriesComp.vue": {
     "mtime": 1789215347.8875442,
@@ -540,8 +534,8 @@
     "semantic_hash": ""
   },
   "components/shared/previews/BookActionsPreview.vue": {
-    "mtime": 1788877217.7104363,
-    "seen": 1789126705.9274926,
+    "mtime": 1791034606.4449396,
+    "seen": 1791998142.7651224,
     "ast_hash": "7e2935f966053c554b909d34267efd95",
     "semantic_hash": "7e2935f966053c554b909d34267efd95"
   },
@@ -564,10 +558,10 @@
     "semantic_hash": "890f2f643c0ad45677c5ab4a8e733a24"
   },
   "composables/appUpdateManifest.js": {
-    "mtime": 1786060166.2685447,
-    "seen": 1789126705.9275048,
-    "ast_hash": "584815606c791b5726b673ffa77dbbfe",
-    "semantic_hash": "584815606c791b5726b673ffa77dbbfe"
+    "mtime": 1795420446.6877372,
+    "seen": 1795422337.2455823,
+    "ast_hash": "0168a2515a5bce635412bde567960930",
+    "semantic_hash": ""
   },
   "composables/kokoroTts.worker.js": {
     "mtime": 1779863089.443399,
@@ -594,21 +588,21 @@
     "semantic_hash": ""
   },
   "composables/tts/mobileTtsDriver.js": {
-    "mtime": 1789131767.2384126,
-    "seen": 1789216826.5115254,
-    "ast_hash": "43e4a7f608a8f7e10fad0cc86387db92",
+    "mtime": 1791663429.7756402,
+    "seen": 1791998142.7742395,
+    "ast_hash": "3c66a9bacb40dbcb10ef893c427467dc",
     "semantic_hash": ""
   },
   "composables/tts/mobileTtsDriver.test.js": {
-    "mtime": 1789131775.3803818,
-    "seen": 1789216826.51153,
-    "ast_hash": "2044fcf3d16cbc7de44094ad8a2a270b",
+    "mtime": 1791663593.8581252,
+    "seen": 1791998142.774244,
+    "ast_hash": "a28fad588637d2e5c0d25b34949444d7",
     "semantic_hash": ""
   },
   "composables/tts/nativeSpeech.js": {
-    "mtime": 1789229862.112267,
-    "seen": 1789468091.606531,
-    "ast_hash": "e07b4499a7f4fe24644244f3aa1e6075",
+    "mtime": 1791664975.5735693,
+    "seen": 1791998142.7742474,
+    "ast_hash": "f8e197894041ba893bec44d583726fc9",
     "semantic_hash": ""
   },
   "composables/useAnnotations.js": {
@@ -630,10 +624,10 @@
     "semantic_hash": "1d62ac152432d4c5a591758e1f7606a0"
   },
   "composables/useAppUpdate.js": {
-    "mtime": 1786060184.0825155,
-    "seen": 1789126705.9275386,
-    "ast_hash": "43b4548f8b2274828887fb96826510bf",
-    "semantic_hash": "43b4548f8b2274828887fb96826510bf"
+    "mtime": 1795420475.5950315,
+    "seen": 1795422337.2977333,
+    "ast_hash": "91155e37b824a7c6427288f4ab2e62c5",
+    "semantic_hash": ""
   },
   "composables/useAuthorDetails.js": {
     "mtime": 1781591230.6243582,
@@ -660,16 +654,16 @@
     "semantic_hash": "28901f62ee4a2d1ff4ca1ce40c961f0f"
   },
   "composables/useAutoMetadata.js": {
-    "mtime": 1786195859.4237075,
-    "seen": 1789126705.927555,
-    "ast_hash": "a790033a7dbf2425201cf5d8a2ed3398",
-    "semantic_hash": "a790033a7dbf2425201cf5d8a2ed3398"
+    "mtime": 1791495905.5397446,
+    "seen": 1791998142.7774842,
+    "ast_hash": "f3017ae86c9525581978bc00cbd3f7cf",
+    "semantic_hash": ""
   },
   "composables/useBookMetadataSearch.js": {
-    "mtime": 1785941705.456237,
-    "seen": 1789126705.927558,
-    "ast_hash": "f71ac5952d3eb51e07f114de6507d971",
-    "semantic_hash": "f71ac5952d3eb51e07f114de6507d971"
+    "mtime": 1791477240.8959675,
+    "seen": 1791998142.7778609,
+    "ast_hash": "f55fd7f3f28da78c8b4f6bce22b64b4f",
+    "semantic_hash": ""
   },
   "composables/useBookMetadataSearch.test.js": {
     "mtime": 1780815587.978097,
@@ -678,10 +672,10 @@
     "semantic_hash": "d94dd70daf474fcbe11faa559bdef2fa"
   },
   "composables/useBookStorage.js": {
-    "mtime": 1783239690.2347825,
-    "seen": 1789126705.9275649,
-    "ast_hash": "056185be9d9d688104f11d200cc23c3c",
-    "semantic_hash": "056185be9d9d688104f11d200cc23c3c"
+    "mtime": 1791456649.2445586,
+    "seen": 1791998142.7785385,
+    "ast_hash": "32ab755dfa079958f65772c84f12b652",
+    "semantic_hash": ""
   },
   "composables/useBookStorage.test.js": {
     "mtime": 1781591230.6457336,
@@ -690,21 +684,21 @@
     "semantic_hash": "bd80f5841870018f09ca4921296bc413"
   },
   "composables/useBookishSettings.js": {
-    "mtime": 1789944544.4900928,
-    "seen": 1789947801.474173,
-    "ast_hash": "1b80e28ac3bf218bfab835c483a65f16",
+    "mtime": 1792008317.5955596,
+    "seen": 1792052200.761573,
+    "ast_hash": "952fba67c4481ece0a89eb12b82e2f76",
     "semantic_hash": ""
   },
   "composables/useBookishSettings.test.js": {
-    "mtime": 1789944686.57121,
-    "seen": 1789947801.4741774,
-    "ast_hash": "235942886527a98ebf5976e9e6e189f8",
+    "mtime": 1791630474.382389,
+    "seen": 1791998142.7788916,
+    "ast_hash": "56362201d93d57afa761dc64ee2381f6",
     "semantic_hash": ""
   },
   "composables/useBooks.js": {
-    "mtime": 1789633643.1937592,
-    "seen": 1789634651.8249035,
-    "ast_hash": "574d94ed332621495987dfbc2ea9dbcf",
+    "mtime": 1791497784.3070443,
+    "seen": 1791998142.7788951,
+    "ast_hash": "81de776f04a13c9fc363c417ffed2aaf",
     "semantic_hash": ""
   },
   "composables/useBooks.test.js": {
@@ -714,10 +708,10 @@
     "semantic_hash": "dfe5cafeed3319e38507059fd556cbc2"
   },
   "composables/useChunkSpans.js": {
-    "mtime": 1783486574.9700193,
-    "seen": 1789126705.9275827,
-    "ast_hash": "46f63f977e12d3cdee11354003eb966a",
-    "semantic_hash": "46f63f977e12d3cdee11354003eb966a"
+    "mtime": 1795386078.704459,
+    "seen": 1795391789.6254878,
+    "ast_hash": "9cbdcb9289de2602f2437b74d829ed90",
+    "semantic_hash": ""
   },
   "composables/useConnectionChecks.js": {
     "mtime": 1784991630.215898,
@@ -750,9 +744,9 @@
     "semantic_hash": "2d0ef2e56c02c314fa0cba896918339a"
   },
   "composables/useDeviceLibrarySync.js": {
-    "mtime": 1789218241.135141,
-    "seen": 1789219871.2957609,
-    "ast_hash": "1c35b9149894b994dda0e79beddac370",
+    "mtime": 1792051054.76609,
+    "seen": 1792052200.7719584,
+    "ast_hash": "6bd80fd4dfb5e5a2f87b25436c8b8df4",
     "semantic_hash": ""
   },
   "composables/useDeviceMetadataSearch.js": {
@@ -768,22 +762,22 @@
     "semantic_hash": "a00af3ba88fdf05e4cd422273655b6fe"
   },
   "composables/useEdgeSpeechClient.js": {
-    "mtime": 1782987989.457973,
-    "seen": 1789126705.927608,
-    "ast_hash": "bcda2aeb69f1e12f6c7351a9b7fb65ca",
-    "semantic_hash": "bcda2aeb69f1e12f6c7351a9b7fb65ca"
+    "mtime": 1791700902.1941545,
+    "seen": 1791998142.7824843,
+    "ast_hash": "2a22212ce25696a7ec0d532fda373480",
+    "semantic_hash": ""
   },
   "composables/useEpubExtractor.js": {
-    "mtime": 1789218225.6651661,
-    "seen": 1789219871.2957854,
-    "ast_hash": "e505f8543e49a23558f722b0a2039bdc",
+    "mtime": 1791661908.28091,
+    "seen": 1791998142.7824883,
+    "ast_hash": "8cde3d4b666c7522f9bf5d77cac0473e",
     "semantic_hash": ""
   },
   "composables/useEpubExtractor.test.js": {
-    "mtime": 1779172554.76785,
-    "seen": 1789126705.927614,
-    "ast_hash": "9730ee07c623e85f4bb88a78c57738ce",
-    "semantic_hash": "9730ee07c623e85f4bb88a78c57738ce"
+    "mtime": 1791662096.2120442,
+    "seen": 1791998142.7824914,
+    "ast_hash": "7387b954b2183ff77d6431d4d87bc535",
+    "semantic_hash": ""
   },
   "composables/useEpubPageMap.js": {
     "mtime": 1783584191.4666567,
@@ -798,10 +792,10 @@
     "semantic_hash": "e62c4365d7827fef5bee5b7ce6fad30f"
   },
   "composables/useFormatEnablement.js": {
-    "mtime": 1786061321.3113475,
-    "seen": 1789126705.9276218,
-    "ast_hash": "5ba23167a00eaa8e846791933a77f9f9",
-    "semantic_hash": "5ba23167a00eaa8e846791933a77f9f9"
+    "mtime": 1791448173.660246,
+    "seen": 1791998142.7832077,
+    "ast_hash": "4fe3427670874dcd2f858c6bce4da5ac",
+    "semantic_hash": ""
   },
   "composables/useGoodreadsRating.js": {
     "mtime": 1779798000.7337706,
@@ -822,10 +816,10 @@
     "semantic_hash": "770d48707b7336222a15f54314575f44"
   },
   "composables/useLibraryBackup.js": {
-    "mtime": 1784991630.2291567,
-    "seen": 1789126705.9276326,
-    "ast_hash": "b4759a0a9c25c27bd13eb135a9b35806",
-    "semantic_hash": "b4759a0a9c25c27bd13eb135a9b35806"
+    "mtime": 1792009117.0677557,
+    "seen": 1792052200.7873323,
+    "ast_hash": "284970f43706c2253e3845cbaadaf749",
+    "semantic_hash": ""
   },
   "composables/useLibraryBackup.test.js": {
     "mtime": 1789978783.8014038,
@@ -834,46 +828,46 @@
     "semantic_hash": ""
   },
   "composables/useLibraryFilters.js": {
-    "mtime": 1785488884.0314164,
-    "seen": 1789126705.9276383,
-    "ast_hash": "d1e9bd717019a0b3bbd0a69ff84c8d61",
-    "semantic_hash": "d1e9bd717019a0b3bbd0a69ff84c8d61"
+    "mtime": 1791454956.135911,
+    "seen": 1791998142.7852402,
+    "ast_hash": "44d00cd4af7508d471d91dcb1ffe6ac3",
+    "semantic_hash": ""
   },
   "composables/useLibrarySearch.js": {
-    "mtime": 1783682601.728728,
-    "seen": 1789126705.927641,
-    "ast_hash": "2f49fc3728d753347b079fc82608dfc8",
-    "semantic_hash": "2f49fc3728d753347b079fc82608dfc8"
+    "mtime": 1790945118.8038077,
+    "seen": 1791998142.785245,
+    "ast_hash": "70d4457fc37a29a4cd4d0b81cdcc11e0",
+    "semantic_hash": ""
   },
   "composables/useLibrarySearch.test.js": {
-    "mtime": 1783682658.5977216,
-    "seen": 1789126705.927643,
-    "ast_hash": "96837e332d6ff19472af6bc581b39463",
-    "semantic_hash": "96837e332d6ff19472af6bc581b39463"
+    "mtime": 1790945122.682736,
+    "seen": 1791998142.7852492,
+    "ast_hash": "6df37bfb90a35f63b515f891eff623a8",
+    "semantic_hash": ""
   },
   "composables/useLibraryStore.js": {
-    "mtime": 1789978624.591233,
-    "seen": 1789978997.0058396,
-    "ast_hash": "f172eabfdb10c680afeeafd2f2adc53e",
+    "mtime": 1795381983.2120283,
+    "seen": 1795382314.5314515,
+    "ast_hash": "23c5b628a08891427ead8b49a98d1004",
     "semantic_hash": ""
   },
   "composables/useLibraryStore.test.js": {
-    "mtime": 1789978624.511546,
-    "seen": 1789978997.0058424,
-    "ast_hash": "4e66c749d106bec1492bcc66b18e480b",
+    "mtime": 1791535772.8304625,
+    "seen": 1791998142.7852557,
+    "ast_hash": "e494df49fc1d028ef1c426bdc3af58da",
     "semantic_hash": ""
   },
   "composables/useMetadataBackfill.js": {
-    "mtime": 1788871512.1097178,
-    "seen": 1789126705.9276512,
-    "ast_hash": "e550f55c3187e8ed91bd72a6b66e4670",
-    "semantic_hash": "e550f55c3187e8ed91bd72a6b66e4670"
+    "mtime": 1791529452.2210555,
+    "seen": 1791998142.7852678,
+    "ast_hash": "c90fd897fe2511ef8a56e5cceb361006",
+    "semantic_hash": ""
   },
   "composables/useMobileReaderPrefs.js": {
-    "mtime": 1788993792.7645454,
-    "seen": 1789126705.9276538,
-    "ast_hash": "135e4a3f7c9069a3b93fff05049aa8fd",
-    "semantic_hash": "135e4a3f7c9069a3b93fff05049aa8fd"
+    "mtime": 1791631588.1731298,
+    "seen": 1791998142.785271,
+    "ast_hash": "ba1c5a39f09c44e267070ae94cbf2049",
+    "semantic_hash": ""
   },
   "composables/useMultiSelect.js": {
     "mtime": 1784991630.2357645,
@@ -900,16 +894,16 @@
     "semantic_hash": "ad48ae389b50b6f9038e81e5b814430e"
   },
   "composables/usePdfExtractor.js": {
-    "mtime": 1785488884.0359411,
-    "seen": 1789126705.9276674,
-    "ast_hash": "62cd460cb2a0c8e8b40e5aff76349fb0",
-    "semantic_hash": "62cd460cb2a0c8e8b40e5aff76349fb0"
+    "mtime": 1791663296.6316347,
+    "seen": 1791998142.7866418,
+    "ast_hash": "c5eabe319e04bbb42feda594e0717311",
+    "semantic_hash": ""
   },
   "composables/usePdfExtractor.test.js": {
-    "mtime": 1781591230.672213,
-    "seen": 1789126705.92767,
-    "ast_hash": "cab3e2876ea63852f592952796d229bb",
-    "semantic_hash": "cab3e2876ea63852f592952796d229bb"
+    "mtime": 1791663629.1183522,
+    "seen": 1791998142.7866454,
+    "ast_hash": "9fdf5da9882762e374ba8184ee1e833c",
+    "semantic_hash": ""
   },
   "composables/usePdfFigures.js": {
     "mtime": 1785488884.0379736,
@@ -942,10 +936,10 @@
     "semantic_hash": "22d9449f02345e5a375727d8a7cf4998"
   },
   "composables/usePdfReflow.js": {
-    "mtime": 1785488884.0389805,
-    "seen": 1789126705.9276881,
-    "ast_hash": "8ae00a14d27a8610f93c93bc209900e5",
-    "semantic_hash": "8ae00a14d27a8610f93c93bc209900e5"
+    "mtime": 1791630420.4896305,
+    "seen": 1791998142.7884004,
+    "ast_hash": "d339539c2c6a0b4bb4a871b29e3fefc9",
+    "semantic_hash": ""
   },
   "composables/useReaderPosition.js": {
     "mtime": 1781591230.6967947,
@@ -966,10 +960,10 @@
     "semantic_hash": "f092ff1a31e96837602278c476620174"
   },
   "composables/useReadingPosition.js": {
-    "mtime": 1785488884.0410109,
-    "seen": 1789126705.927699,
-    "ast_hash": "cb7b7a9ddb4fb5997f7143df5a670fe6",
-    "semantic_hash": "cb7b7a9ddb4fb5997f7143df5a670fe6"
+    "mtime": 1791998895.4068081,
+    "seen": 1792052200.8161933,
+    "ast_hash": "2f733f05b615bdd3d0d1b72a65da3739",
+    "semantic_hash": ""
   },
   "composables/useResumePrompt.js": {
     "mtime": 1784991630.2391534,
@@ -990,28 +984,28 @@
     "semantic_hash": "43ae165fab71de03adf4458bd16c27a3"
   },
   "composables/useSeriesProgress.js": {
-    "mtime": 1785945316.9344833,
-    "seen": 1789126705.9277139,
-    "ast_hash": "89ea33291d7a4db8dcb61640bd3da41f",
-    "semantic_hash": "89ea33291d7a4db8dcb61640bd3da41f"
+    "mtime": 1791495513.4431777,
+    "seen": 1791998142.7912483,
+    "ast_hash": "bbbd5f865b23333f21b1aee689c666e6",
+    "semantic_hash": ""
   },
   "composables/useSeriesProgress.test.js": {
-    "mtime": 1780815403.7810612,
-    "seen": 1789126705.9277165,
-    "ast_hash": "1d8a087325e60051b4860c661b130eae",
-    "semantic_hash": "1d8a087325e60051b4860c661b130eae"
+    "mtime": 1791496616.1589935,
+    "seen": 1791998142.791252,
+    "ast_hash": "457d0e98a30d50db6af4d52489a48896",
+    "semantic_hash": ""
   },
   "composables/useSeriesRepair.js": {
-    "mtime": 1788871108.9061768,
-    "seen": 1789126705.9277194,
-    "ast_hash": "e694d022b3d7833cba8da269ac299b9e",
-    "semantic_hash": "e694d022b3d7833cba8da269ac299b9e"
+    "mtime": 1791529488.5027587,
+    "seen": 1791998142.7912555,
+    "ast_hash": "d89338d30340f0f60137ed61c1f8783a",
+    "semantic_hash": ""
   },
   "composables/useSeriesSuggestions.js": {
-    "mtime": 1788870925.4771104,
-    "seen": 1789126705.9277225,
-    "ast_hash": "72aeb6b7f3df797b0f3ec30b1376e0e9",
-    "semantic_hash": "72aeb6b7f3df797b0f3ec30b1376e0e9"
+    "mtime": 1791529457.2216475,
+    "seen": 1791998142.7912588,
+    "ast_hash": "ddd01b8f6516d758e72f82b6a5fa3462",
+    "semantic_hash": ""
   },
   "composables/useShareApp.js": {
     "mtime": 1785595084.2921464,
@@ -1032,16 +1026,16 @@
     "semantic_hash": "14ebf8425a342a63bc65454e3e18afc8"
   },
   "composables/useTTS.js": {
-    "mtime": 1789229856.3565767,
-    "seen": 1789468091.6363254,
-    "ast_hash": "b5e23d5a0be3f76f62865e4f81090d7e",
+    "mtime": 1795389413.5648656,
+    "seen": 1795391789.6488569,
+    "ast_hash": "e44b4dbee24a72cea2fbb0eba732a998",
     "semantic_hash": ""
   },
   "composables/useTTS.test.js": {
-    "mtime": 1782481582.1694682,
-    "seen": 1789126705.9277363,
-    "ast_hash": "3f3a55bcc59f58512d98b06128b97f09",
-    "semantic_hash": "3f3a55bcc59f58512d98b06128b97f09"
+    "mtime": 1791631695.129843,
+    "seen": 1791998142.7928796,
+    "ast_hash": "36364159234ccf902a3021e49f904cd4",
+    "semantic_hash": ""
   },
   "composables/useThemeCssVars.js": {
     "mtime": 1779733652.970409,
@@ -1056,9 +1050,9 @@
     "semantic_hash": "cfe899413028b552234f0f472e3523b5"
   },
   "composables/useUserProfile.js": {
-    "mtime": 1789978624.5948367,
-    "seen": 1789978997.0059638,
-    "ast_hash": "826391d6f4819d607f1d51a5854a1b87",
+    "mtime": 1791535645.8150938,
+    "seen": 1791998142.7935917,
+    "ast_hash": "22ef0e8ca137ec9936b84d4e0488c3aa",
     "semantic_hash": ""
   },
   "composables/useUserProfile.test.js": {
@@ -1074,27 +1068,27 @@
     "semantic_hash": "b9e68f9a04fc78bc51cc1730a116e304"
   },
   "layouts/default.vue": {
-    "mtime": 1789633969.7238462,
-    "seen": 1789634651.8554394,
-    "ast_hash": "112a4759fed3ad50d007f1afc9108047",
+    "mtime": 1791630420.3602018,
+    "seen": 1791998142.7943027,
+    "ast_hash": "c92611364028bfcc3e84baa229a891e0",
     "semantic_hash": ""
   },
   "layouts/reader.vue": {
-    "mtime": 1789215417.5517807,
-    "seen": 1789216826.578295,
-    "ast_hash": "eabc3f56af1525c7f135a017b064b528",
+    "mtime": 1790885579.0633624,
+    "seen": 1791998142.7943065,
+    "ast_hash": "6c323ea8d9efc2875416aacb3d7f66f6",
     "semantic_hash": ""
   },
   "nuxt.config.ts": {
-    "mtime": 1789978624.523123,
-    "seen": 1789978997.0059814,
-    "ast_hash": "4a01a8958b6c9fed068626bae28a711f",
+    "mtime": 1795421670.25246,
+    "seen": 1795422337.4186764,
+    "ast_hash": "c3b2e5e1f1a3afeedf55731c3519b63d",
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1789948002.2792995,
-    "seen": 1789948132.3889925,
-    "ast_hash": "e39da9e9a8e0fe039514d9cb0caf848b",
+    "mtime": 1795420991.8715327,
+    "seen": 1795422337.418683,
+    "ast_hash": "04355654dd3e455a52a160baed05f1ff",
     "semantic_hash": ""
   },
   "pages/add.vue": {
@@ -1116,9 +1110,9 @@
     "semantic_hash": "03a94c0fdf53d0c652d7bc0698034f36"
   },
   "pages/book/[id].vue": {
-    "mtime": 1789736051.7407737,
-    "seen": 1789947801.4745073,
-    "ast_hash": "becf21e585b881d2a9d1996a80d7e5c5",
+    "mtime": 1790873423.5410774,
+    "seen": 1791998142.7959855,
+    "ast_hash": "1688f9b35a1937fd2ec6a935111a3487",
     "semantic_hash": ""
   },
   "pages/books.vue": {
@@ -1144,12 +1138,6 @@
     "seen": 1789126705.9277847,
     "ast_hash": "6d0bd9efd9396f0de1264f9fb529d17d",
     "semantic_hash": "6d0bd9efd9396f0de1264f9fb529d17d"
-  },
-  "pages/genres.vue": {
-    "mtime": 1782814674.4660616,
-    "seen": 1789126705.9277878,
-    "ast_hash": "42df83a516db42e270863e0ac12bc30a",
-    "semantic_hash": "42df83a516db42e270863e0ac12bc30a"
   },
   "pages/highlights/[id].vue": {
     "mtime": 1784991630.2501886,
@@ -1182,15 +1170,15 @@
     "semantic_hash": "15891fccc6f924c4ee042dcb61916177"
   },
   "pages/profile.vue": {
-    "mtime": 1789215377.425635,
-    "seen": 1789216826.5868948,
-    "ast_hash": "a813bb854bed59aa5e01e7ebd6286154",
+    "mtime": 1790468409.45434,
+    "seen": 1791998142.800049,
+    "ast_hash": "52229b89e112880b2d816cc0757d4793",
     "semantic_hash": ""
   },
   "pages/reader/[id].vue": {
-    "mtime": 1789733929.5733001,
-    "seen": 1789947801.4745605,
-    "ast_hash": "ff2f8e76fc541075e206c517cd9e12d1",
+    "mtime": 1795389425.8050094,
+    "seen": 1795391789.659669,
+    "ast_hash": "4ec88fcca5a2e980099ad29a0ebb0aa4",
     "semantic_hash": ""
   },
   "pages/serie/[id].vue": {
@@ -1236,10 +1224,10 @@
     "semantic_hash": "7e5771dc4d41bfd35ec6ee1170c44dd0"
   },
   "pages/settings/preferences.vue": {
-    "mtime": 1784234893.3149748,
-    "seen": 1789126705.9278274,
-    "ast_hash": "7991e176ae7f06931779725957ddae38",
-    "semantic_hash": "7991e176ae7f06931779725957ddae38"
+    "mtime": 1790947170.9312122,
+    "seen": 1791998142.8038185,
+    "ast_hash": "b9b3d7e28c9e98fba4e017db2f5cf414",
+    "semantic_hash": ""
   },
   "pages/settings/privacy.vue": {
     "mtime": 1789467695.28064,
@@ -1260,10 +1248,10 @@
     "semantic_hash": "fe1353b203564205d6f2cee6bbc096cf"
   },
   "plugins/android-back-button.client.js": {
-    "mtime": 1783069304.6905189,
-    "seen": 1789126705.9278376,
-    "ast_hash": "68b894bd7c01123ad0fd8d7061cacbe1",
-    "semantic_hash": "68b894bd7c01123ad0fd8d7061cacbe1"
+    "mtime": 1791197169.648925,
+    "seen": 1791998142.8054497,
+    "ast_hash": "b80110a86fa63f0134486e3fc21ebc14",
+    "semantic_hash": ""
   },
   "plugins/app-update.client.js": {
     "mtime": 1785488884.0496163,
@@ -1272,10 +1260,10 @@
     "semantic_hash": "d1e14590509155efb9de8da9e9594d34"
   },
   "plugins/auto-metadata.client.js": {
-    "mtime": 1788871498.6519744,
-    "seen": 1789126705.9278429,
-    "ast_hash": "b21082011fb94bd8278ca06fbba08625",
-    "semantic_hash": "b21082011fb94bd8278ca06fbba08625"
+    "mtime": 1791529452.8214297,
+    "seen": 1791998142.8058052,
+    "ast_hash": "4008988a1c7a54aa3564479b61d0f76e",
+    "semantic_hash": ""
   },
   "plugins/device-library-sync.client.js": {
     "mtime": 1788994895.5495777,
@@ -1284,14 +1272,14 @@
     "semantic_hash": "5d77b332ab59fbb22124bd76ecf84c40"
   },
   "plugins/disable-sw-native.client.js": {
-    "mtime": 1783266559.077791,
-    "seen": 1789126705.9278479,
-    "ast_hash": "1c1856fc95d56d8aaf1a9fdad40cf197",
-    "semantic_hash": "1c1856fc95d56d8aaf1a9fdad40cf197"
+    "mtime": 1795421666.2020254,
+    "seen": 1795422337.4617295,
+    "ast_hash": "3fcf931a78b09a491e6ad345521e406a",
+    "semantic_hash": ""
   },
   "plugins/media-session.client.js": {
-    "mtime": 1784991630.2679055,
-    "seen": 1789126705.9278505,
+    "mtime": 1791998089.2011492,
+    "seen": 1791998142.8066752,
     "ast_hash": "91791477a3da0461ac7ff5024e931d10",
     "semantic_hash": "91791477a3da0461ac7ff5024e931d10"
   },
@@ -1308,10 +1296,10 @@
     "semantic_hash": "298c495c0eda824df48ced3c1e8758db"
   },
   "scripts/generate-version-manifest.mjs": {
-    "mtime": 1784416083.3547492,
-    "seen": 1789126705.9278576,
-    "ast_hash": "10b8309d116f4e7005b352e7b2d9963a",
-    "semantic_hash": "10b8309d116f4e7005b352e7b2d9963a"
+    "mtime": 1795420550.5400114,
+    "seen": 1795422337.472653,
+    "ast_hash": "e3eb7cad57f2c1eea873356a94996439",
+    "semantic_hash": ""
   },
   "scripts/sign-release-apk.sh": {
     "mtime": 1785594129.4918714,
@@ -1554,15 +1542,15 @@
     "semantic_hash": "85b23a3fea4cd55bf457a2ab1fcaf155"
   },
   "server/utils/metadataAggregator.ts": {
-    "mtime": 1789731804.5218241,
-    "seen": 1789947801.474919,
-    "ast_hash": "5eed011d22a5219c1e423549baf2b1ff",
+    "mtime": 1791497044.2077973,
+    "seen": 1791998142.8310888,
+    "ast_hash": "8ba515037faf0e52902fae2599d202ec",
     "semantic_hash": ""
   },
   "server/utils/metadataEnrichment.test.ts": {
-    "mtime": 1789634434.9646747,
-    "seen": 1789634651.8959863,
-    "ast_hash": "60b1daac874e2070f53d3e07ee67727d",
+    "mtime": 1791497046.194126,
+    "seen": 1791998142.831094,
+    "ast_hash": "6c00e7ed2c62c51388f0dab5d7589f90",
     "semantic_hash": ""
   },
   "server/utils/migrationAuditSchema.ts": {
@@ -1716,10 +1704,10 @@
     "semantic_hash": "8b6a4378a69cc9e117cc15ce65af8c6d"
   },
   "tests/appUpdate.test.js": {
-    "mtime": 1786060247.4425185,
-    "seen": 1789126705.9280207,
-    "ast_hash": "982f7a4afff4a6b370135e76707614d9",
-    "semantic_hash": "982f7a4afff4a6b370135e76707614d9"
+    "mtime": 1795420600.5763712,
+    "seen": 1795422337.5535023,
+    "ast_hash": "7af3180deafd9592b19c2385f30efd68",
+    "semantic_hash": ""
   },
   "tests/appVersioning.test.js": {
     "mtime": 1789130649.2000234,
@@ -1728,22 +1716,22 @@
     "semantic_hash": ""
   },
   "tests/autoMetadata.test.js": {
-    "mtime": 1784991630.3183506,
-    "seen": 1789126705.928026,
-    "ast_hash": "b0b153957f2d09190c4b2f8ece212eaf",
-    "semantic_hash": "b0b153957f2d09190c4b2f8ece212eaf"
+    "mtime": 1791529793.385554,
+    "seen": 1791998142.8443265,
+    "ast_hash": "5299484b7d7531ec35b5079df6b40a00",
+    "semantic_hash": ""
   },
   "tests/autoMetadataPacing.test.js": {
-    "mtime": 1784991630.3198683,
-    "seen": 1789126705.928028,
-    "ast_hash": "48006c148492c23e22365da2f2893065",
-    "semantic_hash": "48006c148492c23e22365da2f2893065"
+    "mtime": 1791529457.2302027,
+    "seen": 1791998142.844331,
+    "ast_hash": "52cc4c10b5d8446ca6e183104ce9ceec",
+    "semantic_hash": ""
   },
   "tests/deviceLibrarySync.test.js": {
-    "mtime": 1784991630.3219364,
-    "seen": 1789126705.928031,
-    "ast_hash": "a1e2615f446e8bb07c620de35cba4ee4",
-    "semantic_hash": "a1e2615f446e8bb07c620de35cba4ee4"
+    "mtime": 1791496256.281269,
+    "seen": 1791998142.8443353,
+    "ast_hash": "de3e5dafe67d457c7f28929d475cdbfd",
+    "semantic_hash": ""
   },
   "tests/deviceStorage.test.js": {
     "mtime": 1784991630.3239553,
@@ -1770,16 +1758,16 @@
     "semantic_hash": ""
   },
   "tests/mobileDesktopPurity.test.js": {
-    "mtime": 1789130656.1263845,
-    "seen": 1789216826.6585188,
-    "ast_hash": "c94bbb08d8fa2b8f10983d42dc89cd45",
+    "mtime": 1790509549.5353527,
+    "seen": 1791998142.8460622,
+    "ast_hash": "8d72de65d9c1bfcd50f81078cd4c931d",
     "semantic_hash": ""
   },
   "tests/mobileHomeAndProfile.test.js": {
-    "mtime": 1785488884.0518434,
-    "seen": 1789126705.9280467,
-    "ast_hash": "f748cc2d6268946d26049d93d6271e8b",
-    "semantic_hash": "f748cc2d6268946d26049d93d6271e8b"
+    "mtime": 1791535764.7359052,
+    "seen": 1791998142.846066,
+    "ast_hash": "5cf7b59d7d9fa3550186ce389b8541a1",
+    "semantic_hash": ""
   },
   "tests/mobileMetadataAndSettingsNav.test.js": {
     "mtime": 1783069702.9086866,
@@ -1788,9 +1776,9 @@
     "semantic_hash": "269de24911b00282bac74c3190344549"
   },
   "tests/mobileNajibudgetStyle.test.js": {
-    "mtime": 1789130734.5345085,
-    "seen": 1789216826.6601686,
-    "ast_hash": "c23526c812d6c8af606a41f054806eb1",
+    "mtime": 1790509551.9823968,
+    "seen": 1791998142.8464885,
+    "ast_hash": "bf5824bc9482a725665e0c2c316241ee",
     "semantic_hash": ""
   },
   "tests/mobileNativeAppConfig.test.js": {
@@ -1818,15 +1806,15 @@
     "semantic_hash": "046b7787d0c288eb14c3dede020fbc94"
   },
   "tests/pdfVoicesAndSeries.test.js": {
-    "mtime": 1788895177.739003,
-    "seen": 1789126705.9280646,
-    "ast_hash": "e2f5c0d6795db1a3e11bbe7cd0d0a08e",
-    "semantic_hash": "e2f5c0d6795db1a3e11bbe7cd0d0a08e"
+    "mtime": 1791663618.0098472,
+    "seen": 1791998142.8487465,
+    "ast_hash": "025a1f1f0a1a3d1caf9322da2bf0ffc3",
+    "semantic_hash": ""
   },
   "tests/preferences.test.js": {
-    "mtime": 1789733861.744176,
-    "seen": 1789947801.4751346,
-    "ast_hash": "a2650bfad18b1abbf76f3ea3c6721cf3",
+    "mtime": 1791630474.348806,
+    "seen": 1791998142.848754,
+    "ast_hash": "aca9031fe4db93bcc5a1eed502bcf1fa",
     "semantic_hash": ""
   },
   "tests/readerChromeAndListen.test.js": {
@@ -1842,15 +1830,15 @@
     "semantic_hash": "3299f7056676a036f2baa49a81b50570"
   },
   "tests/requestedUxUpdates.test.js": {
-    "mtime": 1789736278.3960834,
-    "seen": 1789947801.475154,
-    "ast_hash": "1f71ce4344d20e39404bcb07020de7a8",
+    "mtime": 1790494970.2217834,
+    "seen": 1791998142.8502722,
+    "ast_hash": "49aea44caa6e0c9d033fc6296db151c7",
     "semantic_hash": ""
   },
   "tests/responsiveComponentSplit.test.js": {
-    "mtime": 1789634376.1684322,
-    "seen": 1789634651.92289,
-    "ast_hash": "b203424e868859f09df0bd7959f9d4d6",
+    "mtime": 1790885728.594924,
+    "seen": 1791998142.8502767,
+    "ast_hash": "a40d3bed4ab9583174504208945771a9",
     "semantic_hash": ""
   },
   "tests/selectionAndFilters.test.js": {
@@ -1968,16 +1956,16 @@
     "semantic_hash": "60395735ca2c21c0ed67055af090ec6e"
   },
   "tests/seriesGrouping.test.js": {
-    "mtime": 1785579748.3760657,
-    "seen": 1789126705.9281254,
-    "ast_hash": "bcfd4af90a6b3fc916e91be56e5354cd",
-    "semantic_hash": "bcfd4af90a6b3fc916e91be56e5354cd"
+    "mtime": 1790509557.6884809,
+    "seen": 1791998142.8592842,
+    "ast_hash": "1fcd729f29584038b8994939662e2272",
+    "semantic_hash": ""
   },
   "tests/seriesMissingSweep.test.js": {
-    "mtime": 1785581092.5703819,
-    "seen": 1789126705.928128,
-    "ast_hash": "d3e536d52d77989fa59fbc63baca92a5",
-    "semantic_hash": "d3e536d52d77989fa59fbc63baca92a5"
+    "mtime": 1791496047.165889,
+    "seen": 1791998142.8592892,
+    "ast_hash": "8ccb045fd335d88c52f0c1d3b2fe53c4",
+    "semantic_hash": ""
   },
   "tests/seriesMutationGuard.test.js": {
     "mtime": 1789731830.4929113,
@@ -1986,10 +1974,10 @@
     "semantic_hash": ""
   },
   "tests/seriesPreservation.test.js": {
-    "mtime": 1786001873.7182288,
-    "seen": 1789126705.9281325,
-    "ast_hash": "c863b54d822a06449a5ff5d39cc5477a",
-    "semantic_hash": "c863b54d822a06449a5ff5d39cc5477a"
+    "mtime": 1791529564.182616,
+    "seen": 1791998142.859709,
+    "ast_hash": "242d578fe2999154748f5ceb3f5fd4c1",
+    "semantic_hash": ""
   },
   "tests/settingsPages.test.js": {
     "mtime": 1789218403.2071252,
@@ -2016,10 +2004,10 @@
     "semantic_hash": "2f55eae08b3b30bc9e9d60a221e2d485"
   },
   "tests/uxBatchFive.test.js": {
-    "mtime": 1786801467.5061374,
-    "seen": 1789126705.928151,
-    "ast_hash": "5713a389156ec042a1d93d287053b522",
-    "semantic_hash": "5713a389156ec042a1d93d287053b522"
+    "mtime": 1791415490.4895096,
+    "seen": 1791998142.8613806,
+    "ast_hash": "f063cc38a683bd18b5311f9c3afad58a",
+    "semantic_hash": ""
   },
   "tests/uxBatchFour.test.js": {
     "mtime": 1789329612.2945566,
@@ -2028,16 +2016,16 @@
     "semantic_hash": ""
   },
   "tests/uxBatchSix.test.js": {
-    "mtime": 1785488884.071171,
-    "seen": 1789126705.9281561,
-    "ast_hash": "e38e3b18b15b75cc84ce82391e3d3a39",
-    "semantic_hash": "e38e3b18b15b75cc84ce82391e3d3a39"
+    "mtime": 1791631752.8960724,
+    "seen": 1791998142.861864,
+    "ast_hash": "d0fd9c511af24acad481316237580377",
+    "semantic_hash": ""
   },
   "tests/uxBatchThree.test.js": {
-    "mtime": 1785488884.0731964,
-    "seen": 1789126705.9281585,
-    "ast_hash": "d349ff0da6dce5797f33860f54e46b5b",
-    "semantic_hash": "d349ff0da6dce5797f33860f54e46b5b"
+    "mtime": 1795381155.5478213,
+    "seen": 1795382314.6192176,
+    "ast_hash": "c9d6d02e59513c0acddeb887065c0575",
+    "semantic_hash": ""
   },
   "tsconfig.json": {
     "mtime": 1775638500.0,
@@ -2046,9 +2034,9 @@
     "semantic_hash": "99d8d7543e8bac462160e11d33e5146e"
   },
   "version.json": {
-    "mtime": 1789948077.6024368,
-    "seen": 1789948132.3895667,
-    "ast_hash": "58f8691bac1c615d9b9bbec3a754865e",
+    "mtime": 1791040747.5805745,
+    "seen": 1791998142.8647254,
+    "ast_hash": "47661ea9859241d3007887faf5d26830",
     "semantic_hash": ""
   },
   "vitest.config.ts": {
@@ -2082,9 +2070,9 @@
     "semantic_hash": ""
   },
   "components/tablet/BooksDesktop.vue": {
-    "mtime": 1789735522.7945378,
-    "seen": 1789947801.4739227,
-    "ast_hash": "ffb35eac397349cc0e524b69e45ba11b",
+    "mtime": 1791529457.2034314,
+    "seen": 1791998142.76618,
+    "ast_hash": "18e7fe3789e22dbf47a360201e7a77cd",
     "semantic_hash": ""
   },
   "components/tablet/FavouritesDesktop.vue": {
@@ -2094,9 +2082,9 @@
     "semantic_hash": ""
   },
   "components/tablet/HomeDesktop.vue": {
-    "mtime": 1789633501.2891705,
-    "seen": 1789634651.8018978,
-    "ast_hash": "573d62057eff1f7c9883c03cb6c0b86d",
+    "mtime": 1791544379.9522398,
+    "seen": 1791998142.766586,
+    "ast_hash": "8092bcba927b8322492225719f36a991",
     "semantic_hash": ""
   },
   "components/tablet/PlaylistsDesktop.vue": {
@@ -2106,9 +2094,9 @@
     "semantic_hash": ""
   },
   "components/tablet/ProfileDesktop.vue": {
-    "mtime": 1789978624.4806788,
-    "seen": 1789978997.005595,
-    "ast_hash": "d94c38e06bf7a326765d11a8c7a73047",
+    "mtime": 1791552958.1553752,
+    "seen": 1791998142.7669723,
+    "ast_hash": "b1943cb334eaf9419f4dd86fc60af3f4",
     "semantic_hash": ""
   },
   "components/tablet/SeriesDesktop.vue": {
@@ -2118,15 +2106,15 @@
     "semantic_hash": ""
   },
   "components/tablet/SettingsDesktop.vue": {
-    "mtime": 1789978624.4891014,
-    "seen": 1789978997.0056005,
-    "ast_hash": "427dd7d7832c66c178024415377ee278",
+    "mtime": 1791630420.4575007,
+    "seen": 1791998142.7674294,
+    "ast_hash": "f8e2aa025f1fab0f98ab8b68f2e7c1c0",
     "semantic_hash": ""
   },
   "components/tablet/Sidebar.vue": {
-    "mtime": 1789978624.497947,
-    "seen": 1789978997.0056036,
-    "ast_hash": "37bac0b37686e39023504f56b6065e1b",
+    "mtime": 1790874523.868559,
+    "seen": 1791998142.7674327,
+    "ast_hash": "855c4fb78abdd98831633b50fdfc4e21",
     "semantic_hash": ""
   },
   "components/tablet/portrait/AddBookTabletPortrait.vue": {
@@ -2184,9 +2172,9 @@
     "semantic_hash": ""
   },
   "components/tablet/portrait/ReaderTabletPortrait.vue": {
-    "mtime": 1789215123.6069047,
-    "seen": 1789216826.506918,
-    "ast_hash": "7550f5f2c7d7f31c685db1486b834eca",
+    "mtime": 1790873666.9878807,
+    "seen": 1791998142.77081,
+    "ast_hash": "80ce7354aee99260f03fb12821ac3aee",
     "semantic_hash": ""
   },
   "components/tablet/portrait/SeriesDetailTabletPortrait.vue": {
@@ -2208,9 +2196,9 @@
     "semantic_hash": ""
   },
   "components/tablet/portrait/SettingsTabletPortrait.vue": {
-    "mtime": 1789215312.091721,
-    "seen": 1789216826.5069404,
-    "ast_hash": "3a586e13edeabbed0765a1814a013423",
+    "mtime": 1790873055.499061,
+    "seen": 1791998142.772021,
+    "ast_hash": "e8fc3d5e24e5cd35c7131f709c4f0d56",
     "semantic_hash": ""
   },
   "components/tablet/portrait/TabletPlayingBar.vue": {
@@ -2238,9 +2226,9 @@
     "semantic_hash": ""
   },
   ".github/workflows/publish-version-manifest.yml": {
-    "mtime": 1785500782.7065797,
-    "seen": 1789216826.6917906,
-    "ast_hash": "76fde703c865cd4f8d6d81fdc58d32e9",
+    "mtime": 1795420591.1925871,
+    "seen": 1795422337.615461,
+    "ast_hash": "e1ef2bdd1d642fa3436305d3018df599",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -2256,9 +2244,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1786711274.2764013,
-    "seen": 1789216826.6918108,
-    "ast_hash": "3c43d78d7f000930183d56db7837324d",
+    "mtime": 1795422001.0192022,
+    "seen": 1795422337.616432,
+    "ast_hash": "3e159396e717d2cee0d0778e4d1bda6a",
     "semantic_hash": ""
   },
   "design-qa.md": {
@@ -3073,26 +3061,26 @@
   },
   "server/database/migrations/0000_add-pages-column.sql": {
     "mtime": 1778139591.9198406,
-    "seen": 1789947801.4747605,
-    "ast_hash": "fae8f00f3932a1e5e3f11be8ea24f3ea",
+    "seen": 1792054380.0626812,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0001_naive_stark_industries.sql": {
     "mtime": 1778224044.757941,
-    "seen": 1789947801.4747653,
-    "ast_hash": "bcb6d05640ed56e698637c15d100f6e7",
+    "seen": 1792054380.0626855,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0002_drop_content_column.sql": {
     "mtime": 1778991194.1574428,
-    "seen": 1789947801.4747725,
-    "ast_hash": "812224c49041ad46b8e8d1e772855b69",
+    "seen": 1792054380.0626888,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "components/shared/BookProgressDisplay.vue": {
-    "mtime": 1789733430.9689872,
-    "seen": 1789947801.473667,
-    "ast_hash": "10ede4578dcd9a2f0c101a969ec49f11",
+    "mtime": 1790942672.5631356,
+    "seen": 1791998142.755427,
+    "ast_hash": "5d72751757a0898aa75bd5b11c00f0af",
     "semantic_hash": ""
   },
   "components/shared/BookRatingDisplay.vue": {
@@ -3114,21 +3102,21 @@
     "semantic_hash": ""
   },
   "composables/useRatingSync.js": {
-    "mtime": 1789467940.4970868,
-    "seen": 1789468091.6307364,
-    "ast_hash": "5cce77256bd0d897fbe85280d90812f4",
+    "mtime": 1791495906.6448984,
+    "seen": 1791998142.7884054,
+    "ast_hash": "84e3159e07a883503bbde9badee7c107",
     "semantic_hash": ""
   },
   "plugins/settings-system-bars.client.js": {
-    "mtime": 1789633727.5305276,
-    "seen": 1789634651.871827,
-    "ast_hash": "a60bf1de8e696af558db6381a7574594",
+    "mtime": 1791196728.7505422,
+    "seen": 1791998142.807098,
+    "ast_hash": "26e55d98582453a3298d9daf8bc04cd5",
     "semantic_hash": ""
   },
   "plugins/system-bars.client.js": {
-    "mtime": 1789633723.295468,
-    "seen": 1789634651.871836,
-    "ast_hash": "a54ab9bf54b7bf4e180285884b22440a",
+    "mtime": 1791196729.1928668,
+    "seen": 1791998142.8071024,
+    "ast_hash": "40fa6d7c6b1f63f3f343112afe4071ac",
     "semantic_hash": ""
   },
   "server/api/books/rating.get.ts": {
@@ -3186,9 +3174,9 @@
     "semantic_hash": ""
   },
   "components/mobile/SettingsStorageResetMobile.vue": {
-    "mtime": 1789936464.6935098,
-    "seen": 1789947801.4736233,
-    "ast_hash": "ff43253a96ea75164392ddd78627a2de",
+    "mtime": 1791497146.0186317,
+    "seen": 1791998142.7536664,
+    "ast_hash": "71bdd731143696e89660c410a7ffbe94",
     "semantic_hash": ""
   },
   "composables/useBookEditNavigation.js": {
@@ -3233,790 +3221,2542 @@
     "ast_hash": "af10b32e4ec4b9cd7f939d53bd8fd3ae",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/5JkcT4B-.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0744305,
-    "ast_hash": "43807df471f021f4a571c8304ce7f6e4",
+  "android/app/src/main/java/com/bookish/app/AppResetPlugin.java": {
+    "mtime": 1791495903.5610995,
+    "seen": 1791998142.7449262,
+    "ast_hash": "85bf887ca3deb2f7b370095a1f1583eb",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/67QK-hSw.js": {
-    "mtime": 1789978189.4812288,
-    "seen": 1789978291.0744362,
-    "ast_hash": "2263e697ddbdd57ec2ab1c3710d47aec",
+  "android/app/src/main/java/com/bookish/app/PageSyncPlugin.java": {
+    "mtime": 1791113941.9376762,
+    "seen": 1791998142.7457035,
+    "ast_hash": "5ed23b21e16d9398e8185442c26a78f8",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/9VNLicRS.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0744398,
-    "ast_hash": "e22ee375c8a4f134281e0a88b8f895af",
+  "components/mobile/BottomNavigationPreferencesMobile.vue": {
+    "mtime": 1791037264.1545198,
+    "seen": 1791998142.7503169,
+    "ast_hash": "0cbb26252e815b81fa574d54f646bc53",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/ABJzF0zC.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.0744429,
-    "ast_hash": "2a6496697e865a798ce971cb514e719a",
+  "components/mobile/TopNavigationPreferencesMobile.vue": {
+    "mtime": 1791630131.278575,
+    "seen": 1791998142.7540078,
+    "ast_hash": "f7776e8a7b81296193ff86282e37b102",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/B-V3t04U.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.074446,
-    "ast_hash": "06895e937c8eb98eb0a43f4864430298",
+  "components/shared/AvatarSourcePicker.vue": {
+    "mtime": 1791039616.834555,
+    "seen": 1791998142.7554188,
+    "ast_hash": "4f04e72c6920def6908acaea7f1750ac",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/B3aFN2qE.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0744488,
-    "ast_hash": "b032b0a9cd9d9f43ea26054af98d70e8",
+  "components/shared/DocumentTypePicker.vue": {
+    "mtime": 1791455030.7917438,
+    "seen": 1791998142.7572827,
+    "ast_hash": "9ba00afc4f5dc4d7c79235f412e5416e",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/B4ZZ2GXZ.js": {
-    "mtime": 1789978189.474383,
-    "seen": 1789978291.0744517,
-    "ast_hash": "e8b4e84837c0570cc8e5fd535fffd380",
+  "components/shared/ProfilePage.vue": {
+    "mtime": 1791535647.029899,
+    "seen": 1791998142.7623656,
+    "ast_hash": "ba5890085f7d3f705389a01b12e96ca1",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/B6hSgSUR.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0744545,
-    "ast_hash": "d8083fcd37200955bbebaf1e51def96b",
+  "components/shared/SearchingOrb.vue": {
+    "mtime": 1791533039.3499963,
+    "seen": 1791998142.7630446,
+    "ast_hash": "53119be3915f236dab30e6f96daad464",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/B75MOh95.js": {
-    "mtime": 1789978189.489202,
-    "seen": 1789978291.0744574,
-    "ast_hash": "6c62215ddd642b0dfc6a23b9b2646f3c",
+  "components/shared/SeriesMembershipPicker.vue": {
+    "mtime": 1791544444.461313,
+    "seen": 1791998142.7633927,
+    "ast_hash": "0fd17b41a4851b3407412d79f71107a1",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BBnX5xw4.js": {
-    "mtime": 1789978189.4812288,
-    "seen": 1789978291.0744603,
-    "ast_hash": "b63a6c814e11c0837136540cf08ca10f",
+  "composables/documentIdentity.js": {
+    "mtime": 1791477065.4625475,
+    "seen": 1791998142.772728,
+    "ast_hash": "95e06c9ca1ed15c83f37fb1401cb82ab",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BDI3_C3n.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.074463,
-    "ast_hash": "318ad754f53f971caa501c188deedb4f",
+  "composables/documentIntelligence.js": {
+    "mtime": 1791495946.726521,
+    "seen": 1791998142.772732,
+    "ast_hash": "eb00ca220a4fc1982371823450f4a4c3",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BEhAsajr.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0744653,
-    "ast_hash": "ceaa1a2ba98893abd8786c47907473a0",
+  "composables/documentIntelligence.test.js": {
+    "mtime": 1791473813.2109694,
+    "seen": 1791998142.7727342,
+    "ast_hash": "a81aadb175e9c7e029ebe7b5133f619a",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BMFUV_KN.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0744681,
-    "ast_hash": "875f412ecdd420cdd0f2c4aa8a1af955",
+  "composables/metadataPolicy.js": {
+    "mtime": 1791529457.1832845,
+    "seen": 1791998142.7730749,
+    "ast_hash": "f0729c4ef41934320457701b8d7cf86a",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BOw-0qHO.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0744712,
-    "ast_hash": "de45efe1e61fa63b020c9bc5e4cc23ca",
+  "composables/metadataRecovery.js": {
+    "mtime": 1791496526.7265434,
+    "seen": 1791998142.77308,
+    "ast_hash": "647a81622af709250d8195983eedad0f",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BPWEvC_a.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.0744736,
-    "ast_hash": "44941810478f090e4bb4133824b2d6a1",
+  "composables/metadataSafety.test.js": {
+    "mtime": 1791529489.1183634,
+    "seen": 1791998142.7730827,
+    "ast_hash": "c0aecbc1e15b9a712864d74ba56f1ee7",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BUJPZyaX.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0744762,
-    "ast_hash": "d4a39601b1450df217056e6e3f3ad5c0",
+  "composables/sourceBookIdentity.js": {
+    "mtime": 1791497783.640021,
+    "seen": 1791998142.7734725,
+    "ast_hash": "efdf2a6eabf3ab8939fbd1b45c07aa21",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BUkT8CbN.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.074479,
-    "ast_hash": "6bc7e8c725abffdc315e4fe7f6498a14",
+  "composables/tts/nativeSpeechRanges.test.js": {
+    "mtime": 1791664976.1900542,
+    "seen": 1791998142.774641,
+    "ast_hash": "7512fe40a9979ede086e922a80b848aa",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BW5j-qiM.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0744815,
-    "ast_hash": "0315438523b481badccc580d172c1890",
+  "composables/tts/timing.js": {
+    "mtime": 1791117381.9553277,
+    "seen": 1791998142.774645,
+    "ast_hash": "209077ce6fb2123ddcb30a6113d47be9",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BYe9tUhK.js": {
-    "mtime": 1789978189.474383,
-    "seen": 1789978291.074484,
-    "ast_hash": "c56f4121e4608504b81dfdb57404566d",
+  "composables/tts/timing.test.js": {
+    "mtime": 1791117382.910245,
+    "seen": 1791998142.774648,
+    "ast_hash": "f051115fe1dca5aef2743aaf4483d928",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BcQn2aJ4.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0744865,
-    "ast_hash": "abb05b35618c3bca5712d4ea0f76d5fb",
+  "composables/useBookAnalytics.js": {
+    "mtime": 1791206076.937321,
+    "seen": 1791998142.7774878,
+    "ast_hash": "6e1bf6a1c2a3b80a6dbfa059d735a8c8",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BcTGGfoY.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0744894,
-    "ast_hash": "0f2a5b3f64f3344865fb92e536c3325b",
+  "composables/useBookAnalytics.test.js": {
+    "mtime": 1791206155.7010677,
+    "seen": 1791998142.7774916,
+    "ast_hash": "37f497f0c93061fc9868638d10d1ca16",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Bed9ObDU.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0744922,
-    "ast_hash": "ebe3de80b149c98bffabaf6e2939aa3c",
+  "composables/useDailyCompliment.js": {
+    "mtime": 1790507906.2348187,
+    "seen": 1791998142.7810354,
+    "ast_hash": "a976a424e4a7cf66b0c548d24563298b",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Bk1AJfmD.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0744948,
-    "ast_hash": "375604bad42ef1d27605940131d35214",
+  "composables/useDocumentIntelligence.js": {
+    "mtime": 1791497654.2929795,
+    "seen": 1791998142.782464,
+    "ast_hash": "e89d6a0e9e9fb5da3a0334b42a116179",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BsCyUOfY.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0744977,
-    "ast_hash": "eaf0e59a797d3dfc62c19fa88ab2cc43",
+  "composables/useDocumentIntelligence.test.js": {
+    "mtime": 1791497784.9880543,
+    "seen": 1791998142.782468,
+    "ast_hash": "f9dff963e8a74fa0dfca9fafb378ea6f",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Bux6oAyl.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0745006,
-    "ast_hash": "52331a2925067806aa614c5649a432e7",
+  "composables/useDocumentIntelligenceStore.js": {
+    "mtime": 1791495599.415076,
+    "seen": 1791998142.7824717,
+    "ast_hash": "150a759fa968cd883325b3f5bd9c38de",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/BxX5Q09J.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0745037,
-    "ast_hash": "c039aff64cf2e2eadfb58c84323e475b",
+  "composables/useDocumentIntelligenceStore.test.js": {
+    "mtime": 1791473825.8923135,
+    "seen": 1791998142.782475,
+    "ast_hash": "710106c2a32a5509ab2992bcab7f24e9",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/C-RbsSWT.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.074506,
-    "ast_hash": "2f212adf4e30f5e052fbdfc6c9784ece",
+  "composables/useDocumentReview.js": {
+    "mtime": 1791477530.4557776,
+    "seen": 1791998142.782478,
+    "ast_hash": "550f46c21142366a0f66342a7bc582fd",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/C-cRj51Z.js": {
-    "mtime": 1789978189.4812288,
-    "seen": 1789978291.074508,
-    "ast_hash": "55e7104679bc63a85ac54dd16171e05e",
+  "composables/useDocumentReview.test.js": {
+    "mtime": 1791473670.5003948,
+    "seen": 1791998142.7824807,
+    "ast_hash": "d49fe37a6044be64fede3667ce77c1eb",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/C12B7_Kl.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.074511,
-    "ast_hash": "0cca0b72e2350c97d17560055d64b13e",
+  "composables/useListenProgress.js": {
+    "mtime": 1791117142.8674493,
+    "seen": 1791998142.785259,
+    "ast_hash": "f3a36e4065935c3b92cbe9b1bde7554b",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/C1lJLqxa.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0745137,
-    "ast_hash": "40bf87ea7abf7768b5cacf80c76a282e",
+  "composables/useListenProgress.test.js": {
+    "mtime": 1791117143.9877908,
+    "seen": 1791998142.7852635,
+    "ast_hash": "169c8770850fac6a9ac37d10fe051b11",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/C5M-x6MD.js": {
-    "mtime": 1789978189.4812288,
-    "seen": 1789978291.0745165,
-    "ast_hash": "2e845c6c3507323c869b4c889679107f",
+  "composables/usePageSyncMatch.js": {
+    "mtime": 1791113941.4354067,
+    "seen": 1791998142.7866347,
+    "ast_hash": "f6f6b7a7f194b7d0c295d055caa1e269",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CFWCaXjP.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0745192,
-    "ast_hash": "94425a6ff38cd9fa7b15b4ce9cfe86fc",
+  "composables/usePageSyncMatch.test.js": {
+    "mtime": 1791114165.375479,
+    "seen": 1791998142.786638,
+    "ast_hash": "23f14a1d60772c6900858847cae3b3dc",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CFhmFvzF.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0745218,
-    "ast_hash": "59a3a65af770b2b0c74ea2476278a5bc",
+  "composables/useTTS.resume.test.js": {
+    "mtime": 1791064074.3613281,
+    "seen": 1791998142.7928758,
+    "ast_hash": "050774dbbaece5d5a82bf29018af6061",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CHfjGXPl.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0745244,
-    "ast_hash": "c7e458305db07deebc974a2723916f56",
+  "pages/analytics/[id].vue": {
+    "mtime": 1791550833.7332063,
+    "seen": 1791998142.7947364,
+    "ast_hash": "9f93aa2e960275d6cb701ff36c9d908a",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CIKxhCpr.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.074527,
-    "ast_hash": "5765628a87ed6295bd9360464584e0f8",
+  "pages/editprofilepage.vue": {
+    "mtime": 1790468415.3305595,
+    "seen": 1791998142.797304,
+    "ast_hash": "a813bb854bed59aa5e01e7ebd6286154",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CJzlubhx.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0745296,
-    "ast_hash": "c7d82caf59d188743523bcf88f4938d4",
+  "pages/listen-settings/[id].vue": {
+    "mtime": 1791544380.5214386,
+    "seen": 1791998142.7984908,
+    "ast_hash": "fa070b31a4c87d54f18d6969cfd7f985",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CSH8Fg-0.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0745323,
-    "ast_hash": "ab2b3ee3eb037016161ccdbb89f60b25",
+  "pages/notifications.vue": {
+    "mtime": 1791477575.149721,
+    "seen": 1791998142.799024,
+    "ast_hash": "0337ca99233b9a4d0408e82085677fa1",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/C_tqdgC0.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0745347,
-    "ast_hash": "187360ab89263a92403538f66f0c7a24",
+  "pages/read-settings/[id].vue": {
+    "mtime": 1791631555.812323,
+    "seen": 1791998142.8000546,
+    "ast_hash": "597ec5e8f6d48740dea3f22a14e6becb",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Ccaza-hF.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0745375,
-    "ast_hash": "d48e65422f2c03cec891145253318b11",
+  "pages/review-documents.vue": {
+    "mtime": 1791477536.0004475,
+    "seen": 1791998142.8000646,
+    "ast_hash": "1bf123e578972ebbe9c2faff44c59f63",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Cf1qQLhP.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0745397,
-    "ast_hash": "7f679088935d368467920fd611d82547",
+  "pages/settings.vue": {
+    "mtime": 1790947510.6940806,
+    "seen": 1791998142.8017187,
+    "ast_hash": "93c05bdca55754b64114f52137300178",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Ch3YINNP.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.074542,
-    "ast_hash": "eb29e11ac74bb2c7c9a70bff835aa0cf",
+  "pages/settings/preferences/bottom-navigation.vue": {
+    "mtime": 1790947182.8795736,
+    "seen": 1791998142.8038273,
+    "ast_hash": "59c51695b14dcb2332ff96027d3c412e",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Cj5xYdIp.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.074545,
-    "ast_hash": "1fac62946d19e4da8517e230826cf8b2",
+  "pages/settings/preferences/top-navigation.vue": {
+    "mtime": 1791552203.640864,
+    "seen": 1791998142.8038335,
+    "ast_hash": "44d33897d9c08ed85f9bf9face2e8de0",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Cpj98o6Y.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0745478,
-    "ast_hash": "146eaf85c344cee008c91f2685dbf82f",
+  "plugins/book-analytics.client.js": {
+    "mtime": 1791205873.3135293,
+    "seen": 1791998142.8058093,
+    "ast_hash": "17dd499cd409d7f3969a39853c244cd7",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CprV63pF.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0745509,
-    "ast_hash": "c677ff278d7824ececf8dea8fad2b998",
+  "scripts/inspect-device-library.mjs": {
+    "mtime": 1791496526.2526755,
+    "seen": 1791998142.807997,
+    "ast_hash": "ab8b9f391fc626da48ab3312f4c9fcbe",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Cvdz0ic2.js": {
-    "mtime": 1789978189.4780643,
-    "seen": 1789978291.0745533,
-    "ast_hash": "c0de7354cf5724c82efeb1a80ab6ee44",
+  "services/immersive/data/contextual-audition-v1/full/audit.json": {
+    "mtime": 1791934057.116774,
+    "seen": 1791998142.8425493,
+    "ast_hash": "7194f738b6b944fe8f94e54ef3e8ffbc",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Cy4FebX7.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0745564,
-    "ast_hash": "eaf325635d41c792e63fa0a60fc64e9d",
+  "services/immersive/data/contextual-audition-v1/full/blind-mapping.json": {
+    "mtime": 1791934542.7541254,
+    "seen": 1791998142.8425534,
+    "ast_hash": "ca343791f6a29e6ba59532d9058e4fb7",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/CyDNiwFy.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.074559,
-    "ast_hash": "e62589d1c5c818cec5bcc73168e2af34",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/manifest.json": {
+    "mtime": 1791933529.7248602,
+    "seen": 1791998142.8425567,
+    "ast_hash": "cfbea0b6f3f7ed55d63cab073a92eb59",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/D-W5Btpj.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0745614,
-    "ast_hash": "504498a554d678093c51a3baffac5d79",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/manifest.json": {
+    "mtime": 1791933424.5543733,
+    "seen": 1791998142.842561,
+    "ast_hash": "24856c76f9c6884e000b83c64388bf92",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/D0rCik1O.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0745637,
-    "ast_hash": "f7b43e3aaac366aa8bd406316e69890b",
+  "services/immersive/data/contextual-audition-v1/full/mara-us-v1/map.json": {
+    "mtime": 1791935489.5008576,
+    "seen": 1791998142.8425646,
+    "ast_hash": "a3c1c2cdf26534c39e17f6385deede29",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/D0toqlkb.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0745668,
-    "ast_hash": "9b07c939867e51cfb5e96b99a0f0e3fa",
+  "services/immersive/data/contextual-audition-v1/full/original-door/manifest.json": {
+    "mtime": 1791933180.3062656,
+    "seen": 1791998142.8425674,
+    "ast_hash": "23b0630ce87a9033d8c1ab0d80b247d0",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/D23xq3nL.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0745697,
-    "ast_hash": "2db3ba18c30113bbcf2b5e0319287e03",
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/map.json": {
+    "mtime": 1791988059.1450355,
+    "seen": 1791998142.8425705,
+    "ast_hash": "9113d32edc4ad3784226c4d54b091d7c",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/D4ak7zMx.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0745723,
-    "ast_hash": "5faaff3c8548e49e6a974b7db2f29252",
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/config.json": {
+    "mtime": 1791989247.8322494,
+    "seen": 1791998142.8425734,
+    "ast_hash": "355218aeac93e0467da068dc9caedd44",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/D58HeFwH.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.074575,
-    "ast_hash": "e5506c83b999e60870f0e18f090f2fd1",
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/map.json": {
+    "mtime": 1791989247.830245,
+    "seen": 1791998142.8425763,
+    "ast_hash": "3351bdc04327a2989027e58f53157140",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DDHDfiBz.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.074577,
-    "ast_hash": "e78ba0f1609bb99edf7e3131d5becf1f",
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/manifest.json": {
+    "mtime": 1791934012.3345723,
+    "seen": 1791998142.8425791,
+    "ast_hash": "a04988ce9b972b5b2d845447c3717e41",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DEn-2_OS.js": {
-    "mtime": 1789978189.4780643,
-    "seen": 1789978291.07458,
-    "ast_hash": "b9cc8f81a71f1ff5563b4a9413cc84ef",
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/manifest.json": {
+    "mtime": 1791933224.728697,
+    "seen": 1791998142.8425822,
+    "ast_hash": "2e0d8b4f653def5ade9fae60e5796ce7",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DFCv8GAS.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.0745823,
-    "ast_hash": "a90f4b1ff5a4210d8cc6bf96ea7e16df",
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/manifest.json": {
+    "mtime": 1791933582.2103798,
+    "seen": 1791998142.8425848,
+    "ast_hash": "21028edafe1ffb6c528e63d383d4b597",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DKHfM0Qa.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0745847,
-    "ast_hash": "1cff53163493811c2cd20abae4d637d1",
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/manifest.json": {
+    "mtime": 1791933353.3699834,
+    "seen": 1791998142.842588,
+    "ast_hash": "868c4d62d91e8bc613ec0dd7befba480",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DL4JPYl_.js": {
-    "mtime": 1789978189.4780643,
-    "seen": 1789978291.074587,
-    "ast_hash": "67e925df5a02ec59b63bb15600465e09",
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/manifest.json": {
+    "mtime": 1791933483.1039684,
+    "seen": 1791998142.8425913,
+    "ast_hash": "1bb0458fd232c5c3d9e7371d9ca9ab6c",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DOgoeE6f.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.07459,
-    "ast_hash": "46d9bea80d39cf399dd4124eb0abcd2d",
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/blind-mapping.json": {
+    "mtime": 1791932372.9335864,
+    "seen": 1791998142.8425941,
+    "ast_hash": "a780cebbd7889b4f9e9285c3bff6f290",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DP3_tlzr.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0745926,
-    "ast_hash": "b15770b04e2f5dc232e3c9d154bd22bd",
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/manifest.json": {
+    "mtime": 1791931995.3795648,
+    "seen": 1791998142.842597,
+    "ast_hash": "5e6878666c867d7615a0b93eca31f2a3",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DQ_wlJcA.js": {
-    "mtime": 1789978189.4812288,
-    "seen": 1789978291.0745947,
-    "ast_hash": "72fade75cc635de14c224d81ab6c7f14",
+  "services/immersive/data/contextual-audition-v1/plan-gold.json": {
+    "mtime": 1791931160.3377795,
+    "seen": 1791998142.8426008,
+    "ast_hash": "20c56abe410bc68ef67cfaa6ee459b67",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DTtNUFxP.js": {
-    "mtime": 1789978189.4780643,
-    "seen": 1789978291.0745971,
-    "ast_hash": "6c8a98cc76a762ca59999f50d0dc6e2b",
+  "services/immersive/data/contextual-audition-v1/plan-model.json": {
+    "mtime": 1791932972.0159402,
+    "seen": 1791998142.842604,
+    "ast_hash": "caa148d79ac697e3e9405b3c34872182",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DX9u_fId.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0746,
-    "ast_hash": "b3ea8531de20b88d7034cda07fbf7bee",
+  "services/immersive/data/trial-access.json": {
+    "mtime": 1791843967.7436981,
+    "seen": 1791998142.8426073,
+    "ast_hash": "d5ca5a711fa0dcdb9f9d394b9b48b300",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DXuW3F03.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0746026,
-    "ast_hash": "626244ef5b44ab4108cb25e911f60f5f",
+  "services/immersive/data/trial-hybrid-v3-result.json": {
+    "mtime": 1791893129.533512,
+    "seen": 1791998142.8426104,
+    "ast_hash": "3add248ac97abb6821a964488dca341f",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/D_grzeH2.js": {
-    "mtime": 1789978189.474383,
-    "seen": 1789978291.0746052,
-    "ast_hash": "6d5eafa6c475f535bd59122e9b40f283",
+  "services/immersive/data/trial-hybrid-v3-session.json": {
+    "mtime": 1791892430.0993493,
+    "seen": 1791998142.8426135,
+    "ast_hash": "e212c8bc95e68aadb5de0622e536704c",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DgM-Tn__.js": {
-    "mtime": 1789978189.489202,
-    "seen": 1789978291.0746076,
-    "ast_hash": "cd31a00444ceeb6cf9789e90d7b9fe35",
+  "services/immersive/data/trial-restrained-v2-result.json": {
+    "mtime": 1791885206.2993698,
+    "seen": 1791998142.8426163,
+    "ast_hash": "056355eef3295366c096f568758d4525",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DijYkd-2.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.07461,
-    "ast_hash": "dfa02544abb04071c3fac4b1790f664f",
+  "services/immersive/data/trial-restrained-v2-session.json": {
+    "mtime": 1791885025.072196,
+    "seen": 1791998142.842619,
+    "ast_hash": "6183ca7a10fe3cc2af1ac242054a6676",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DjtRlowM.js": {
-    "mtime": 1789978189.4855714,
-    "seen": 1789978291.0746124,
-    "ast_hash": "620d7a2dadc40d536fc2126cbfb0a43f",
+  "services/immersive/data/trial-smoke-result.json": {
+    "mtime": 1791843853.9929078,
+    "seen": 1791998142.8426213,
+    "ast_hash": "cac3a9368248fc00c7f7f1fee72fcf74",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Dl-iy7qS.js": {
-    "mtime": 1789978189.474383,
-    "seen": 1789978291.074615,
-    "ast_hash": "8fed783350fd0c46bd822cb8fcc63002",
+  "services/immersive/data/trial-smoke-session.json": {
+    "mtime": 1791843734.5958657,
+    "seen": 1791998142.8426247,
+    "ast_hash": "e64341c76bcc8c38c4e1c8426a24871e",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DsKm6pLg.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.074618,
-    "ast_hash": "9446497d8740a63c9a041b4fa6357669",
+  "tests/edgeSpeechConnection.test.js": {
+    "mtime": 1791700902.7961812,
+    "seen": 1791998142.8452613,
+    "ast_hash": "e597804ec8722fd3214649dd8e6e9d43",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DsY5pEH9.js": {
-    "mtime": 1789978189.4780643,
-    "seen": 1789978291.0746207,
-    "ast_hash": "18931a024e40ba2c15f763465d95b5ed",
+  "tests/pdfReaderNavigation.test.js": {
+    "mtime": 1791665215.857086,
+    "seen": 1791998142.848737,
+    "ast_hash": "d115f80fea592ecd18d5e5e77030ceb3",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/DzlUQh5b.js": {
-    "mtime": 1789978189.4780643,
-    "seen": 1789978291.0746236,
-    "ast_hash": "5d709340e229df1b7e7c782d8d57213c",
+  "tests/profilePreferencesAndCompliments.test.js": {
+    "mtime": 1790508599.846892,
+    "seen": 1791998142.8487587,
+    "ast_hash": "cfb60b7b58f5cbf670d730f99bda7a76",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/G8Siohqk.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.0746257,
-    "ast_hash": "ed7099f863c6383fd7c02d397ab554cb",
+  "utils/bookSeriesState.js": {
+    "mtime": 1791529451.6205533,
+    "seen": 1791998142.8647058,
+    "ast_hash": "444f33a8cfcb38861c00d314828ca8c7",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/HCBmfE-O.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0746284,
-    "ast_hash": "d32ab2cbf4035737fedabdf3402df564",
+  "utils/metadataIdentity.js": {
+    "mtime": 1791536356.2816968,
+    "seen": 1791998142.8647106,
+    "ast_hash": "d5a37739e12a1dce499731cc9ac1d529",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/P22CZNCU.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.0746307,
-    "ast_hash": "c0fc4e3f665df3ab04571d543adb8140",
+  "utils/profileDraft.js": {
+    "mtime": 1791552238.4567428,
+    "seen": 1791998142.8647137,
+    "ast_hash": "10c0383b22f1e8ddf736ec210154cc89",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Q_0UIkpk.js": {
-    "mtime": 1789978189.474383,
-    "seen": 1789978291.0746331,
-    "ast_hash": "f884bef8c2e7807c1e6e0dd71dc8932c",
+  "utils/profileDraft.test.js": {
+    "mtime": 1791552239.1400366,
+    "seen": 1791998142.8647168,
+    "ast_hash": "89864e646ec4c88ea4af5bd1ef056e17",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/RId8cFMl.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0746357,
-    "ast_hash": "5c6f060ab4b8aca9c0b137bbc37300ec",
+  "vendor/thinking-orbs/engine-core.js": {
+    "mtime": 499162500.0,
+    "seen": 1791998142.8647203,
+    "ast_hash": "a54b21992d7ad6553425859ed2e5dfe5",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/WUl-VInr.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0746386,
-    "ast_hash": "32748e39e6ab31e5f28456ed8d685908",
+  "docs/document-intelligence-fix-instructions.md": {
+    "mtime": 1791476901.7987175,
+    "seen": 1791998142.8687906,
+    "ast_hash": "e9860287886a54b10f935b65e6736cbc",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/YugXHjuw.js": {
-    "mtime": 1789978189.4769907,
-    "seen": 1789978291.0746415,
-    "ast_hash": "c88d91b4db43d2d715439afd1ebe8a68",
+  "docs/document-intelligence-redesign.md": {
+    "mtime": 1791474422.987062,
+    "seen": 1791998142.8687968,
+    "ast_hash": "7a681043a38aebd042cf33e55aed06ee",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/Z2Bu6WWa.js": {
-    "mtime": 1789978189.4920018,
-    "seen": 1789978291.0746443,
-    "ast_hash": "553dda3787de76f0f5a3b85de5bd915a",
+  "docs/metadata-and-pdf-repair-report.md": {
+    "mtime": 1791530841.9436824,
+    "seen": 1791998142.8688014,
+    "ast_hash": "cb2110f010dc6c6389062fc80bc25b14",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/builds/latest.json": {
-    "mtime": 1789978190.7439733,
-    "seen": 1789978291.0746467,
-    "ast_hash": "423f5d56505acde0958edbdac03c440c",
+  "docs/releases/1.3.1.md": {
+    "mtime": 1791040665.4537485,
+    "seen": 1791998142.868808,
+    "ast_hash": "449e3049f0f3149ac34714c32fad1e42",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/builds/meta/45fea658-cccd-4218-98e7-7932bd490dc4.json": {
-    "mtime": 1789978190.7454903,
-    "seen": 1789978291.0746496,
-    "ast_hash": "1030e24be0a96eb311f341062006ea90",
+  "docs/releases/1.3.2.md": {
+    "mtime": 1791536312.396561,
+    "seen": 1791998142.8688128,
+    "ast_hash": "3bce973eead5a83cf7ca43581471ebc5",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/cBzA24kv.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0746522,
-    "ast_hash": "d84598ed5cd34f1af1520942dcd6ee2a",
+  "docs/releases/1.3.4.md": {
+    "mtime": 1791701793.2370124,
+    "seen": 1791998142.8688188,
+    "ast_hash": "93c0583d0ad500065b72717f8987e4f8",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/gRcD3CNl.js": {
-    "mtime": 1789978189.4812288,
-    "seen": 1789978291.074655,
-    "ast_hash": "49b9c1603a6d5a1ae7498701c90781e1",
+  "public/licenses/thinking-orbs.txt": {
+    "mtime": 499162500.0,
+    "seen": 1791998142.8852408,
+    "ast_hash": "c41e88dc69effcd8077a83e6a3b12928",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/he0XHq6r.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0746582,
-    "ast_hash": "a65509e944e569155aab8d73ed228b14",
+  "public/reset.html": {
+    "mtime": 1791495905.0222294,
+    "seen": 1791998142.8852458,
+    "ast_hash": "f8f61a8255277193b3248ae6a9cdb9e3",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/kfBP8M6e.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0746608,
-    "ast_hash": "f5ebb484a34bc5dd09780fd662f78106",
+  "services/immersive/data/contextual-audition-v1/full/pocket-compare.html": {
+    "mtime": 1791989261.286615,
+    "seen": 1791998142.8856657,
+    "ast_hash": "429f3ef812dafc6403cb7b669c270833",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/mVMl_AVB.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.0746632,
-    "ast_hash": "0cd6032c7ecae31bc190bee3e220415c",
+  "services/immersive/data/contextual-audition-v1/full/review.html": {
+    "mtime": 1791934542.7571375,
+    "seen": 1791998142.88567,
+    "ast_hash": "26e89324aaacb8f7388343ec1ef224ef",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/mt6K1KZ5.js": {
-    "mtime": 1789978189.4791398,
-    "seen": 1789978291.0746655,
-    "ast_hash": "15323656fa7de7a2216941b7ed3ebfb1",
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/review.html": {
+    "mtime": 1791932372.934594,
+    "seen": 1791998142.8856735,
+    "ast_hash": "e3c3705a248e1730746577534b82cb18",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/pdf.worker.B1D2UnXD.mjs": {
-    "mtime": 1789978189.512356,
-    "seen": 1789978291.074668,
-    "ast_hash": "b169314e56c737213dba6418ab0b6512",
+  "vendor/thinking-orbs/README.md": {
+    "mtime": 1791533038.8459845,
+    "seen": 1791998142.8856764,
+    "ast_hash": "420895c59adf3265506aee54850c77df",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/rCgEe0N1.js": {
-    "mtime": 1789978189.4801526,
-    "seen": 1789978291.0746708,
-    "ast_hash": "24cbd4954e97dd36f157ab3540c13f33",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/A-0.wav": {
+    "mtime": 1791933529.7118433,
+    "seen": 1791998142.9273686,
+    "ast_hash": "bf8b5becd6102ab0e191ec2b88541a87",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/twaOW2Jj.js": {
-    "mtime": 1789978189.475971,
-    "seen": 1789978291.0746734,
-    "ast_hash": "2538aab6f423ee88287b9b4fd25e25c0",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/A-1.wav": {
+    "mtime": 1791933529.7138472,
+    "seen": 1791998142.9273725,
+    "ast_hash": "1d5a4d1899bcdbb9f1a5568e083c7222",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/yoveu4pO.js": {
-    "mtime": 1789978189.4785993,
-    "seen": 1789978291.0746758,
-    "ast_hash": "d6ef73cdcab939f74b7bec18f18c0d38",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/B-0.wav": {
+    "mtime": 1791933529.7148592,
+    "seen": 1791998142.9273758,
+    "ast_hash": "252cc06789770697f299682b38ed1122",
     "semantic_hash": ""
   },
-  ".vercel/output/static/sw.js": {
-    "mtime": 1789978201.1752748,
-    "seen": 1789978291.0746784,
-    "ast_hash": "9ea1dc82e4921768b1e7f415daf9bc9e",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/B-1.wav": {
+    "mtime": 1791933529.7168643,
+    "seen": 1791998142.9273782,
+    "ast_hash": "cd3e2c89fb012aa786e4fc3fb424b507",
     "semantic_hash": ""
   },
-  ".vercel/output/static/workbox-07e28819.js": {
-    "mtime": 1789978201.1798356,
-    "seen": 1789978291.0746808,
-    "ast_hash": "07def569da29fb4560a94a5525ce5712",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/C-0.wav": {
+    "mtime": 1791933529.717873,
+    "seen": 1791998142.927381,
+    "ast_hash": "043e85ce2028ef6300dc6bc2586ed617",
     "semantic_hash": ""
   },
-  ".vercel/output/static/robots.txt": {
-    "mtime": 1775638500.0,
-    "seen": 1789978291.0759773,
-    "ast_hash": "243b03ecba82dde9612cd5163145a86d",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/C-1.wav": {
+    "mtime": 1791933529.7208638,
+    "seen": 1791998142.9273832,
+    "ast_hash": "14041d908fc92d4e38c58eaab3dca077",
     "semantic_hash": ""
   },
-  ".vercel/output/static/_nuxt/remixicon.BTtOSOPh.svg": {
-    "mtime": 1789978189.5162714,
-    "seen": 1789978291.0761032,
-    "ast_hash": "c67337ab1a4fbf37dd51c527a38aa0d7",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-A-0.mp3": {
+    "mtime": 1791933662.5303254,
+    "seen": 1791998142.927386,
+    "ast_hash": "6585dfc59f74e82472e10c18f351d5d2",
     "semantic_hash": ""
   },
-  ".vercel/output/static/icons/drizzle.svg": {
-    "mtime": 1779998729.6340208,
-    "seen": 1789978291.0761058,
-    "ast_hash": "5a17674322da9a9533c55cd79c922d49",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-A-2.mp3": {
+    "mtime": 1791933663.8201842,
+    "seen": 1791998142.9273891,
+    "ast_hash": "8fa5c87e50f0844b489314e59cdc68df",
     "semantic_hash": ""
   },
-  ".vercel/output/static/icons/neon.svg": {
-    "mtime": 1779998794.1630273,
-    "seen": 1789978291.076108,
-    "ast_hash": "76b1e2208d79632835b83d669becab38",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-A-4.mp3": {
+    "mtime": 1791933665.7799406,
+    "seen": 1791998142.927392,
+    "ast_hash": "0462baccb26e9e1762439bec41633cf0",
     "semantic_hash": ""
   },
-  ".vercel/output/static/icons/nuxt.svg": {
-    "mtime": 1779998831.159214,
-    "seen": 1789978291.0761106,
-    "ast_hash": "3431a6cae886d8e767c64311285e4a10",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-A-5.mp3": {
+    "mtime": 1791933667.132758,
+    "seen": 1791998142.9273942,
+    "ast_hash": "b8f9de567b86aa4f43935da13b333772",
     "semantic_hash": ""
   },
-  ".vercel/output/static/icons/type--script.svg": {
-    "mtime": 1779999529.482091,
-    "seen": 1789978291.076113,
-    "ast_hash": "f7c6335b22e121bf9e8e19a69aa8d05f",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-B-0.mp3": {
+    "mtime": 1791933723.5255947,
+    "seen": 1791998142.927397,
+    "ast_hash": "6f6a32c866aa216847b93edea662ff2b",
     "semantic_hash": ""
   },
-  ".vercel/output/static/icons/vue.svg": {
-    "mtime": 1779998588.3396113,
-    "seen": 1789978291.0761154,
-    "ast_hash": "6b6569e8bf5105d680572d3bf5fbcf64",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-B-2.mp3": {
+    "mtime": 1791933724.8714523,
+    "seen": 1791998142.9273999,
+    "ast_hash": "cceab2951a86512eb56e9893c087476f",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Empty State 1.png": {
-    "mtime": 1785794692.6276653,
-    "seen": 1789978291.0761182,
-    "ast_hash": "66575d88bf36e76a8aac9b7e5c306bf2",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-B-4.mp3": {
+    "mtime": 1791933726.2402155,
+    "seen": 1791998142.9274027,
+    "ast_hash": "e03a650356ce1cfff46b98cc1972f518",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Empty State 2.png": {
-    "mtime": 1785796861.082862,
-    "seen": 1789978291.076121,
-    "ast_hash": "e0da7202c46d00657e5b81be13d9eb1f",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-B-5.mp3": {
+    "mtime": 1791933727.4042058,
+    "seen": 1791998142.9274056,
+    "ast_hash": "636ab886dc5e5a9450910b4369d57261",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Empty State 3.png": {
-    "mtime": 1785831857.4964077,
-    "seen": 1789978291.0761235,
-    "ast_hash": "8ecfa25bc8dc65d756d6a86ffddfdcd8",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-C-0.mp3": {
+    "mtime": 1791933723.5255947,
+    "seen": 1791998142.9274082,
+    "ast_hash": "6f6a32c866aa216847b93edea662ff2b",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Empty-state.png": {
-    "mtime": 1783682533.596378,
-    "seen": 1789978291.0761259,
-    "ast_hash": "23a2d1b9adde206a6935b646e32273bb",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-C-2.mp3": {
+    "mtime": 1791933724.8714523,
+    "seen": 1791998142.9274113,
+    "ast_hash": "cceab2951a86512eb56e9893c087476f",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Favourites empty-state.png": {
-    "mtime": 1786791580.0548134,
-    "seen": 1789978291.0761285,
-    "ast_hash": "ce6928382fa5c8fac5f457870af49998",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-C-4.mp3": {
+    "mtime": 1791933726.2402155,
+    "seen": 1791998142.927414,
+    "ast_hash": "e03a650356ce1cfff46b98cc1972f518",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Flame.png": {
-    "mtime": 1788943392.8476906,
-    "seen": 1789978291.076131,
-    "ast_hash": "07ae16c543938587b1dac23022fef5e1",
+  "services/immersive/data/contextual-audition-v1/full/dry-humor/edge-C-5.mp3": {
+    "mtime": 1791933727.4042058,
+    "seen": 1791998142.9274168,
+    "ast_hash": "636ab886dc5e5a9450910b4369d57261",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Logo 1.png": {
-    "mtime": 1784991630.2790446,
-    "seen": 1789978291.0761335,
-    "ast_hash": "1096b5128da9225af8f1a77c41beb7a3",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/A-0.wav": {
+    "mtime": 1791933424.5174985,
+    "seen": 1791998142.92742,
+    "ast_hash": "d4ceb045dc12c98b3de24ad0268166d1",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Logo 2.png": {
-    "mtime": 1776090015.0247328,
-    "seen": 1789978291.0761359,
-    "ast_hash": "18ab0225eda24e053f2977cc0acd131f",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/A-1.wav": {
+    "mtime": 1791933424.5205944,
+    "seen": 1791998142.9274223,
+    "ast_hash": "c4f16c72eceacf358edc783817c5d20f",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Logo.png": {
-    "mtime": 1778224656.9868689,
-    "seen": 1789978291.0761385,
-    "ast_hash": "ead67d34ca66a863e7c36a547fb8e173",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/A-2.wav": {
+    "mtime": 1791933424.522686,
+    "seen": 1791998142.9274244,
+    "ast_hash": "32e3ad883222c6287f697e60806c13dd",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/P Logo.png": {
-    "mtime": 1785763895.260803,
-    "seen": 1789978291.0761414,
-    "ast_hash": "8f77a4e19d1a3bb33f805d527db52397",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/A-3.wav": {
+    "mtime": 1791933424.5267358,
+    "seen": 1791998142.9274275,
+    "ast_hash": "cb7513eba01bc6261f8643cbbfc519f5",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Pages-Logo.png": {
-    "mtime": 1784991630.291413,
-    "seen": 1789978291.0761435,
-    "ast_hash": "58a798deeadc449bf7079e07aaa6870e",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/B-0.wav": {
+    "mtime": 1791933424.5287404,
+    "seen": 1791998142.9274304,
+    "ast_hash": "4548a13558bb1cf79d37a009e3b66339",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Playlist empty-state.png": {
-    "mtime": 1786792363.3690825,
-    "seen": 1789978291.076146,
-    "ast_hash": "3dd0bffdbdc3bdbf6e1d609da988c00d",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/B-1.wav": {
+    "mtime": 1791933424.5320683,
+    "seen": 1791998142.9274335,
+    "ast_hash": "d47551a60a7f8df7b80933e8984a842a",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/Streak.png": {
-    "mtime": 1789946786.5672698,
-    "seen": 1789978291.0761483,
-    "ast_hash": "af10b32e4ec4b9cd7f939d53bd8fd3ae",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/B-2.wav": {
+    "mtime": 1791933424.534671,
+    "seen": 1791998142.9274366,
+    "ast_hash": "cca3f86d77898739bfdc58a0598b7aa9",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/01.png": {
-    "mtime": 1782857825.767578,
-    "seen": 1789978291.0761502,
-    "ast_hash": "196c76ea8940ef0d31059523cac811ad",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/B-3.wav": {
+    "mtime": 1791933424.5388377,
+    "seen": 1791998142.9274387,
+    "ast_hash": "a5d1d666b155943bfdcdf416e9c13b8e",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Afterclap-2.png": {
-    "mtime": 1782857826.579204,
-    "seen": 1789978291.0761526,
-    "ast_hash": "b441a17861bb5cde9a62cd72fbcce2bb",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/C-0.wav": {
+    "mtime": 1791933424.54564,
+    "seen": 1791998142.9274416,
+    "ast_hash": "71071a330ac6e489bbb5443b9e0697c3",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Afterclap-4.png": {
-    "mtime": 1782857826.3058047,
-    "seen": 1789978291.0761552,
-    "ast_hash": "7d2b87d93e85aa29031f3019c5fa6b3c",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/C-1.wav": {
+    "mtime": 1791933424.5482023,
+    "seen": 1791998142.9274447,
+    "ast_hash": "65fd66dd513866112d8b937b974aafcc",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Afterclap-5.png": {
-    "mtime": 1782857826.2447183,
-    "seen": 1789978291.0761583,
-    "ast_hash": "300820beaa45b850766f5caf3477d613",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-A-1.mp3": {
+    "mtime": 1791933728.937356,
+    "seen": 1791998142.9274478,
+    "ast_hash": "2ba0e23ffe8c09ed73dd079ca672f6b1",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Afterclap-6.png": {
-    "mtime": 1782857826.370147,
-    "seen": 1789978291.0761604,
-    "ast_hash": "54b76b656bebbd9cbabfa1bee1e993c6",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-A-3.mp3": {
+    "mtime": 1791933729.9662874,
+    "seen": 1791998142.9274504,
+    "ast_hash": "c310c26cd8b03dab21e8cbce3de70f3b",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Funny Bunny-1.png": {
-    "mtime": 1782857826.4454367,
-    "seen": 1789978291.0761628,
-    "ast_hash": "7f6217abc883e03dc8fa337b627cdf54",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-A-5.mp3": {
+    "mtime": 1791933731.2687123,
+    "seen": 1791998142.9274523,
+    "ast_hash": "2bb0d0f5616b7589d0333b5660a48933",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Funny Bunny-4.png": {
-    "mtime": 1782857826.591419,
-    "seen": 1789978291.0761652,
-    "ast_hash": "5e9f20a435ee37aca23044a43cb8d1e6",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-B-1.mp3": {
+    "mtime": 1791933728.937356,
+    "seen": 1791998142.9274552,
+    "ast_hash": "2ba0e23ffe8c09ed73dd079ca672f6b1",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Funny Bunny-6.png": {
-    "mtime": 1782857826.6447918,
-    "seen": 1789978291.0761673,
-    "ast_hash": "7990c35b135b3cc849b43201a7ce4775",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-B-3.mp3": {
+    "mtime": 1791933729.9662874,
+    "seen": 1791998142.9274578,
+    "ast_hash": "c310c26cd8b03dab21e8cbce3de70f3b",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Funny Bunny.png": {
-    "mtime": 1782857826.357387,
-    "seen": 1789978291.07617,
-    "ast_hash": "7c4d9652288ec249219e9868ac7e10bc",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-B-5.mp3": {
+    "mtime": 1791933731.2687123,
+    "seen": 1791998142.9274602,
+    "ast_hash": "2bb0d0f5616b7589d0333b5660a48933",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Teamwork-5.png": {
-    "mtime": 1782857825.9756284,
-    "seen": 1789978291.0761724,
-    "ast_hash": "5369e48e602a591d24b8d363c2b492e8",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-C-1.mp3": {
+    "mtime": 1791933728.937356,
+    "seen": 1791998142.9274623,
+    "ast_hash": "2ba0e23ffe8c09ed73dd079ca672f6b1",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Teamwork-6.png": {
-    "mtime": 1782857825.906534,
-    "seen": 1789978291.0761755,
-    "ast_hash": "9f98354ca1ac8ef1fe58314b8148a0ba",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-C-3.mp3": {
+    "mtime": 1791933729.9662874,
+    "seen": 1791998142.9274652,
+    "ast_hash": "c310c26cd8b03dab21e8cbce3de70f3b",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Upstream-1.png": {
-    "mtime": 1782857826.1158793,
-    "seen": 1789978291.0761776,
-    "ast_hash": "8033b0c2955032c3e05535e725aa2418",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-C-4.mp3": {
+    "mtime": 1791933732.559296,
+    "seen": 1791998142.9274678,
+    "ast_hash": "7b5c5cf83aaa75ff0ef8e7bd45eb9c91",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Upstream-2.png": {
-    "mtime": 1782857826.0840948,
-    "seen": 1789978291.0761802,
-    "ast_hash": "9a55bafb4d1016c5e6c174686b346f76",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-C-5.mp3": {
+    "mtime": 1791933731.2687123,
+    "seen": 1791998142.92747,
+    "ast_hash": "2bb0d0f5616b7589d0333b5660a48933",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Upstream-4.png": {
-    "mtime": 1782857826.1448953,
-    "seen": 1789978291.076183,
-    "ast_hash": "05a8be4f5fec97319cbc1f504087066a",
+  "services/immersive/data/contextual-audition-v1/full/interrupted-turn/edge-C-6.mp3": {
+    "mtime": 1791933733.919937,
+    "seen": 1791998142.9274728,
+    "ast_hash": "133cb44152bd3838273f7b54f98e5201",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Upstream-5.png": {
-    "mtime": 1782857826.1306474,
-    "seen": 1789978291.0761857,
-    "ast_hash": "9c1439d705ea7f33e56ca5687f574ada",
+  "services/immersive/data/contextual-audition-v1/full/mara-us-v1/original-door-B-1.wav": {
+    "mtime": 1791935489.495328,
+    "seen": 1791998142.9274752,
+    "ast_hash": "0082e20b9b84d2b5c5eec35746e3b468",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/Upstream-8.png": {
-    "mtime": 1782857825.8474903,
-    "seen": 1789978291.0761878,
-    "ast_hash": "ec2537a8217f8094fa62bbab2533d824",
+  "services/immersive/data/contextual-audition-v1/full/original-door/A-0.wav": {
+    "mtime": 1791933180.2754078,
+    "seen": 1791998142.9274778,
+    "ast_hash": "9c057b342299d967e9bd3c649e92c62e",
     "semantic_hash": ""
   },
-  ".vercel/output/static/images/User Avatars/default-user.jpeg": {
-    "mtime": 1776000711.13842,
-    "seen": 1789978291.07619,
-    "ast_hash": "3b78aaeb450b8192e09d7c437c41e59d",
+  "services/immersive/data/contextual-audition-v1/full/original-door/A-1.wav": {
+    "mtime": 1791933180.2774062,
+    "seen": 1791998142.92748,
+    "ast_hash": "fb7ef0d40fa33bd7d7e04880ad7d700f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/B-0.wav": {
+    "mtime": 1791933180.280414,
+    "seen": 1791998142.9274828,
+    "ast_hash": "f3419310df6fec6681aa954f3a77dd7d",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/B-1.wav": {
+    "mtime": 1791933180.2845445,
+    "seen": 1791998142.9274855,
+    "ast_hash": "0f5ef6663265e79bc35f7ed34686af09",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/C-0.wav": {
+    "mtime": 1791933180.2860668,
+    "seen": 1791998142.9274874,
+    "ast_hash": "e44fc78d22819caddadb2e3ac626e627",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/C-1.wav": {
+    "mtime": 1791933180.2916114,
+    "seen": 1791998142.9274898,
+    "ast_hash": "f392a3e27351b3c2fdada80c6e1dd6ac",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-A-0.mp3": {
+    "mtime": 1791933365.8155215,
+    "seen": 1791998142.9274926,
+    "ast_hash": "8229f117a0f40e02ddd5d7d847149c53",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-A-2.mp3": {
+    "mtime": 1791933367.186875,
+    "seen": 1791998142.9274955,
+    "ast_hash": "0a726e0d8365f19d9f4c4de240d3d42c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-A-4.mp3": {
+    "mtime": 1791933368.5058718,
+    "seen": 1791998142.9274986,
+    "ast_hash": "135c1dc938234f8acd2fa0ddd5cc1839",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-B-0.mp3": {
+    "mtime": 1791933365.8155215,
+    "seen": 1791998142.9275007,
+    "ast_hash": "8229f117a0f40e02ddd5d7d847149c53",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-B-2.mp3": {
+    "mtime": 1791933367.186875,
+    "seen": 1791998142.9275036,
+    "ast_hash": "0a726e0d8365f19d9f4c4de240d3d42c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-B-4.mp3": {
+    "mtime": 1791933368.5058718,
+    "seen": 1791998142.927506,
+    "ast_hash": "135c1dc938234f8acd2fa0ddd5cc1839",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-C-0.mp3": {
+    "mtime": 1791933365.8155215,
+    "seen": 1791998142.927508,
+    "ast_hash": "8229f117a0f40e02ddd5d7d847149c53",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-C-2.mp3": {
+    "mtime": 1791933367.186875,
+    "seen": 1791998142.9275105,
+    "ast_hash": "0a726e0d8365f19d9f4c4de240d3d42c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/original-door/edge-C-4.mp3": {
+    "mtime": 1791933368.5058718,
+    "seen": 1791998142.9275124,
+    "ast_hash": "135c1dc938234f8acd2fa0ddd5cc1839",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/dry-humor-1.wav": {
+    "mtime": 1791988058.761647,
+    "seen": 1791998142.927515,
+    "ast_hash": "1d1cabf86569b95118a484554922bd78",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/dry-humor-3.wav": {
+    "mtime": 1791988058.7778747,
+    "seen": 1791998142.9275177,
+    "ast_hash": "16f0fc04d43873a7af9803abd39dfa52",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/interrupted-turn-0.wav": {
+    "mtime": 1791988058.7938745,
+    "seen": 1791998142.9275966,
+    "ast_hash": "5d6ca81e7ddb7d1ea8d1ca5670be852c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/interrupted-turn-2.wav": {
+    "mtime": 1791988058.808573,
+    "seen": 1791998142.9276,
+    "ast_hash": "704955c62f199621840107c4632f9237",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/interrupted-turn-4.wav": {
+    "mtime": 1791988058.8253117,
+    "seen": 1791998142.9276025,
+    "ast_hash": "7d3deea2036f7e04d9185548e5641898",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/interrupted-turn-6.wav": {
+    "mtime": 1791988058.8401248,
+    "seen": 1791998142.9276047,
+    "ast_hash": "7b7b004695be4bd6bed539096bd680c0",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/original-door-1.wav": {
+    "mtime": 1791988000.2103846,
+    "seen": 1791998142.9276073,
+    "ast_hash": "709e0ab3fa98aa7e1c7226b273fda6df",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/original-door-3.wav": {
+    "mtime": 1791988000.2271914,
+    "seen": 1791998142.9276094,
+    "ast_hash": "cc8d6f803d4fc7a94a42807ac36ee540",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/returning-cast-3.wav": {
+    "mtime": 1791988058.859716,
+    "seen": 1791998142.9276118,
+    "ast_hash": "5440d03b153b45e64792c92f179bb9ff",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/returning-cast-5.wav": {
+    "mtime": 1791988058.873855,
+    "seen": 1791998142.9276142,
+    "ast_hash": "ea93ece800b60313cef7eec11db1d258",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/returning-cast-7.wav": {
+    "mtime": 1791988058.8902738,
+    "seen": 1791998142.9276166,
+    "ast_hash": "25d4c3165bb5baf15398c4fb9a7a33f7",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/same-words-three-meanings-1.wav": {
+    "mtime": 1791988058.906068,
+    "seen": 1791998142.9276187,
+    "ast_hash": "f7fae130be04dd1d693ca98a2da3212b",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/same-words-three-meanings-3.wav": {
+    "mtime": 1791988058.924578,
+    "seen": 1791998142.927621,
+    "ast_hash": "85d2a6abd3d0149c737f4d1077d58c33",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/same-words-three-meanings-5.wav": {
+    "mtime": 1791988058.9385886,
+    "seen": 1791998142.9276233,
+    "ast_hash": "cdd70561c67a96d7fa419fd67383902f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/shout-then-ordinary-1.wav": {
+    "mtime": 1791988058.956182,
+    "seen": 1791998142.9276252,
+    "ast_hash": "3199f1d970c8d49a9199373bf37b03d3",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/shout-then-ordinary-3.wav": {
+    "mtime": 1791988058.9711215,
+    "seen": 1791998142.9276278,
+    "ast_hash": "443c1cc83bfca6b0f4c6807202cfe86a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/shout-then-ordinary-5.wav": {
+    "mtime": 1791988058.9885356,
+    "seen": 1791998142.9276304,
+    "ast_hash": "ba1fafab6db72082d42f24c8c60c1a71",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/three-way-station-1.wav": {
+    "mtime": 1791988059.0042667,
+    "seen": 1791998142.9276323,
+    "ast_hash": "be22ee67730fa8b33a4577a0f02cc7f8",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/three-way-station-11.wav": {
+    "mtime": 1791988059.0785613,
+    "seen": 1791998142.9276342,
+    "ast_hash": "bf9fe03f7c66a105a8423c31ccf363fa",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/three-way-station-3.wav": {
+    "mtime": 1791988000.241182,
+    "seen": 1791998142.9276364,
+    "ast_hash": "09060ffac87b11cee372ac332409b74b",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/three-way-station-5.wav": {
+    "mtime": 1791988059.0273502,
+    "seen": 1791998142.927639,
+    "ast_hash": "0965b6e4cfd666ec78704e1023304089",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/three-way-station-7.wav": {
+    "mtime": 1791988059.0429666,
+    "seen": 1791998142.9276414,
+    "ast_hash": "42ab6ba48a521a0f938731c7d5b9e281",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/three-way-station-9.wav": {
+    "mtime": 1791988059.061334,
+    "seen": 1791998142.9276433,
+    "ast_hash": "18e3bc1c5046cf9f4ae40b8c785601b8",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/whispers-and-reset-1.wav": {
+    "mtime": 1791988059.0975988,
+    "seen": 1791998142.9276462,
+    "ast_hash": "fe5447d352673b60bc5d286babc0d4e6",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/whispers-and-reset-3.wav": {
+    "mtime": 1791988059.1112697,
+    "seen": 1791998142.9276485,
+    "ast_hash": "da5053a54657d215bc94a817833a98c5",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v1/whispers-and-reset-5.wav": {
+    "mtime": 1791988059.1275158,
+    "seen": 1791998142.9276505,
+    "ast_hash": "c356cf5a5d63f5aaa93bfdbe441a65f5",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/dry-humor-1.wav": {
+    "mtime": 1791989247.4905765,
+    "seen": 1791998142.9276528,
+    "ast_hash": "118bfd49cc640c6611fe5b0be6581358",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/dry-humor-3.wav": {
+    "mtime": 1791989247.5065749,
+    "seen": 1791998142.9276555,
+    "ast_hash": "f806a8ad5aed6a13aca464e1bd158de8",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/interrupted-turn-0.wav": {
+    "mtime": 1791989247.523591,
+    "seen": 1791998142.9276578,
+    "ast_hash": "3a81fa41d43c8343d5572742d3edf4ba",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/interrupted-turn-2.wav": {
+    "mtime": 1791989247.540117,
+    "seen": 1791998142.9276602,
+    "ast_hash": "cdfc90674aad474a8d123850238e63e3",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/interrupted-turn-4.wav": {
+    "mtime": 1791989247.5587754,
+    "seen": 1791998142.9276626,
+    "ast_hash": "ed8eebade39ef007c1c5aed2617bb7bc",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/interrupted-turn-6.wav": {
+    "mtime": 1791989247.5737922,
+    "seen": 1791998142.9276648,
+    "ast_hash": "37a46a54f95e7523a168b642610b6cc7",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/original-door-1.wav": {
+    "mtime": 1791989127.6656513,
+    "seen": 1791998142.9276667,
+    "ast_hash": "a878748538bdcbf5e31add07a9af7da9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/original-door-3.wav": {
+    "mtime": 1791989127.6826537,
+    "seen": 1791998142.927669,
+    "ast_hash": "9b9e31bdac90564a0e848e020d0752ac",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/returning-cast-3.wav": {
+    "mtime": 1791989247.5877764,
+    "seen": 1791998142.9276712,
+    "ast_hash": "521fbf65754421495f0e81e07c3d14b5",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/returning-cast-5.wav": {
+    "mtime": 1791989247.6007826,
+    "seen": 1791998142.9276733,
+    "ast_hash": "de9598dd5105924592f6e9d2daa42c29",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/returning-cast-7.wav": {
+    "mtime": 1791989247.6167758,
+    "seen": 1791998142.9276757,
+    "ast_hash": "5abcb86203ff647d4c1a1273f8f050ac",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/same-words-three-meanings-1.wav": {
+    "mtime": 1791989247.6317768,
+    "seen": 1791998142.927678,
+    "ast_hash": "35622ffd27fd26595c12eb0d3351e767",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/same-words-three-meanings-3.wav": {
+    "mtime": 1791989247.6468084,
+    "seen": 1791998142.9276803,
+    "ast_hash": "9bd2ab37049dff323e412a56d33a1a2a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/same-words-three-meanings-5.wav": {
+    "mtime": 1791989247.6603425,
+    "seen": 1791998142.9276829,
+    "ast_hash": "9b83fc4ad8404689f2ed14c7aaae9965",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/shout-then-ordinary-1.wav": {
+    "mtime": 1791989247.6748908,
+    "seen": 1791998142.9276845,
+    "ast_hash": "00ead873aefc1a1a8b4d2c38592bd9eb",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/shout-then-ordinary-3.wav": {
+    "mtime": 1791989247.6888883,
+    "seen": 1791998142.927687,
+    "ast_hash": "1392dd1d111e944bea97c74c3eaad7a1",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/shout-then-ordinary-5.wav": {
+    "mtime": 1791989247.7018857,
+    "seen": 1791998142.927689,
+    "ast_hash": "754402974deff469283b5b61987a7728",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/three-way-station-1.wav": {
+    "mtime": 1791989247.7158995,
+    "seen": 1791998142.927691,
+    "ast_hash": "4d2f33c1e7aa4985d9ca4da322114e72",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/three-way-station-11.wav": {
+    "mtime": 1791989247.7710342,
+    "seen": 1791998142.9276943,
+    "ast_hash": "76705917c8a3223a505b73be7734cfed",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/three-way-station-3.wav": {
+    "mtime": 1791989127.6966667,
+    "seen": 1791998142.9276967,
+    "ast_hash": "041bebb54f239be1fbbad720952221fa",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/three-way-station-5.wav": {
+    "mtime": 1791989247.7329044,
+    "seen": 1791998142.9276989,
+    "ast_hash": "fb5c8231e0a8b3c38e17de4dc9efd5f1",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/three-way-station-7.wav": {
+    "mtime": 1791989247.7449074,
+    "seen": 1791998142.9277012,
+    "ast_hash": "f4e444a14434b62f741e7be4d91241c0",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/three-way-station-9.wav": {
+    "mtime": 1791989247.7590349,
+    "seen": 1791998142.9277034,
+    "ast_hash": "95f4613694c0a87b0db6f8b997b544ba",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/whispers-and-reset-1.wav": {
+    "mtime": 1791989247.784238,
+    "seen": 1791998142.9277053,
+    "ast_hash": "4ec93f0320145e22fde0ff3e429e3347",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/whispers-and-reset-3.wav": {
+    "mtime": 1791989247.8002517,
+    "seen": 1791998142.9277074,
+    "ast_hash": "9daac1cab16a0eb79adf4b2c8f9ff008",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/pocket-v2/whispers-and-reset-5.wav": {
+    "mtime": 1791989247.8182478,
+    "seen": 1791998142.9277093,
+    "ast_hash": "1cee28808ab1b7bc407824b6c0c8ec21",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/A-0.wav": {
+    "mtime": 1791934012.3175702,
+    "seen": 1791998142.9277117,
+    "ast_hash": "6a84349848688c089aa104181a9ae1f2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/A-1.wav": {
+    "mtime": 1791934012.3185737,
+    "seen": 1791998142.9277139,
+    "ast_hash": "036b7fbcd38a919ba7eb0ce556119abe",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/A-2.wav": {
+    "mtime": 1791934012.3205745,
+    "seen": 1791998142.927716,
+    "ast_hash": "f5b7c25add8e047abc8f5f0344c9ad5d",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/B-0.wav": {
+    "mtime": 1791934012.3215744,
+    "seen": 1791998142.9277182,
+    "ast_hash": "046bc0d4db6e4f6bd7e430cd082d2dc1",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/B-1.wav": {
+    "mtime": 1791934012.3235734,
+    "seen": 1791998142.9277203,
+    "ast_hash": "8a5c6c400f6066c5756969c1f32f3528",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/B-2.wav": {
+    "mtime": 1791934012.3245747,
+    "seen": 1791998142.9277222,
+    "ast_hash": "2002afe542f3290cd0ea5bf22a7d5599",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/C-0.wav": {
+    "mtime": 1791934012.3255808,
+    "seen": 1791998142.9277246,
+    "ast_hash": "2545daf15e9b4cba2346bd023187fab4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/C-1.wav": {
+    "mtime": 1791934012.3275769,
+    "seen": 1791998142.9277265,
+    "ast_hash": "5bc9a5823ed4e5fcd4c774f32c034060",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/C-2.wav": {
+    "mtime": 1791934012.3295765,
+    "seen": 1791998142.927729,
+    "ast_hash": "d3515ba26457949859f49607f2382834",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-A-0.mp3": {
+    "mtime": 1791934037.807456,
+    "seen": 1791998142.9277313,
+    "ast_hash": "0885f416229e034df6a4ed0cd4968bd1",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-A-1.mp3": {
+    "mtime": 1791934039.1405358,
+    "seen": 1791998142.9277334,
+    "ast_hash": "6c8c1bbac3f4a402ecab713e1e183187",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-A-2.mp3": {
+    "mtime": 1791934040.456825,
+    "seen": 1791998142.9277358,
+    "ast_hash": "2c335f96bb2747854584421495f87c86",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-A-4.mp3": {
+    "mtime": 1791934041.875831,
+    "seen": 1791998142.927738,
+    "ast_hash": "b970c3843c188d2b7fe10c338d01ced2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-A-6.mp3": {
+    "mtime": 1791934043.4553137,
+    "seen": 1791998142.9277399,
+    "ast_hash": "153a2f95e4c935346656cef3cd767527",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-A-8.mp3": {
+    "mtime": 1791934045.0173626,
+    "seen": 1791998142.9277422,
+    "ast_hash": "d4761d804c6625261c5332a08dc807c4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-B-0.mp3": {
+    "mtime": 1791934037.807456,
+    "seen": 1791998142.9277442,
+    "ast_hash": "0885f416229e034df6a4ed0cd4968bd1",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-B-1.mp3": {
+    "mtime": 1791934039.1405358,
+    "seen": 1791998142.9277463,
+    "ast_hash": "6c8c1bbac3f4a402ecab713e1e183187",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-B-2.mp3": {
+    "mtime": 1791934040.456825,
+    "seen": 1791998142.927749,
+    "ast_hash": "2c335f96bb2747854584421495f87c86",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-B-4.mp3": {
+    "mtime": 1791934041.875831,
+    "seen": 1791998142.9277508,
+    "ast_hash": "b970c3843c188d2b7fe10c338d01ced2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-B-6.mp3": {
+    "mtime": 1791934043.4553137,
+    "seen": 1791998142.927753,
+    "ast_hash": "153a2f95e4c935346656cef3cd767527",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-B-8.mp3": {
+    "mtime": 1791934045.0173626,
+    "seen": 1791998142.9277554,
+    "ast_hash": "d4761d804c6625261c5332a08dc807c4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-C-0.mp3": {
+    "mtime": 1791934037.807456,
+    "seen": 1791998142.9277575,
+    "ast_hash": "0885f416229e034df6a4ed0cd4968bd1",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-C-1.mp3": {
+    "mtime": 1791934039.1405358,
+    "seen": 1791998142.92776,
+    "ast_hash": "6c8c1bbac3f4a402ecab713e1e183187",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-C-2.mp3": {
+    "mtime": 1791934040.456825,
+    "seen": 1791998142.9277632,
+    "ast_hash": "2c335f96bb2747854584421495f87c86",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-C-4.mp3": {
+    "mtime": 1791934041.875831,
+    "seen": 1791998142.9277656,
+    "ast_hash": "b970c3843c188d2b7fe10c338d01ced2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-C-6.mp3": {
+    "mtime": 1791934043.4553137,
+    "seen": 1791998142.9277678,
+    "ast_hash": "153a2f95e4c935346656cef3cd767527",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/returning-cast/edge-C-8.mp3": {
+    "mtime": 1791934045.0173626,
+    "seen": 1791998142.9277701,
+    "ast_hash": "d4761d804c6625261c5332a08dc807c4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/A-0.wav": {
+    "mtime": 1791933224.672512,
+    "seen": 1791998142.9277728,
+    "ast_hash": "cfe44c52ae23d008ff9cbed93f22e654",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/A-1.wav": {
+    "mtime": 1791933224.6805472,
+    "seen": 1791998142.927775,
+    "ast_hash": "c5ad1e5d2e763e00088c231e57171ae9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/A-2.wav": {
+    "mtime": 1791933224.6825857,
+    "seen": 1791998142.9277773,
+    "ast_hash": "7d8d8566095c67e6e259d5e6e289667a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/B-0.wav": {
+    "mtime": 1791933224.6856182,
+    "seen": 1791998142.9277797,
+    "ast_hash": "7f4c08255e0d386917f2ac29a372a3d2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/B-1.wav": {
+    "mtime": 1791933224.687618,
+    "seen": 1791998142.9277816,
+    "ast_hash": "1a74adf9d807572cc68cf91dede8d53e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/B-2.wav": {
+    "mtime": 1791933224.6926484,
+    "seen": 1791998142.9277842,
+    "ast_hash": "90febb364b0b6f7725da285cdf130e8e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/C-0.wav": {
+    "mtime": 1791933224.6946795,
+    "seen": 1791998142.9277866,
+    "ast_hash": "5676e312669d92c3b64abb7799c15bba",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/C-1.wav": {
+    "mtime": 1791933224.7052784,
+    "seen": 1791998142.9277885,
+    "ast_hash": "5e846532b4a8c16326ab1d3c94842cc1",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-A-0.mp3": {
+    "mtime": 1791933369.955855,
+    "seen": 1791998142.9277906,
+    "ast_hash": "c874816df5f280693dc8da319fe406a2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-A-2.mp3": {
+    "mtime": 1791933371.3289669,
+    "seen": 1791998142.9277928,
+    "ast_hash": "a4be1ab53d428f4409821777d0d2162a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-A-4.mp3": {
+    "mtime": 1791933372.729651,
+    "seen": 1791998142.9277954,
+    "ast_hash": "ff0353c33ddcfe75bd10dd916dbf4029",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-A-6.mp3": {
+    "mtime": 1791933374.0546162,
+    "seen": 1791998142.9277976,
+    "ast_hash": "b9017d7a130e3a02144c934550459378",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-B-0.mp3": {
+    "mtime": 1791933369.955855,
+    "seen": 1791998142.9277995,
+    "ast_hash": "c874816df5f280693dc8da319fe406a2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-B-2.mp3": {
+    "mtime": 1791933371.3289669,
+    "seen": 1791998142.9278016,
+    "ast_hash": "a4be1ab53d428f4409821777d0d2162a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-B-4.mp3": {
+    "mtime": 1791933372.729651,
+    "seen": 1791998142.9278038,
+    "ast_hash": "ff0353c33ddcfe75bd10dd916dbf4029",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-B-6.mp3": {
+    "mtime": 1791933374.0546162,
+    "seen": 1791998142.9278054,
+    "ast_hash": "b9017d7a130e3a02144c934550459378",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-C-0.mp3": {
+    "mtime": 1791933369.955855,
+    "seen": 1791998142.9278076,
+    "ast_hash": "c874816df5f280693dc8da319fe406a2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-C-2.mp3": {
+    "mtime": 1791933371.3289669,
+    "seen": 1791998142.9278097,
+    "ast_hash": "a4be1ab53d428f4409821777d0d2162a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-C-3.mp3": {
+    "mtime": 1791933375.332657,
+    "seen": 1791998142.9278119,
+    "ast_hash": "f2d7b1dbc7a34bf6fd788725a0c65378",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-C-4.mp3": {
+    "mtime": 1791933372.729651,
+    "seen": 1791998142.9278142,
+    "ast_hash": "ff0353c33ddcfe75bd10dd916dbf4029",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/same-words-three-meanings/edge-C-6.mp3": {
+    "mtime": 1791933374.0546162,
+    "seen": 1791998142.9278166,
+    "ast_hash": "b9017d7a130e3a02144c934550459378",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/A-0.wav": {
+    "mtime": 1791933582.1925986,
+    "seen": 1791998142.9278195,
+    "ast_hash": "4699c217d3327bf5ed6a2f1f9779c76d",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/A-1.wav": {
+    "mtime": 1791933582.1946008,
+    "seen": 1791998142.9278219,
+    "ast_hash": "0d1937a9e7675ea87ef5f00121261e0a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/A-2.wav": {
+    "mtime": 1791933582.1966016,
+    "seen": 1791998142.9278238,
+    "ast_hash": "9730f063ebeb2f231abddedffdf42ab9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/B-0.wav": {
+    "mtime": 1791933582.1978471,
+    "seen": 1791998142.9278264,
+    "ast_hash": "969ea3828e4a69c72af5c19c27ba2b40",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/B-1.wav": {
+    "mtime": 1791933582.1998394,
+    "seen": 1791998142.9278288,
+    "ast_hash": "46c5b1b49dbfbc50f4277064cf4ab6df",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/B-2.wav": {
+    "mtime": 1791933582.201834,
+    "seen": 1791998142.9278307,
+    "ast_hash": "35096c0cf18cd8827e956d15e68f47ab",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/C-0.wav": {
+    "mtime": 1791933582.2033622,
+    "seen": 1791998142.927833,
+    "ast_hash": "191b2d6a6ff5d52301b3027a0e2fb8d8",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/C-1.wav": {
+    "mtime": 1791933582.2053828,
+    "seen": 1791998142.927836,
+    "ast_hash": "688eefcbc9eef5bfe4db98022a8e66d8",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/C-2.wav": {
+    "mtime": 1791933582.2073793,
+    "seen": 1791998142.9278378,
+    "ast_hash": "c9adf6bd7cc638297219fdedb79c53f0",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-A-0.mp3": {
+    "mtime": 1791933744.5468223,
+    "seen": 1791998142.92784,
+    "ast_hash": "cc3b41bb47884bbcb9ccb5c1c74f30e4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-A-2.mp3": {
+    "mtime": 1791933746.0021422,
+    "seen": 1791998142.9278426,
+    "ast_hash": "e613aed21192a726b515a018859c69ee",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-A-4.mp3": {
+    "mtime": 1791933747.3818953,
+    "seen": 1791998142.9278445,
+    "ast_hash": "e210164b6f5207f473c82ac68cd51e78",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-B-0.mp3": {
+    "mtime": 1791933744.5468223,
+    "seen": 1791998142.9278471,
+    "ast_hash": "cc3b41bb47884bbcb9ccb5c1c74f30e4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-B-2.mp3": {
+    "mtime": 1791933746.0021422,
+    "seen": 1791998142.9278493,
+    "ast_hash": "e613aed21192a726b515a018859c69ee",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-B-4.mp3": {
+    "mtime": 1791933747.3818953,
+    "seen": 1791998142.9278514,
+    "ast_hash": "e210164b6f5207f473c82ac68cd51e78",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-C-0.mp3": {
+    "mtime": 1791933744.5468223,
+    "seen": 1791998142.9278533,
+    "ast_hash": "cc3b41bb47884bbcb9ccb5c1c74f30e4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-C-2.mp3": {
+    "mtime": 1791933746.0021422,
+    "seen": 1791998142.9278557,
+    "ast_hash": "e613aed21192a726b515a018859c69ee",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/shout-then-ordinary/edge-C-4.mp3": {
+    "mtime": 1791933747.3818953,
+    "seen": 1791998142.927858,
+    "ast_hash": "e210164b6f5207f473c82ac68cd51e78",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/A-0.wav": {
+    "mtime": 1791933353.3192017,
+    "seen": 1791998142.9278603,
+    "ast_hash": "1d1ca4aa2e3806ec90ae7b396fe71085",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/A-1.wav": {
+    "mtime": 1791933353.3207242,
+    "seen": 1791998142.9278622,
+    "ast_hash": "a8aa5571cc04e591869dbab9c74bdf8e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/A-2.wav": {
+    "mtime": 1791933353.3227942,
+    "seen": 1791998142.927865,
+    "ast_hash": "043fe414f68b1397042a5149d6c73348",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/A-3.wav": {
+    "mtime": 1791933353.3250017,
+    "seen": 1791998142.9278674,
+    "ast_hash": "6c5c93fbee0731993d3ddb94ce8bdf31",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/A-4.wav": {
+    "mtime": 1791933353.3274436,
+    "seen": 1791998142.9278698,
+    "ast_hash": "ff1feac681e10b45af6e226251875107",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/A-5.wav": {
+    "mtime": 1791933353.329437,
+    "seen": 1791998142.9278717,
+    "ast_hash": "5727f2ad369ccc46d9f4b88ba4c708d2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/B-0.wav": {
+    "mtime": 1791933353.3330288,
+    "seen": 1791998142.927874,
+    "ast_hash": "85b52efe6dd2a04fd7c46873c851461e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/B-1.wav": {
+    "mtime": 1791933353.336409,
+    "seen": 1791998142.9278762,
+    "ast_hash": "380cf4f4b7f89cc78fdb71221719f4c6",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/B-2.wav": {
+    "mtime": 1791933353.3386717,
+    "seen": 1791998142.9278784,
+    "ast_hash": "3e831ea783356d591356cbf77fd7a7fa",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/B-3.wav": {
+    "mtime": 1791933353.3407092,
+    "seen": 1791998142.927881,
+    "ast_hash": "ba75352cdbd169ed8bd698a4ec1e70d9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/B-4.wav": {
+    "mtime": 1791933353.342762,
+    "seen": 1791998142.927883,
+    "ast_hash": "3e9311d7cc44b4af32c84219f70ce684",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/B-5.wav": {
+    "mtime": 1791933353.3448286,
+    "seen": 1791998142.9278853,
+    "ast_hash": "62fbda43ebb14799f0250775614ed55f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/C-0.wav": {
+    "mtime": 1791933353.3531833,
+    "seen": 1791998142.9278874,
+    "ast_hash": "28f7e23e1cc3fa6268e81a0b68cc3d0a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/C-1.wav": {
+    "mtime": 1791933353.3552394,
+    "seen": 1791998142.9278893,
+    "ast_hash": "457b06a6e83508463e04afdf9fd0143d",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/C-2.wav": {
+    "mtime": 1791933353.3572776,
+    "seen": 1791998142.9278917,
+    "ast_hash": "deaed8455d86a744dfcc2557ea79d7ab",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/C-3.wav": {
+    "mtime": 1791933353.3588088,
+    "seen": 1791998142.927894,
+    "ast_hash": "5689bad28c06af59a778121d87cb0aa3",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/C-4.wav": {
+    "mtime": 1791933353.3603306,
+    "seen": 1791998142.9278963,
+    "ast_hash": "1b8475417331be80f59af1d5bab95596",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/C-5.wav": {
+    "mtime": 1791933353.3618908,
+    "seen": 1791998142.9278986,
+    "ast_hash": "705156292804b548ced61d0f1fb2a8ef",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-A-0.mp3": {
+    "mtime": 1791933376.8234756,
+    "seen": 1791998142.9279013,
+    "ast_hash": "cc0e5b3c0a1df7f94b8497c09ed97734",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-A-10.mp3": {
+    "mtime": 1791933383.6321633,
+    "seen": 1791998142.9279032,
+    "ast_hash": "f2dfe308ee99ccbc7b22388619127e03",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-A-2.mp3": {
+    "mtime": 1791933378.2280097,
+    "seen": 1791998142.9279058,
+    "ast_hash": "65c8feccc4ed456c5aafcae9a103997c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-A-4.mp3": {
+    "mtime": 1791933379.6535006,
+    "seen": 1791998142.9279082,
+    "ast_hash": "b0ba08a8e20fde9caebbb635f50e4bbc",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-A-6.mp3": {
+    "mtime": 1791933380.8658688,
+    "seen": 1791998142.9279103,
+    "ast_hash": "500d96ba350a877264d02abc1742c63e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-A-8.mp3": {
+    "mtime": 1791933382.239249,
+    "seen": 1791998142.927913,
+    "ast_hash": "d5311819155337ee34ccff42bdab94c9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-B-0.mp3": {
+    "mtime": 1791933376.8234756,
+    "seen": 1791998142.927915,
+    "ast_hash": "cc0e5b3c0a1df7f94b8497c09ed97734",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-B-10.mp3": {
+    "mtime": 1791933383.6321633,
+    "seen": 1791998142.9279172,
+    "ast_hash": "f2dfe308ee99ccbc7b22388619127e03",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-B-2.mp3": {
+    "mtime": 1791933378.2280097,
+    "seen": 1791998142.9279199,
+    "ast_hash": "65c8feccc4ed456c5aafcae9a103997c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-B-4.mp3": {
+    "mtime": 1791933379.6535006,
+    "seen": 1791998142.9279222,
+    "ast_hash": "b0ba08a8e20fde9caebbb635f50e4bbc",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-B-6.mp3": {
+    "mtime": 1791933380.8658688,
+    "seen": 1791998142.9279244,
+    "ast_hash": "500d96ba350a877264d02abc1742c63e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-B-8.mp3": {
+    "mtime": 1791933382.239249,
+    "seen": 1791998142.9279268,
+    "ast_hash": "d5311819155337ee34ccff42bdab94c9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-C-0.mp3": {
+    "mtime": 1791933376.8234756,
+    "seen": 1791998142.9279292,
+    "ast_hash": "cc0e5b3c0a1df7f94b8497c09ed97734",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-C-10.mp3": {
+    "mtime": 1791933383.6321633,
+    "seen": 1791998142.9279313,
+    "ast_hash": "f2dfe308ee99ccbc7b22388619127e03",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-C-2.mp3": {
+    "mtime": 1791933378.2280097,
+    "seen": 1791998142.9279337,
+    "ast_hash": "65c8feccc4ed456c5aafcae9a103997c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-C-4.mp3": {
+    "mtime": 1791933379.6535006,
+    "seen": 1791998142.9279363,
+    "ast_hash": "b0ba08a8e20fde9caebbb635f50e4bbc",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-C-6.mp3": {
+    "mtime": 1791933380.8658688,
+    "seen": 1791998142.9279387,
+    "ast_hash": "500d96ba350a877264d02abc1742c63e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/three-way-station/edge-C-8.mp3": {
+    "mtime": 1791933382.239249,
+    "seen": 1791998142.9279413,
+    "ast_hash": "d5311819155337ee34ccff42bdab94c9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/A-0.wav": {
+    "mtime": 1791933483.0854366,
+    "seen": 1791998142.927944,
+    "ast_hash": "9277033e966891b160fd352e570efb6e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/A-1.wav": {
+    "mtime": 1791933483.0874386,
+    "seen": 1791998142.9279463,
+    "ast_hash": "e25f2cf380d2dea94e5db972bde21439",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/A-2.wav": {
+    "mtime": 1791933483.0884416,
+    "seen": 1791998142.927949,
+    "ast_hash": "8a863f5a590e2c33842dcac32dfc3f81",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/B-0.wav": {
+    "mtime": 1791933483.090456,
+    "seen": 1791998142.9279516,
+    "ast_hash": "bbb2ac0cc43af20bf0935a9ac7958e9f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/B-1.wav": {
+    "mtime": 1791933483.092455,
+    "seen": 1791998142.927954,
+    "ast_hash": "7899a6e4d2bfa157d32f5d89c88bee73",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/B-2.wav": {
+    "mtime": 1791933483.0944545,
+    "seen": 1791998142.9279559,
+    "ast_hash": "380208485ad8b67b116ac904681cd424",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/C-0.wav": {
+    "mtime": 1791933483.0964549,
+    "seen": 1791998142.9279583,
+    "ast_hash": "c0d60f79d0a11a397e3c63ccbce0a3bd",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/C-1.wav": {
+    "mtime": 1791933483.0984662,
+    "seen": 1791998142.9279606,
+    "ast_hash": "e9420501b1fbe83ac30b5b8c4e70dfaa",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/C-2.wav": {
+    "mtime": 1791933483.1004512,
+    "seen": 1791998142.927963,
+    "ast_hash": "b27130ec6811775ac4be8bdb38e2d77f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-A-0.mp3": {
+    "mtime": 1791933749.112408,
+    "seen": 1791998142.9279652,
+    "ast_hash": "89b183a4538923bdd6408bcf2581ed57",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-A-2.mp3": {
+    "mtime": 1791933750.6680744,
+    "seen": 1791998142.9279678,
+    "ast_hash": "f02e660f049147e6a5fe85536537cb72",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-A-4.mp3": {
+    "mtime": 1791933751.8981636,
+    "seen": 1791998142.92797,
+    "ast_hash": "144ff10325c3dd8011ed2ae08d439cc4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-A-6.mp3": {
+    "mtime": 1791933754.6082702,
+    "seen": 1791998142.927972,
+    "ast_hash": "8288ba129e4e16ea9ce27dd3215757b9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-B-0.mp3": {
+    "mtime": 1791933749.112408,
+    "seen": 1791998142.9279745,
+    "ast_hash": "89b183a4538923bdd6408bcf2581ed57",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-B-2.mp3": {
+    "mtime": 1791933750.6680744,
+    "seen": 1791998142.9279766,
+    "ast_hash": "f02e660f049147e6a5fe85536537cb72",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-B-4.mp3": {
+    "mtime": 1791933751.8981636,
+    "seen": 1791998142.9279792,
+    "ast_hash": "144ff10325c3dd8011ed2ae08d439cc4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-B-6.mp3": {
+    "mtime": 1791933754.6082702,
+    "seen": 1791998142.9279816,
+    "ast_hash": "8288ba129e4e16ea9ce27dd3215757b9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-C-0.mp3": {
+    "mtime": 1791933749.112408,
+    "seen": 1791998142.9279838,
+    "ast_hash": "89b183a4538923bdd6408bcf2581ed57",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-C-2.mp3": {
+    "mtime": 1791933750.6680744,
+    "seen": 1791998142.9279861,
+    "ast_hash": "f02e660f049147e6a5fe85536537cb72",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-C-4.mp3": {
+    "mtime": 1791933751.8981636,
+    "seen": 1791998142.9279885,
+    "ast_hash": "144ff10325c3dd8011ed2ae08d439cc4",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/full/whispers-and-reset/edge-C-6.mp3": {
+    "mtime": 1791933754.6082702,
+    "seen": 1791998142.9279904,
+    "ast_hash": "8288ba129e4e16ea9ce27dd3215757b9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/A-0.wav": {
+    "mtime": 1791931995.3684475,
+    "seen": 1791998142.9279928,
+    "ast_hash": "a6c46857cbc949728141fbb2bf408c27",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/A-1.wav": {
+    "mtime": 1791931995.3709724,
+    "seen": 1791998142.9279954,
+    "ast_hash": "b04765733e6897d3a4f8ab1a46ed5471",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/B-0.wav": {
+    "mtime": 1791931995.3725674,
+    "seen": 1791998142.927998,
+    "ast_hash": "4dc4c5d2f87c6aa196c00d13ef9e45d9",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/B-1.wav": {
+    "mtime": 1791931995.3745744,
+    "seen": 1791998142.928,
+    "ast_hash": "1fa200275a82bf808c695551745c5ac2",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/C-0.wav": {
+    "mtime": 1791931995.375572,
+    "seen": 1791998142.9280024,
+    "ast_hash": "2288489e3c9c2cc2291ef9d10590f52a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/C-1.wav": {
+    "mtime": 1791931995.377572,
+    "seen": 1791998142.928005,
+    "ast_hash": "1d06874cbb18b7be4f30db6e9c13a74b",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/edge-0.mp3": {
+    "mtime": 1791932243.3289044,
+    "seen": 1791998142.9280071,
+    "ast_hash": "838efbcb6befb3195b7554631e1f7fd5",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/edge-2.mp3": {
+    "mtime": 1791932244.7757604,
+    "seen": 1791998142.9280095,
+    "ast_hash": "36e3a82b2fcccf11d3f29cc3d11af89e",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/contextual-audition-v1/modal-cost-sample/edge-4.mp3": {
+    "mtime": 1791932246.2260616,
+    "seen": 1791998142.928012,
+    "ast_hash": "0682e4057ed143f777726188fa8b8b68",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-0lfrvoed/audio/10c51fd5efde4159a162560bbe4818bb.wav": {
+    "mtime": 1791813342.5773058,
+    "seen": 1791998142.928014,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-0lfrvoed/audio/40563ccdd3d5429aabd696ab7893aa74.wav": {
+    "mtime": 1791813342.6035645,
+    "seen": 1791998142.9280164,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-0lfrvoed/audio/5840894284d94ecaa82202b800ac9472.wav": {
+    "mtime": 1791813342.5396779,
+    "seen": 1791998142.9280186,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-1r6sf5nv/audio/8ac119cbdc1647e1a85f4190c126321b.wav": {
+    "mtime": 1791833899.1713414,
+    "seen": 1791998142.9280214,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-1r6sf5nv/audio/9326560237e24b2495a746cf2f5e8a68.wav": {
+    "mtime": 1791833899.1415186,
+    "seen": 1791998142.9280238,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-1r6sf5nv/audio/9c4f1e82c1cb4c89868a42129262730f.wav": {
+    "mtime": 1791833899.203534,
+    "seen": 1791998142.9280262,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-5oq8dixn/audio/ce46b2eb38fb461798c532221612b4e1.wav": {
+    "mtime": 1791900004.7989225,
+    "seen": 1791998142.9280283,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-6fa2a96x/audio/f32a62119fc04716bd50a0d8a8fb025c.wav": {
+    "mtime": 1791891953.9049263,
+    "seen": 1791998142.9280305,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-7mxp74t2/audio/3c50da1d09a046918ef617e989a7fa15.wav": {
+    "mtime": 1791883918.784511,
+    "seen": 1791998142.9280324,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-7mxp74t2/audio/8cc50b5544374539858f2a6f093188b4.wav": {
+    "mtime": 1791883918.813199,
+    "seen": 1791998142.9280348,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-7mxp74t2/audio/b263296666e346ff9c1ed3fa6bcc0b53.wav": {
+    "mtime": 1791883918.7548664,
+    "seen": 1791998142.928037,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-9h76xmxi/audio/11228440339d43aca3e8308c4f53e7a1.wav": {
+    "mtime": 1791884965.2551117,
+    "seen": 1791998142.9280388,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-9h76xmxi/audio/270e7704bfa74931815cc1bdf4ef96b7.wav": {
+    "mtime": 1791884965.220433,
+    "seen": 1791998142.9280415,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-9h76xmxi/audio/f63952c01cc343268229ae1582362b69.wav": {
+    "mtime": 1791884965.186423,
+    "seen": 1791998142.9280438,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-_5lk4hht/audio/0d4167844f9a4b7b8079abe5d4fd53f1.wav": {
+    "mtime": 1791884282.5092309,
+    "seen": 1791998142.928046,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-_5lk4hht/audio/623285b05c6a45e7a1b13ef0065aa711.wav": {
+    "mtime": 1791884282.5406382,
+    "seen": 1791998142.9280484,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-_5lk4hht/audio/a2a04eea998b4836850c88ede0021a4e.wav": {
+    "mtime": 1791884282.4737751,
+    "seen": 1791998142.9280505,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-arkys9jo/audio/6d7066e59de145fab8ec019e473a957d.wav": {
+    "mtime": 1791843794.6049871,
+    "seen": 1791998142.928053,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-arkys9jo/audio/f8dfa9dca1374c79aaa85eeeff3147b9.wav": {
+    "mtime": 1791843794.6526492,
+    "seen": 1791998142.9280553,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-arkys9jo/audio/fcecc465da614c3198c04902aa2128ec.wav": {
+    "mtime": 1791843794.6271172,
+    "seen": 1791998142.9280574,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-boyquc2m/audio/dc37c832c72a4f1a95e4f9349bbef1d3.wav": {
+    "mtime": 1791892606.1878755,
+    "seen": 1791998142.9280598,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-btvmybag/audio/7d00eef8dc0041679c29281f99778c05.wav": {
+    "mtime": 1791884646.0543177,
+    "seen": 1791998142.9280622,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-btvmybag/audio/9df3c58a8a424916815f4c7d075c637d.wav": {
+    "mtime": 1791884646.0052288,
+    "seen": 1791998142.9280643,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-btvmybag/audio/9f34d4135cc3471b9ca46e5d37c0570a.wav": {
+    "mtime": 1791884645.9587452,
+    "seen": 1791998142.9280665,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-ewk0asim/audio/c91c3bbc4f0545409c8aa8d83bddbe79.wav": {
+    "mtime": 1791934121.212098,
+    "seen": 1791998142.9280689,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-fguww29x/audio/f7bd77bf0b334bf09ec8187ede37e085.wav": {
+    "mtime": 1791892402.4517615,
+    "seen": 1791998142.928071,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-glv6_oh7/audio/57bf0c2dccfc41c09270dc83f528b013.wav": {
+    "mtime": 1791931212.6375563,
+    "seen": 1791998142.9280732,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-k_5b9udb/audio/406257df94284d17af599db734386e14.wav": {
+    "mtime": 1791884515.5905495,
+    "seen": 1791998142.9280758,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-k_5b9udb/audio/73f035db7e774d2aa788823d8173be46.wav": {
+    "mtime": 1791884515.6350243,
+    "seen": 1791998142.928078,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-k_5b9udb/audio/b1afa9a376f6415297c77ff3633968dd.wav": {
+    "mtime": 1791884515.6728847,
+    "seen": 1791998142.92808,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-mqz5xh98/audio/a2fd59efd34e44a0b89ac6a6de6ce119.wav": {
+    "mtime": 1791892116.052365,
+    "seen": 1791998142.9280822,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-okgeg3un/audio/6328efe8ae034d28a364d7facdd32d13.wav": {
+    "mtime": 1791883843.7574022,
+    "seen": 1791998142.9280844,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-okgeg3un/audio/f28c05425f1f4239b073dc59bd912f5c.wav": {
+    "mtime": 1791883843.8008041,
+    "seen": 1791998142.9280865,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-okgeg3un/audio/f781d8e8fb3b44029e4b543593f2ec06.wav": {
+    "mtime": 1791883843.837059,
+    "seen": 1791998142.9280887,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-opfjgdk3/audio/44bb8600993344bd9d7bfa67c69435ed.wav": {
+    "mtime": 1791892005.3942606,
+    "seen": 1791998142.9280906,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-sqa39ko2/audio/986584dbe12c4bbf9169c68471ae235b.wav": {
+    "mtime": 1791884124.7993226,
+    "seen": 1791998142.9280925,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-sqa39ko2/audio/b40b231c3e93450ab18caa13c87b8e60.wav": {
+    "mtime": 1791884124.825034,
+    "seen": 1791998142.9280949,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-sqa39ko2/audio/d08810138e3640a182dddf61bf0b0e4d.wav": {
+    "mtime": 1791884124.7741685,
+    "seen": 1791998142.928097,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-ucsl6fef/audio/8563f07ee0d14fccaf4126c497b62f80.wav": {
+    "mtime": 1791833997.0856788,
+    "seen": 1791998142.9280992,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-ucsl6fef/audio/aa4728c752f649639ea27a9abf2a4af9.wav": {
+    "mtime": 1791833997.0514412,
+    "seen": 1791998142.928101,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-ucsl6fef/audio/f94af87cc02c44e29826149ab5dd70b9.wav": {
+    "mtime": 1791833997.1337516,
+    "seen": 1791998142.9281032,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-wx_g7fof/audio/27a24bc635e144d48a389bfb4d986259.wav": {
+    "mtime": 1791825717.7953289,
+    "seen": 1791998142.928105,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-wx_g7fof/audio/2f0496bbd19242f8a36aa9757b619bae.wav": {
+    "mtime": 1791825717.8193717,
+    "seen": 1791998142.928107,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-wx_g7fof/audio/d827dd251d964ece8e55d480bbc82b58.wav": {
+    "mtime": 1791825717.770789,
+    "seen": 1791998142.9281092,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-xzrvbvm_/audio/6599b2bf7808495095e9b8bdacf6d4f0.wav": {
+    "mtime": 1791833957.5109398,
+    "seen": 1791998142.928111,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-xzrvbvm_/audio/c34da73cff114ffebc8a7d94783154ed.wav": {
+    "mtime": 1791833957.5424645,
+    "seen": 1791998142.928113,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/test-xzrvbvm_/audio/e430923798c54c569bce31f6e350c948.wav": {
+    "mtime": 1791833957.5731032,
+    "seen": 1791998142.9281154,
+    "ast_hash": "7b3896d894a9de6a0926640788913f8f",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-dialogue-reel.wav": {
+    "mtime": 1791893223.2670748,
+    "seen": 1791998142.9281175,
+    "ast_hash": "1b56049d0f6a38c14735b258f77f0d08",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-1.wav": {
+    "mtime": 1791893130.9063468,
+    "seen": 1791998142.9281197,
+    "ast_hash": "6bd5a31cb8614e2538079dbee828e2b8",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-11.wav": {
+    "mtime": 1791893136.069893,
+    "seen": 1791998142.9281216,
+    "ast_hash": "ba99e84764b96058ac0fd45aa3252c9d",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-13.wav": {
+    "mtime": 1791893137.1694968,
+    "seen": 1791998142.9281235,
+    "ast_hash": "348548b14fbacb4b4e0032c24afa7a95",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-15.wav": {
+    "mtime": 1791893138.234868,
+    "seen": 1791998142.9281254,
+    "ast_hash": "da302cd32d906ba0c0f02516cf3fdd75",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-17.wav": {
+    "mtime": 1791893139.2187693,
+    "seen": 1791998142.9281278,
+    "ast_hash": "c3d0cce04d7e006db56619153cc303de",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-19.wav": {
+    "mtime": 1791893140.3550105,
+    "seen": 1791998142.9281297,
+    "ast_hash": "5672773af5ff664a755fb7090716caef",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-21.wav": {
+    "mtime": 1791893141.473265,
+    "seen": 1791998142.9281316,
+    "ast_hash": "3e021241a42ced34a2d1d33832835c70",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-23.wav": {
+    "mtime": 1791893142.3474543,
+    "seen": 1791998142.9281337,
+    "ast_hash": "30a4592729a088c55653b9ea8f07c4ec",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-25.wav": {
+    "mtime": 1791893143.2913792,
+    "seen": 1791998142.9281356,
+    "ast_hash": "a73c5b71b40aa401e2fa083acaa122b7",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-27.wav": {
+    "mtime": 1791893144.3886254,
+    "seen": 1791998142.9281378,
+    "ast_hash": "c57b7a8f4bc0c064ad1102a9abf846f7",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-29.wav": {
+    "mtime": 1791893145.3010712,
+    "seen": 1791998142.9281397,
+    "ast_hash": "93a7814c556529e1d7c3cac9a7fde348",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-3.wav": {
+    "mtime": 1791893131.9146435,
+    "seen": 1791998142.9281416,
+    "ast_hash": "20079b443b0a46461fc0efad7687134c",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-31.wav": {
+    "mtime": 1791893146.1278715,
+    "seen": 1791998142.9281435,
+    "ast_hash": "074f61564be87a9edea551e642e4bf84",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-33.wav": {
+    "mtime": 1791893147.3875608,
+    "seen": 1791998142.928146,
+    "ast_hash": "0b7b858284f7fa35f25811122b0a9196",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-35.wav": {
+    "mtime": 1791893148.4766293,
+    "seen": 1791998142.928148,
+    "ast_hash": "9baec7ef2218cc42d4d6462470dca74a",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-5.wav": {
+    "mtime": 1791893132.7906983,
+    "seen": 1791998142.9281502,
+    "ast_hash": "eeeeeb75e3d8532495ec9ff74804669b",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-7.wav": {
+    "mtime": 1791893134.1229508,
+    "seen": 1791998142.9281526,
+    "ast_hash": "af474ecf1607218d028a5296fe477561",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-hybrid-v3-scene-9.wav": {
+    "mtime": 1791893135.1493454,
+    "seen": 1791998142.9281552,
+    "ast_hash": "a724f18d2b5fc057b799497683e9a450",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-scene-0.wav": {
+    "mtime": 1791843861.6396747,
+    "seen": 1791998142.9281573,
+    "ast_hash": "de964092f6c00cc93840ef59547249cd",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-scene-1.wav": {
+    "mtime": 1791843865.0453653,
+    "seen": 1791998142.9281597,
+    "ast_hash": "455ffb7d580905bb3564ac138da0c185",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-scene-2.wav": {
+    "mtime": 1791843874.5925312,
+    "seen": 1791998142.9281623,
+    "ast_hash": "9c30b89a4160743484e9d34d943c89bb",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-scene-3.wav": {
+    "mtime": 1791843877.0014257,
+    "seen": 1791998142.9281642,
+    "ast_hash": "3e9ff8da7b5cea8071cb975a18e46cd6",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-scene-4.wav": {
+    "mtime": 1791843879.814724,
+    "seen": 1791998142.9281666,
+    "ast_hash": "3e4ac9c8b06ef99145ea06aa80962390",
+    "semantic_hash": ""
+  },
+  "services/immersive/data/trial-scene.wav": {
+    "mtime": 1791844092.7205112,
+    "seen": 1791998142.9281693,
+    "ast_hash": "429a1fc25ffa61d833f860e6b3b91d36",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/bookish/app/LocalSpeechPlugin.java": {
+    "mtime": 1795390661.7655962,
+    "seen": 1795391789.5656717,
+    "ast_hash": "47fe1573fab3e1120eecec7d5e42ff75",
+    "semantic_hash": ""
+  },
+  "components/shared/SpeechDownloadStatus.vue": {
+    "mtime": 1795381637.3913727,
+    "seen": 1795382314.4933138,
+    "ast_hash": "164c5ccafb7e83ff917a1733193579cd",
+    "semantic_hash": ""
+  },
+  "composables/readingPositionStore.js": {
+    "mtime": 1795379809.5252554,
+    "seen": 1795382314.5070314,
+    "ast_hash": "cd3ffcdf79dde283ac9695e751765c41",
+    "semantic_hash": ""
+  },
+  "composables/readingPositionStore.test.js": {
+    "mtime": 1795379809.528795,
+    "seen": 1795382314.5070348,
+    "ast_hash": "b3a23e332f06cfc10248049157c7d7c7",
+    "semantic_hash": ""
+  },
+  "composables/tts/localTtsDriver.js": {
+    "mtime": 1795391245.3958244,
+    "seen": 1795391789.6145365,
+    "ast_hash": "2940f1107976217e4b270da731707bcf",
+    "semantic_hash": ""
+  },
+  "composables/tts/localTtsDriver.test.js": {
+    "mtime": 1795381541.3433821,
+    "seen": 1795382314.5085666,
+    "ast_hash": "89d41781611fc171fe3d465eb9ffe331",
+    "semantic_hash": ""
+  },
+  "scripts/prepare-local-speech.mjs": {
+    "mtime": 1792008235.0508964,
+    "seen": 1792052200.89371,
+    "ast_hash": "07f67c70df2ef252e53564ec1060778d",
+    "semantic_hash": ""
+  },
+  "utils/readingLocation.js": {
+    "mtime": 1792007829.9018357,
+    "seen": 1792052201.0959582,
+    "ast_hash": "b75ea8468ccd8f73876fceda78b63877",
+    "semantic_hash": ""
+  },
+  "docs/releases/1.3.5.md": {
+    "mtime": 1792054095.9984543,
+    "seen": 1792054256.1487272,
+    "ast_hash": "1903730b00ff5e4f9019df68e1db4577",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/pockettts/PocketTtsSynthesizer.kt": {
+    "mtime": 1795408009.9860673,
+    "seen": 1795408568.6602361,
+    "ast_hash": "28e3e4e4cbf8e29e454709754a4ca3ec",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/pockettts/SpTokenizer.kt": {
+    "mtime": 1792054107.3258822,
+    "seen": 1792054255.9665568,
+    "ast_hash": "08d633a6ec08fafe6e3fcd0dfb1a7633",
+    "semantic_hash": ""
+  },
+  "docs/licenses/pocket-tts-litert-MIT.txt": {
+    "mtime": 1792053431.4601462,
+    "seen": 1792054380.0632188,
+    "ast_hash": "a44732798352c828da5104dd55623661",
+    "semantic_hash": ""
+  },
+  "composables/tts/silenceTrim.js": {
+    "mtime": 1795381714.317921,
+    "seen": 1795382314.5104554,
+    "ast_hash": "9de86601881792f4421a3b23e75172b1",
+    "semantic_hash": ""
+  },
+  "composables/tts/silenceTrim.test.js": {
+    "mtime": 1795381716.9561608,
+    "seen": 1795382314.5104587,
+    "ast_hash": "ab85d74c5ad461b83e8768ce2853b5bd",
+    "semantic_hash": ""
+  },
+  "error.vue": {
+    "mtime": 1795381976.1504984,
+    "seen": 1795382314.547244,
+    "ast_hash": "8eb77d3d763c741703c9b779da48938c",
+    "semantic_hash": ""
+  },
+  "plugins/00.app-errors.client.js": {
+    "mtime": 1795381956.1571677,
+    "seen": 1795382314.5610697,
+    "ast_hash": "893565d80e4e807470f9121e71eb4eac",
+    "semantic_hash": ""
+  },
+  "tests/startupResilience.test.js": {
+    "mtime": 1795381993.8616562,
+    "seen": 1795382314.6178892,
+    "ast_hash": "a08d0803f9bbe7483e448b70f914689b",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/bookish/app/LocalSpeechStream.java": {
+    "mtime": 1795391483.0212264,
+    "seen": 1795391789.565676,
+    "ast_hash": "0a660ca7f55bf8e314c4c11c5aed3cb2",
+    "semantic_hash": ""
+  },
+  "composables/useChunkSpans.test.js": {
+    "mtime": 1795385916.440817,
+    "seen": 1795391789.6254914,
+    "ast_hash": "0738871ef6a465a0b1f17a035d949594",
+    "semantic_hash": ""
+  },
+  "composables/useLiveUpdate.js": {
+    "mtime": 1795421700.4540708,
+    "seen": 1795422337.3681338,
+    "ast_hash": "376194d12f6fc06f04567e6b0095f260",
+    "semantic_hash": ""
+  },
+  "plugins/live-update.client.js": {
+    "mtime": 1795420475.745082,
+    "seen": 1795422337.4617355,
+    "ast_hash": "808f377286ec437d68861621a427cfd1",
+    "semantic_hash": ""
+  },
+  "scripts/build-web-bundle.mjs": {
+    "mtime": 1795420524.4788253,
+    "seen": 1795422337.4726446,
+    "ast_hash": "a69bed8203c614ed48e141918c0702b0",
+    "semantic_hash": ""
+  },
+  "tests/liveUpdate.test.js": {
+    "mtime": 1795421700.5970497,
+    "seen": 1795422337.5576303,
+    "ast_hash": "f83f4094a86ac2e2251704f426e00328",
     "semantic_hash": ""
   }
 }

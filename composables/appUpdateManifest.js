@@ -55,7 +55,61 @@ export function normalizeUpdateManifest(raw) {
     // Only an explicit `true` forces the update, so a malformed value can't
     // trap the user in an undismissable dialog.
     mandatory: raw.mandatory === true,
+    // Optional silent web update (see normalizeWebBundle). Absent or invalid
+    // means "APK only", which is exactly how manifests behaved before OTA.
+    web: normalizeWebBundle(raw.web),
   }
+}
+
+// --- Silent web (OTA) updates -------------------------------------------------
+//
+// A release can carry a signed zip of the web layer next to its APK. Phones
+// whose installed APK already contains every native change that web build
+// needs swap to it silently on the next launch; everyone else gets the APK
+// prompt exactly as before.
+
+const SHA256_HEX = /^[0-9a-f]{64}$/
+// Base64 of an RSA signature: 256 bytes for a 2048-bit key = 344 chars. Bounded
+// loosely so a 4096-bit key also passes, but junk does not.
+const BASE64 = /^[A-Za-z0-9+/]{100,1400}={0,2}$/
+
+export function normalizeWebBundle(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+  const versionCode = toVersionCode(raw.versionCode)
+  // minNativeCode: the lowest APK versionCode that contains all the native code
+  // (Java/Kotlin, plugins, gradle) this web build calls into.
+  const minNativeCode = toVersionCode(raw.minNativeCode)
+  if (!versionCode || !minNativeCode || minNativeCode > versionCode) return null
+  if (!isSafeApkUrl(raw.url)) return null
+  const sha256 = typeof raw.sha256 === 'string' ? raw.sha256.trim().toLowerCase() : ''
+  if (!SHA256_HEX.test(sha256)) return null
+  const signature = typeof raw.signature === 'string' ? raw.signature.trim() : ''
+  if (!BASE64.test(signature)) return null
+  const size = Number.isFinite(raw.size) && raw.size > 0 ? Math.round(raw.size) : null
+  return { versionCode, minNativeCode, url: raw.url.trim(), sha256, signature, size }
+}
+
+// The bundle id the plugin stores a web build under. Derived from the version
+// so a re-check never downloads the same build twice.
+export const webBundleId = (versionCode) => `web-${versionCode}`
+
+// What to do about a manifest, given the installed APK (nativeCode) and the web
+// build actually running (webCode — the bundle's own baked-in build number,
+// which is higher than nativeCode once a web update has been applied):
+//   'web'  download the web bundle silently; no prompt
+//   'apk'  the release needs native code this APK lacks — offer the APK
+//   'none' already up to date (or nothing we can safely compare)
+export function chooseUpdatePath({ nativeCode, webCode, manifest }) {
+  if (!manifest) return 'none'
+  const native = toVersionCode(nativeCode)
+  if (!native) return 'none'
+  const running = Math.max(native, toVersionCode(webCode) || 0)
+  if (manifest.versionCode <= running) return 'none'
+  const web = manifest.web
+  if (web && web.versionCode === manifest.versionCode && native >= web.minNativeCode) {
+    return 'web'
+  }
+  return 'apk'
 }
 
 // Whether `manifest` describes a build newer than what's installed, and whether

@@ -26,6 +26,31 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    // Silent web (OTA) updates, self-hosted on GitHub Releases — see
+    // composables/useLiveUpdate.js and scripts/build-web-bundle.mjs.
+    LiveUpdate: {
+      // Every bundle must carry an RSA signature from android/live-update-
+      // private.pem (never committed). A bundle replaces the app's code, so
+      // without this a compromised release page could ship arbitrary JS —
+      // the one path that Android's APK signature check does not cover.
+      publicKey: [
+        '-----BEGIN PUBLIC KEY-----',
+        'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwMvWyZc8Inc4OEGZLX2B',
+        'DIUTcXgXM47Pr4TKHo0XpXDF/lba1Tyg16qfOwhBNPGwG4pdO17PLdmBRQF8rewm',
+        'AIspD0+bmWWQTFXgLLtePIDZsdtTo0zSYAJDiITgDOILJyEc6AYmQLpO+fRLR4Gr',
+        'bQuoGCIIZjPL7LSAIUZF2h6T+bhiPIbsCXOto5X1MXKHo4EpryTMVqPfKSBiu1KF',
+        '7aCplLYK3DXXK346xAac3Li+7P0VH2QroFQpcycH/oEgDW7QGHaJwQtIpshX0mtc',
+        'GmvKbzgdcYwGUfvbhVBGq9fqelQ1SwZSm9NEpY27q3S2v1b0zvKp6yCN4tCGeDEg',
+        '3QIDAQAB',
+        '-----END PUBLIC KEY-----',
+      ].join('\n'),
+      // A bundle that has not reached a healthy startup within this window
+      // (see plugins/live-update.client.js) is rolled back to the bundle that
+      // shipped inside the APK, and blocked from being installed again.
+      readyTimeout: 15000,
+      autoBlockRolledBackBundles: true,
+      autoDeleteBundles: true,
+    },
   },
 }
 

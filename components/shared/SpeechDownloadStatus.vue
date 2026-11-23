@@ -1,5 +1,5 @@
 <template>
-  <aside v-if="status && status.phase !== 'ready'" class="speech-status" role="status" aria-live="polite">
+  <aside v-if="status && !['ready', 'downloaded'].includes(status.phase)" class="speech-status" role="status" aria-live="polite">
     <strong>{{ name }}</strong>
     <span v-if="status.phase === 'downloading'">Downloading voice · {{ status.percent }}%<small>One-time download. Works offline afterward.</small></span>
     <span v-else-if="status.phase === 'installing'">Installing voice…</span>

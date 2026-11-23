@@ -33,7 +33,7 @@
 // unmounted sections used to freeze the reader mid-scroll.
 
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { mapSectionChunks, buildTextIndex, resolveRangePoint } from "~/composables/useChunkSpans";
+import { wrapSectionHtml, collectChunkSpans, buildTextIndex, resolveRangePoint } from "~/composables/useChunkSpans";
 
 const props = defineProps({
   bookId: { type: [String, Number], default: "" },
@@ -164,19 +164,16 @@ const renderSection = async (index, targetPage = 0) => {
   const safeIndex = Math.max(0, Math.min(props.sections.length - 1, index));
 
   animate.value = false;
-  el.innerHTML = props.sanitizeHtml(props.sections[safeIndex]?.html || "");
-  chunkEls = new Map();
-
   const base = sectionStartChunk(safeIndex);
   const count = (props.sectionCounts || [])[safeIndex] || 0;
-  if (count > 0) {
-    mapSectionChunks(
-      el,
-      (props.readableChunks || []).slice(base, base + count),
-      base,
-      (chunkIdx, span) => chunkEls.set(chunkIdx, span),
-    );
-  }
+  const html = props.sanitizeHtml(props.sections[safeIndex]?.html || "");
+  // Sentences are wrapped offscreen (cached per chapter) and the result set in
+  // one assignment — wrapping inside the live page cost seconds per chapter.
+  el.innerHTML = count > 0
+    ? wrapSectionHtml(html, (props.readableChunks || []).slice(base, base + count), base)
+    : html;
+  chunkEls = new Map();
+  collectChunkSpans(el, (chunkIdx, span) => chunkEls.set(chunkIdx, span));
 
   await nextTick();
   await document.fonts?.ready;
@@ -198,6 +195,7 @@ const renderSection = async (index, targetPage = 0) => {
 
 const setPage = (target) => {
   _landed = true;
+  cancelJump();
   const next = Math.max(0, Math.min(sectionPages.value - 1, target));
   if (next === page.value) return;
   animate.value = true;
@@ -208,6 +206,7 @@ const setPage = (target) => {
 
 const nextPage = () => {
   _landed = true;
+  cancelJump();
   if (page.value < sectionPages.value - 1) {
     setPage(page.value + 1);
   } else if (section.value < props.sections.length - 1) {
@@ -218,6 +217,7 @@ const nextPage = () => {
 
 const prevPage = () => {
   _landed = true;
+  cancelJump();
   if (page.value > 0) {
     setPage(page.value - 1);
   } else if (section.value > 0) {
@@ -227,29 +227,41 @@ const prevPage = () => {
 };
 
 const goToSection = (index) => {
+  // The parent re-announces the chapter while a restore jump is still landing;
+  // a jump already heading into that chapter is the more precise target, so it
+  // must not be cancelled back to the chapter's first page.
+  if (navTarget && sectionForChunk(navTarget.chunk) === index) return;
   _landed = true;
+  cancelJump();
   if (index === section.value) return;
   trackingReady.value = true;
   renderSection(index, 0);
 };
 
-// Land on the page that holds a specific chunk. Used by "Open in book" from the
-// highlights and notes screens, so it turns to the passage rather than to the
-// last place the reader left off.
-const goToChunk = async (chunkIdx, savedPosition = null) => {
-  if (!Number.isFinite(chunkIdx) || chunkIdx < 0) return;
-  trackingReady.value = false;
-  const targetSection = sectionForChunk(chunkIdx);
-  if (targetSection !== section.value || !chunkEls.size) {
-    await renderSection(targetSection, 0);
-  }
-  const chunkPage = pageForChunkEl(chunkEls.get(chunkIdx));
-  // Land instantly, not with a page-turn animation: this is a jump to a
-  // passage, and the transition from the freshly rendered page-0 to a deep page
-  // could be caught mid-flight by the initial layout settling.
-  animate.value = false;
-  page.value = Math.max(0, Math.min(sectionPages.value - 1, chunkPage ?? 0));
-  const saved = savedPosition;
+// The place the reader was sent to, kept until the USER moves (page turn,
+// swipe, chapter change). Layout keeps settling after a jump lands — the page
+// geometry is measured a beat after mount, fonts and images arrive late — and a
+// landing measured too early lands on page one of the chapter. Every re-layout
+// therefore re-lands on this anchor instead of re-reading "the first chunk on
+// the current page", which after an early landing IS the wrong page; reading it
+// back used to make that wrong page permanent, and the next save overwrote the
+// real position with it.
+let navTarget = null;
+let navToken = 0;
+let verifyTimer = null;
+
+const cancelJump = () => {
+  navToken += 1;
+  navTarget = null;
+  if (verifyTimer) { clearTimeout(verifyTimer); verifyTimer = null; }
+};
+
+const relayoutTarget = () => navTarget ?? { chunk: firstChunkOnCurrentPage(), saved: null };
+
+// The page that holds a chunk (or the exact saved character within it) in the
+// layout as it is right now.
+const pageForTarget = (chunkIdx, saved) => {
+  let target = pageForChunkEl(chunkEls.get(chunkIdx)) ?? 0;
   if (saved?.charOffset > 0 && chunkEls.has(chunkIdx)) {
     const { map } = buildTextIndex(chunkEls.get(chunkIdx));
     const point = resolveRangePoint(map, Math.min(map.length - 1, saved.charOffset), 1);
@@ -259,14 +271,55 @@ const goToChunk = async (chunkIdx, savedPosition = null) => {
       range.setEnd(point.node, Math.min(point.node.length, point.offset + 1));
       const rect = range.getBoundingClientRect();
       const base = contentRef.value.getBoundingClientRect();
-      page.value = Math.max(0, Math.min(sectionPages.value - 1, Math.floor((rect.left - base.left + 2) / stride.value)));
+      target = Math.floor((rect.left - base.left + 2) / stride.value);
     }
   }
-  if (saved?.section === targetSection && saved?.layout === currentLayout()) {
-    page.value = Math.max(0, Math.min(sectionPages.value - 1, Number(saved.pageInSection) || 0));
+  if (saved?.section === section.value && saved?.layout === currentLayout()) {
+    target = Number(saved.pageInSection) || 0;
   }
+  return Math.max(0, Math.min(sectionPages.value - 1, target));
+};
+
+// Land on the page that holds a specific chunk: the saved reading position on
+// open, "Open in book" from highlights and notes, Page Sync.
+const goToChunk = async (chunkIdx, savedPosition = null) => {
+  if (!Number.isFinite(chunkIdx) || chunkIdx < 0) return;
+  const token = ++navToken;
+  navTarget = { chunk: chunkIdx, saved: savedPosition };
+  trackingReady.value = false;
+  const targetSection = sectionForChunk(chunkIdx);
+  // A re-layout can re-render the DOM under this jump while it awaits its own
+  // render (knocking that render out); render again rather than give up, as
+  // long as no newer jump has taken over.
+  for (let attempt = 0; attempt < 3 && token === navToken
+    && (targetSection !== section.value || !chunkEls.size); attempt += 1) {
+    await renderSection(targetSection, 0);
+  }
+  // A newer jump or user navigation took over while this one was rendering;
+  // landing now would put the reader back on a page it has already left.
+  if (token !== navToken || section.value !== targetSection) return;
+  // Land instantly, not with a page-turn animation: this is a jump to a
+  // passage, and the transition from the freshly rendered page-0 to a deep page
+  // could be caught mid-flight by the initial layout settling.
+  animate.value = false;
+  page.value = pageForTarget(chunkIdx, savedPosition);
   trackingReady.value = true;
   emitPosition();
+
+  // Re-check once layout has had time to settle (fonts, images, the geometry
+  // pass). Only while nothing else has moved the reader since.
+  if (verifyTimer) clearTimeout(verifyTimer);
+  verifyTimer = setTimeout(() => {
+    verifyTimer = null;
+    if (token !== navToken || section.value !== targetSection || !contentRef.value) return;
+    sectionPages.value = measureSectionPages();
+    const settled = pageForTarget(chunkIdx, savedPosition);
+    if (settled !== page.value) {
+      animate.value = false;
+      page.value = settled;
+      emitPosition();
+    }
+  }, 350);
 };
 
 const goToSectionPage = (targetSection, pageInSection) => {
@@ -356,6 +409,8 @@ watch(() => props.activeChunkIndex, async (chunkIdx) => {
   }
   const targetSection = sectionForChunk(chunkIdx);
   if (targetSection !== section.value) {
+    // Narration carried the reader to another chapter; that is now the place.
+    cancelJump();
     await renderSection(targetSection, 0);
   }
   const el = chunkEls.get(chunkIdx);
@@ -506,28 +561,33 @@ const renderPendingOrSection = async (fallbackSection, fallbackPage) => {
   await renderSection(fallbackSection, fallbackPage);
 };
 
+// Re-lay-out the current place at the new geometry/typography. The target is
+// read BEFORE re-rendering (afterwards the reader sits on page one), but if a
+// jump starts while the re-render is awaited, that jump is newer and owns the
+// position — landing the stale pre-render target is exactly what used to throw
+// a just-restored reader back to the top of the chapter.
+const relayout = async () => {
+  const before = relayoutTarget();
+  trackingReady.value = false;
+  await renderSection(sectionForChunk(before.chunk), 0);
+  // The re-render reset the page, so always land again — on the newest jump's
+  // target if one started meanwhile (it stays set until the user moves).
+  const target = navTarget ?? before;
+  await goToChunk(target.chunk, target.saved);
+};
+
 watch(() => props.geometry, async () => {
   _geometrySettled = true;
   // Viewport or typography change: re-lay-out the current section and keep the
   // reader on the same page (clamped to the new count) — unless the open-jump
   // is still pending, in which case land it now at the real geometry.
   if (openJumpPending()) await renderPendingOrSection(section.value, page.value);
-  else {
-    const chunk = firstChunkOnCurrentPage();
-    trackingReady.value = false;
-    await renderSection(section.value, 0);
-    await goToChunk(chunk);
-  }
+  else await relayout();
 }, { deep: true });
 
 watch(() => props.layoutHash, async () => {
   if (openJumpPending()) await renderPendingOrSection(section.value, page.value);
-  else {
-    const chunk = firstChunkOnCurrentPage();
-    trackingReady.value = false;
-    await renderSection(section.value, 0);
-    await goToChunk(chunk);
-  }
+  else await relayout();
 });
 
 watch(() => props.sections, async (sections) => {
@@ -562,6 +622,7 @@ watch(() => props.startChunk, async (chunk) => {
 
 onUnmounted(() => {
   cancelLongPress();
+  cancelJump();
   renderToken += 1;
 });
 

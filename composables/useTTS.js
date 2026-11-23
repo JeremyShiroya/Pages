@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { Capacitor } from '@capacitor/core'
-import { LOCAL_TTS_VOICES, isLocalTtsVoice, synthesizeLocalSpeech, prepareLocalSpeech, cancelLocalSpeech } from '~/composables/tts/localTtsDriver'
+import { trimClipSilence } from '~/composables/tts/silenceTrim'
+import { LOCAL_TTS_VOICES, isLocalTtsVoice, synthesizeLocalSpeech, prepareLocalSpeech, cancelLocalSpeech, localVoicesInstalled, localStreamingSupported, createLocalStreamAudio, stopLocalStream, prepareLocalStream } from '~/composables/tts/localTtsDriver'
 import { useState } from '#app'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
 import { synthesizeDesktopSpeech } from '~/composables/tts/desktopTtsDriver'
@@ -22,7 +23,13 @@ let _rafId = null                // requestAnimationFrame handle for word-highli
 let _onlineListenerBound = false // useTTS() runs per-component; bind the listener once
 
 const DEFAULT_SENTENCE_MAX_CHARS = 480
-const AUDIO_CACHE_LIMIT = 8
+const AUDIO_CACHE_LIMIT = 14
+// How many sentences are synthesized ahead of the one playing. On-device
+// narrators (Charles, Nicole) take roughly as long to synthesize a sentence as
+// to speak it, so the queue has to run well ahead of playback for sentence
+// boundaries to be seamless; Edge only needs to cover network round-trips.
+export const TTS_LOOKAHEAD_LOCAL = 6
+export const TTS_LOOKAHEAD_EDGE = 3
 const WORDS_PER_MIN = TTS_WORDS_PER_MIN
 
 // Prefix durations keep a PDF's start/seek and every following sentence O(1).
@@ -63,6 +70,7 @@ const LEGACY_EDGE_VOICE_REPLACEMENTS = Object.freeze({
 let _audioCache = new Map()
 let _prewarmCache = new Map()
 let _prewarmInFlight = new Map()
+const _audioInFlight = new Map()
 const PREWARM_CACHE_LIMIT = 4
 
 const normalizeAvailableVoice = (voiceId) => {
@@ -671,8 +679,12 @@ export const useTTS = () => {
     _persistSession()
   }
 
+  // On-device narrators synthesize at 1x and speed is applied at playback
+  // (pitch-preserving playbackRate), so their audio does not depend on speed.
+  // Keying it by speed discarded every prepared sentence on each speed change.
+  const _speedKey = () => (isLocalTtsVoice(ttsVoiceId.value) ? 1 : ttsSpeed.value)
   const _audioCacheKey = (chunkIdx) => (
-    `${ttsBook.value?.id || ''}:${chunkIdx}:${ttsVoiceId.value}:${ttsSpeed.value}`
+    `${ttsBook.value?.id || ''}:${chunkIdx}:${ttsVoiceId.value}:${_speedKey()}`
   )
 
   const _cacheAudio = (chunkIdx, data, key = _audioCacheKey(chunkIdx)) => {
@@ -783,7 +795,7 @@ export const useTTS = () => {
     _keepAlive = null
   }
 
-  const _cancelAudio = () => {
+  const _cancelAudio = ({ keepLocalStream = false } = {}) => {
     if (_currentAudio) {
       _currentAudio.onended = null
       _currentAudio.onerror = null
@@ -792,6 +804,9 @@ export const useTTS = () => {
       else _currentAudio.pause()
       _currentAudio = null
     }
+    // Also when cancelled between two sentences of the native stream — but a
+    // fresh play() keeps a pre-buffered stream it may be about to resume.
+    if (!keepLocalStream) void stopLocalStream()
     _prefetchChunk = null
     _prefetchGeneration++
     ttsPlayingChunkIdx.value = -1
@@ -811,7 +826,11 @@ export const useTTS = () => {
     if (cached) return cached
 
     const voice = normalizeAvailableVoice(ttsVoiceId.value)
-    const prewarmKey = ttsPrewarmKey(chunk, voice, ttsSpeed.value)
+    // On-device narrators stream natively: nothing to synthesize up front.
+    if (isLocalTtsVoice(voice) && localStreamingSupported()) {
+      return { chunkIdx, chunkText: chunk, stream: true }
+    }
+    const prewarmKey = ttsPrewarmKey(chunk, voice, _speedKey())
     if (_prewarmInFlight.has(prewarmKey)) await _prewarmInFlight.get(prewarmKey)
     const prewarmed = _prewarmCache.get(prewarmKey)
     if (prewarmed) {
@@ -826,6 +845,10 @@ export const useTTS = () => {
       return result
     }
 
+    // The look-ahead queue and the player can ask for the same sentence at
+    // once; share one synthesis instead of running it twice.
+    if (_audioInFlight.has(cacheKey)) return _audioInFlight.get(cacheKey)
+    const request = (async () => {
     try {
       const data = await synthesizeSpeech({
         text: chunk,
@@ -846,12 +869,50 @@ export const useTTS = () => {
         nativeVoice: data.native ? data.voice : undefined,
         preferNetwork: !!data.preferNetwork,
       }
-      if (generation === _prefetchGeneration) _cacheAudio(chunkIdx, result, cacheKey)
-      return result
+      // Edge pads every sentence with silence at both ends; trim it so
+      // sentences flow (on-device narrators are trimmed natively).
+      const trimmed = result.audio && !result.native && !isLocalTtsVoice(voice)
+        ? { ...result, ...(await trimClipSilence(result)) }
+        : result
+      if (generation === _prefetchGeneration) _cacheAudio(chunkIdx, trimmed, cacheKey)
+      return trimmed
     } catch (err) {
       console.warn('[TTS] fetch error:', err)
       return null
     }
+    })().finally(() => { _audioInFlight.delete(cacheKey) })
+    _audioInFlight.set(cacheKey, request)
+    return request
+  }
+
+  // Keep the next few sentences synthesized while the current one plays, in
+  // reading order (the on-device engine works through a FIFO queue).
+  const _fillLookahead = () => {
+    // The native stream keeps its own queue ahead of playback.
+    if (isLocalTtsVoice(ttsVoiceId.value) && localStreamingSupported()) return
+    const depth = isLocalTtsVoice(ttsVoiceId.value) ? TTS_LOOKAHEAD_LOCAL : TTS_LOOKAHEAD_EDGE
+    for (let offset = 1; offset <= depth; offset += 1) {
+      const idx = _chunkIdx + offset
+      if (idx >= _chunks.length) break
+      if (!String(_chunks[idx] || '').trim()) continue
+      const key = _audioCacheKey(idx)
+      if (_audioCache.has(key) || _audioInFlight.has(key)) continue
+      _fetchChunkAudio(idx).catch(() => {})
+    }
+  }
+
+  // Build (and start decoding) the <audio> element for a sentence before it is
+  // needed, so the hand-off at a sentence boundary is play() on an already
+  // loaded element rather than create → fetch → decode → play.
+  const _prepareElement = (result) => {
+    if (!result?.audio || result.native || result.element || typeof Audio === 'undefined') return result
+    try {
+      const element = new Audio(result.audio)
+      element.preload = 'auto'
+      element.load()
+      result.element = element
+    } catch {}
+    return result
   }
 
   // rAF loop: maps audio.currentTime → the current word boundary index
@@ -944,11 +1005,18 @@ export const useTTS = () => {
         nativeText: prefetched.nativeText,
         nativeVoice: prefetched.nativeVoice,
         preferNetwork: prefetched.preferNetwork,
+        element: prefetched.element,
+        stream: !!prefetched.stream,
       }
+      prefetched.element = null
       _prefetchChunk = null
     } else {
       _prefetchChunk = null
-      chunkData = await _fetchChunkAudio(requestedChunkIdx)
+      // Queue this sentence first, then the ones after it, so the engine works
+      // through them in reading order while this one is being prepared.
+      const pending = _fetchChunkAudio(requestedChunkIdx)
+      _fillLookahead()
+      chunkData = await pending
     }
 
     // Bail if cancel/seek/voice-switch happened while we were awaiting the fetch
@@ -956,7 +1024,7 @@ export const useTTS = () => {
     if (ttsStatus.value !== 'playing') return
     if (_chunkIdx !== requestedChunkIdx || _chunks[requestedChunkIdx] !== requestedChunkText) return
 
-    if (!chunkData || (!chunkData.audio && !chunkData.native)) {
+    if (!chunkData || (!chunkData.audio && !chunkData.native && !chunkData.stream)) {
       // Retry this same sentence with backoff before declaring failure, so a
       // throttled socket in the background can't end the book (or force a
       // narrator-voice switch) on one bad fetch.
@@ -1006,9 +1074,28 @@ export const useTTS = () => {
         ttsBoundaries.value = _currentBoundaries
         ttsWordIdx.value = 0
       }
+    } else if (chunkData.stream) {
+      ttsUsingDeviceVoice.value = false
+      audio = createLocalStreamAudio({
+        voice: normalizeAvailableVoice(ttsVoiceId.value),
+        index: requestedChunkIdx,
+        // The book's next readable sentences, empty ones skipped (the player
+        // steps over those too, so indexes stay aligned).
+        items: (from, count) => {
+          const out = []
+          for (let i = Math.max(0, from); i < _chunks.length && out.length < count; i += 1) {
+            const text = String(_chunks[i] || '').trim()
+            if (text) out.push({ index: i, text })
+          }
+          return out
+        },
+        speed: ttsSpeed.value,
+        volume: ttsVolume.value,
+      })
+      chunkData.boundaries = []
     } else {
       ttsUsingDeviceVoice.value = false
-      audio = new Audio(chunkData.audio)
+      audio = chunkData.element || new Audio(chunkData.audio)
       if (isLocalTtsVoice(ttsVoiceId.value)) audio.playbackRate = ttsSpeed.value
     }
     audio.volume = ttsVolume.value
@@ -1025,16 +1112,14 @@ export const useTTS = () => {
       const gen = _prefetchGeneration
       _fetchChunkAudio(nextIdx).then(result => {
         if (_prefetchGeneration === gen && result) {
-          _prefetchChunk = result
+          // A copy, so the cached entry never hands the same element out twice.
+          _prefetchChunk = _prepareElement({ ...result, element: null })
         }
       })
     }
 
-    // Warm one more chunk ahead into the per-index audio cache.
-    const nextIdx2 = _chunkIdx + 2
-    if (nextIdx2 < _chunks.length) {
-      _fetchChunkAudio(nextIdx2).catch(() => {})
-    }
+    // And keep the queue beyond it full.
+    _fillLookahead()
 
     audio.onended = () => {
       if (_currentAudio !== audio) return
@@ -1071,8 +1156,8 @@ export const useTTS = () => {
     })
   }
 
-  const _stopInternal = () => {
-    _cancelAudio()
+  const _stopInternal = ({ keepLocalStream = false } = {}) => {
+    _cancelAudio({ keepLocalStream })
     _stopKeepAlive()
     _clearAudioCache(true)
     _chunks = []
@@ -1089,10 +1174,10 @@ export const useTTS = () => {
     // A dismissed player keeps its listening position without restoring the bar.
     // Capture it before the new track's first progress update replaces the session.
     const savedSession = options.ignoreSavedSession ? null : readStoredTtsSession()
-    _stopInternal()
+    ttsVoiceId.value = normalizeAvailableVoice(ttsVoiceId.value)
+    _stopInternal({ keepLocalStream: isLocalTtsVoice(ttsVoiceId.value) })
     ttsBook.value = book
     ttsStatus.value = 'loading'
-    ttsVoiceId.value = normalizeAvailableVoice(ttsVoiceId.value)
 
     let stored = null
     if ((!book?.content || !book?.tocTitles) && !options.chunks?.length) {
@@ -1226,6 +1311,30 @@ export const useTTS = () => {
     if (!stoppedSession) clearStoredTtsSession()
   }
 
+  // Start synthesizing an on-device narrator from `index` while nothing is
+  // playing, so pressing play is instant and playback starts with a cushion.
+  const prebufferNarration = ({ chunks, index }) => {
+    const voice = normalizeAvailableVoice(ttsVoiceId.value)
+    if (!isLocalTtsVoice(voice) || ttsStatus.value !== 'idle' || !Array.isArray(chunks)) return
+    let start = Math.max(0, Number(index) || 0)
+    while (start < chunks.length && !String(chunks[start] || '').trim()) start += 1
+    if (start >= chunks.length) return
+    return prepareLocalStream({
+      voice,
+      index: start,
+      items: (from, count) => {
+        const out = []
+        for (let i = Math.max(0, from); i < chunks.length && out.length < count; i += 1) {
+          const text = String(chunks[i] || '').trim()
+          if (text) out.push({ index: i, text })
+        }
+        return out
+      },
+      speed: ttsSpeed.value,
+      volume: ttsVolume.value,
+    })
+  }
+
   const setSpeed = (rate) => {
     const nextSettings = updateSettings({ ttsSpeed: Number(rate) })
     ttsSpeed.value = nextSettings.ttsSpeed
@@ -1265,7 +1374,11 @@ export const useTTS = () => {
     _clearAudioCache()
     _persistSession()
     void cancelLocalSpeech().then(() => {
-      if (isLocalTtsVoice(ttsVoiceId.value)) return prepareLocalSpeech(ttsVoiceId.value)
+      // Load the narrator into memory ahead of play, but only once it is on the
+      // device: downloading is an explicit choice made in the voice picker.
+      if (isLocalTtsVoice(ttsVoiceId.value) && localVoicesInstalled.value?.[ttsVoiceId.value] !== false) {
+        return prepareLocalSpeech(ttsVoiceId.value)
+      }
     }).catch(error => { console.warn('[TTS] Voice preparation:', error) })
     if (ttsStatus.value === 'playing') {
       _cancelAudio()
@@ -1309,7 +1422,7 @@ export const useTTS = () => {
       return false
     }
     if (!probe?.audio) return false
-    const key = ttsPrewarmKey(text, normalizeAvailableVoice(ttsVoiceId.value), ttsSpeed.value)
+    const key = ttsPrewarmKey(text, normalizeAvailableVoice(ttsVoiceId.value), _speedKey())
     _prewarmCache.set(key, { audio: probe.audio, boundaries: probe.boundaries ?? [] })
     _clearAudioCache(true)
     if (ttsStatus.value === 'playing') {
@@ -1354,7 +1467,10 @@ export const useTTS = () => {
     const value = String(text || '').trim()
     if (!value) return
     const voice = normalizeAvailableVoice(ttsVoiceId.value)
-    const key = ttsPrewarmKey(value, voice, ttsSpeed.value)
+    // Streaming narrators start instantly from any sentence; a prewarm would
+    // only compete with the stream for the inference thread.
+    if (isLocalTtsVoice(voice) && localStreamingSupported()) return
+    const key = ttsPrewarmKey(value, voice, _speedKey())
     if (_prewarmCache.has(key)) return
     if (_prewarmInFlight.has(key)) return _prewarmInFlight.get(key)
     const request = (async () => {
@@ -1489,6 +1605,6 @@ export const useTTS = () => {
     play, pause, resume, togglePlay, stop, restart, restoreLastSession,
     setSpeed, setVolume, setVoice, seekToProgress, skipChunks, skipSeconds, seekToChunk,
     loadDeviceVoices, setNativeVoice, retryOnlineVoices,
-    setChapterBoundaries, prewarmText,
+    setChapterBoundaries, prewarmText, prebufferNarration,
   }
 }

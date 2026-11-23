@@ -14,7 +14,8 @@
 // that generates it.
 
 import { useState } from '#app'
-import { normalizeUpdateManifest, shouldPromptForUpdate, toVersionCode } from '~/composables/appUpdateManifest'
+import { chooseUpdatePath, normalizeUpdateManifest, shouldPromptForUpdate, toVersionCode } from '~/composables/appUpdateManifest'
+import { stageWebUpdate } from '~/composables/useLiveUpdate'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 
 export const SKIPPED_VERSION_KEY = 'bookish:update-skipped-code'
@@ -102,6 +103,25 @@ export const useAppUpdate = () => {
       if (!response.ok) return null
 
       const manifest = normalizeUpdateManifest(await response.json())
+
+      // Web-only releases arrive silently (see useLiveUpdate.js). The APK
+      // prompt is kept for releases that need native code this APK lacks —
+      // and for manifests without a web bundle, exactly as before.
+      const path = chooseUpdatePath({
+        nativeCode: current.code,
+        webCode: config.public?.buildNumber,
+        manifest,
+      })
+      if (path === 'web') {
+        void stageWebUpdate(manifest.web)
+        available.value = null
+        return null
+      }
+      if (path === 'none') {
+        available.value = null
+        return null
+      }
+
       const prompt = shouldPromptForUpdate({
         installedCode: current.code,
         installedName: current.name,

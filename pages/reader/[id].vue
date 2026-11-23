@@ -27,6 +27,7 @@
         :sanitize-html="sanitizeHtml"
         :resolve-chunk-at-point="resolveChunkAtPoint"
         :prewarm-chunk="prewarmChunkAudio"
+        :prebuffer-narration="prebufferNarrationHere"
         :readable-chunks="allReadableChunks"
         :section-counts="epubSectionCounts"
         :full-sections="chapterList"
@@ -77,6 +78,7 @@
         :sanitize-html="sanitizeHtml"
         :resolve-chunk-at-point="resolveChunkAtPoint"
         :prewarm-chunk="prewarmChunkAudio"
+        :prebuffer-narration="prebufferNarrationHere"
         :readable-chunks="allReadableChunks"
         :section-counts="epubSectionCounts"
         :full-sections="chapterList"
@@ -127,6 +129,7 @@
         :sanitize-html="sanitizeHtml"
         :resolve-chunk-at-point="resolveChunkAtPoint"
         :prewarm-chunk="prewarmChunkAudio"
+        :prebuffer-narration="prebufferNarrationHere"
         :readable-chunks="allReadableChunks"
         :section-counts="epubSectionCounts"
         :full-sections="chapterList"
@@ -344,7 +347,11 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'reader' })
+// The reader owns its scroll position. Nuxt's default scrollBehavior scrolls to
+// the top once the page transition ENDS — after the reader has already scrolled
+// to the saved position — and that scroll was then saved as the new position.
+// That reset every in-app open of a scroll-mode EPUB or an original-view PDF.
+definePageMeta({ layout: 'reader', scrollToTop: false })
 
 import { computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch } from 'vue'
 import { createMobileReaderDomState } from '~/architectures/mobile/readerDomState'
@@ -357,9 +364,9 @@ import { useBookishSettings } from '~/composables/useBookishSettings'
 import { sanitizeBookHtml } from '~/composables/useHtmlSanitizer'
 import {
   buildTextIndex,
-  mapSectionChunks,
   resolveRangePoint,
-  unwrapTtsSpans,
+  wrapSectionHtml,
+  collectChunkSpans,
 } from '~/composables/useChunkSpans'
 import { getPrewarmedReaderContent } from '~/composables/useReaderPrewarm'
 import {
@@ -375,7 +382,7 @@ import { reflowPdfManifest } from '~/composables/usePdfReflow'
 import { useMobileReaderPrefs } from '~/composables/useMobileReaderPrefs'
 import { pdfProgressForPage } from '~/composables/useReaderPosition'
 import { openReadingPosition, POSITION_FIELDS } from '~/composables/readingPositionStore'
-import { buildLocationIndex, textAnchor, resolveTextAnchor, validReadingLocation } from '~/utils/readingLocation'
+import { buildLocationIndex, textAnchor, resolveTextAnchor, validReadingLocation, sameReadingLocation } from '~/utils/readingLocation'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 import {
   progressForChunk,
@@ -407,6 +414,7 @@ const {
   pause: pauseTTS,
   resume: resumeTTS,
   prewarmText,
+  prebufferNarration,
 } = useTTS()
 
 const MIN_ZOOM = 0.5
@@ -696,11 +704,88 @@ const chapterList = computed(() => {
   }))
 })
 
-// Keep scroll text mounted. Rendering placeholders races the compositor during
-// flings; sentence mapping remains time-sliced independently of visible text.
+// Scroll mode paints the chapters around the reading position first, so the
+// book opens on the right page in one short frame, then mounts every other
+// chapter in ONE step right after that first paint. Mounting a whole novel
+// before the first paint was a ~350 ms wait at open; mounting it chapter by
+// chapter over many frames was worse (each insertion re-lays-out the whole very
+// tall document). Everything is mounted within moments of opening — never "on
+// approach" during a fling, which is what used to leave blank gaps — and
+// browser scroll anchoring keeps the visible text still as chapters above it
+// arrive.
 const mountedSections = ref([])
-const mobileChapterList = computed(() => chapterList.value)
-const _cancelIdleSectionMounting = () => {}
+const mobileChapterList = computed(() => {
+  const mounted = mountedSections.value
+  return chapterList.value.map((chapter, index) => (
+    mounted[index] === false ? { ...chapter, html: null } : chapter
+  ))
+})
+let _progressiveMountToken = 0
+const _cancelIdleSectionMounting = () => { _progressiveMountToken += 1 }
+
+// Scroll-mode restore target, held until the reader touches the screen. Every
+// event that moves text around after open — the first render, the webfont
+// arriving, the remaining chapters mounting above — re-places the view on it
+// synchronously, before the browser paints, so the reader never sees the text
+// jump or a blank stretch while the book settles.
+let _pendingScrollTarget = null
+
+function _placeScrollTarget() {
+  const target = _pendingScrollTarget
+  if (!target || readerDisposed || usePagedReader.value || !readsAsEpub.value) return false
+  const section = sectionForChunk(target.chunk)
+  if (mountedSections.value[section] === false) mountSection(section)
+  _mapOneSection(section)
+  const el = _readerDom().chunkEls[target.chunk]
+  if (!el?.isConnected) return false
+  const rect = el.getBoundingClientRect()
+  // Same reading line (80 px) the position tracker saves against.
+  const top = window.scrollY + rect.top - 80 + rect.height * (Number(target.fraction) || 0)
+  _scrollRestoringPosition = true
+  window.scrollTo({ top: Math.max(0, top), behavior: 'instant' })
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (_pendingScrollTarget === target) _scrollRestoringPosition = false
+  }))
+  return true
+}
+
+function _setScrollTarget(chunk, fraction = 0) {
+  if (usePagedReader.value || !readsAsEpub.value || !Number.isFinite(chunk) || chunk < 0) return
+  _pendingScrollTarget = { chunk, fraction }
+  nextTick(_placeScrollTarget)
+  document.fonts?.ready?.then(() => nextTick(_placeScrollTarget))
+}
+
+function _releaseScrollTarget() {
+  if (!_pendingScrollTarget) return
+  _pendingScrollTarget = null
+  _scrollRestoringPosition = false
+}
+
+function _mountRemainingSections() {
+  const token = ++_progressiveMountToken
+  // After the first paint: rAF fires before it, the timeout after it.
+  requestAnimationFrame(() => setTimeout(() => {
+    if (token !== _progressiveMountToken || readerDisposed) return
+    if (!mountedSections.value.some(mounted => mounted === false)) return
+    // If the reader is already scrolling on their own, keep whatever is under
+    // the reading line exactly where it is as chapters above it arrive.
+    const anchorEl = _pendingScrollTarget ? null
+      : document.elementFromPoint(Math.round(window.innerWidth / 2), 80)?.closest?.('[data-tts-chunk], [id^="ch-"]')
+    const anchorTop = anchorEl?.getBoundingClientRect().top
+    mountedSections.value = new Array(chapterList.value.length).fill(true)
+    nextTick(() => {
+      if (token !== _progressiveMountToken) return
+      if (!_placeScrollTarget() && anchorEl?.isConnected && Number.isFinite(anchorTop)) {
+        const delta = anchorEl.getBoundingClientRect().top - anchorTop
+        if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' })
+      }
+      // Wrap the newly mounted chapters' sentences; the time-sliced chunk map
+      // picks up any it has already passed.
+      _buildChunkMap()
+    })
+  }, 0))
+}
 
 // The chunk this book should open at. Narration wins while it is playing;
 // otherwise it is the saved reading position, which both surfaces write.
@@ -741,7 +826,38 @@ function initialSectionIndex() {
 }
 
 function initializeSectionMounting() {
-  mountedSections.value = new Array(chapterList.value.length).fill(true)
+  const total = chapterList.value.length
+  // Paged mode and PDFs never render this list; mount everything (no cost).
+  if (!total || usePagedReader.value || !readsAsEpub.value) {
+    _cancelIdleSectionMounting()
+    mountedSections.value = new Array(total).fill(true)
+    return
+  }
+  const center = Math.max(0, Math.min(total - 1, currentChapterIdx.value))
+  const mounted = new Array(total).fill(false)
+  for (const index of [center - 1, center, center + 1]) {
+    if (index >= 0 && index < total) mounted[index] = true
+  }
+  mountedSections.value = mounted
+  _mountRemainingSections()
+}
+
+// Decide where the book opens in the SAME tick its content arrives, before the
+// reading surface mounts. The paged surface mounts as soon as it has sections;
+// if it saw no start chunk it rendered page one, and its first geometry
+// re-layout then captured "page one" and raced the later restore jump — the
+// loser of that race was the saved position, which the next save overwrote.
+// That race only lost when content was already prewarmed (opening from the book
+// page), which is why tracking "worked for some books" and not others.
+function primeReadingTarget() {
+  if (!readsAsEpub.value || !chapterList.value.length || currentReadingChunk.value >= 0) return
+  const hasSavedPosition = !!resumeLocation.value || Number(book.value?.readingChunk) >= 0
+    || Number(book.value?.progress) > 0 || openToChunk >= 0
+  if (!hasSavedPosition && !isCurrentBookNarrating.value) return
+  const target = initialReadingChunk()
+  if (!Number.isFinite(target) || target < 0) return
+  currentChapterIdx.value = sectionForChunk(target)
+  currentReadingChunk.value = target
 }
 
 function mountSection(index) {
@@ -942,6 +1058,7 @@ function goToAdjacentChapter(delta) {
 }
 
 function scrollToChapter(index) {
+  _releaseScrollTarget()
   const el = document.getElementById(`ch-${index}`)
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
@@ -1037,6 +1154,17 @@ function requestReadCurrentPosition() {
 
   const targetText = allReadableChunks.value[targetChunkId]
   if (targetText) prewarmText(targetText)
+}
+
+// Charles and Nicole: start synthesizing from where the Listen button would
+// start, while the reader is still looking at the Listen screen.
+function prebufferNarrationHere() {
+  if (!book.value || !allReadableChunks.value.length || ttsStatus.value !== 'idle') return
+  const index = !readsAsEpub.value
+    ? firstChunkForPage(pdfManifest.value, pdfViewerRef.value?.getVisiblePage?.() || currentPdfPage.value)?.id
+    : (currentReadingChunk.value >= 0 ? currentReadingChunk.value : chunkIndexForCurrentPosition())
+  if (index === null || index === undefined) return
+  void prebufferNarration({ chunks: allReadableChunks.value, index })
 }
 
 async function playFromCurrentPosition() {
@@ -1323,36 +1451,50 @@ const CHUNK_MAP_BUDGET_MS = 6
 const CHUNK_MAP_INTERVAL_MS = 16
 let _chunkMapCursor = 0
 
+// Sections in the order they are wrapped: the one on screen first, then
+// outward in both directions, so whatever the reader reaches next is ready.
+let _chunkMapOrder = []
+const _mappedSections = new Set()
+
 function _buildChunkMap() {
   _cancelScheduledChunkMapBuild()
   const container = chaptersContainerRef.value
   if (!container || !rawContent.value || !readsAsEpub.value) return
 
   clearHtmlHighlight()
-  unwrapTtsSpans(container)
   const state = _readerDom()
   state.chunkEls = []
   state.activeWordMap = null
   state.activeWordMapIdx = -1
+  _mappedSections.clear()
+  const total = readableChunkData.value.sectionCounts.length
+  const start = Math.max(0, Math.min(total - 1, currentChapterIdx.value))
+  _chunkMapOrder = [start]
+  for (let step = 1; _chunkMapOrder.length < total; step += 1) {
+    if (start + step < total) _chunkMapOrder.push(start + step)
+    if (start - step >= 0) _chunkMapOrder.push(start - step)
+  }
   _chunkMapCursor = 0
   _stepChunkMap()
 }
 
 function _stepChunkMap() {
   _chunkMapTimerId = null
-  const { sectionCounts } = readableChunkData.value
   const deadline = performance.now() + CHUNK_MAP_BUDGET_MS
 
-  while (_chunkMapCursor < sectionCounts.length && performance.now() < deadline) {
-    _mapOneSection(_chunkMapCursor)
+  // At least one section per slice (each is a few ms offscreen), then as many
+  // more as fit the budget.
+  do {
+    if (_chunkMapCursor >= _chunkMapOrder.length) break
+    _mapOneSection(_chunkMapOrder[_chunkMapCursor])
     _chunkMapCursor += 1
-  }
+  } while (performance.now() < deadline)
 
   // Announce the slice: freshly wrapped sections are freshly anchorable, so
   // any highlight living in them can now be painted.
   chunkMapVersion.value += 1
 
-  if (_chunkMapCursor < sectionCounts.length) {
+  if (_chunkMapCursor < _chunkMapOrder.length) {
     _chunkMapTimerId = setTimeout(_stepChunkMap, CHUNK_MAP_INTERVAL_MS)
   }
 }
@@ -1373,21 +1515,32 @@ function _mapOneSection(sectionIndex) {
 
   const sectionEl = _sectionElement(sectionIndex)
   if (!sectionEl) return
-
-  // mapSectionChunks isn't idempotent — wrapping an already-wrapped section
-  // would nest spans — so clear this section's spans first. Scoped to the one
-  // section, this is cheap.
-  unwrapTtsSpans(sectionEl)
-  const state = _readerDom()
-  state.activeWordMap = null
-  state.activeWordMapIdx = -1
+  // A chapter still waiting to be mounted has no text to wrap yet.
+  const article = sectionEl.querySelector('article')
+  if (!article) return
 
   let offset = 0
   for (let s = 0; s < sectionIndex; s++) offset += sectionCounts[s] || 0
 
-  mapSectionChunks(sectionEl, chunks.slice(offset, offset + count), offset, (chunkIdx, span) => {
-    state.chunkEls[chunkIdx] = span
-  })
+  const state = _readerDom()
+  // Called on every scroll frame for the section under the anchor line: once a
+  // section is mapped (and its spans are still the live ones), there is
+  // nothing to do.
+  if (_mappedSections.has(sectionIndex) && state.chunkEls[offset]?.isConnected) return
+
+  // The wrapped HTML is built offscreen and swapped in with ONE assignment —
+  // never sentence-by-sentence edits of the live, laid-out page (that was
+  // seconds of main-thread work per chapter on a phone).
+  const wrapKey = `${offset}:${count}`
+  if (article.dataset.wrapKey !== wrapKey || !article.querySelector('span[data-tts-chunk]')) {
+    const source = sanitizeHtml(chapterList.value[sectionIndex]?.html || '')
+    article.innerHTML = wrapSectionHtml(source, chunks.slice(offset, offset + count), offset)
+    article.dataset.wrapKey = wrapKey
+    state.activeWordMap = null
+    state.activeWordMapIdx = -1
+  }
+  collectChunkSpans(article, (chunkIdx, span) => { state.chunkEls[chunkIdx] = span })
+  _mappedSections.add(sectionIndex)
 }
 
 function _isNearViewport(el) {
@@ -1423,7 +1576,10 @@ function _highlightChunk(index, { forceScroll = false } = {}) {
   // Follow narration only while the reader is near it. If the user scrolled
   // away, don't yank the viewport back — they can use "Jump to narration".
   const shouldFollow = forceScroll || !previousEl || _isNearViewport(previousEl) || _isNearViewport(el)
-  if (shouldFollow) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  if (shouldFollow) {
+    _releaseScrollTarget()
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
 }
 
 function _ensureWordHighlight() {
@@ -1535,6 +1691,10 @@ function readingProgressSnapshot({ pdfPage } = {}) {
 
 let _progressSaveTimer = null
 
+// The writer only reports a failure once it has proven persistent (several
+// consecutive failed writes), and at most once per writer. The flag is never
+// re-armed by a later success: alternating success/failure used to re-show the
+// toast on every page turn.
 function positionSaveError(error) {
   console.error('[Reader] Position persistence failed:', error)
   if (!positionErrorShown && !readerDisposed) {
@@ -1586,7 +1746,9 @@ async function flushPendingSave(position) {
     _progressSaveTimer = null
   }
   await saveReadingProgress(position)
-  try { await positionWriter?.flush() } catch (error) { positionSaveError(error) }
+  // Flush failures are already reported by the writer once they persist, and a
+  // stopped writer (book merged away, newer session) is not an error to show.
+  try { await positionWriter?.flush() } catch (error) { console.warn('[Reader] Position flush:', error) }
 }
 
 function updateBookEdge() {
@@ -1698,11 +1860,19 @@ function applyStoredReaderContent(stored) {
   book.value = { ...book.value, content: stored.content ?? '', tocTitles: stored.tocTitles ?? [] }
   // Seed the mobile mounting window before the DOM renders so the first paint
   // only parses the sections around the reading position.
+  primeReadingTarget()
   initializeSectionMounting()
+  if (currentReadingChunk.value >= 0) {
+    _setScrollTarget(currentReadingChunk.value, openToChunk < 0 ? resumeLocation.value?.scrollFraction : 0)
+  }
   return true
 }
 
 async function loadBook(id) {
+  // Covers the whole open, including the moment between mounting and the
+  // content being applied; the paged view otherwise showed its "no readable
+  // content" message for that moment.
+  contentLoading.value = true
   readerReady.value = false
   positionTrackingReady.value = false
   restoredInitialPdfScroll.value = false
@@ -1722,24 +1892,41 @@ async function loadBook(id) {
     loading.value = false
   }
 
-  try {
-    positionWriter = await openReadingPosition(book.value.id, {
-      onSaved(saved) {
-        if (readerDisposed || saved.id !== book.value?.id) return
-        const patch = Object.fromEntries([...POSITION_FIELDS, 'progress', 'status', 'lastReadAt', 'updatedAt']
-          .filter(field => field in saved).map(field => [field, saved[field]]))
-        book.value = { ...book.value, ...patch }
-        const index = books.value.findIndex(item => item.id === saved.id)
-        if (index >= 0) books.value[index] = { ...books.value[index], ...patch }
-        positionErrorShown = false
-      },
-      onError: positionSaveError,
-    })
-    if (readerDisposed) { await positionWriter.close(); return }
-    book.value = { ...book.value, ...positionWriter.book }
-    resumeLocation.value = validReadingLocation(book.value.readingPosition) ? book.value.readingPosition
-      : validReadingLocation(book.value.previousReadingPosition) ? book.value.previousReadingPosition : null
-  } catch (error) { positionSaveError(error) }
+  const writerOptions = {
+    onSaved(saved) {
+      if (readerDisposed || saved.id !== book.value?.id) return
+      const patch = Object.fromEntries([...POSITION_FIELDS, 'progress', 'status', 'lastReadAt', 'updatedAt']
+        .filter(field => field in saved).map(field => [field, saved[field]]))
+      book.value = { ...book.value, ...patch }
+      const index = books.value.findIndex(item => item.id === saved.id)
+      if (index >= 0) books.value[index] = { ...books.value[index], ...patch }
+    },
+    onError: positionSaveError,
+  }
+  const savedLocation = (record) => (
+    validReadingLocation(record?.readingPosition) ? record.readingPosition
+      : validReadingLocation(record?.previousReadingPosition) ? record.previousReadingPosition : null
+  )
+  // Opening the writer claims the reading session in the database. It runs IN
+  // PARALLEL with putting the book on screen: the library record already holds
+  // the saved position (every save patches it), so the reader opens on the
+  // right page immediately instead of waiting a database round-trip first.
+  // Retried, because a transient IndexedDB failure here used to mean "save
+  // nothing for the whole session".
+  const writerReady = (async () => {
+    let openError = null
+    for (let attempt = 0; attempt < 3 && !positionWriter && !readerDisposed; attempt += 1) {
+      try {
+        positionWriter = await openReadingPosition(book.value.id, writerOptions)
+      } catch (error) {
+        openError = error
+        await new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)))
+      }
+    }
+    if (!positionWriter && openError && !readerDisposed) positionSaveError(openError)
+    return positionWriter
+  })()
+  resumeLocation.value = savedLocation(book.value)
 
   const prewarmed = getPrewarmedReaderContent(id)
   const prewarmedContent = prewarmed?.content ?? null
@@ -1828,6 +2015,25 @@ async function loadBook(id) {
     console.error('[Reader] Failed to load content from IndexedDB:', error)
   } finally {
     contentLoading.value = false
+    // The reading list only exists once loading ends; place the view now,
+    // still before the first paint of the text.
+    nextTick(_placeScrollTarget)
+  }
+
+  // The writer's record is authoritative: it can carry a position recovered
+  // from the crash journal that the in-memory library never saw. Only when it
+  // differs from what the reader opened on does the reader move again.
+  const writer = await writerReady
+  if (readerDisposed) { await writer?.close().catch(() => {}); return }
+  if (writer) {
+    const opened = resumeLocation.value
+    book.value = { ...book.value, ...writer.book }
+    const authoritative = savedLocation(book.value)
+    if (!sameReadingLocation(opened, authoritative)) {
+      resumeLocation.value = authoritative
+      currentReadingChunk.value = -1
+      primeReadingTarget()
+    }
   }
 
   await nextTick()
@@ -1852,20 +2058,15 @@ async function loadBook(id) {
     currentReadingChunk.value = targetChunk
 
     if (!usePagedReader.value) {
-      _scrollRestoringPosition = true
-      await scrollToChunk(targetChunk)
-      const targetElRefined = _readerDom().chunkEls[targetChunk]
-      if (targetElRefined?.isConnected) {
-        targetElRefined.scrollIntoView({ behavior: 'instant', block: 'start' })
-        if (openToChunk < 0 && resumeLocation.value?.scrollFraction) {
-          window.scrollBy({ top: targetElRefined.getBoundingClientRect().height * resumeLocation.value.scrollFraction - 80, behavior: 'instant' })
-        }
-      }
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          _scrollRestoringPosition = false
-        })
-      })
+      // Usually already in place from when the content arrived; this covers a
+      // target that changed (crash-journal recovery, narration) and settles
+      // it once images in the chapter have their real size.
+      const fraction = openToChunk < 0 ? resumeLocation.value?.scrollFraction : 0
+      if (_pendingScrollTarget?.chunk !== targetChunk) _setScrollTarget(targetChunk, fraction)
+      await nextTick()
+      const sectionElement = _sectionElement(safeIndex)
+      if (sectionElement) await Promise.allSettled([...sectionElement.querySelectorAll('img')].map(img => img.decode?.()))
+      _placeScrollTarget()
     } else {
       await nextTick()
       await mobileReaderRefs.pagedRef?.value?.goToChunk?.(targetChunk, openToChunk < 0 ? resumeLocation.value : null)
@@ -1889,6 +2090,8 @@ async function loadBook(id) {
 // Scroll mode's counterpart to the paged reader's goToChunk: mount the owning
 // section, then bring that sentence to the reading anchor line.
 function scrollToChunk(chunkIndex) {
+  // A deliberate jump supersedes the open-time restore target.
+  _releaseScrollTarget()
   return new Promise((resolve) => {
     if (!import.meta.client || !readsAsEpub.value) return resolve(false)
     const target = Number(chunkIndex)
@@ -2086,7 +2289,11 @@ onMounted(async () => {
   }
   window.addEventListener('keydown', onKeydown)
   window.addEventListener('resize', updateBookEdge)
+  // With the router's scroll-to-top disabled, start from the top ourselves so a
+  // book without a saved position does not inherit the library's scroll offset.
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   window.addEventListener('scroll', onReaderScroll, { passive: true })
+  for (const type of ['touchstart', 'wheel', 'keydown']) window.addEventListener(type, _releaseScrollTarget, { passive: true })
   await loadBook(route.params.id)
 
   // ?chunk=N — "Open in book" from the highlights/notes screens. Chunks are
@@ -2118,6 +2325,8 @@ onUnmounted(async () => {
   window.removeEventListener('keydown', onKeydown)
   window.removeEventListener('resize', updateBookEdge)
   window.removeEventListener('scroll', onReaderScroll)
+  for (const type of ['touchstart', 'wheel', 'keydown']) window.removeEventListener(type, _releaseScrollTarget)
+  _cancelIdleSectionMounting()
   if (_scrollRaf !== null) cancelAnimationFrame(_scrollRaf)
   if (_observer) _observer.disconnect()
   _cancelScheduledChunkMapBuild()

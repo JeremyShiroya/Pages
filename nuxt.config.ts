@@ -102,6 +102,13 @@ export default defineNuxtConfig({
   },
   pwa: {
     registerType: 'autoUpdate',
+    // The module's own client plugin registers the worker on EVERY platform,
+    // including the native app, where it then serves its precached app shell
+    // for every navigation — masking a fresh APK or live-update bundle with an
+    // old one. Registration is done by plugins/disable-sw-native.client.js
+    // instead, on the web only.
+    injectRegister: false,
+    client: { registerPlugin: false },
     manifest: {
       name: 'Pages',
       short_name: 'Pages',

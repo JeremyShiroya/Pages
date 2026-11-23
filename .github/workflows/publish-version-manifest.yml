@@ -11,6 +11,12 @@
 # empty value disables the update check completely — which is why a build made
 # without it never prompts, however many releases are published afterwards.
 #
+# Silent web updates: when the release also carries bookish-web-<version>.zip
+# and .json (from `npm run release:web`), they are verified here and added to
+# the manifest as `web`. Phones whose APK already has the native code that web
+# build needs switch to it silently on next launch; others get the APK prompt.
+# A release without them behaves exactly as before (APK prompt only).
+#
 # This workflow publishes the MANIFEST only; it does not build or sign the APK.
 # Attach the APK to the release yourself (named bookish-<version>.apk), and the
 # manifest will be generated to point at it. The job fails loudly rather than
@@ -99,9 +105,48 @@ jobs:
           # would follow, and is guaranteed https (the app rejects anything else).
           echo "url=https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/$EXPECTED" >> "$GITHUB_OUTPUT"
 
+      # Optional. The bundle's signature is checked on the phone against the key
+      # baked into the APK; here we only make sure the two files belong
+      # together and to this release, so a mismatch fails loudly instead of
+      # being silently ignored on every device.
+      - name: Find the web bundle attached to the release
+        id: web
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.target.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+          CODE: ${{ steps.version.outputs.code }}
+        run: |
+          set -euo pipefail
+          ZIP="bookish-web-${VERSION}.zip"
+          META="bookish-web-${VERSION}.json"
+          NAMES="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')"
+          if ! grep -qxF "$ZIP" <<<"$NAMES" || ! grep -qxF "$META" <<<"$NAMES"; then
+            echo "No web bundle on $TAG - publishing an APK-only manifest."
+            echo "args=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mkdir -p web-bundle
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir web-bundle --pattern "$ZIP" --pattern "$META"
+          ACTUAL="$(sha256sum "web-bundle/$ZIP" | cut -d' ' -f1)"
+          EXPECTED="$(node -p "require('./web-bundle/$META').sha256")"
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "::error::$ZIP does not match $META (sha256 $ACTUAL vs $EXPECTED). Re-run npm run release:web and re-attach both."
+            exit 1
+          fi
+          BUNDLE_CODE="$(node -p "require('./web-bundle/$META').versionCode")"
+          if [ "$BUNDLE_CODE" != "$CODE" ]; then
+            echo "::error::$META is versionCode $BUNDLE_CODE but $TAG is $CODE. Rebuild the bundle from the release commit."
+            exit 1
+          fi
+          echo "args=--web-meta web-bundle/$META --web-url https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/$ZIP" >> "$GITHUB_OUTPUT"
+
       - name: Generate version.json
         env:
           NOTES: ${{ github.event.release.body }}
+          # Built above from fixed strings and the tag, never from free text,
+          # so word-splitting it below is safe.
+          WEB_ARGS: ${{ steps.web.outputs.args }}
         run: |
           set -euo pipefail
           # The generator reads --notes as a single argv value, but rejects one
@@ -110,10 +155,10 @@ jobs:
           # changelog can never fail the release.
           if [ -n "${NOTES:-}" ] && [ "${NOTES#--}" = "$NOTES" ]; then
             node scripts/generate-version-manifest.mjs \
-              --apk-url "${{ steps.apk.outputs.url }}" --notes "$NOTES"
+              --apk-url "${{ steps.apk.outputs.url }}" --notes "$NOTES" $WEB_ARGS
           else
             node scripts/generate-version-manifest.mjs \
-              --apk-url "${{ steps.apk.outputs.url }}"
+              --apk-url "${{ steps.apk.outputs.url }}" $WEB_ARGS
           fi
           cat version.json
 
