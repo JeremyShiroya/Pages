@@ -2,6 +2,7 @@ import { PAGES_SETTINGS_KEY, readPagesSettings, writePagesSettings } from '~/com
 import { PAGES_TTS_SESSION_KEY, readStoredTtsSession, writeStoredTtsSession } from '~/composables/useTTS'
 import { openLibraryDB, LIBRARY_STORE_NAMES } from './useLibraryStore'
 import { clearReadingPositionJournals, flushReadingPositions } from './readingPositionStore'
+import { collectLocalData, restoreLocalData } from '~/utils/backupLocalData'
 
 const BACKUP_VERSION = 1
 const LIBRARY_DB_NAME = 'bookish-library'
@@ -206,6 +207,8 @@ export const useLibraryBackup = () => {
       exportedAt: new Date().toISOString(),
       settings: readPagesSettings(),
       ttsSession: readStoredTtsSession(),
+      // Streak, per-book reading analytics, reader prefs, saved filters.
+      local: collectLocalData(),
       indexedDB: {
         [LIBRARY_DB_NAME]: library,
         ...(storage ? { [STORAGE_DB_NAME]: storage } : {}),
@@ -230,6 +233,9 @@ export const useLibraryBackup = () => {
       await replaceStores(storageDb, backup.indexedDB[STORAGE_DB_NAME], STORAGE_STORES)
     }
     writePagesSettings(backup.settings || {})
+
+    // Merged, not replaced: a restore never erases streak days this device has.
+    restoreLocalData(backup.local)
 
     if (backup.ttsSession) writeStoredTtsSession(backup.ttsSession)
     else if (typeof localStorage !== 'undefined') localStorage.removeItem(PAGES_TTS_SESSION_KEY)
