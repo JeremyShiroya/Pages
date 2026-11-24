@@ -48,12 +48,12 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useBookishSettings } from '~/composables/useBookishSettings';
+import { usePagesSettings } from '~/composables/usePagesSettings';
 import { useUserProfile } from '~/composables/useUserProfile';
 
 const props = defineProps({ preview: { type: Boolean, default: false } });
 const route = useRoute();
-const { settings } = useBookishSettings();
+const { settings } = usePagesSettings();
 const { profile, activeAvatarPreset } = useUserProfile();
 const profileAvatarSrc = computed(() => profile.value.avatarType === 'image'
   ? profile.value.avatarValue : activeAvatarPreset.value.src);

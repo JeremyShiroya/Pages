@@ -234,7 +234,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryBackfill } from '~/composables/useMetadataBackfill'
 import { useAutoMetadata } from '~/composables/useAutoMetadata'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import {
   DEFAULT_SCAN_FOLDERS,
   normalizeScanFolder,
@@ -286,7 +286,7 @@ const refreshStorageSummary = async () => {
 // and watches. Owning the loop in component scope meant navigating away threw
 // the progress state (and the apparent run) away mid-sweep.
 const { state: backfill, start: runLibraryBackfill, stop: stopLibraryBackfill } = useLibraryBackfill()
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { state: autoMeta } = useAutoMetadata()
 const showFailures = ref(false)
 const showDiagnostics = ref(false)

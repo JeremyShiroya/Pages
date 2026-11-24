@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make Bookish installable and native-wrappable while making mobile reader entry feel immediate.
+**Goal:** Make Pages installable and native-wrappable while making mobile reader entry feel immediate.
 
 **Architecture:** Keep Nuxt as the source app. Add PWA generation for browser-installed apps, add Capacitor config for Android/iOS shells, and introduce a client-side reader prewarm cache that can show recently requested content before slower persistent storage returns.
 
@@ -52,7 +52,7 @@
 - Create: `capacitor.config.ts`
 
 - [ ] Install `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/ios`, `@capacitor/filesystem`, and `@capacitor/preferences`.
-- [ ] Configure app id `com.bookish.app`, app name `Bookish`, `webDir: '.output/public'`, and bundled web runtime.
+- [ ] Configure app id `com.bookish.app`, app name `Pages`, `webDir: '.output/public'`, and bundled web runtime.
 - [ ] Add scripts for `cap:sync`, `cap:open:android`, and `cap:open:ios`.
 - [ ] Keep native platform folders out of this first pass unless the user runs `npx cap add android` or `npx cap add ios`.
 

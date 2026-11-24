@@ -6,7 +6,9 @@ const packageJson = JSON.parse(
 )
 
 const resolveBuildNumber = () => {
-  if (process.env.BOOKISH_BUILD_NUMBER) return process.env.BOOKISH_BUILD_NUMBER
+  // PAGES_* is current; the BOOKISH_* names still work for older setups.
+  const override = process.env.PAGES_BUILD_NUMBER || process.env.BOOKISH_BUILD_NUMBER
+  if (override) return override
   try {
     return execFileSync('git', ['rev-list', '--count', 'HEAD'], {
       encoding: 'utf8',
@@ -14,6 +16,18 @@ const resolveBuildNumber = () => {
     }).trim()
   } catch {
     return new Date().toISOString().replace(/\D/g, '').slice(0, 12)
+  }
+}
+
+// Accounts and cloud backup reuse the Supabase project that already hosts the
+// series-ordering function, unless a dedicated one is configured.
+const resolveSupabaseUrl = () => {
+  if (process.env.NUXT_PUBLIC_SUPABASE_URL) return process.env.NUXT_PUBLIC_SUPABASE_URL
+  try {
+    const url = new URL(process.env.NUXT_PUBLIC_AI_SERIES_ENDPOINT || '')
+    return url.hostname.endsWith('.supabase.co') ? url.origin : ''
+  } catch {
+    return ''
   }
 }
 
@@ -57,7 +71,7 @@ export default defineNuxtConfig({
       // app has no server to keep it behind. Restrict the key to the Books API
       // (and to the Android package) so a leak can only spend Books quota.
       googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || process.env.NUXT_GOOGLE_BOOKS_API_KEY || '',
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || process.env.BOOKISH_API_BASE_URL || '',
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || process.env.PAGES_API_BASE_URL || process.env.BOOKISH_API_BASE_URL || '',
       // AI series ordering (see server/utils/aiSeriesEnumerator.ts). Used only
       // to PROPOSE which books a series contains when the Goodreads series page
       // is unreachable; every proposed title is then verified against the real
@@ -92,7 +106,16 @@ export default defineNuxtConfig({
       // Where the native build looks for version.json (see
       // scripts/generate-version-manifest.mjs). Empty disables the update
       // check entirely, which is the right default for web and desktop.
-      updateManifestUrl: process.env.BOOKISH_UPDATE_MANIFEST_URL || '',
+      updateManifestUrl: process.env.PAGES_UPDATE_MANIFEST_URL || process.env.BOOKISH_UPDATE_MANIFEST_URL || '',
+      // Accounts + cloud backup (composables/useAccount.js). The publishable
+      // key is safe to ship: every table and bucket it can reach is behind RLS
+      // scoped to the signed-in user (supabase/migrations/*_cloud_backups.sql).
+      supabaseUrl: resolveSupabaseUrl(),
+      supabaseKey: process.env.NUXT_PUBLIC_SUPABASE_KEY || process.env.NUXT_PUBLIC_AI_SERIES_ENDPOINT_KEY || '',
+      // OAuth "Web application" client ID from Google Cloud. Native Android
+      // sign-in uses it as the ID token audience, and Supabase's Google
+      // provider must list the same ID. Empty = sign-in reports "not set up".
+      googleWebClientId: process.env.NUXT_PUBLIC_GOOGLE_WEB_CLIENT_ID || '',
     },
   },
   nitro: {

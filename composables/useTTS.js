@@ -9,7 +9,7 @@ import { synthesizeMobileSpeech, resetMobileTtsDriver } from '~/composables/tts/
 import { createNativeSpeechAudio, loadNativeVoices } from '~/composables/tts/nativeSpeech'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 import { firstChunkForPage } from '~/composables/usePdfManifest'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { TTS_WORDS_PER_MIN, chunkIndexAtEstimatedSecond } from '~/composables/tts/timing'
 
 let _currentAudio = null
@@ -44,7 +44,7 @@ export function chunkTimeOffsets(chunks, speed = 1) {
   }
   return offsets
 }
-export const BOOKISH_TTS_SESSION_KEY = 'bookish:tts-session'
+export const PAGES_TTS_SESSION_KEY = 'bookish:tts-session'
 
 const EDGE_VOICES = [
   { id: 'en-CA-LiamNeural',         name: 'Liam (Canada)' },
@@ -89,7 +89,7 @@ export function readStoredTtsSession(storage = resolveStorage()) {
   if (!storage) return null
 
   try {
-    const raw = storage.getItem(BOOKISH_TTS_SESSION_KEY)
+    const raw = storage.getItem(PAGES_TTS_SESSION_KEY)
     if (!raw) return null
     const session = JSON.parse(raw)
     if (!session?.bookId) return null
@@ -126,7 +126,7 @@ export function writeStoredTtsSession(session, storage = resolveStorage()) {
   }
 
   try {
-    storage.setItem(BOOKISH_TTS_SESSION_KEY, JSON.stringify(normalized))
+    storage.setItem(PAGES_TTS_SESSION_KEY, JSON.stringify(normalized))
   } catch {
     // localStorage can fail in private browsing or quota-limited contexts.
   }
@@ -135,7 +135,7 @@ export function writeStoredTtsSession(session, storage = resolveStorage()) {
 }
 
 export function clearStoredTtsSession(storage = resolveStorage()) {
-  storage?.removeItem?.(BOOKISH_TTS_SESSION_KEY)
+  storage?.removeItem?.(PAGES_TTS_SESSION_KEY)
 }
 
 export function dismissStoredTtsSession(bookId, storage = resolveStorage()) {
@@ -581,7 +581,7 @@ async function synthesizeSpeech({ text, voice, speed, apiUrl, apiBaseUrl }) {
 }
 
 export const useTTS = () => {
-  const { settings, updateSettings } = useBookishSettings()
+  const { settings, updateSettings } = usePagesSettings()
   const { apiUrl, apiBaseUrl } = useApiEndpoint()
 
   const ttsBook         = useState('tts:book',         () => null)

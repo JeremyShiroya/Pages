@@ -49,12 +49,12 @@
 <script setup>
 import { computed, ref } from 'vue'
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useShareApp } from '~/composables/useShareApp'
 import { useToast } from '~/composables/useToast'
 
 const runtimeConfig = useRuntimeConfig()
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { canShareApp, shareApp } = useShareApp()
 const { addToast } = useToast()
 const router = useRouter()

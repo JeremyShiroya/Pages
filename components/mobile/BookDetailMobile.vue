@@ -2,8 +2,8 @@
   <div class="book-detail-page">
     <!-- No title: the hero below already names the book, and a long title
          crowded the bar. Back button only. -->
-    <MobileSettingsNav :show-title="false" back-to="/books" aria-label="Book navigation">
-      <template v-if="minimalActions && book" #actions>
+    <MobileSettingsNav :show-title="false" :back-to="backTo" aria-label="Book navigation">
+      <template v-if="minimalActions && book && !isSuggestion" #actions>
         <div ref="detailMenuElement" class="detail-more-wrap" @click.stop>
           <button
             type="button"
@@ -68,21 +68,27 @@
           <p class="book-author">
             {{ book.author || "Unknown author" }}<span v-if="book.publishYear"> &middot; {{ book.publishYear }}</span>
           </p>
-          <button v-if="book.format === 'pdf'" type="button" class="document-type-link" @click="router.push(bookEditLocation(book.id, route.fullPath))">
+          <button v-if="!isSuggestion && book.format === 'pdf'" type="button" class="document-type-link" @click="router.push(bookEditLocation(book.id, route.fullPath))">
             <i class="ri-file-text-line" aria-hidden="true"></i>
             <span>{{ book.documentType === 'unclassified' ? 'Review file type' : book.documentType === 'personal' ? 'Personal document' : 'Book' }}</span>
             <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
           </button>
           <p v-if="book.series" class="book-series">
-            {{ book.series }}<span v-if="book.seriesInstallment"> #{{ book.seriesInstallment }}</span>
+            {{ book.series }}<span v-if="book.seriesInstallment"> #{{ book.seriesInstallment }}</span><span v-if="isSuggestion && suggestionSeriesTotal"> of {{ suggestionSeriesTotal }}</span>
           </p>
+          <p v-else-if="isSuggestion" class="book-series">Standalone</p>
+
+          <div v-if="isSuggestion" class="not-owned-chip">
+            <i class="ri-bookmark-3-line" aria-hidden="true"></i>
+            <span>Not in your library</span>
+          </div>
 
           <div v-if="book.genre" class="genre-chip">
             <i class="ri-price-tag-3-line"></i>
             <span>{{ book.genre }}</span>
           </div>
 
-          <div class="progress-row">
+          <div v-if="!isSuggestion" class="progress-row">
             <BookProgressDisplay :progress="progress" compact />
           </div>
 
@@ -95,7 +101,7 @@
             class="detail-rating"
           />
 
-          <div v-if="!minimalActions" class="quick-actions">
+          <div v-if="!minimalActions && !isSuggestion" class="quick-actions">
             <button
               type="button"
               class="icon-action"
@@ -135,7 +141,14 @@
         </div>
       </div>
 
-      <div class="book-actions">
+      <div v-if="isSuggestion" class="book-actions suggestion-actions">
+        <button type="button" class="edit-details-btn" @click="router.push(suggestionPath(suggestionSeries, suggestionInstallment, '/edit'))">
+          <i class="ri-edit-2-line"></i>
+          Edit Details
+        </button>
+      </div>
+
+      <div v-else class="book-actions">
         <button type="button" class="listen-btn" @click="handleListen">
           <i :class="isListening ? 'ri-pause-fill' : 'ri-headphone-line'"></i>
           {{ listenLabel }}
@@ -148,7 +161,7 @@
 
       <!-- Only offered once there is something to show: an empty screen is a
            worse answer than no entry point. -->
-      <div v-if="highlightCount || noteCount" class="annotation-links">
+      <div v-if="!isSuggestion && (highlightCount || noteCount)" class="annotation-links">
         <button
           v-if="highlightCount"
           type="button"
@@ -173,7 +186,9 @@
 
       <section class="synopsis-section">
         <h2>Synopsis</h2>
-        <p>{{ book.blurb || "No description available for this book." }}</p>
+        <p v-if="book.blurb">{{ book.blurb }}</p>
+        <p v-else-if="suggestionLoading" class="synopsis-loading"><i class="ri-loader-4-line spinner"></i> Looking up the synopsis…</p>
+        <p v-else>No description available for this book.</p>
       </section>
     </section>
 
@@ -197,7 +212,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { loadAnnotations, useAnnotations } from "~/composables/useAnnotations";
 import { useBooks } from "~/composables/useBooks";
-import { useBookishSettings } from "~/composables/useBookishSettings";
+import { usePagesSettings } from "~/composables/usePagesSettings";
 import { useToast } from "~/composables/useToast";
 import { useShareBook } from "~/composables/useShareBook";
 import { prewarmReaderContent } from "~/composables/useReaderPrewarm";
@@ -208,6 +223,15 @@ import DeleteConfirmModal from "~/components/shared/DeleteConfirmModal.vue";
 import BookProgressDisplay from "~/components/shared/BookProgressDisplay.vue";
 import BookRatingDisplay from "~/components/shared/BookRatingDisplay.vue";
 import MobileSettingsNav from "./MobileSettingsNav.vue";
+import { fetchSuggestionDetails, suggestionNeedsFullDetails, suggestionPath, useSeriesSuggestion } from "~/composables/useSeriesSuggestions";
+
+// Suggestion mode: the page shows a series installment the library does NOT
+// own — the same layout as a library book, minus everything that needs a file
+// (listen, read, progress, annotations), with "Edit Details" in their place.
+const props = defineProps({
+  suggestionSeries: { type: String, default: "" },
+  suggestionInstallment: { type: [String, Number], default: "" },
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -215,7 +239,7 @@ const { books, collections, loading, toggleFavourite, hideBook, deleteBook } = u
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 const { addToast } = useToast();
 const { shareBook } = useShareBook();
-const { settings } = useBookishSettings();
+const { settings } = usePagesSettings();
 
 const showPlaylistModal = ref(false);
 const showDeleteModal = ref(false);
@@ -269,7 +293,28 @@ watch(minimalActions, (enabled) => {
   if (!enabled) detailMenuOpen.value = false;
 });
 
-const book = computed(() => books.value.find((b) => String(b.id) === String(route.params.id)));
+const isSuggestion = computed(() => Boolean(props.suggestionSeries));
+const { entry: suggestionEntry, book: suggestionBook } = useSeriesSuggestion(
+  computed(() => props.suggestionSeries),
+  computed(() => props.suggestionInstallment),
+);
+const suggestionLoading = ref(false);
+const suggestionSeriesTotal = computed(() => {
+  if (!isSuggestion.value) return null;
+  const key = String(props.suggestionSeries).trim().toLowerCase();
+  const totals = books.value
+    .filter((item) => String(item.series || "").trim().toLowerCase() === key)
+    .map((item) => Number(item.seriesTotal))
+    .filter((total) => Number.isSafeInteger(total) && total > 0);
+  return totals.length ? Math.max(...totals) : null;
+});
+const backTo = computed(() => (isSuggestion.value ? `/serie/${encodeURIComponent(props.suggestionSeries)}` : "/books"));
+
+const book = computed(() => (
+  isSuggestion.value
+    ? suggestionBook.value
+    : books.value.find((b) => String(b.id) === String(route.params.id))
+));
 
 // The playlist button fills the way the heart does, so the page says whether the
 // book is filed anywhere without having to open the sheet to find out.
@@ -290,7 +335,15 @@ const highlightCount = computed(() => forThisBook(highlights.value).length);
 const noteCount = computed(() => forThisBook(notes.value).length);
 
 onMounted(() => {
-  if (route.params.id) loadAnnotations(route.params.id);
+  // Details are fetched once and kept on the device; a later open paints them
+  // straight from storage with no request.
+  if (isSuggestion.value && suggestionNeedsFullDetails(suggestionEntry.value)) {
+    suggestionLoading.value = true;
+    fetchSuggestionDetails(props.suggestionSeries, props.suggestionInstallment)
+      .catch(() => {})
+      .finally(() => { suggestionLoading.value = false; });
+  }
+  if (!isSuggestion.value && route.params.id) loadAnnotations(route.params.id);
   document.addEventListener('pointerdown', closeDetailMenuOutside);
 });
 onUnmounted(() => document.removeEventListener('pointerdown', closeDetailMenuOutside));
@@ -307,6 +360,12 @@ const generateCoverPlaceholder = (title) => {
 
 const coverUrl = computed(() => book.value?.cover || generateCoverPlaceholder(book.value?.title ?? ""));
 const handleCoverError = (event) => {
+  const remote = book.value?.coverRemote;
+  if (remote && event.target.dataset.triedRemote !== "1") {
+    event.target.dataset.triedRemote = "1";
+    event.target.src = remote;
+    return;
+  }
   event.target.src = generateCoverPlaceholder(book.value?.title ?? "");
 };
 
@@ -330,13 +389,19 @@ const handleListen = () => {
 watch(
   () => book.value?.id,
   (bookId) => {
-    if (bookId) prewarmReaderContent(bookId);
+    if (bookId && !isSuggestion.value) prewarmReaderContent(bookId);
   },
   { immediate: true },
 );
 </script>
 
 <style scoped>
+.not-owned-chip{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;width:fit-content;margin:2px 0 4px;padding:5px 10px;border-radius:999px;border:1px dashed color-mix(in srgb,var(--color-text-muted) 55%,transparent);color:var(--color-text-secondary);font-size:.76rem;font-weight:600;letter-spacing:.01em}
+.not-owned-chip i{font-size:.9rem;color:var(--color-brand-primary)}
+.suggestion-actions{grid-template-columns:1fr}
+.edit-details-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;width:100%;min-height:48px;border:1px solid var(--color-border-subtle);border-radius:12px;background:var(--color-surface-card);color:var(--color-text-primary);font:inherit;font-size:.95rem;font-weight:600;cursor:pointer}
+.edit-details-btn i{font-size:1.1rem;color:var(--color-brand-primary)}
+.synopsis-loading{display:flex;align-items:center;gap:8px;color:var(--color-text-muted)}
 .document-type-link{display:inline-flex;align-self:flex-start;flex:0 0 auto;align-items:center;gap:5px;width:fit-content;max-width:100%;border:1px solid var(--color-border-subtle);background:color-mix(in srgb,var(--color-surface-primary) 60%,transparent);color:var(--color-text-secondary);border-radius:999px;padding:5px 9px;font-size:.76rem;font-weight:500;cursor:pointer;margin:4px 0 10px}
 .document-type-link:hover{color:var(--color-text-primary);background:var(--color-surface-secondary)}
 .book-detail-page {

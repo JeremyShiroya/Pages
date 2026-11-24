@@ -16,7 +16,7 @@ the metadata request will fetch that page and extract its primary-work count. Th
 will flow through the existing metadata aggregator as `seriesTotal` and be persisted on
 the selected book.
 
-Bookish will not perform a web request when opening the Series page. The page derives the
+Pages will not perform a web request when opening the Series page. The page derives the
 best stored total from its local books, so it remains fast and local-first. A later add or
 edit metadata refresh can update the stored total when a series grows.
 

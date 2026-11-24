@@ -30,8 +30,8 @@ describe('app versioning is derived, not hand-written', () => {
   // Both layers honour the same override, so a CI build can pin the APK and the
   // in-app "Build" string to one number.
   test('gradle and nuxt honour the same build-number override', () => {
-    expect(buildGradle).toContain('BOOKISH_BUILD_NUMBER')
-    expect(read('nuxt.config.ts')).toContain('BOOKISH_BUILD_NUMBER')
+    expect(buildGradle).toContain('PAGES_BUILD_NUMBER')
+    expect(read('nuxt.config.ts')).toContain('PAGES_BUILD_NUMBER')
   })
 
   // A placeholder versionCode is unrecoverable in the field, so an

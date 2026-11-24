@@ -1,5 +1,5 @@
-import { BOOKISH_SETTINGS_KEY, readBookishSettings, writeBookishSettings } from '~/composables/useBookishSettings'
-import { BOOKISH_TTS_SESSION_KEY, readStoredTtsSession, writeStoredTtsSession } from '~/composables/useTTS'
+import { PAGES_SETTINGS_KEY, readPagesSettings, writePagesSettings } from '~/composables/usePagesSettings'
+import { PAGES_TTS_SESSION_KEY, readStoredTtsSession, writeStoredTtsSession } from '~/composables/useTTS'
 import { openLibraryDB, LIBRARY_STORE_NAMES } from './useLibraryStore'
 import { clearReadingPositionJournals, flushReadingPositions } from './readingPositionStore'
 
@@ -12,7 +12,7 @@ const STORAGE_DB_VERSION = 2
 const LIBRARY_STORES = LIBRARY_STORE_NAMES
 const STORAGE_STORES = ['book-content', 'book-pdf-source']
 
-function openBookishDB(name, version) {
+function openPagesDB(name, version) {
   if (name === LIBRARY_DB_NAME) return openLibraryDB()
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(name, version)
@@ -61,7 +61,7 @@ function base64ToBytes(base64) {
   return bytes
 }
 
-async function serializeValue(value) {
+export async function serializeValue(value) {
   if (value === null || value === undefined) return value
   if (value instanceof ArrayBuffer) {
     return { __bookishType: 'ArrayBuffer', data: bytesToBase64(new Uint8Array(value)) }
@@ -92,7 +92,7 @@ async function serializeValue(value) {
   return value
 }
 
-function deserializeValue(value) {
+export function deserializeValue(value) {
   if (value === null || value === undefined) return value
   if (Array.isArray(value)) return value.map(item => deserializeValue(item))
   if (typeof value !== 'object') return value
@@ -184,37 +184,39 @@ function normalizeBackup(input) {
 }
 
 export const useLibraryBackup = () => {
-  const exportBookishData = async () => {
+  // includeStorage=false leaves out extracted book content and PDF sources:
+  // the cloud backup sends those per book instead (see useCloudBackup.js).
+  const exportPagesData = async ({ includeStorage = true } = {}) => {
     await flushReadingPositions()
     if (typeof indexedDB === 'undefined') {
       throw new Error('IndexedDB is not available in this browser.')
     }
 
     const libraryDb = await openLibraryDB()
-    const storageDb = await openBookishDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
+    const storageDb = await openPagesDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
 
     const [library, storage] = await Promise.all([
       readAllRecords(libraryDb, LIBRARY_STORES),
-      readAllRecords(storageDb, STORAGE_STORES),
+      includeStorage ? readAllRecords(storageDb, STORAGE_STORES) : Promise.resolve(null),
     ])
 
     return {
       app: 'Pages',
       version: BACKUP_VERSION,
       exportedAt: new Date().toISOString(),
-      settings: readBookishSettings(),
+      settings: readPagesSettings(),
       ttsSession: readStoredTtsSession(),
       indexedDB: {
         [LIBRARY_DB_NAME]: library,
-        [STORAGE_DB_NAME]: storage,
+        ...(storage ? { [STORAGE_DB_NAME]: storage } : {}),
       },
     }
   }
 
-  const importBookishData = async (backupInput) => {
+  const importPagesData = async (backupInput) => {
     const backup = normalizeBackup(backupInput)
     const libraryDb = await openLibraryDB()
-    const storageDb = await openBookishDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
+    const storageDb = await openPagesDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
 
     const previous = await readAllRecords(libraryDb, ['books'])
     await clearReadingPositionJournals([...new Set([
@@ -222,16 +224,20 @@ export const useLibraryBackup = () => {
       ...(backup.indexedDB?.[LIBRARY_DB_NAME]?.books || []).map(book => book.key),
     ])])
     await replaceStores(libraryDb, backup.indexedDB?.[LIBRARY_DB_NAME] || {}, LIBRARY_STORES)
-    await replaceStores(storageDb, backup.indexedDB?.[STORAGE_DB_NAME] || {}, STORAGE_STORES)
-    writeBookishSettings(backup.settings || {})
+    // A backup without a storage section (cloud snapshots) keeps whatever
+    // content is already on this device; content arrives per book afterwards.
+    if (backup.indexedDB?.[STORAGE_DB_NAME]) {
+      await replaceStores(storageDb, backup.indexedDB[STORAGE_DB_NAME], STORAGE_STORES)
+    }
+    writePagesSettings(backup.settings || {})
 
     if (backup.ttsSession) writeStoredTtsSession(backup.ttsSession)
-    else if (typeof localStorage !== 'undefined') localStorage.removeItem(BOOKISH_TTS_SESSION_KEY)
+    else if (typeof localStorage !== 'undefined') localStorage.removeItem(PAGES_TTS_SESSION_KEY)
   }
 
-  const wipeBookishData = async () => {
+  const wipePagesData = async () => {
     const libraryDb = await openLibraryDB()
-    const storageDb = await openBookishDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
+    const storageDb = await openPagesDB(STORAGE_DB_NAME, STORAGE_DB_VERSION)
 
     const previous = await readAllRecords(libraryDb, ['books'])
     await clearReadingPositionJournals(previous.books.map(book => book.key))
@@ -241,17 +247,17 @@ export const useLibraryBackup = () => {
     ])
 
     if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(BOOKISH_SETTINGS_KEY)
-      localStorage.removeItem(BOOKISH_TTS_SESSION_KEY)
+      localStorage.removeItem(PAGES_SETTINGS_KEY)
+      localStorage.removeItem(PAGES_TTS_SESSION_KEY)
     }
   }
 
   const createDownload = async () => {
-    const backup = await exportBookishData()
+    const backup = await exportPagesData()
     const json = JSON.stringify(backup, null, 2)
     const stamp = new Date().toISOString().slice(0, 10)
     return {
-      filename: `bookish-backup-${stamp}.json`,
+      filename: `pages-backup-${stamp}.json`,
       url: URL.createObjectURL(new Blob([json], { type: 'application/json' })),
       summary: {
         books: backup.indexedDB[LIBRARY_DB_NAME].books.length,
@@ -264,9 +270,9 @@ export const useLibraryBackup = () => {
   }
 
   return {
-    exportBookishData,
-    importBookishData,
-    wipeBookishData,
+    exportPagesData,
+    importPagesData,
+    wipePagesData,
     createDownload,
   }
 }

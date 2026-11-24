@@ -26,6 +26,17 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    // Google sign-in for accounts / cloud backup. Only Google is bundled so
+    // the other providers' SDKs never reach the APK.
+    SocialLogin: {
+      providers: {
+        google: true,
+        facebook: false,
+        apple: false,
+        twitter: false,
+      },
+      logLevel: 1,
+    },
     // Silent web (OTA) updates, self-hosted on GitHub Releases — see
     // composables/useLiveUpdate.js and scripts/build-web-bundle.mjs.
     LiveUpdate: {

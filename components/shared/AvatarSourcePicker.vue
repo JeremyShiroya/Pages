@@ -17,7 +17,7 @@
             <i class="ri-image-line" aria-hidden="true"></i><span><strong>Choose from Gallery</strong><small>Select and crop a photo from your device</small></span><i class="ri-arrow-right-s-line" aria-hidden="true"></i>
           </button>
           <button class="source-option" type="button" @click="choosePreset">
-            <i class="ri-user-smile-line" aria-hidden="true"></i><span><strong>Select Avatar</strong><small>Choose one of the Bookish avatars</small></span><i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+            <i class="ri-user-smile-line" aria-hidden="true"></i><span><strong>Select Avatar</strong><small>Choose one of the Pages avatars</small></span><i class="ri-arrow-right-s-line" aria-hidden="true"></i>
           </button>
           <p v-if="imageError" class="picker-error" role="alert">{{ imageError }}</p>
         </template>

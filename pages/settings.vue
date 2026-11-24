@@ -29,11 +29,11 @@
 
 <script setup>
 import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 
 const route = useRoute()
 const { isTablet } = useDeviceArchitecture()
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const settingsPages = computed(() => [
   { label: 'Overview', to: '/settings', icon: 'ri-dashboard-line' },
   { label: 'Preferences', to: '/settings/preferences', icon: 'ri-equalizer-2-line' },

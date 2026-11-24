@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace Bookish's failed PDF narration navigation/highlighting and inaccurate author totals with deterministic, independently verified systems.
+**Goal:** Replace Pages's failed PDF narration navigation/highlighting and inaccurate author totals with deterministic, independently verified systems.
 
 **Architecture:** Build one versioned PDF manifest directly from ordered PDF.js text items and make TTS, highlighting, progress, and navigation consume its chunk records by ID. Separately parse only explicitly classified full-length bibliography sections for author book and series totals, returning unknown rather than provider catalog counts.
 

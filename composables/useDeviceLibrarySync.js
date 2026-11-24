@@ -1,7 +1,7 @@
 import { registerPlugin } from '@capacitor/core'
 import { Filesystem } from '@capacitor/filesystem'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
-import { enabledExtensionPattern, useBookishSettings, readBookishSettings } from '~/composables/useBookishSettings'
+import { enabledExtensionPattern, usePagesSettings, readPagesSettings } from '~/composables/usePagesSettings'
 import { useBooks } from '~/composables/useBooks'
 import { useBookStorage } from '~/composables/useBookStorage'
 import { useLibraryStore } from '~/composables/useLibraryStore'
@@ -21,9 +21,9 @@ import { sourceDocumentIdentity } from '~/composables/sourceBookIdentity'
 // library, and then backfills missing book details from the web in the
 // background — announcing each phase with a toast.
 
-export const BOOKISH_DEVICE_IMPORTS_KEY = 'bookish:device-imports'
-export const BOOKISH_DEVICE_SYNC_ASKED_KEY = 'bookish:device-sync-asked'
-export const BOOKISH_SCAN_FOLDERS_KEY = 'bookish:scan-folders'
+export const PAGES_DEVICE_IMPORTS_KEY = 'bookish:device-imports'
+export const PAGES_DEVICE_SYNC_ASKED_KEY = 'bookish:device-sync-asked'
+export const PAGES_SCAN_FOLDERS_KEY = 'bookish:scan-folders'
 
 // Default: the whole shared storage. Users can narrow this from
 // Settings → Storage → Scanned folders.
@@ -39,7 +39,7 @@ const resolveStorage = () => (typeof localStorage === 'undefined' ? null : local
 export function readImportRegistry(storage = resolveStorage()) {
   if (!storage) return {}
   try {
-    const parsed = JSON.parse(storage.getItem(BOOKISH_DEVICE_IMPORTS_KEY) || '{}')
+    const parsed = JSON.parse(storage.getItem(PAGES_DEVICE_IMPORTS_KEY) || '{}')
     return parsed && typeof parsed === 'object' ? parsed : {}
   } catch {
     return {}
@@ -49,7 +49,7 @@ export function readImportRegistry(storage = resolveStorage()) {
 export function writeImportRegistry(registry, storage = resolveStorage()) {
   if (!storage) return
   try {
-    storage.setItem(BOOKISH_DEVICE_IMPORTS_KEY, JSON.stringify(registry))
+    storage.setItem(PAGES_DEVICE_IMPORTS_KEY, JSON.stringify(registry))
   } catch {
     // Quota errors just mean the same files get re-checked next open.
   }
@@ -66,7 +66,7 @@ export function normalizeScanFolder(value) {
 export function readScanFolders(storage = resolveStorage()) {
   if (!storage) return [...DEFAULT_SCAN_FOLDERS]
   try {
-    const parsed = JSON.parse(storage.getItem(BOOKISH_SCAN_FOLDERS_KEY) || 'null')
+    const parsed = JSON.parse(storage.getItem(PAGES_SCAN_FOLDERS_KEY) || 'null')
     if (!Array.isArray(parsed)) return [...DEFAULT_SCAN_FOLDERS]
     const folders = parsed.map(normalizeScanFolder).filter(Boolean)
     return folders.length ? folders : []
@@ -78,7 +78,7 @@ export function readScanFolders(storage = resolveStorage()) {
 export function writeScanFolders(folders, storage = resolveStorage()) {
   const normalized = [...new Set((folders || []).map(normalizeScanFolder).filter(Boolean))]
   try {
-    storage?.setItem(BOOKISH_SCAN_FOLDERS_KEY, JSON.stringify(normalized))
+    storage?.setItem(PAGES_SCAN_FOLDERS_KEY, JSON.stringify(normalized))
   } catch {}
   return normalized
 }
@@ -267,6 +267,22 @@ export function base64ToFile(base64, name, extension) {
   return new File([bytes], name, { type })
 }
 
+// Used by the setup flow after a restore: asks for file access BEFORE the app
+// restarts, so the first scan can reconnect the restored books straight away.
+// Touches no settings (a restore has just rewritten them in storage).
+export async function requestDeviceBooksAccess() {
+  try {
+    const { granted } = await DeviceBooks.check()
+    if (granted) return true
+    try { resolveStorage()?.setItem(PAGES_DEVICE_SYNC_ASKED_KEY, '1') } catch {}
+    await DeviceBooks.request()
+    return (await DeviceBooks.check()).granted === true
+  } catch (error) {
+    console.warn('[DeviceSync] Permission request failed:', error)
+    return false
+  }
+}
+
 // Ask once per app open via the styled in-app modal; the actual grant happens
 // on the system settings screen, so we re-check when the app regains focus.
 async function ensureStoragePermission(addToast) {
@@ -274,7 +290,7 @@ async function ensureStoragePermission(addToast) {
   if (granted) return true
 
   const storage = resolveStorage()
-  try { storage?.setItem(BOOKISH_DEVICE_SYNC_ASKED_KEY, '1') } catch {}
+  try { storage?.setItem(PAGES_DEVICE_SYNC_ASKED_KEY, '1') } catch {}
 
   try {
     await DeviceBooks.request()
@@ -386,7 +402,7 @@ export async function importDocumentFile(documentFile, extension, { addBook, add
     if (savedBook?.id) {
       try { await useDocumentIntelligenceStore().saveEvidence(savedBook.id, evidence) }
       catch (error) { console.warn('[DocumentIntelligence] Could not cache evidence', error) }
-      if (extension === 'pdf') void runDocumentIntelligence(savedBook.id, { searchEnabled: readBookishSettings().metadataAutoFill === true })
+      if (extension === 'pdf') void runDocumentIntelligence(savedBook.id, { searchEnabled: readPagesSettings().metadataAutoFill === true })
         .catch((error) => console.warn('[DocumentIntelligence] Import analysis will retry', error))
     }
   } catch (error) {
@@ -473,7 +489,7 @@ export async function syncDeviceLibrary({ silent = false, announce = !silent, ba
   const { books, addBook, addDeviceBook, updateBook, deleteBook, fetchAllData, initialized } = useBooks()
   const { saveBookContent, getBookContent } = useBookStorage()
   const { ask } = useDevicePermissionPrompt()
-  const { settings } = useBookishSettings()
+  const { settings } = usePagesSettings()
 
   // The first-boot chooser decides which extensions may be imported at all.
   // Scanning before it is answered would import books the user is about to say

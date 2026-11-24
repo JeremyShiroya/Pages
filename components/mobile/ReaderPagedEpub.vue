@@ -672,9 +672,9 @@ defineExpose({ nextPage, prevPage, goToSection, goToSectionPage, goToChunk, getP
 .paged-viewport {
   position: absolute;
   top: calc(env(safe-area-inset-top) + 14px);
-  right: 20px;
+  right: var(--mr-margin, 20px);
   bottom: calc(env(safe-area-inset-bottom) + 14px);
-  left: 20px;
+  left: var(--mr-margin, 20px);
   overflow: hidden;
   touch-action: none;
 }
@@ -696,7 +696,7 @@ defineExpose({ nextPage, prevPage, goToSection, goToSectionPage, goToChunk, getP
      control silently does nothing. */
   font-weight: var(--mr-font-weight, 400) !important;
   line-height: var(--mr-line-height, 1.62);
-  letter-spacing: 0.002em;
+  letter-spacing: var(--mr-letter-spacing, 0.002em);
   text-align: var(--mr-text-align, justify);
   text-justify: inter-word;
   hyphens: auto;

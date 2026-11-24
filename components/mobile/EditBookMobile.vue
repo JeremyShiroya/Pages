@@ -1,6 +1,6 @@
 <template>
   <div class="add-book-page">
-    <MobileSettingsNav title="Edit Book" back-to="/books" aria-label="Book form navigation" />
+    <MobileSettingsNav :title="isSuggestion ? 'Edit Details' : 'Edit Book'" :back-to="isSuggestion ? suggestionPath(suggestionSeries, suggestionInstallment) : '/books'" aria-label="Book form navigation" />
 
     <div v-if="isLoading" class="loading-state">
       <SkeletonLoader variant="form" />
@@ -147,7 +147,17 @@
             />
           </div>
           
-          <div class="info-card">
+          <div v-if="isSuggestion" class="info-card">
+            <div class="info-item">
+              <span class="info-label">Library</span>
+              <span class="info-value">Not in your library</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Series</span>
+              <span class="info-value">#{{ suggestionInstallment }}</span>
+            </div>
+          </div>
+          <div v-else class="info-card">
             <div class="info-item">
               <span class="info-label">Format</span>
               <span class="info-value">{{ editBook.format ? editBook.format.toUpperCase() : 'Unknown' }}</span>
@@ -161,7 +171,7 @@
 
         <!-- Details Section -->
         <div class="details-column">
-          <div v-if="editBook.format === 'pdf'" class="form-group">
+          <div v-if="!isSuggestion && editBook.format === 'pdf'" class="form-group">
             <label for="document-type">This file is</label>
             <DocumentTypePicker v-model="editBook.documentType" />
             <small v-if="editBook.documentType === 'unclassified'">Pages will not search the web for this file until you mark it as a book.</small>
@@ -215,7 +225,7 @@
             ></textarea>
           </div>
 
-          <div v-if="editBook.documentType === 'book'" class="form-group">
+          <div v-if="editBook.documentType === 'book' && !isSuggestion" class="form-group">
             <label>Series membership</label>
             <SeriesMembershipPicker :model-value="bookKind" @update:model-value="setBookKind" />
           </div>
@@ -229,6 +239,7 @@
                 v-model="editBook.series" 
                 placeholder="e.g. Middle-earth Universe"
                 class="form-input"
+                :disabled="isSuggestion"
               />
             </div>
             <div class="form-group">
@@ -239,6 +250,7 @@
                 v-model="editBook.seriesInstallment"
                 placeholder="e.g. 1"
                 class="form-input"
+                :disabled="isSuggestion"
               />
             </div>
             <div class="form-group">
@@ -249,6 +261,7 @@
                 v-model.number="editBook.seriesTotal"
                 placeholder="e.g. 6"
                 class="form-input"
+                :disabled="isSuggestion"
                 min="1"
               />
             </div>
@@ -277,10 +290,12 @@
             </div>
           </div>
 
-          <div class="form-row">
+          <small v-if="isSuggestion" class="suggestion-series-note">Series and number come from the series this book belongs to.</small>
+
+          <div v-if="!isSuggestion" class="form-row">
             <div class="form-group">
               <label for="status">Reading Status</label>
-              <BookishSelect
+              <PagesSelect
                 input-id="status"
                 v-model="editBook.status"
                 :options="['Unread', 'Reading', 'Read']"
@@ -320,7 +335,8 @@
 
 <script setup>
 import { seriesMembership, applySeriesChoice } from '~/utils/bookSeriesState'
-import { ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
+import { readSuggestion, saveSuggestionEdits, suggestionAsBook, suggestionPath } from '~/composables/useSeriesSuggestions'
 import { useRouter } from 'vue-router'
 import { reconcileStatusProgress, useBooks } from '~/composables/useBooks'
 import { useToast } from '~/composables/useToast'
@@ -330,12 +346,12 @@ import { propagateSeriesTotal } from '~/composables/useSeriesProgress'
 import { hasManualSeriesDecisionChanged, protectManualSeriesDecision } from '~/composables/seriesMutationGuard'
 import { useCoverImageCache } from '~/composables/useCoverImageCache'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
-import BookishSelect from '~/components/shared/BookishSelect.vue'
+import PagesSelect from '~/components/shared/PagesSelect.vue'
 import CoverImageModal from '~/components/shared/CoverImageModal.vue'
 import GoodreadsRatingDisplay from '~/components/shared/GoodreadsRatingDisplay.vue'
 import BookRatingDisplay from '~/components/shared/BookRatingDisplay.vue'
 import PersonalRatingInput from '~/components/shared/PersonalRatingInput.vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import MultiStepLoader from '~/components/shared/MultiStepLoader.vue'
 import DocumentTypePicker from '~/components/shared/DocumentTypePicker.vue'
 import SeriesMembershipPicker from '~/components/shared/SeriesMembershipPicker.vue'
@@ -347,9 +363,14 @@ import { documentTypeOf, withDocumentType } from '~/composables/useDocumentRevie
 const props = defineProps({
   bookId: {
     type: String,
-    required: true
-  }
+    default: ''
+  },
+  // Suggestion mode: editing the stored details of a series installment the
+  // library does not own. Same form, no reading status.
+  suggestionSeries: { type: String, default: '' },
+  suggestionInstallment: { type: [String, Number], default: '' },
 })
+const isSuggestion = computed(() => Boolean(props.suggestionSeries))
 
 const router = useRouter()
 const { returnFromEditor } = useBookEditReturn()
@@ -357,7 +378,7 @@ const { fetchBookById, updateBook, books } = useBooks()
 const { addToast } = useToast()
 const { cacheCoverImage } = useCoverImageCache()
 const { apiUrl } = useApiEndpoint()
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 
 const editBook = ref({
   title: '',
@@ -464,7 +485,29 @@ const goBack = () => {
   returnFromEditor()
 }
 
+const loadSuggestion = () => {
+  const entry = readSuggestion(props.suggestionSeries, props.suggestionInstallment)
+  const asBook = suggestionAsBook(props.suggestionSeries, props.suggestionInstallment, entry)
+  if (!asBook) {
+    addToast('Book not found', 'error')
+    router.replace(suggestionPath(props.suggestionSeries, props.suggestionInstallment))
+    return
+  }
+  editBook.value = {
+    ...editBook.value,
+    ...JSON.parse(JSON.stringify(asBook)),
+    // The remote cover stays the source of truth; the form shows the local copy.
+    coverSource: entry?.cover || '',
+    publishYear: asBook.publishYear || null,
+  }
+  bookKind.value = 'series'
+}
+
 onMounted(async () => {
+  if (isSuggestion.value) {
+    try { loadSuggestion() } finally { isLoading.value = false }
+    return
+  }
   try {
     // Find book in already loaded books first for instant feel
     const existing = books.value.find(b => b.id.toString() === props.bookId.toString())
@@ -706,8 +749,49 @@ const handleBookKindChange = () => {
   }
 }
 
+// A cover picked from the device is a data URL; on the phone it is written to
+// the covers folder so the suggestion store keeps a short file URL instead.
+const storeSuggestionCover = async () => {
+  const cover = editBook.value.coverSource || editBook.value.cover || null
+  if (!cover || !String(cover).startsWith('data:')) return cover
+  try {
+    const { assetsAvailable, useDeviceAssets } = await import('~/composables/useDeviceAssets')
+    if (!assetsAvailable()) return cover
+    const ext = /^data:image\/(png|webp|gif)/i.exec(cover)?.[1]?.toLowerCase() || 'jpg'
+    const saved = await useDeviceAssets().saveBase64('covers', `suggestion-${Date.now().toString(36)}.${ext}`, cover)
+    return saved?.webSrc || cover
+  } catch {
+    return cover
+  }
+}
+
+const saveSuggestion = async () => {
+  isUpdating.value = true
+  try {
+    const year = Number(editBook.value.publishYear)
+    await saveSuggestionEdits(props.suggestionSeries, props.suggestionInstallment, {
+      title: String(editBook.value.title || '').trim(),
+      author: String(editBook.value.author || '').trim(),
+      blurb: editBook.value.blurb || '',
+      genre: editBook.value.genre || '',
+      publisher: editBook.value.publisher || '',
+      year: Number.isFinite(year) && year > 0 ? year : null,
+      rating: Number(editBook.value.rating) || 0,
+      cover: await storeSuggestionCover(),
+    })
+    addToast('Details saved', 'success')
+    router.replace(suggestionPath(props.suggestionSeries, props.suggestionInstallment))
+  } catch (error) {
+    console.error('Suggestion update error:', error)
+    addToast('Failed to save details', 'error')
+  } finally {
+    isUpdating.value = false
+  }
+}
+
 const handleUpdateBook = async () => {
   if (isUpdating.value) return
+  if (isSuggestion.value) return saveSuggestion()
   
   isUpdating.value = true;
   const cachedCover = await cacheCoverImage(editBook.value.cover);
@@ -1485,4 +1569,14 @@ const handleUpdateBook = async () => {
   accent-color: var(--color-brand-primary);
 }
 
+.suggestion-series-note {
+  display: block;
+  margin: -0.4rem 0 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.form-input:disabled {
+  opacity: 0.6;
+}
 </style>

@@ -23,7 +23,7 @@ const readCode = (path) => read(path)
 const manifest = (overrides = {}) => normalizeUpdateManifest({
   versionCode: 200,
   versionName: '1.3.0',
-  apkUrl: 'https://github.com/JeremyShiroya/Bookish/releases/download/v1.3.0/bookish.apk',
+  apkUrl: 'https://github.com/JeremyShiroya/Pages/releases/download/v1.3.0/pages-1.3.0.apk',
   ...overrides,
 })
 
@@ -32,7 +32,7 @@ describe('update manifest validation', () => {
     expect(manifest()).toEqual({
       versionCode: 200,
       versionName: '1.3.0',
-      apkUrl: 'https://github.com/JeremyShiroya/Bookish/releases/download/v1.3.0/bookish.apk',
+      apkUrl: 'https://github.com/JeremyShiroya/Pages/releases/download/v1.3.0/pages-1.3.0.apk',
       notes: '',
       mandatory: false,
       web: null,
@@ -139,7 +139,7 @@ describe('update checker wiring', () => {
     const composable = read('composables/useAppUpdate.js')
     expect(composable).toContain('isNativeCapacitorPlatform')
     expect(composable).toContain('updateManifestUrl')
-    expect(read('nuxt.config.ts')).toContain('BOOKISH_UPDATE_MANIFEST_URL')
+    expect(read('nuxt.config.ts')).toContain('PAGES_UPDATE_MANIFEST_URL')
 
     const plugin = read('plugins/app-update.client.js')
     expect(plugin).toContain('isNativeCapacitorPlatform')
@@ -176,7 +176,7 @@ describe('update checker wiring', () => {
     expect(script).toContain('normalizeUpdateManifest')
     // Same version sources as the APK and the About screen.
     expect(script).toContain("'rev-list', '--count', 'HEAD'")
-    expect(script).toContain('BOOKISH_BUILD_NUMBER')
+    expect(script).toContain('PAGES_BUILD_NUMBER')
   })
 })
 

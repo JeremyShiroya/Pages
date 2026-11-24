@@ -10,7 +10,7 @@ export const DEFAULT_USER_PROFILE = Object.freeze({
   bio: '',
 })
 
-export const BOOKISH_PROFILE_UPDATED_EVENT = 'bookish:profile-updated'
+export const PAGES_PROFILE_UPDATED_EVENT = 'bookish:profile-updated'
 
 export const USER_AVATAR_OPTIONS = Object.freeze([
   'Funny Bunny.png',
@@ -49,7 +49,7 @@ const LEGACY_USER_AVATAR_PATH_PREFIX = '/Images/User%20Avatars/'
 
 function notifyProfileUpdated(profile) {
   if (!import.meta.client || typeof window === 'undefined') return
-  window.dispatchEvent(new CustomEvent(BOOKISH_PROFILE_UPDATED_EVENT, { detail: profile }))
+  window.dispatchEvent(new CustomEvent(PAGES_PROFILE_UPDATED_EVENT, { detail: profile }))
 }
 
 function normalizeProfile(value) {

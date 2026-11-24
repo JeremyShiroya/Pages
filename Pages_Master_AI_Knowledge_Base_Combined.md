@@ -1,6 +1,6 @@
-# Pages (Bookish): Complete Reverse-Engineered Master AI Knowledge Base & Architectural Interrogation Report
+# Pages: Complete Reverse-Engineered Master AI Knowledge Base & Architectural Interrogation Report
 
-> **DOCUMENT PURPOSE**: This file is a comprehensive, single-file compilation of all 17 Architectural Interrogation Phases and Master Technical Specifications for **Pages** (formerly Bookish). It is formatted specifically for immediate sharing with AI models (such as ChatGPT, Claude, or Gemini) to provide near-project-level understanding of Pages without requiring access to the source code repository.
+> **DOCUMENT PURPOSE**: This file is a comprehensive, single-file compilation of all 17 Architectural Interrogation Phases and Master Technical Specifications for **Pages** . It is formatted specifically for immediate sharing with AI models (such as ChatGPT, Claude, or Gemini) to provide near-project-level understanding of Pages without requiring access to the source code repository.
 
 ---
 
@@ -33,7 +33,7 @@ Pages is a local-first, mobile-native and PWA reading application built with **N
 ### Directory Structure & File Map
 
 ```text
-Bookish/
+Pages/
 ├── android/                        # Native Android Gradle & Capacitor wrapper project
 ├── assets/                         # Global CSS/SCSS styles and theme variables
 ├── components/                     # Vue 3 UI components (split by target platform)
@@ -214,7 +214,7 @@ $$\text{Score} = S_{\text{ISBN}} + S_{\text{Title}} + S_{\text{Author}}$$
 4. **Author Compatibility Filter (`authorsCompatible`)**: Candidate is **rejected** if target and candidate author exist but share no substring overlap and token overlap $< 0.5$.
 
 ## 3. LLM Metadata Verifier Integration
-When `BOOKISH_AI_PROVIDER` (or `GEMINI_API_KEY` / `GROQ_API_KEY`) is configured, candidates are passed to an LLM verifier (`gemini-flash-latest` or `llama-3.3-70b-versatile`):
+When `PAGES_AI_PROVIDER` (or `GEMINI_API_KEY` / `GROQ_API_KEY`) is configured, candidates are passed to an LLM verifier (`gemini-flash-latest` or `llama-3.3-70b-versatile`):
 - Temperature: `0` (Zero-shot JSON output mode).
 - Rules: LLM is explicitly forbidden from inventing new facts. Rejects title-byline series (e.g. `"Dune by Frank Herbert"`), removes page noise blurbs (Cloudflare captchas), and assigns position confidence tags (`CONFIRMED` vs `INFERRED`).
 

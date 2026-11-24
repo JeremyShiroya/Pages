@@ -13,8 +13,8 @@
 ### Task 1: Independent Pagination Settings
 
 **Files:**
-- Modify: `composables/useBookishSettings.js`
-- Modify: `composables/useBookishSettings.test.js`
+- Modify: `composables/usePagesSettings.js`
+- Modify: `composables/usePagesSettings.test.js`
 - Modify: `components/SettingsComp.vue`
 - Modify: `components/BooksComp.vue`
 

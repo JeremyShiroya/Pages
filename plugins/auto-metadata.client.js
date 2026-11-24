@@ -2,13 +2,13 @@ import { App } from '@capacitor/app'
 import { startAutoMetadata, wakeAutoMetadata } from '~/composables/useAutoMetadata'
 import { useLibraryBackfill, unmarkFalseStandalones } from '~/composables/useMetadataBackfill'
 import { runSeriesSuggestionSweep, realignEntireLibrarySeries } from '~/composables/useSeriesSuggestions'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useBooks } from '~/composables/useBooks'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:mounted', () => {
     nuxtApp.runWithContext(async () => {
-      const { settings } = useBookishSettings()
+      const { settings } = usePagesSettings()
       const { books, seriesList, updateBook, initialized, fetchAllData } = useBooks()
       const { state: backfill } = useLibraryBackfill()
 

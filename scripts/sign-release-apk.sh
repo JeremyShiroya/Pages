@@ -92,14 +92,14 @@ ZIPALIGN="$(find_tool zipalign)"
 KEYSTORE_PROPS="$ROOT/android/keystore.properties"
 PASS_ARGS_NEW=()
 if [ -f "$KEYSTORE_PROPS" ]; then
-  BOOKISH_STORE_PASS="$(sed -n 's/^storePassword=//p' "$KEYSTORE_PROPS" | tr -d '\r')"
-  BOOKISH_KEY_PASS="$(sed -n 's/^keyPassword=//p' "$KEYSTORE_PROPS" | tr -d '\r')"
+  PAGES_STORE_PASS="$(sed -n 's/^storePassword=//p' "$KEYSTORE_PROPS" | tr -d '\r')"
+  PAGES_KEY_PASS="$(sed -n 's/^keyPassword=//p' "$KEYSTORE_PROPS" | tr -d '\r')"
   ALIAS_FROM_PROPS="$(sed -n 's/^keyAlias=//p' "$KEYSTORE_PROPS" | tr -d '\r')"
   [ -n "$ALIAS_FROM_PROPS" ] && RELEASE_ALIAS="$ALIAS_FROM_PROPS"
-  if [ -n "$BOOKISH_STORE_PASS" ]; then
-    export BOOKISH_STORE_PASS BOOKISH_KEY_PASS
-    PASS_ARGS_NEW=(--ks-pass "env:BOOKISH_STORE_PASS")
-    [ -n "$BOOKISH_KEY_PASS" ] && PASS_ARGS_NEW+=(--key-pass "env:BOOKISH_KEY_PASS")
+  if [ -n "$PAGES_STORE_PASS" ]; then
+    export PAGES_STORE_PASS PAGES_KEY_PASS
+    PASS_ARGS_NEW=(--ks-pass "env:PAGES_STORE_PASS")
+    [ -n "$PAGES_KEY_PASS" ] && PASS_ARGS_NEW+=(--key-pass "env:PAGES_KEY_PASS")
   fi
 fi
 # The debug keystore password is the documented public default, not a secret.

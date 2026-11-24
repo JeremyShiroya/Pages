@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { groupBooksBySeries, normalizeLibrarySeriesName } from '../composables/useBooks.js'
-import { DEFAULT_BOOKISH_SETTINGS, normalizeBookishSettings } from '../composables/useBookishSettings.js'
+import { DEFAULT_PAGES_SETTINGS, normalizePagesSettings } from '../composables/usePagesSettings.js'
 
 describe('library series grouping', () => {
   test('normalizes manually entered series names into one group', () => {
@@ -42,15 +42,15 @@ describe('series suggestion placeholders', () => {
   test('the preference is on by default, and opting out is respected', () => {
     // On by default: it answers "which book next", needs no setup, and a reader
     // who never opens Preferences would otherwise never learn it exists.
-    expect(DEFAULT_BOOKISH_SETTINGS.seriesSuggestions).toBe(true)
+    expect(DEFAULT_PAGES_SETTINGS.seriesSuggestions).toBe(true)
     // Never chosen -> the default applies. This is the case that matters: with
     // a strict `=== true` check here, every existing install would stay off
     // however the default was written.
-    expect(normalizeBookishSettings({}).seriesSuggestions).toBe(true)
-    expect(normalizeBookishSettings({ seriesSuggestions: undefined }).seriesSuggestions).toBe(true)
+    expect(normalizePagesSettings({}).seriesSuggestions).toBe(true)
+    expect(normalizePagesSettings({ seriesSuggestions: undefined }).seriesSuggestions).toBe(true)
     // An explicit choice always wins, in both directions.
-    expect(normalizeBookishSettings({ seriesSuggestions: false }).seriesSuggestions).toBe(false)
-    expect(normalizeBookishSettings({ seriesSuggestions: true }).seriesSuggestions).toBe(true)
+    expect(normalizePagesSettings({ seriesSuggestions: false }).seriesSuggestions).toBe(false)
+    expect(normalizePagesSettings({ seriesSuggestions: true }).seriesSuggestions).toBe(true)
   })
 
   test('the series detail page renders placeholders in installment order', () => {
@@ -75,7 +75,9 @@ describe('series suggestion placeholders', () => {
     // the entry's synthetic book carries the resolved cover, name, author,
     // and year into that shared renderer.
     expect(source).toContain(':book="entry.book"')
-    expect(source).toContain('cover: meta?.cover || null')
+    // The on-device copy of the cover first, the remote one as fallback.
+    expect(source).toContain('cover: suggestionCover(meta)')
+    expect(source).toContain('coverRemote: meta?.cover || null')
     expect(source).toContain('author: meta?.author ||')
     expect(source).toContain('publishYear: meta?.year || null')
 

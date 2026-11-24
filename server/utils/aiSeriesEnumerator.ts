@@ -80,7 +80,7 @@ const normalize = (value: unknown) => compact(value)
   .replace(/[^a-z0-9]/g, '')
 
 // Same provider-selection rules as the metadata verifier, so one setting
-// (BOOKISH_AI_PROVIDER / the *_API_KEY vars) governs every AI feature.
+// (PAGES_AI_PROVIDER / the *_API_KEY vars) governs every AI feature.
 export function resolveAiSeriesConfig(env: Record<string, string | undefined> = {}): AiSeriesConfig | null {
   return resolveAiSeriesConfigs(env)[0] || null
 }
@@ -92,7 +92,7 @@ export function resolveAiSeriesConfig(env: Record<string, string | undefined> = 
 // failure this feature exists to remove. Both are equally safe to consult,
 // since nothing either proposes is stored without provider confirmation.
 export function resolveAiSeriesConfigs(env: Record<string, string | undefined> = {}): AiSeriesConfig[] {
-  const requested = compact(env.BOOKISH_AI_PROVIDER).toLowerCase()
+  const requested = compact(env.PAGES_AI_PROVIDER || env.BOOKISH_AI_PROVIDER).toLowerCase()
   if (requested === 'off' || requested === 'none' || requested === 'false') return []
 
   const geminiKey = env.GEMINI_API_KEY || env.GOOGLE_AI_API_KEY

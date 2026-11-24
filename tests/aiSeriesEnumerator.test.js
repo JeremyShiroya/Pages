@@ -22,8 +22,8 @@ const groqReply = (payload) => ({
 })
 
 describe('provider selection matches the rest of the app', () => {
-  test('BOOKISH_AI_PROVIDER=off disables it entirely', () => {
-    expect(resolveAiSeriesConfig({ BOOKISH_AI_PROVIDER: 'off', GEMINI_API_KEY: 'k' })).toBeNull()
+  test('PAGES_AI_PROVIDER=off disables it entirely', () => {
+    expect(resolveAiSeriesConfig({ PAGES_AI_PROVIDER: 'off', GEMINI_API_KEY: 'k' })).toBeNull()
   })
 
   test('gemini is preferred when both keys exist', () => {
@@ -46,7 +46,7 @@ describe('provider selection matches the rest of the app', () => {
   })
 
   test('both providers are offered, the requested one first', () => {
-    const env = { BOOKISH_AI_PROVIDER: 'groq', GEMINI_API_KEY: 'g', GROQ_API_KEY: 'q' }
+    const env = { PAGES_AI_PROVIDER: 'groq', GEMINI_API_KEY: 'g', GROQ_API_KEY: 'q' }
     expect(resolveAiSeriesConfigs(env).map((c) => c.provider)).toEqual(['groq', 'gemini'])
   })
 })

@@ -57,11 +57,11 @@
 <script setup>
 import { computed } from 'vue'
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 
 const route = useRoute()
 const readerPath = computed(() => `/reader/${encodeURIComponent(String(route.params.id))}?mode=listen`)
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const listenBackSeconds = computed(() => settings.value.listenBackSeconds)
 const listenForwardSeconds = computed(() => settings.value.listenForwardSeconds)
 const setProgressScope = (scope) => updateSettings({ listenBarScope: scope, listenSummaryScope: scope })

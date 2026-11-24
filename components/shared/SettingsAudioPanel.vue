@@ -13,7 +13,7 @@
         <h3>Narrator voice</h3>
         <p>{{ currentVoiceName }}</p>
       </div>
-      <BookishSelect
+      <PagesSelect
         :model-value="settings.ttsVoice"
         :options="ttsVoices.map(voice => ({ value: voice.id, label: voice.name }))"
         @update:model-value="setAudioVoice"
@@ -60,11 +60,11 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useTTS } from '~/composables/useTTS'
-import BookishSelect from './BookishSelect.vue'
+import PagesSelect from './PagesSelect.vue'
 
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { ttsVoices, setSpeed, setVolume, setVoice } = useTTS()
 const speedOptions = [0.75, 1, 1.25, 1.5, 2]
 

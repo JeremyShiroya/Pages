@@ -1,6 +1,8 @@
 <template>
   <main class="settings-detail-page">
     <MobileSettingsNav title="Storage" back-to="/settings" aria-label="Settings navigation" />
+    <!-- Cloud backup has its own page; this row is its entry point. -->
+    <div class="backup-row-wrap"><BackupStatusRow /></div>
     <ResponsiveViewSwitch>
       <template #phone>
         <SettingsStorageMobile />
@@ -17,6 +19,7 @@
 
 <script setup>
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
+import BackupStatusRow from '~/components/shared/BackupStatusRow.vue'
 import SettingsStorageMobile from '~/components/mobile/SettingsStorageResetMobile.vue'
 import SettingsStorageTabletPortrait from '~/components/tablet/portrait/SettingsStorageTabletPortrait.vue'
 import ResponsiveViewSwitch from '~/components/shared/ResponsiveViewSwitch.vue'
@@ -29,5 +32,8 @@ import SettingsStoragePanel from '~/components/shared/SettingsStoragePanel.vue'
   min-height: 100vh;
   min-width: 0;
   background: var(--color-settings-background);
+}
+.backup-row-wrap {
+  padding: 0 var(--mobile-page-padding-inline, 16px);
 }
 </style>

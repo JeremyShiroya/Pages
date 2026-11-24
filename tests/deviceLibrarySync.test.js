@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import {
-  BOOKISH_DEVICE_IMPORTS_KEY,
-  BOOKISH_SCAN_FOLDERS_KEY,
+  PAGES_DEVICE_IMPORTS_KEY,
+  PAGES_SCAN_FOLDERS_KEY,
   MAX_DEVICE_IMPORT_BYTES,
   cleanTitleFromFileName,
   chooseDeviceImportKeeper,
@@ -72,9 +72,9 @@ describe('device library sync', () => {
   test('round-trips the import registry through storage', () => {
     const storage = fakeStorage()
     writeImportRegistry({ '/a.pdf': { size: 1, modified: 2 } }, storage)
-    expect(JSON.parse(storage.getItem(BOOKISH_DEVICE_IMPORTS_KEY))).toEqual({ '/a.pdf': { size: 1, modified: 2 } })
+    expect(JSON.parse(storage.getItem(PAGES_DEVICE_IMPORTS_KEY))).toEqual({ '/a.pdf': { size: 1, modified: 2 } })
     expect(readImportRegistry(storage)).toEqual({ '/a.pdf': { size: 1, modified: 2 } })
-    expect(readImportRegistry(fakeStorage({ [BOOKISH_DEVICE_IMPORTS_KEY]: 'not-json' }))).toEqual({})
+    expect(readImportRegistry(fakeStorage({ [PAGES_DEVICE_IMPORTS_KEY]: 'not-json' }))).toEqual({})
   })
 
   test('derives a readable title from a file name', () => {
@@ -136,7 +136,7 @@ describe('device library sync', () => {
 
     // Default (never configured) scans everything; explicitly empty = scan off.
     expect(readScanFolders(fakeStorage())).toEqual(['/storage/emulated/0'])
-    expect(readScanFolders(fakeStorage({ [BOOKISH_SCAN_FOLDERS_KEY]: '[]' }))).toEqual([])
+    expect(readScanFolders(fakeStorage({ [PAGES_SCAN_FOLDERS_KEY]: '[]' }))).toEqual([])
 
     const folders = ['/storage/emulated/0/Download']
     expect(fileInScanFolders('/storage/emulated/0/Download/book.epub', folders)).toBe(true)

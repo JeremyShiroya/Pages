@@ -3,7 +3,7 @@
     ref="cardElement"
     class="library-book-card"
     :class="{ 'no-backdrop': cardBackground === 'blank', selectable, selected, unavailable, 'tablet-card': isTablet, 'compact-actions': effectiveCollapseActions && !restoreOnly }"
-    :aria-disabled="unavailable || undefined"
+    :aria-label="unavailable ? `${book.title}, not in your library` : undefined"
     @click="onCardClick"
   >
 
@@ -151,7 +151,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import BookProgressDisplay from './BookProgressDisplay.vue'
 import BookRatingDisplay from './BookRatingDisplay.vue'
 import { useBooks } from '~/composables/useBooks'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import { useRouter } from 'vue-router'
 
@@ -202,13 +202,18 @@ const emit = defineEmits([
   'open', 'play', 'favourite', 'playlist', 'edit', 'hide', 'share', 'delete', 'restore', 'toggle-select',
 ])
 const router = useRouter()
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const { isTablet } = useDeviceArchitecture()
 const effectiveCollapseActions = computed(() => props.collapseActions || isTablet.value)
 
 // While selecting, a tap anywhere on the card picks it rather than opening it.
 const onCardClick = () => {
-  if (props.unavailable) return
+  // A suggested installment the library does not own still opens — its own
+  // detail page — but never joins a selection.
+  if (props.unavailable) {
+    if (!props.selectable) emit('open', props.book)
+    return
+  }
   if (props.selectable) emit('toggle-select', props.book)
   else emit('open', props.book)
 }
@@ -299,6 +304,14 @@ const generateCoverPlaceholder = (title) => {
 
 const coverUrl = computed(() => props.book.cover || generateCoverPlaceholder(props.book.title))
 const handleCoverError = (event) => {
+  // An on-device copy that has gone missing falls back to its remote source
+  // once before the generated placeholder.
+  const remote = props.book.coverRemote
+  if (remote && event.target.dataset.triedRemote !== '1' && event.target.src !== remote) {
+    event.target.dataset.triedRemote = '1'
+    event.target.src = remote
+    return
+  }
   event.target.src = generateCoverPlaceholder(props.book.title)
 }
 
@@ -546,7 +559,7 @@ const truncateWords = (value, limit) => {
 
 .library-book-card.unavailable {
   opacity: 0.55;
-  cursor: default;
+  cursor: pointer;
 }
 
 .library-book-card.unavailable:hover {

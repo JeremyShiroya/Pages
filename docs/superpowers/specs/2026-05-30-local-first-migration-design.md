@@ -5,11 +5,11 @@
 
 ## Problem
 
-Bookish is deployed on Vercel with a shared NeonDB (PostgreSQL) database. All users read from and write to the same database with no user separation. When any user adds a book, every other visitor sees that book listed — but the actual file only exists in the uploader's browser IndexedDB, so it cannot be opened by anyone else. This is architecturally wrong for a local-first app.
+Pages is deployed on Vercel with a shared NeonDB (PostgreSQL) database. All users read from and write to the same database with no user separation. When any user adds a book, every other visitor sees that book listed — but the actual file only exists in the uploader's browser IndexedDB, so it cannot be opened by anyone else. This is architecturally wrong for a local-first app.
 
 ## Goal
 
-Make Bookish behave like Nora Music Player: every user's library lives entirely in their own browser. No data leaves the device. No database is required to use the app.
+Make Pages behave like Nora Music Player: every user's library lives entirely in their own browser. No data leaves the device. No database is required to use the app.
 
 ## What Changes
 

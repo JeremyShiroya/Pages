@@ -87,6 +87,7 @@
     <Teleport to="body">
       <div v-if="showReset" class="sheet-overlay" @click.self="!resetting && (showReset = false)" @keydown.esc="!resetting && (showReset = false)">
         <section class="result-sheet reset-sheet" role="alertdialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-description">
+          <img src="/images/Trash.png" alt="" class="reset-art" width="400" height="400" />
           <h3 id="reset-title">Reset Pages and start fresh?</h3>
           <p id="reset-description">All app data will be permanently erased, including your reading progress, notes, profile and settings. Original PDF and EPUB files in shared phone folders will remain. Pages will close; reopen it to see the first-time setup.</p>
           <p v-if="resetError" role="alert">{{ resetError }}</p>
@@ -110,7 +111,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryBackfill } from '~/composables/useMetadataBackfill'
 import { useAutoMetadata } from '~/composables/useAutoMetadata'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { DEFAULT_SCAN_FOLDERS, normalizeScanFolder, readScanFolders, syncDeviceLibrary, writeScanFolders } from '~/composables/useDeviceLibrarySync'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
 import { useBooks } from '~/composables/useBooks'
@@ -122,7 +123,7 @@ const router = useRouter()
 const { addToast } = useToast()
 const { books, updateBook, restoreHiddenBooks, countHiddenBooks } = useBooks()
 const { getStorageSummary } = useBookStorage()
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { state: autoMeta } = useAutoMetadata()
 const { state: backfill, start: runLibraryBackfill, stop: stopLibraryBackfill } = useLibraryBackfill()
 const showReset = ref(false)
@@ -279,6 +280,8 @@ onMounted(() => { refreshStorageSummary(); refreshHiddenCount() })
 .spin { animation: storage-spin .9s linear infinite; }
 .reset-sheet { display: grid; gap: 16px; }
 .reset-sheet p { margin: 0; line-height: 1.5; font-size: 14px; }
+.reset-art { justify-self: center; width: 112px; height: 112px; margin-bottom: -6px; animation: reset-art .6s cubic-bezier(.2, 1.4, .35, 1) both; }
+@keyframes reset-art { from { opacity: 0; transform: scale(.7) rotate(-6deg); } to { opacity: 1; transform: none; } }
 .danger-button { color: #be3030; }
 .primary-button.danger-button { background: #be3030; color: white; }
 @keyframes storage-spin { to { transform: rotate(360deg); } }

@@ -4,9 +4,32 @@
     {
       "name": "bookish-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["nuxt", "dev"],
+      "runtimeArgs": [
+        "nuxt",
+        "dev"
+      ],
       "port": 3456,
       "autoPort": true
+    },
+    {
+      "name": "bookish-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "nuxt",
+        "preview",
+        "--port",
+        "3460"
+      ],
+      "port": 3460
+    },
+    {
+      "name": "pages-website-prod",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "process.env.PORT='3100';import('file:///C:/Users/jerem/GitHub/Pages_Website/.output/server/index.mjs')"
+      ],
+      "port": 3100
     }
   ]
 }

@@ -4,7 +4,7 @@ import { useRuntimeConfig } from '#app'
 // Capacitor shell instead of a Nuxt server. The backend base URL can be baked
 // in at build time (NUXT_PUBLIC_API_BASE_URL) or set at runtime from Settings,
 // which wins so the app can be repointed without rebuilding.
-export const BOOKISH_API_BASE_URL_KEY = 'bookish:api-base-url'
+export const PAGES_API_BASE_URL_KEY = 'bookish:api-base-url'
 
 const resolveStorage = () => {
   if (typeof localStorage === 'undefined') return null
@@ -22,7 +22,7 @@ export function resolveApiBaseUrl(configValue, storedValue) {
 export function readStoredApiBaseUrl(storage = resolveStorage()) {
   if (!storage) return ''
   try {
-    return normalizeApiBaseUrl(storage.getItem(BOOKISH_API_BASE_URL_KEY))
+    return normalizeApiBaseUrl(storage.getItem(PAGES_API_BASE_URL_KEY))
   } catch {
     return ''
   }
@@ -32,8 +32,8 @@ export function writeStoredApiBaseUrl(value, storage = resolveStorage()) {
   const normalized = normalizeApiBaseUrl(value)
   if (!storage) return normalized
   try {
-    if (normalized) storage.setItem(BOOKISH_API_BASE_URL_KEY, normalized)
-    else storage.removeItem(BOOKISH_API_BASE_URL_KEY)
+    if (normalized) storage.setItem(PAGES_API_BASE_URL_KEY, normalized)
+    else storage.removeItem(PAGES_API_BASE_URL_KEY)
   } catch {
     // localStorage can fail in private browsing or quota-limited contexts.
   }

@@ -46,7 +46,7 @@ describe('desktopTtsDriver device-voice fallback', () => {
   // marker — narration died with "TTS failed — check your connection" instead of
   // falling back to the device voice.
   it('falls back when the endpoint answers 200 with HTML instead of audio', async () => {
-    $fetch.mockResolvedValue('<!DOCTYPE html><html><body>Bookish</body></html>')
+    $fetch.mockResolvedValue('<!DOCTYPE html><html><body>Pages</body></html>')
     await expect(speak()).resolves.toMatchObject({ native: true, text: 'A sentence.' })
   })
 

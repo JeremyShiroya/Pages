@@ -1,7 +1,7 @@
 import { readonly, ref } from 'vue'
 
 // Mobile reader display preferences (Reader → sound-module icon).
-// Kept separate from useBookishSettings so the reader page tweaks stay
+// Kept separate from usePagesSettings so the reader page tweaks stay
 // self-contained and cheap to extend.
 
 export const MOBILE_READER_PREFS_KEY = 'bookish:mobile-reader-prefs'
@@ -18,7 +18,14 @@ export const PDF_PAGE_MODE_OPTIONS = Object.freeze(['scroll'])
 export const PDF_ZOOM_MIN = 0.5
 export const PDF_ZOOM_MAX = 3.0
 export const PDF_ZOOM_STEP = 0.25
-export const READER_BACKGROUND_OPTIONS = Object.freeze(['default', 'sepia'])
+// 'default' follows the app's light/dark theme; the others pin a page colour.
+export const READER_BACKGROUND_OPTIONS = Object.freeze(['default', 'paper', 'sepia', 'night'])
+export const READER_PAGE_THEMES = Object.freeze([
+  { id: 'default', label: 'Auto', swatch: 'linear-gradient(135deg, #ffffff 50%, #1d1b22 50%)' },
+  { id: 'paper', label: 'Paper', swatch: '#f7f2e8' },
+  { id: 'sepia', label: 'Sepia', swatch: '#ecdfc8' },
+  { id: 'night', label: 'Night', swatch: '#14161c' },
+])
 // Every reader font must carry real 300-700 weights, otherwise the thickness
 // control does nothing: CSS font-matching silently collapses 300 and 500 onto
 // 400 when the family has no such face (Georgia only ships 400/700, which is why
@@ -39,6 +46,13 @@ export const READER_LINE_SPACING_OPTIONS = Object.freeze([1.4, 1.62, 1.8, 2.0])
 export const READER_ALIGN_OPTIONS = Object.freeze(['justify', 'left'])
 export const READER_FONT_SIZE_MIN = 14
 export const READER_FONT_SIZE_MAX = 24
+// Side margin of the page, px.
+export const READER_MARGIN_MIN = 12
+export const READER_MARGIN_MAX = 40
+// Extra letter spacing in thousandths of an em (0 = the book's own spacing).
+export const READER_LETTER_SPACING_MAX = 60
+// Brightness is a dimming layer over the reader, as a percentage.
+export const READER_BRIGHTNESS_MIN = 35
 
 export const DEFAULT_MOBILE_READER_PREFS = Object.freeze({
   readingMode: 'page',      // 'page' (ReadEra-style page turns) | 'scroll'
@@ -51,6 +65,9 @@ export const DEFAULT_MOBILE_READER_PREFS = Object.freeze({
   fontWeight: 400,
   lineSpacing: 1.62,
   textAlign: 'justify',
+  pageMargin: 20,           // px each side
+  letterSpacing: 0,         // thousandths of an em, added to the base
+  brightness: 100,          // % — below 100 dims the reader
 })
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
@@ -91,6 +108,15 @@ export function normalizeMobileReaderPrefs(value) {
     textAlign: READER_ALIGN_OPTIONS.includes(source.textAlign)
       ? source.textAlign
       : DEFAULT_MOBILE_READER_PREFS.textAlign,
+    pageMargin: Number.isFinite(Number(source.pageMargin))
+      ? clamp(Math.round(Number(source.pageMargin)), READER_MARGIN_MIN, READER_MARGIN_MAX)
+      : DEFAULT_MOBILE_READER_PREFS.pageMargin,
+    letterSpacing: Number.isFinite(Number(source.letterSpacing))
+      ? clamp(Math.round(Number(source.letterSpacing) / 5) * 5, 0, READER_LETTER_SPACING_MAX)
+      : DEFAULT_MOBILE_READER_PREFS.letterSpacing,
+    brightness: Number.isFinite(Number(source.brightness))
+      ? clamp(Math.round(Number(source.brightness)), READER_BRIGHTNESS_MIN, 100)
+      : DEFAULT_MOBILE_READER_PREFS.brightness,
   }
 }
 
@@ -101,7 +127,13 @@ export function readerFontStack(fontFamilyId) {
 
 // Any pref that changes text layout invalidates cached page maps.
 export function readerPrefsLayoutHash(prefs) {
-  return [prefs.fontSize, prefs.fontFamily, prefs.fontWeight, prefs.lineSpacing, prefs.textAlign].join('|')
+  const base = [prefs.fontSize, prefs.fontFamily, prefs.fontWeight, prefs.lineSpacing, prefs.textAlign]
+  // Appended only when changed from the defaults, so page maps cached before
+  // these controls existed stay valid for readers who never touch them.
+  const margin = Number(prefs.pageMargin ?? DEFAULT_MOBILE_READER_PREFS.pageMargin)
+  const letters = Number(prefs.letterSpacing ?? 0)
+  if (margin !== DEFAULT_MOBILE_READER_PREFS.pageMargin || letters !== 0) base.push(`m${margin}`, `l${letters}`)
+  return base.join('|')
 }
 
 const prefsState = ref({ ...DEFAULT_MOBILE_READER_PREFS })

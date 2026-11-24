@@ -32,11 +32,12 @@ ext.resolveVersionName = {
 ext.resolveVersionCode = {
     // Same override nuxt.config.ts honours, so a CI build can pin both layers
     // to one number.
-    def override = System.getenv('BOOKISH_BUILD_NUMBER')
+    // PAGES_BUILD_NUMBER is current; BOOKISH_BUILD_NUMBER still works.
+    def override = System.getenv('PAGES_BUILD_NUMBER') ?: System.getenv('BOOKISH_BUILD_NUMBER')
     if (override?.trim()) {
         def parsed = override.trim()
         if (!parsed.isInteger()) {
-            throw new GradleException("BOOKISH_BUILD_NUMBER must be an integer, got '${parsed}'.")
+            throw new GradleException("PAGES_BUILD_NUMBER must be an integer, got '${parsed}'.")
         }
         return parsed.toInteger()
     }
@@ -62,7 +63,7 @@ ext.resolveVersionCode = {
     if (!count) {
         throw new GradleException(
             'Cannot resolve versionCode: git history unavailable. '
-            + 'Build from a git clone, or set BOOKISH_BUILD_NUMBER to an integer.')
+            + 'Build from a git clone, or set PAGES_BUILD_NUMBER to an integer.')
     }
     return count
 }
@@ -84,15 +85,16 @@ if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
 }
 
+// Environment names are PAGES_*; the original BOOKISH_* names still work.
 def resolveSigning = { String key, String envName ->
-    def value = keystoreProperties.getProperty(key) ?: System.getenv(envName)
+    def value = keystoreProperties.getProperty(key) ?: System.getenv(envName) ?: System.getenv(envName.replace('PAGES_', 'BOOKISH_'))
     return value?.trim() ? value.trim() : null
 }
 
-ext.releaseStoreFile = resolveSigning('storeFile', 'BOOKISH_KEYSTORE_FILE')
-ext.releaseStorePassword = resolveSigning('storePassword', 'BOOKISH_KEYSTORE_PASSWORD')
-ext.releaseKeyAlias = resolveSigning('keyAlias', 'BOOKISH_KEY_ALIAS')
-ext.releaseKeyPassword = resolveSigning('keyPassword', 'BOOKISH_KEY_PASSWORD')
+ext.releaseStoreFile = resolveSigning('storeFile', 'PAGES_KEYSTORE_FILE')
+ext.releaseStorePassword = resolveSigning('storePassword', 'PAGES_KEYSTORE_PASSWORD')
+ext.releaseKeyAlias = resolveSigning('keyAlias', 'PAGES_KEY_ALIAS')
+ext.releaseKeyPassword = resolveSigning('keyPassword', 'PAGES_KEY_PASSWORD')
 ext.hasReleaseSigning = ext.releaseStoreFile && ext.releaseStorePassword && ext.releaseKeyAlias && ext.releaseKeyPassword
 
 android {

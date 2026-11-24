@@ -82,7 +82,7 @@ describe('AI metadata verifier', () => {
     }], {
       fetchFn,
       env: {
-        BOOKISH_AI_PROVIDER: 'groq',
+        PAGES_AI_PROVIDER: 'groq',
         GROQ_API_KEY: 'test-key',
         GROQ_MODEL: 'llama-3.3-70b-versatile',
       },

@@ -91,12 +91,12 @@
 </template>
 
 <script setup>
-import { DEFAULT_BOOKISH_SETTINGS, useBookishSettings } from '~/composables/useBookishSettings'
+import { DEFAULT_PAGES_SETTINGS, usePagesSettings } from '~/composables/usePagesSettings'
 import MobileBottomNav from './MobileBottomNav.vue'
 import MobileSettingsNav from './MobileSettingsNav.vue'
 import { useUserProfile } from '~/composables/useUserProfile'
 
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { profile, activeAvatarPreset } = useUserProfile()
 const profileAvatarSrc = computed(() => profile.value.avatarType === 'image' ? profile.value.avatarValue : activeAvatarPreset.value.src)
 const set = (key, value) => updateSettings({ [key]: value })
@@ -107,9 +107,9 @@ const highlightChoices = [{ value: 'soft', label: 'Soft' }, { value: 'none', lab
 const iconChoices = [{ value: 'fill', label: 'Fill' }, { value: 'line', label: 'Line' }]
 const profileChoices = [{ value: 'icon', label: 'Icon' }, { value: 'avatar', label: 'Avatar' }]
 const titleChoices = [{ value: true, label: 'Show' }, { value: false, label: 'Hide' }]
-const restoreClarity = () => updateSettings({ mobileNavOpacity: DEFAULT_BOOKISH_SETTINGS.mobileNavOpacity, mobileNavBlur: DEFAULT_BOOKISH_SETTINGS.mobileNavBlur })
+const restoreClarity = () => updateSettings({ mobileNavOpacity: DEFAULT_PAGES_SETTINGS.mobileNavOpacity, mobileNavBlur: DEFAULT_PAGES_SETTINGS.mobileNavBlur })
 const restoreAll = () => updateSettings(Object.fromEntries(
-  Object.entries(DEFAULT_BOOKISH_SETTINGS).filter(([key]) => key.startsWith('mobileNav')),
+  Object.entries(DEFAULT_PAGES_SETTINGS).filter(([key]) => key.startsWith('mobileNav')),
 ))
 </script>
 

@@ -90,6 +90,9 @@ describe('useMobileReaderPrefs', () => {
       fontWeight: 500,
       lineSpacing: 1.8,
       textAlign: 'left',
+      pageMargin: 28,
+      letterSpacing: 20,
+      brightness: 80,
     }
     expect(normalizeMobileReaderPrefs(valid)).toEqual(valid)
   })

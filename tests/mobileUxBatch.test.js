@@ -333,7 +333,7 @@ describe('mobile UX batch', () => {
     expect(backPlugin).toContain('App.minimizeApp()')
   })
 
-  test('android launcher uses the generated Bookish icons', () => {
+  test('android launcher uses the generated Pages icons', () => {
     expect(existsSync(resolve(root, 'assets/icon-only.png'))).toBe(true)
     expect(existsSync(resolve(root, 'android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png'))).toBe(true)
     expect(existsSync(resolve(root, 'android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml'))).toBe(true)

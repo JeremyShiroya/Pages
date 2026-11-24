@@ -24,7 +24,7 @@ personal details, and author candidate matching remain outside this removal.
 ## Canonical PDF Manifest
 
 PDF.js `getTextContent()` becomes the only source for PDF narration structure.
-For every PDF page, Bookish builds a manifest containing:
+For every PDF page, Pages builds a manifest containing:
 
 - the page number;
 - ordered text items and their PDF-space geometry;
@@ -63,9 +63,9 @@ Ordinary chunk changes do not move the viewport.
 
 Author profiles display:
 
-- books owned in Bookish;
+- books owned in Pages;
 - total full-length books when a validated bibliography supplies one;
-- series owned in Bookish;
+- series owned in Pages;
 - total named full-length-book series when validated.
 
 Full-length totals exclude short stories, novellas, anthology contributions,
@@ -73,7 +73,7 @@ translations, alternate editions, adaptations, and duplicate regional titles.
 The parser recognizes explicit full-length sections such as novels, standalone
 novels, and named series. It does not treat a generic mixed “Published Works”
 list as authoritative unless entries can be classified. Unknown totals display
-as `?`; Bookish never substitutes provider record counts.
+as `?`; Pages never substitutes provider record counts.
 
 ## Persistence
 

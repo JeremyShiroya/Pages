@@ -11,9 +11,9 @@
 import { onMounted } from 'vue'
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
 import ConnectionTestPanel from '~/components/shared/ConnectionTestPanel.vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const router = useRouter()
 
 onMounted(() => {

@@ -23,8 +23,8 @@ import {
   formatModeFor,
   isFormatEnabled,
   normalizeEnabledFormats,
-  normalizeBookishSettings,
-} from '../composables/useBookishSettings.js'
+  normalizePagesSettings,
+} from '../composables/usePagesSettings.js'
 import { booksOfFormat, formatsRemovedBy } from '../composables/useFormatEnablement.js'
 import {
   assembleLines,
@@ -219,7 +219,7 @@ describe('formats the app handles at all', () => {
   })
 
   test('settings carry the choice and whether it has been made', () => {
-    const settings = normalizeBookishSettings({ enabledFormats: ['pdf'] })
+    const settings = normalizePagesSettings({ enabledFormats: ['pdf'] })
     expect(settings.enabledFormats).toEqual(['pdf'])
     // First boot has not been answered yet, which is what shows the chooser.
     expect(settings.formatChoiceMade).toBe(false)
@@ -232,8 +232,9 @@ describe('formats the app handles at all', () => {
     expect(sync).toContain("settings.value.formatChoiceMade !== true")
     expect(sync).toContain('enabledExtensionPattern(enabledFormats)')
 
-    const modal = read('components/shared/FormatChoiceModal.vue')
-    expect(modal).toContain('applyFormatMode')
+    // The chooser is now the Formats step of the first-open setup flow.
+    const setup = read('pages/welcome.vue')
+    expect(setup).toContain('applyFormatMode')
   })
 
   test('removing a format never deletes the file', () => {

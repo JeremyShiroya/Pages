@@ -1,4 +1,4 @@
-# Bookish UX batch — voices, position sync, filters, format removal, PDF reflow
+# Pages UX batch — voices, position sync, filters, format removal, PDF reflow
 
 **Date:** 2026-07-30
 **Status:** approved
@@ -126,7 +126,7 @@ New `composables/useLibraryFilters.js`, keyed by a scope string (`books`,
 - Each scope owns `{ status, format, ...extras }`, persisted under
   `bookish:filters:<scope>` and restored on mount.
 - A module-level reactive cache makes back-navigation within a session instant.
-- `LibraryControlsRow` stops importing `useBookishSettings` and becomes a pure
+- `LibraryControlsRow` stops importing `usePagesSettings` and becomes a pure
   controlled component over its scope's values.
 - The Preferences "Book format" row stops being a filter and becomes the app-level
   format setting (§6), which is what removes the pressure to keep filters global.
@@ -149,7 +149,7 @@ title becomes "In N playlists" when set.
 
 ### Design
 
-A new concept, distinct from filtering: `enabledFormats` in `useBookishSettings` is
+A new concept, distinct from filtering: `enabledFormats` in `usePagesSettings` is
 the set of formats the app handles **at all**.
 
 - **Detection chokepoint.** `useDeviceLibrarySync` currently tests

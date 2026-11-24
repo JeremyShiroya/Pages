@@ -1,8 +1,8 @@
 import { readonly, ref } from 'vue'
 
-export const BOOKISH_SETTINGS_KEY = 'bookish:settings'
+export const PAGES_SETTINGS_KEY = 'bookish:settings'
 
-export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
+export const DEFAULT_PAGES_SETTINGS = Object.freeze({
   settingsVersion: 4,
   readerTheme: 'light',
   readerZoom: 1.0,
@@ -60,6 +60,8 @@ export const DEFAULT_BOOKISH_SETTINGS = Object.freeze({
   // reader. Files on the device are never touched.
   enabledFormats: ['epub', 'pdf'],
   formatChoiceMade: false,         // the first-boot chooser has been answered
+  // The first-open setup flow (pages/welcome.vue) was finished or skipped.
+  onboardingComplete: false,
   developerMode: false,
 })
 
@@ -157,7 +159,7 @@ const LEGACY_TTS_VOICE_REPLACEMENTS = Object.freeze({
   'en-US-DavisNeural': 'en-US-AndrewNeural',
 })
 
-const settingsState = ref({ ...DEFAULT_BOOKISH_SETTINGS })
+const settingsState = ref({ ...DEFAULT_PAGES_SETTINGS })
 let loadedFromStorage = false
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
@@ -170,42 +172,42 @@ const numberOrDefault = (value, fallback, min, max) => {
 const voiceOrDefault = (value) => {
   const savedVoice = typeof value === 'string' ? value.trim() : ''
   const voice = LEGACY_TTS_VOICE_REPLACEMENTS[savedVoice] || savedVoice
-  return TTS_VOICE_IDS.has(voice) ? voice : DEFAULT_BOOKISH_SETTINGS.ttsVoice
+  return TTS_VOICE_IDS.has(voice) ? voice : DEFAULT_PAGES_SETTINGS.ttsVoice
 }
 
-export function normalizeBookishSettings(value) {
+export function normalizePagesSettings(value) {
   const source = value && typeof value === 'object' ? value : {}
   const legacyPageSize = Number(source.libraryItemsPerPage)
   const legacyGridPageSize = LIBRARY_GRID_ITEMS_PER_PAGE_OPTIONS.includes(legacyPageSize)
     ? legacyPageSize
-    : DEFAULT_BOOKISH_SETTINGS.libraryGridItemsPerPage
+    : DEFAULT_PAGES_SETTINGS.libraryGridItemsPerPage
   const legacyTablePageSize = LIBRARY_TABLE_ITEMS_PER_PAGE_OPTIONS.includes(legacyPageSize)
-    && legacyPageSize <= DEFAULT_BOOKISH_SETTINGS.libraryTableItemsPerPage
+    && legacyPageSize <= DEFAULT_PAGES_SETTINGS.libraryTableItemsPerPage
     ? legacyPageSize
-    : DEFAULT_BOOKISH_SETTINGS.libraryTableItemsPerPage
+    : DEFAULT_PAGES_SETTINGS.libraryTableItemsPerPage
 
   return {
     readerTheme: ['light', 'dark'].includes(source.readerTheme)
       ? source.readerTheme
-      : DEFAULT_BOOKISH_SETTINGS.readerTheme,
+      : DEFAULT_PAGES_SETTINGS.readerTheme,
     readerZoom: numberOrDefault(
       source.readerZoom,
-      DEFAULT_BOOKISH_SETTINGS.readerZoom,
+      DEFAULT_PAGES_SETTINGS.readerZoom,
       0.5,
       2.5
     ),
     libraryView: ['grid', 'table'].includes(source.libraryView)
       ? source.libraryView
-      : DEFAULT_BOOKISH_SETTINGS.libraryView,
+      : DEFAULT_PAGES_SETTINGS.libraryView,
     groupDetailView: ['grid', 'table'].includes(source.groupDetailView)
       ? source.groupDetailView
-      : DEFAULT_BOOKISH_SETTINGS.groupDetailView,
+      : DEFAULT_PAGES_SETTINGS.groupDetailView,
     librarySort: ['name', 'rating', 'year', 'added'].includes(source.librarySort)
       ? source.librarySort
-      : DEFAULT_BOOKISH_SETTINGS.librarySort,
+      : DEFAULT_PAGES_SETTINGS.librarySort,
     librarySortDirection: ['asc', 'desc'].includes(source.librarySortDirection)
       ? source.librarySortDirection
-      : DEFAULT_BOOKISH_SETTINGS.librarySortDirection,
+      : DEFAULT_PAGES_SETTINGS.librarySortDirection,
     libraryGridItemsPerPage: LIBRARY_GRID_ITEMS_PER_PAGE_OPTIONS.includes(Number(source.libraryGridItemsPerPage))
       ? Number(source.libraryGridItemsPerPage)
       : legacyGridPageSize,
@@ -215,123 +217,126 @@ export function normalizeBookishSettings(value) {
     ttsVoice: voiceOrDefault(source.ttsVoice),
     ttsSpeed: numberOrDefault(
       source.ttsSpeed,
-      DEFAULT_BOOKISH_SETTINGS.ttsSpeed,
+      DEFAULT_PAGES_SETTINGS.ttsSpeed,
       0.5,
       2.5
     ),
     ttsVolume: numberOrDefault(
       source.ttsVolume,
-      DEFAULT_BOOKISH_SETTINGS.ttsVolume,
+      DEFAULT_PAGES_SETTINGS.ttsVolume,
       0,
       1
     ),
     metadataAutoFill: source.metadataAutoFill === undefined
-      ? DEFAULT_BOOKISH_SETTINGS.metadataAutoFill
+      ? DEFAULT_PAGES_SETTINGS.metadataAutoFill
       : source.metadataAutoFill !== false,
     trackSplitting: source.trackSplitting === undefined
-      ? DEFAULT_BOOKISH_SETTINGS.trackSplitting
+      ? DEFAULT_PAGES_SETTINGS.trackSplitting
       : source.trackSplitting === true,
     appBackground: APP_BACKGROUND_OPTIONS.includes(source.appBackground)
       ? source.appBackground
-      : DEFAULT_BOOKISH_SETTINGS.appBackground,
+      : DEFAULT_PAGES_SETTINGS.appBackground,
     darkAppBackground: DARK_APP_BACKGROUND_OPTIONS.includes(source.darkAppBackground)
       ? source.darkAppBackground
-      : DEFAULT_BOOKISH_SETTINGS.darkAppBackground,
+      : DEFAULT_PAGES_SETTINGS.darkAppBackground,
     mobileTopNavDisplay: MOBILE_TOP_NAV_DISPLAY_OPTIONS.includes(source.mobileTopNavDisplay)
       ? source.mobileTopNavDisplay
-      : DEFAULT_BOOKISH_SETTINGS.mobileTopNavDisplay,
+      : DEFAULT_PAGES_SETTINGS.mobileTopNavDisplay,
     mobileNavStyle: MOBILE_NAV_STYLE_OPTIONS.includes(source.mobileNavStyle)
       ? source.mobileNavStyle
-      : DEFAULT_BOOKISH_SETTINGS.mobileNavStyle,
+      : DEFAULT_PAGES_SETTINGS.mobileNavStyle,
     mobileNavSize: MOBILE_NAV_SIZE_OPTIONS.includes(source.mobileNavSize)
-      ? source.mobileNavSize : DEFAULT_BOOKISH_SETTINGS.mobileNavSize,
-    mobileNavOpacity: numberOrDefault(source.mobileNavOpacity, DEFAULT_BOOKISH_SETTINGS.mobileNavOpacity, 50, 100),
-    mobileNavBlur: numberOrDefault(source.mobileNavBlur, DEFAULT_BOOKISH_SETTINGS.mobileNavBlur, 0, 30),
+      ? source.mobileNavSize : DEFAULT_PAGES_SETTINGS.mobileNavSize,
+    mobileNavOpacity: numberOrDefault(source.mobileNavOpacity, DEFAULT_PAGES_SETTINGS.mobileNavOpacity, 50, 100),
+    mobileNavBlur: numberOrDefault(source.mobileNavBlur, DEFAULT_PAGES_SETTINGS.mobileNavBlur, 0, 30),
     mobileNavMaterial: MOBILE_NAV_MATERIAL_OPTIONS.includes(source.mobileNavMaterial)
-      ? source.mobileNavMaterial : DEFAULT_BOOKISH_SETTINGS.mobileNavMaterial,
+      ? source.mobileNavMaterial : DEFAULT_PAGES_SETTINGS.mobileNavMaterial,
     mobileNavHighlight: MOBILE_NAV_HIGHLIGHT_OPTIONS.includes(source.mobileNavHighlight)
-      ? source.mobileNavHighlight : DEFAULT_BOOKISH_SETTINGS.mobileNavHighlight,
+      ? source.mobileNavHighlight : DEFAULT_PAGES_SETTINGS.mobileNavHighlight,
     mobileNavActiveIconStyle: MOBILE_NAV_ACTIVE_ICON_OPTIONS.includes(source.mobileNavActiveIconStyle)
-      ? source.mobileNavActiveIconStyle : DEFAULT_BOOKISH_SETTINGS.mobileNavActiveIconStyle,
+      ? source.mobileNavActiveIconStyle : DEFAULT_PAGES_SETTINGS.mobileNavActiveIconStyle,
     mobileNavProfileDisplay: MOBILE_NAV_PROFILE_OPTIONS.includes(source.mobileNavProfileDisplay)
-      ? source.mobileNavProfileDisplay : DEFAULT_BOOKISH_SETTINGS.mobileNavProfileDisplay,
+      ? source.mobileNavProfileDisplay : DEFAULT_PAGES_SETTINGS.mobileNavProfileDisplay,
     mobileNavShowTitles: typeof source.mobileNavShowTitles === 'boolean'
-      ? source.mobileNavShowTitles : DEFAULT_BOOKISH_SETTINGS.mobileNavShowTitles,
+      ? source.mobileNavShowTitles : DEFAULT_PAGES_SETTINGS.mobileNavShowTitles,
     seriesCardBackground: 'blur',
     seriesCardLayout: 'fan',
     favouritesCardBackground: CARD_BACKGROUND_OPTIONS.includes(source.favouritesCardBackground)
       ? source.favouritesCardBackground
-      : DEFAULT_BOOKISH_SETTINGS.favouritesCardBackground,
+      : DEFAULT_PAGES_SETTINGS.favouritesCardBackground,
     favouritesCardLayout: FAVOURITES_CARD_LAYOUT_OPTIONS.includes(source.favouritesCardLayout)
       ? source.favouritesCardLayout
-      : DEFAULT_BOOKISH_SETTINGS.favouritesCardLayout,
+      : DEFAULT_PAGES_SETTINGS.favouritesCardLayout,
     profileFavouritesLayout: FAVOURITES_CARD_LAYOUT_OPTIONS.includes(source.profileFavouritesLayout)
       ? source.profileFavouritesLayout
-      : DEFAULT_BOOKISH_SETTINGS.profileFavouritesLayout,
+      : DEFAULT_PAGES_SETTINGS.profileFavouritesLayout,
     playlistCardBackground: 'blur',
     playlistCardLayout: 'fan',
     bookActionDisplay: BOOK_ACTION_DISPLAY_OPTIONS.includes(source.bookActionDisplay)
       ? source.bookActionDisplay
-      : DEFAULT_BOOKISH_SETTINGS.bookActionDisplay,
+      : DEFAULT_PAGES_SETTINGS.bookActionDisplay,
     ratingSource: RATING_SOURCE_OPTIONS.includes(source.ratingSource)
       ? source.ratingSource
-      : DEFAULT_BOOKISH_SETTINGS.ratingSource,
+      : DEFAULT_PAGES_SETTINGS.ratingSource,
     personalRatingScale: PERSONAL_RATING_SCALE_OPTIONS.includes(Number(source.personalRatingScale))
       ? Number(source.personalRatingScale)
-      : DEFAULT_BOOKISH_SETTINGS.personalRatingScale,
+      : DEFAULT_PAGES_SETTINGS.personalRatingScale,
     readerHighlight: source.readerHighlight === undefined
-      ? DEFAULT_BOOKISH_SETTINGS.readerHighlight
+      ? DEFAULT_PAGES_SETTINGS.readerHighlight
       : source.readerHighlight !== false,
     listenCoverBlur: source.listenCoverBlur === undefined
-      ? DEFAULT_BOOKISH_SETTINGS.listenCoverBlur
+      ? DEFAULT_PAGES_SETTINGS.listenCoverBlur
       : source.listenCoverBlur !== false,
     listenBackSeconds: Math.round(numberOrDefault(
-      source.listenBackSeconds ?? source.listenSkipSeconds, DEFAULT_BOOKISH_SETTINGS.listenBackSeconds, 1, 60,
+      source.listenBackSeconds ?? source.listenSkipSeconds, DEFAULT_PAGES_SETTINGS.listenBackSeconds, 1, 60,
     )),
     listenForwardSeconds: Math.round(numberOrDefault(
-      source.listenForwardSeconds ?? source.listenSkipSeconds, DEFAULT_BOOKISH_SETTINGS.listenForwardSeconds, 1, 60,
+      source.listenForwardSeconds ?? source.listenSkipSeconds, DEFAULT_PAGES_SETTINGS.listenForwardSeconds, 1, 60,
     )),
     listenBarScope: ['book', 'chapter'].includes(source.listenBarScope)
-      ? source.listenBarScope : DEFAULT_BOOKISH_SETTINGS.listenBarScope,
+      ? source.listenBarScope : DEFAULT_PAGES_SETTINGS.listenBarScope,
     listenSummaryScope: ['book', 'chapter'].includes(source.listenSummaryScope)
-      ? source.listenSummaryScope : DEFAULT_BOOKISH_SETTINGS.listenSummaryScope,
+      ? source.listenSummaryScope : DEFAULT_PAGES_SETTINGS.listenSummaryScope,
     showStreak: source.showStreak === undefined
-      ? DEFAULT_BOOKISH_SETTINGS.showStreak
+      ? DEFAULT_PAGES_SETTINGS.showStreak
       : source.showStreak !== false,
     formatFilter: (
       normalizeEnabledFormats(source.enabledFormats).length <= 1
       || (source.formatFilter !== 'all' && !normalizeEnabledFormats(source.enabledFormats).includes(source.formatFilter))
     )
       ? 'all'
-      : (FORMAT_FILTER_OPTIONS.includes(source.formatFilter) ? source.formatFilter : DEFAULT_BOOKISH_SETTINGS.formatFilter),
+      : (FORMAT_FILTER_OPTIONS.includes(source.formatFilter) ? source.formatFilter : DEFAULT_PAGES_SETTINGS.formatFilter),
     hideContent: source.hideContent === true,
     // undefined means "never chosen", which must fall through to the default —
     // `=== true` would pin every existing install to off no matter what the
     // default says, so flipping the default alone would change nothing.
     seriesSuggestions: source.seriesSuggestions === undefined
-      ? DEFAULT_BOOKISH_SETTINGS.seriesSuggestions
+      ? DEFAULT_PAGES_SETTINGS.seriesSuggestions
       : source.seriesSuggestions !== false,
     enabledFormats: normalizeEnabledFormats(source.enabledFormats),
     formatChoiceMade: source.formatChoiceMade === true,
+    // Anyone who already answered the old first-boot format chooser is an
+    // existing user: they never see the new setup flow.
+    onboardingComplete: source.onboardingComplete === true || source.formatChoiceMade === true,
     developerMode: source.developerMode === true,
-    settingsVersion: Number(source.settingsVersion) || DEFAULT_BOOKISH_SETTINGS.settingsVersion,
+    settingsVersion: Number(source.settingsVersion) || DEFAULT_PAGES_SETTINGS.settingsVersion,
   }
 }
 
-export function applyBookishTheme(
+export function applyPagesTheme(
   theme,
-  appBackground = DEFAULT_BOOKISH_SETTINGS.appBackground,
-  darkAppBackground = DEFAULT_BOOKISH_SETTINGS.darkAppBackground,
+  appBackground = DEFAULT_PAGES_SETTINGS.appBackground,
+  darkAppBackground = DEFAULT_PAGES_SETTINGS.darkAppBackground,
 ) {
   if (typeof document === 'undefined') return
 
   const normalizedTheme = theme === 'dark' ? 'dark' : 'light'
   const normalizedBackground = APP_BACKGROUND_OPTIONS.includes(appBackground)
     ? appBackground
-    : DEFAULT_BOOKISH_SETTINGS.appBackground
+    : DEFAULT_PAGES_SETTINGS.appBackground
   const normalizedDarkBackground = DARK_APP_BACKGROUND_OPTIONS.includes(darkAppBackground)
     ? darkAppBackground
-    : DEFAULT_BOOKISH_SETTINGS.darkAppBackground
+    : DEFAULT_PAGES_SETTINGS.darkAppBackground
   document.documentElement.dataset.theme = normalizedTheme
   document.documentElement.dataset.appBackground = normalizedBackground
   document.documentElement.dataset.darkAppBackground = normalizedDarkBackground
@@ -380,21 +385,21 @@ function migrateBottomNav(source) {
   return {
     ...previousNav,
     ...(untouched ? {
-      mobileNavStyle: DEFAULT_BOOKISH_SETTINGS.mobileNavStyle,
-      mobileNavSize: DEFAULT_BOOKISH_SETTINGS.mobileNavSize,
-      mobileNavMaterial: DEFAULT_BOOKISH_SETTINGS.mobileNavMaterial,
-      mobileNavProfileDisplay: DEFAULT_BOOKISH_SETTINGS.mobileNavProfileDisplay,
+      mobileNavStyle: DEFAULT_PAGES_SETTINGS.mobileNavStyle,
+      mobileNavSize: DEFAULT_PAGES_SETTINGS.mobileNavSize,
+      mobileNavMaterial: DEFAULT_PAGES_SETTINGS.mobileNavMaterial,
+      mobileNavProfileDisplay: DEFAULT_PAGES_SETTINGS.mobileNavProfileDisplay,
     } : {}),
   }
 }
 
-export function readBookishSettings(storage) {
+export function readPagesSettings(storage) {
   const targetStorage = resolveStorage(storage)
-  if (!targetStorage) return { ...DEFAULT_BOOKISH_SETTINGS }
+  if (!targetStorage) return { ...DEFAULT_PAGES_SETTINGS }
 
   try {
-    const raw = targetStorage.getItem(BOOKISH_SETTINGS_KEY)
-    if (!raw) return { ...DEFAULT_BOOKISH_SETTINGS }
+    const raw = targetStorage.getItem(PAGES_SETTINGS_KEY)
+    if (!raw) return { ...DEFAULT_PAGES_SETTINGS }
 
     const parsed = JSON.parse(raw)
     const storedVersion = Number(parsed?.settingsVersion || 0)
@@ -407,54 +412,54 @@ export function readBookishSettings(storage) {
       const preservedEnabledFormats = parsed?.enabledFormats
       const preservedFormatChoiceMade = parsed?.formatChoiceMade
 
-      const migrated = normalizeBookishSettings({
+      const migrated = normalizePagesSettings({
         ...parsed,
         seriesCardBackground: 'blur',
         seriesCardLayout: 'fan',
         playlistCardBackground: 'blur',
         playlistCardLayout: 'fan',
-        bookActionDisplay: DEFAULT_BOOKISH_SETTINGS.bookActionDisplay,
-        ratingSource: DEFAULT_BOOKISH_SETTINGS.ratingSource,
-        personalRatingScale: DEFAULT_BOOKISH_SETTINGS.personalRatingScale,
-        seriesSuggestions: DEFAULT_BOOKISH_SETTINGS.seriesSuggestions,
-        readerHighlight: DEFAULT_BOOKISH_SETTINGS.readerHighlight,
-        listenCoverBlur: DEFAULT_BOOKISH_SETTINGS.listenCoverBlur,
-        showStreak: DEFAULT_BOOKISH_SETTINGS.showStreak,
-        hideContent: DEFAULT_BOOKISH_SETTINGS.hideContent,
+        bookActionDisplay: DEFAULT_PAGES_SETTINGS.bookActionDisplay,
+        ratingSource: DEFAULT_PAGES_SETTINGS.ratingSource,
+        personalRatingScale: DEFAULT_PAGES_SETTINGS.personalRatingScale,
+        seriesSuggestions: DEFAULT_PAGES_SETTINGS.seriesSuggestions,
+        readerHighlight: DEFAULT_PAGES_SETTINGS.readerHighlight,
+        listenCoverBlur: DEFAULT_PAGES_SETTINGS.listenCoverBlur,
+        showStreak: DEFAULT_PAGES_SETTINGS.showStreak,
+        hideContent: DEFAULT_PAGES_SETTINGS.hideContent,
         formatFilter: 'all',
-        enabledFormats: preservedEnabledFormats !== undefined ? preservedEnabledFormats : DEFAULT_BOOKISH_SETTINGS.enabledFormats,
-        formatChoiceMade: preservedFormatChoiceMade !== undefined ? preservedFormatChoiceMade : DEFAULT_BOOKISH_SETTINGS.formatChoiceMade,
+        enabledFormats: preservedEnabledFormats !== undefined ? preservedEnabledFormats : DEFAULT_PAGES_SETTINGS.enabledFormats,
+        formatChoiceMade: preservedFormatChoiceMade !== undefined ? preservedFormatChoiceMade : DEFAULT_PAGES_SETTINGS.formatChoiceMade,
         settingsVersion: 3,
       })
       Object.assign(parsed, migrated)
     }
 
     if (storedVersion < CURRENT_SETTINGS_VERSION) {
-      const migrated = normalizeBookishSettings({
+      const migrated = normalizePagesSettings({
         ...parsed,
         ...navMigration,
         settingsVersion: CURRENT_SETTINGS_VERSION,
       })
-      try { targetStorage.setItem(BOOKISH_SETTINGS_KEY, JSON.stringify(migrated)) } catch {}
+      try { targetStorage.setItem(PAGES_SETTINGS_KEY, JSON.stringify(migrated)) } catch {}
       return migrated
     }
 
-    return normalizeBookishSettings(parsed)
+    return normalizePagesSettings(parsed)
   } catch {
-    return { ...DEFAULT_BOOKISH_SETTINGS }
+    return { ...DEFAULT_PAGES_SETTINGS }
   }
 }
 
-export function writeBookishSettings(nextSettings, storage) {
-  const normalized = normalizeBookishSettings({
-    ...DEFAULT_BOOKISH_SETTINGS,
+export function writePagesSettings(nextSettings, storage) {
+  const normalized = normalizePagesSettings({
+    ...DEFAULT_PAGES_SETTINGS,
     ...nextSettings,
   })
   const targetStorage = resolveStorage(storage)
 
   if (targetStorage) {
     try {
-      targetStorage.setItem(BOOKISH_SETTINGS_KEY, JSON.stringify(normalized))
+      targetStorage.setItem(PAGES_SETTINGS_KEY, JSON.stringify(normalized))
     } catch {
       // localStorage can fail in private browsing or quota-limited contexts.
     }
@@ -463,12 +468,12 @@ export function writeBookishSettings(nextSettings, storage) {
   return normalized
 }
 
-export function resetBookishSettingsForTests() {
-  settingsState.value = { ...DEFAULT_BOOKISH_SETTINGS }
+export function resetPagesSettingsForTests() {
+  settingsState.value = { ...DEFAULT_PAGES_SETTINGS }
   loadedFromStorage = false
 }
 
-export const useBookishSettings = () => {
+export const usePagesSettings = () => {
   const applyMobileNavSpacing = () => {
     if (typeof document === 'undefined') return
     const compact = settingsState.value.mobileNavSize === 'compact'
@@ -481,9 +486,9 @@ export const useBookishSettings = () => {
   }
 
   const loadSettings = () => {
-    settingsState.value = readBookishSettings()
+    settingsState.value = readPagesSettings()
     applyMobileNavSpacing()
-    applyBookishTheme(
+    applyPagesTheme(
       settingsState.value.readerTheme,
       settingsState.value.appBackground,
       settingsState.value.darkAppBackground,
@@ -497,12 +502,12 @@ export const useBookishSettings = () => {
   }
 
   const updateSettings = (patch) => {
-    settingsState.value = writeBookishSettings({
+    settingsState.value = writePagesSettings({
       ...settingsState.value,
       ...patch,
     })
     applyMobileNavSpacing()
-    applyBookishTheme(
+    applyPagesTheme(
       settingsState.value.readerTheme,
       settingsState.value.appBackground,
       settingsState.value.darkAppBackground,

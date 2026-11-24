@@ -6,8 +6,8 @@
 //
 //   npm run cap:sync                      # builds .output/public
 //   (build + sign the APK as usual)
-//   npm run release:web                   # → release/bookish-web-<version>.zip
-//                                         #   release/bookish-web-<version>.json
+//   npm run release:web                   # → release/pages-web-<version>.zip
+//                                         #   release/pages-web-<version>.json
 //
 // Attach both files to the GitHub release next to the APK. The release workflow
 // verifies them and folds them into version.json (scripts/generate-version-
@@ -29,8 +29,8 @@ import JSZip from 'jszip'
 import { normalizeWebBundle } from '../composables/appUpdateManifest.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const webDir = resolve(root, process.env.BOOKISH_WEB_DIR || '.output/public')
-const keyPath = resolve(root, process.env.BOOKISH_LIVE_UPDATE_KEY || 'android/live-update-private.pem')
+const webDir = resolve(root, process.env.PAGES_WEB_DIR || process.env.BOOKISH_WEB_DIR || '.output/public')
+const keyPath = resolve(root, process.env.PAGES_LIVE_UPDATE_KEY || process.env.BOOKISH_LIVE_UPDATE_KEY || 'android/live-update-private.pem')
 const outDir = resolve(root, 'release')
 
 // --allow-dirty: for testing on a dev phone only. It skips the "everything is
@@ -159,7 +159,7 @@ const main = async () => {
   const signature = createSign('RSA-SHA256').update(data).sign(createPrivateKey(readFileSync(keyPath)), 'base64')
   const sha256 = createHash('sha256').update(data).digest('hex')
 
-  const base = `bookish-web-${versionName || versionCode}`
+  const base = `pages-web-${versionName || versionCode}`
   const meta = { versionCode, versionName, minNativeCode, sha256, signature, size: data.length }
 
   // Validate with the app's own rules (with a placeholder url — the workflow

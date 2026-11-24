@@ -10,7 +10,7 @@ export const searchOpenAlex = async (title: string, author?: string): Promise<Me
     const url = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=5`;
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Bookish/1.2 (mailto:support@bookish.app)',
+        'User-Agent': 'Pages/1.2 (+https://pages.jeremyshiroya.tech)',
       },
     });
 

@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { parseGoodreadsReview } from '~/composables/useGoodreadsRating'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 
 export const RATING_SOURCE_LABELS = Object.freeze({
   goodreads: 'Goodreads',
@@ -81,7 +81,7 @@ export const withExternalRating = (book, source, rating) => ({
 })
 
 export const useSelectedBookRating = (book) => {
-  const { settings } = useBookishSettings()
+  const { settings } = usePagesSettings()
   const source = computed(() => settings.value.ratingSource)
   const rating = computed(() => getBookRating(
     book?.value ?? book,

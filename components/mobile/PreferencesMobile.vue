@@ -399,7 +399,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { enabledFormatsForMode, useBookishSettings } from '~/composables/useBookishSettings'
+import { enabledFormatsForMode, usePagesSettings } from '~/composables/usePagesSettings'
 import { useBooks } from '~/composables/useBooks'
 import { RATING_SOURCE_LABELS } from '~/composables/useBookRating'
 import { useRatingSync } from '~/composables/useRatingSync'
@@ -413,7 +413,7 @@ import ReadingPreview from '../shared/previews/ReadingPreview.vue'
 // Playlist cards offer the same two layouts as series cards, so they share the
 // same preview mockup.
 
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { isTablet } = useDeviceArchitecture()
 const { addToast } = useToast()
 const { books, updateBook, fetchAllData } = useBooks()

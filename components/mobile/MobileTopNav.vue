@@ -42,10 +42,10 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { BOOKISH_SETTINGS_KEY, useBookishSettings } from "~/composables/useBookishSettings";
+import { PAGES_SETTINGS_KEY, usePagesSettings } from "~/composables/usePagesSettings";
 import { useStreak } from "~/composables/useStreak";
 import {
-  BOOKISH_PROFILE_UPDATED_EVENT,
+  PAGES_PROFILE_UPDATED_EVENT,
   useUserProfile,
 } from "~/composables/useUserProfile";
 
@@ -55,7 +55,7 @@ let currentRuntimeIsFirstBoot = null;
 
 const router = useRouter();
 const { streakCount } = useStreak();
-const { settings } = useBookishSettings();
+const { settings } = usePagesSettings();
 const topNavDisplay = computed(() => settings.value.mobileTopNavDisplay || 'logo-title');
 const showStreak = computed(() => settings.value.showStreak !== false);
 const { profile, activeAvatarPreset, loadProfile } = useUserProfile();
@@ -90,17 +90,17 @@ const refreshProfile = () => {
 onMounted(() => {
   if (currentRuntimeIsFirstBoot === null) {
     const hasPreviousLaunch = localStorage.getItem(LAUNCHED_KEY) === 'true'
-      || localStorage.getItem(BOOKISH_SETTINGS_KEY) !== null;
+      || localStorage.getItem(PAGES_SETTINGS_KEY) !== null;
     currentRuntimeIsFirstBoot = !hasPreviousLaunch;
     localStorage.setItem(LAUNCHED_KEY, 'true');
   }
   isFirstBoot.value = currentRuntimeIsFirstBoot;
   refreshProfile();
-  window.addEventListener(BOOKISH_PROFILE_UPDATED_EVENT, refreshProfile);
+  window.addEventListener(PAGES_PROFILE_UPDATED_EVENT, refreshProfile);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener(BOOKISH_PROFILE_UPDATED_EVENT, refreshProfile);
+  window.removeEventListener(PAGES_PROFILE_UPDATED_EVENT, refreshProfile);
 });
 </script>
 

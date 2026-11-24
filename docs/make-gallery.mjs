@@ -41,7 +41,7 @@ const CARDS = [
   {
     file: 'metadata.png',
     title: 'Covers. Ratings.', title2: 'Blurbs. Done.',
-    sub1: 'Add a title and author — Bookish fetches',
+    sub1: 'Add a title and author — Pages fetches',
     sub2: 'everything else automatically.',
     g1: '#064E3B', g2: '#059669',
     covers: ['The Boyfriend.jpg', 'Into The Water.jpg', 'girlonthetrain.jpg'],

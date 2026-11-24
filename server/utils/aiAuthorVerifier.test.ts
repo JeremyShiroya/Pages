@@ -33,7 +33,7 @@ describe('AI author verifier', () => {
     const verified = await verifyAuthorDetails('Stephen King', ['The Shining'], authorDetails, {
       fetchFn,
       env: {
-        BOOKISH_AI_PROVIDER: 'groq',
+        PAGES_AI_PROVIDER: 'groq',
         GROQ_API_KEY: 'test-key',
         GROQ_MODEL: 'llama-3.3-70b-versatile',
       },
@@ -76,7 +76,7 @@ describe('AI author verifier', () => {
     }, {
       fetchFn,
       env: {
-        BOOKISH_AI_PROVIDER: 'groq',
+        PAGES_AI_PROVIDER: 'groq',
         GROQ_API_KEY: 'test-key',
       },
     })
@@ -107,7 +107,7 @@ describe('AI author verifier', () => {
       validatedSeriesCount: 2,
     }, {
       fetchFn,
-      env: { BOOKISH_AI_PROVIDER: 'groq', GROQ_API_KEY: 'test-key' },
+      env: { PAGES_AI_PROVIDER: 'groq', GROQ_API_KEY: 'test-key' },
     })
 
     expect(verified.validatedBooksCount).toBe(65)
@@ -134,7 +134,7 @@ describe('AI author verifier', () => {
       validatedSeriesCount: 3,
     }, {
       fetchFn,
-      env: { BOOKISH_AI_PROVIDER: 'groq', GROQ_API_KEY: 'test-key' },
+      env: { PAGES_AI_PROVIDER: 'groq', GROQ_API_KEY: 'test-key' },
     })
 
     expect(verified.validatedBooksCount).toBe(12)

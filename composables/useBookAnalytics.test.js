@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { bookStreak, calendarDaysBetween, readBookAnalytics, recordBookActivity } from './useBookAnalytics'
 
 const values = new Map()
@@ -11,8 +11,12 @@ beforeEach(() => {
 })
 
 describe('book analytics', () => {
+  beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date(2026, 9, 5, 10)) })
+  afterEach(() => vi.useRealTimers())
   it('keeps read and listened time separate and counts adjacent page turns only', () => {
     recordBookActivity('book-a', { mode: 'read', seconds: 12, page: 1, chapter: 1 })
+    // A chapter only counts once time was spent in it.
+    vi.setSystemTime(Date.now() + 90_000)
     recordBookActivity('book-a', { mode: 'listened', seconds: 8, page: 2, chapter: 2 })
     recordBookActivity('book-a', { page: 20, chapter: 9 })
     const result = readBookAnalytics('book-a')

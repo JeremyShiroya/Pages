@@ -351,10 +351,10 @@ import { computed, ref } from 'vue'
 import { useBooks } from '~/composables/useBooks'
 import {
   enabledFormatsForMode,
-  useBookishSettings,
+  usePagesSettings,
   LIBRARY_GRID_ITEMS_PER_PAGE_OPTIONS,
   LIBRARY_TABLE_ITEMS_PER_PAGE_OPTIONS,
-} from '~/composables/useBookishSettings'
+} from '~/composables/usePagesSettings'
 import { formatLabel, formatsRemovedBy, useFormatEnablement } from '~/composables/useFormatEnablement'
 import { useToast } from '~/composables/useToast'
 import { useShareApp } from '~/composables/useShareApp'
@@ -366,7 +366,7 @@ import ReadingPreview from '../shared/previews/ReadingPreview.vue'
 // same preview mockup.
 
 const { books, authors, collections, genres, recentlyAddedBooks, fetchAndStoreAuthorDetails } = useBooks()
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { addToast } = useToast()
 const { canShareApp, shareApp } = useShareApp()
 const router = useRouter()

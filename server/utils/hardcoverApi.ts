@@ -48,7 +48,7 @@ export const searchHardcover = async (title: string, author?: string): Promise<M
     const searchTerm = `%${title.trim()}%`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'User-Agent': 'Bookish/1.2 (+https://github.com/JeremyShiroya/Bookish)',
+      'User-Agent': 'Pages/1.2 (+https://github.com/JeremyShiroya/Pages)',
     };
     if (_hardcoverApiKey) {
       headers.Authorization = _hardcoverApiKey.startsWith('Bearer ')
@@ -145,7 +145,7 @@ export const fetchHardcoverSeriesRoster = async (seriesName: string, seedTitle?:
   try {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'User-Agent': 'Bookish/1.2 (+https://github.com/JeremyShiroya/Bookish)',
+      'User-Agent': 'Pages/1.2 (+https://github.com/JeremyShiroya/Pages)',
     };
     if (_hardcoverApiKey) {
       headers.Authorization = _hardcoverApiKey.startsWith('Bearer ')

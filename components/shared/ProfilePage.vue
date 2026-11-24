@@ -42,10 +42,21 @@
         <div class="profile-details">
           <h2>{{ profile.displayName || 'Reader' }}</h2>
           <p>{{ profile.profileTextMode === 'bio' && profile.bio ? profile.bio : dailyCompliment }}</p>
-          <NuxtLink class="edit-profile-button" to="/editprofilepage">
-            <i class="ri-edit-line" aria-hidden="true"></i>
-            <span>Edit profile</span>
-          </NuxtLink>
+          <div class="profile-buttons" :class="{ split: showBackupButton }">
+            <NuxtLink class="edit-profile-button" to="/editprofilepage">
+              <i class="ri-edit-line" aria-hidden="true"></i>
+              <span>Edit profile</span>
+            </NuxtLink>
+            <!-- No account yet: creating one is what turns on cloud backup. -->
+            <NuxtLink
+              v-if="showBackupButton"
+              class="edit-profile-button backup-profile-button"
+              :to="{ path: '/welcome', query: { flow: 'account', next: '/profile' } }"
+            >
+              <i class="ri-cloud-line" aria-hidden="true"></i>
+              <span>Back up library</span>
+            </NuxtLink>
+          </div>
         </div>
       </section>
 
@@ -188,13 +199,14 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useBooks } from '~/composables/useBooks'
 import { deferredDocumentReviews } from '~/composables/useDocumentReview'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { bookEditLocation } from '~/composables/useBookEditNavigation'
 import { useDailyCompliment } from '~/composables/useDailyCompliment'
 import { useLongPress, useMultiSelect } from '~/composables/useMultiSelect'
 import { useStreak } from '~/composables/useStreak'
 import { useToast } from '~/composables/useToast'
 import { useUserProfile } from '~/composables/useUserProfile'
+import { isAccountConfigured, useAccount } from '~/composables/useAccount'
 import EmptyState from './EmptyState.vue'
 import AddToPlaylistModal from './AddToPlaylistModal.vue'
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
@@ -207,7 +219,7 @@ import AvatarSourcePicker from './AvatarSourcePicker.vue'
 const router = useRouter()
 const { books, collections, favourites, fetchAllData, toggleFavourite, hideBook, deleteBook } = useBooks()
 const notificationCount = computed(() => deferredDocumentReviews(books.value).length)
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const { compliment: dailyCompliment, loadDailyCompliment } = useDailyCompliment()
 const { streakCount } = useStreak()
 const { addToast } = useToast()
@@ -224,6 +236,9 @@ const bulkDeleteBooks = ref(null)
 const showStreak = computed(() => settings.value.showStreak !== false)
 const profileAvatar = computed(() => profile.value.avatarValue || activeAvatarPreset.value.src)
 const profileFavouritesLayout = computed(() => settings.value.profileFavouritesLayout || 'grid')
+const { signedIn, ready: accountReady } = useAccount()
+// Waits for the stored session so a signed-in reader never sees it flash.
+const showBackupButton = computed(() => isAccountConfigured() && accountReady.value && !signedIn.value)
 
 const {
   selectionMode,
@@ -408,9 +423,14 @@ onMounted(async () => {
 .profile-details { margin-top: 20px; }
 .profile-details h2 { margin: 0; font-size: 1.2rem; font-weight: 650; }
 .profile-details p { margin: 5px 0 0; color: var(--color-text-muted); font-size: 0.9rem; }
-.edit-profile-button { display: flex; width: 100%; min-height: 40px; align-items: center; justify-content: center; gap: 7px; margin-top: 16px; padding: 0 18px; border: 1px solid var(--color-border-card); border-radius: var(--mobile-control-radius); background: var(--color-settings-group); color: var(--color-text-primary); text-decoration: none; font-size: 0.86rem; font-weight: 600; }
+.profile-buttons { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 16px; }
+.profile-buttons.split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.edit-profile-button { display: flex; width: 100%; min-height: 40px; min-width: 0; align-items: center; justify-content: center; gap: 7px; padding: 0 18px; border: 1px solid var(--color-border-card); border-radius: var(--mobile-control-radius); background: var(--color-settings-group); color: var(--color-text-primary); text-decoration: none; font-size: 0.86rem; font-weight: 600; }
 .edit-profile-button:active { background: var(--color-surface-hover); }
 :root[data-theme="dark"] .edit-profile-button { border-color: transparent; }
+.backup-profile-button { border-color: transparent; background: var(--color-brand-primary); color: var(--color-text-on-brand); }
+.backup-profile-button:active { background: var(--color-brand-primary-hover); }
+.edit-profile-button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .profile-library { margin-top: 28px; }
 .profile-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid var(--color-border-subtle); }
 .profile-tabs button { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; border: 0; background: transparent; color: var(--color-text-muted); cursor: pointer; font: inherit; font-size: 0.9rem; }

@@ -326,8 +326,8 @@ import { getBookRating } from "~/composables/useBookRating";
 import { useTTS } from "~/composables/useTTS";
 import {
   FORMAT_FILTER_CHOICES,
-  useBookishSettings,
-} from "~/composables/useBookishSettings";
+  usePagesSettings,
+} from "~/composables/usePagesSettings";
 import { useLibraryFilters } from "~/composables/useLibraryFilters";
 import { useToast } from "~/composables/useToast";
 import { useShareBook } from "~/composables/useShareBook";
@@ -350,7 +350,7 @@ const {
   fetchAllData,
 } = useBooks();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS()
-const { settings, updateSettings } = useBookishSettings();
+const { settings, updateSettings } = usePagesSettings();
 const { isPhone } = useDeviceArchitecture();
 const collapseBookActions = computed(() => isPhone.value || settings.value.bookActionDisplay === "minimal");
 const { addToast } = useToast();

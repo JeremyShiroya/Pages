@@ -3,8 +3,8 @@
   <main class="privacy-page">
     <article class="policy-card" aria-labelledby="privacy-title">
       <p class="lede">
-        Pages is a local-first reading application. Your library lives on your own device, there
-        are no user accounts, and Pages does not sell, rent, or trade any information about you.
+        Pages is a local-first reading application. Your library lives on your own device, an account is
+        optional and used only for cloud backup, and Pages does not sell, rent, or trade any information about you.
         This policy explains exactly what data Pages handles, where it goes, and the choices you
         have.
       </p>
@@ -25,7 +25,8 @@
         </ul>
         <p>
           This data never leaves your device unless you explicitly export it or a feature described
-          below requires a network request. Pages has no server-side copy of your library.
+          below requires a network request. Pages keeps no server-side copy of your library unless
+          you turn on cloud backup (section 5).
         </p>
       </section>
 
@@ -72,7 +73,27 @@
       </section>
 
       <section>
-        <h2>5. Analytics</h2>
+        <h2>5. Optional account and cloud backup</h2>
+        <p>
+          You can use Pages without an account. If you choose to sign in with Google, Pages
+          receives your name, email address and profile photo from Google, and creates an account
+          whose only purpose is backing up your library.
+        </p>
+        <p>
+          A backup contains your library records, reading progress, highlights and notes,
+          playlists, profile and settings, and, only if you turn on <em>Include book files</em>,
+          the contents of your books. It is compressed on your device and stored in a private
+          storage area (hosted by Supabase) that only your signed-in account can read. Backups
+          run while the app is open, on the schedule you choose in Settings → Storage → Backup.
+        </p>
+        <p>
+          From that page you can sign out, permanently delete every cloud backup, or delete your
+          account together with all of its backups at any time.
+        </p>
+      </section>
+
+      <section>
+        <h2>6. Analytics</h2>
         <p>
           The hosted web version of Pages may collect anonymous, aggregated page-view analytics
           (via Vercel Web Analytics) to understand overall usage. These analytics do not use cookies,
@@ -82,28 +103,29 @@
       </section>
 
       <section>
-        <h2>6. What Pages does not do</h2>
+        <h2>7. What Pages does not do</h2>
         <ul>
-          <li>No accounts, sign-ups, passwords, or profiles stored on our systems;</li>
+          <li>No passwords: the optional account signs in with Google, and nothing is stored on our systems unless you turn on cloud backup;</li>
           <li>No selling, renting, or sharing of personal data with third parties for marketing;</li>
           <li>No advertising and no advertising trackers;</li>
           <li>No reading of your files beyond what is needed to display and narrate them;</li>
-          <li>No background transmission of your library, notes, or reading habits.</li>
+          <li>No transmission of your library, notes, or reading habits, except the cloud backup you choose to turn on.</li>
         </ul>
       </section>
 
       <section>
-        <h2>7. Your control: export, import, and deletion</h2>
+        <h2>8. Your control: export, import, and deletion</h2>
         <p>
           From Settings → Storage you can export your full library as a backup file, import a
           backup, and permanently wipe all Pages data from the device. Because all data is local,
           uninstalling the app or clearing browser site data also removes your library entirely.
-          Deletion is immediate and irreversible — there is no server copy to purge.
+          Deletion is immediate and irreversible. If you use cloud backup, delete the cloud copy from
+          Settings → Storage → Backup as well.
         </p>
       </section>
 
       <section>
-        <h2>8. Data security</h2>
+        <h2>9. Data security</h2>
         <p>
           Your library is protected by your device's own security (device lock, browser sandboxing,
           and app sandboxing on mobile). All network requests Pages makes use encrypted HTTPS
@@ -114,7 +136,7 @@
       </section>
 
       <section>
-        <h2>9. Children's privacy</h2>
+        <h2>10. Children's privacy</h2>
         <p>
           Pages does not knowingly collect personal information from anyone, including children.
           Since no data is transmitted to us, there is nothing for us to collect, retain, or delete
@@ -123,7 +145,7 @@
       </section>
 
       <section>
-        <h2>10. Your rights</h2>
+        <h2>11. Your rights</h2>
         <p>
           Depending on where you live (for example under the GDPR or CCPA), you may have rights to
           access, correct, delete, or port your personal data. Pages' design satisfies these by
@@ -133,7 +155,7 @@
       </section>
 
       <section>
-        <h2>11. Changes to this policy</h2>
+        <h2>12. Changes to this policy</h2>
         <p>
           If Pages' data practices change, this policy will be updated and the effective date
           above revised. Material changes will be noted in the app's release notes. Continued use of
@@ -142,7 +164,7 @@
       </section>
 
       <section>
-        <h2>12. Contact</h2>
+        <h2>13. Contact</h2>
         <p>
           Questions or concerns about privacy in Pages can be raised on the project's GitHub
           repository at

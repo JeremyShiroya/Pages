@@ -1,5 +1,5 @@
 import { computed, reactive } from 'vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { documentTypeOf } from '~/composables/useDocumentReview'
 
 // Per-page library filter state.
@@ -99,7 +99,7 @@ function loadScope(scope, extras, storage) {
   }
 
   const normalized = normalizeLibraryFilters(stored, extras)
-  const { settings } = useBookishSettings()
+  const { settings } = usePagesSettings()
   if (normalized.format !== 'all' && !settings.value.enabledFormats.includes(normalized.format)) {
     normalized.format = 'all'
   }
@@ -150,7 +150,7 @@ export const useLibraryFilters = (scope, extras = {}, storage = null) => {
   //
   // A book has to pass both. (Neither is `enabledFormats`, which decides whether
   // the app handles the format at all — see useFormatEnablement.)
-  const { settings } = useBookishSettings()
+  const { settings } = usePagesSettings()
 
   const matches = (book, statusOf) => {
     const hidden = settings.value.formatFilter || 'all'

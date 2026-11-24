@@ -104,6 +104,7 @@
             :class="{ 'mobile-list-book-card': viewMode === 'list' }"
             :collapse-actions="viewMode === 'list'"
             unavailable
+            @open="openSuggestion(entry)"
           />
         </template>
       </div>
@@ -187,11 +188,11 @@ import LibraryBookCard from '~/components/shared/LibraryBookCard.vue';
 import LibraryControlsRow from '~/components/shared/LibraryControlsRow.vue';
 import SelectionActionsBar from '~/components/shared/SelectionActionsBar.vue';
 import { fetchBookMetadataResults } from '~/composables/useBookMetadataSearch';
-import { useBookishSettings } from '~/composables/useBookishSettings';
+import { usePagesSettings } from '~/composables/usePagesSettings';
 import { useLibraryFilters } from '~/composables/useLibraryFilters';
 import { useBooks } from '~/composables/useBooks';
 import { ensureSeriesTotal, formatSeriesCollectionProgress, propagateSeriesTotal } from '~/composables/useSeriesProgress';
-import { useSeriesSuggestions } from '~/composables/useSeriesSuggestions';
+import { suggestionCover, suggestionPath, useSeriesSuggestions } from '~/composables/useSeriesSuggestions';
 import { useTTS } from '~/composables/useTTS';
 import { useToast } from '~/composables/useToast';
 import { bookEditLocation } from '~/composables/useBookEditNavigation';
@@ -202,7 +203,7 @@ const route = useRoute();
 const router = useRouter();
 const { books, seriesList, updateBook, deleteBook, toggleFavourite, hideBook } = useBooks();
 const { addToast } = useToast();
-const { settings } = useBookishSettings();
+const { settings } = usePagesSettings();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 // Each series remembers its own filters.
 const { filters, setFilter, matches } = useLibraryFilters(`series:${route.params.id}`);
@@ -389,7 +390,9 @@ watch([missingInstallments, seriesBooks], async ([missing, books]) => {
   try {
     // Passing the missing numbers lets the composable judge whether its cache
     // actually covers them, instead of trusting any non-empty result.
-    await fetchSeriesInstallments(seriesName.value, books, missing);
+    // preferStored: details already on the device are shown as they are — the
+    // page never refetches them just because it was opened.
+    await fetchSeriesInstallments(seriesName.value, books, missing, { preferStored: true });
   } catch (error) {
     console.warn('[series detail] Failed to load missing-book metadata:', error);
   }
@@ -416,13 +419,14 @@ const seriesEntries = computed(() => {
       title: meta?.title || null,
       author: meta?.author || null,
       year: meta?.year || null,
-      cover: meta?.cover || null,
+      cover: suggestionCover(meta),
       book: {
         id: `missing-${installment}`,
         title: meta?.title || `Book ${installment}`,
         author: meta?.author || '',
         publishYear: meta?.year || null,
-        cover: meta?.cover || null,
+        cover: suggestionCover(meta),
+        coverRemote: meta?.cover || null,
         series: seriesNavTitle.value,
       },
     });
@@ -433,6 +437,16 @@ const seriesEntries = computed(() => {
     - (Number.isFinite(b.order) ? b.order : Infinity)
   ));
 });
+
+// A suggested installment opens its own detail page — once there is something
+// to show. A bare "Book 7" placeholder has no title to look anything up by.
+const openSuggestion = (entry) => {
+  if (!entry?.title) {
+    addToast('Details for this book have not been found yet.', 'info');
+    return;
+  }
+  router.push(suggestionPath(seriesName.value, entry.installment));
+};
 
 const handlePlay = (book) => {
   if (isBookActive(book)) {

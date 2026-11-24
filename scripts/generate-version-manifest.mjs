@@ -9,7 +9,7 @@
 //     --apk-url https://github.com/<owner>/<repo>/releases/download/v1.3.0/bookish-1.3.0.apk \
 //     --notes "Fixed playlist layout" \
 //     [--mandatory] [--out version.json]
-//     [--web-meta release/bookish-web-1.3.0.json --web-url https://…/bookish-web-1.3.0.zip]
+//     [--web-meta release/pages-web-1.3.0.json --web-url https://…/pages-web-1.3.0.zip]
 //
 // --web-meta / --web-url add a silent web (OTA) update (see
 // scripts/build-web-bundle.mjs and composables/useLiveUpdate.js).
@@ -83,9 +83,9 @@ if (!versionName) fail('package.json has no "version" field.')
 
 // Mirrors resolveBuildNumber() in nuxt.config.ts and resolveVersionCode() in
 // android/app/build.gradle.
-const versionCode = process.env.BOOKISH_BUILD_NUMBER?.trim() || gitCommitCount()
+const versionCode = (process.env.PAGES_BUILD_NUMBER || process.env.BOOKISH_BUILD_NUMBER)?.trim() || gitCommitCount()
 if (!versionCode) {
-  fail('Cannot resolve versionCode: git history unavailable. Set BOOKISH_BUILD_NUMBER instead.')
+  fail('Cannot resolve versionCode: git history unavailable. Set PAGES_BUILD_NUMBER instead.')
 }
 
 let apkUrl = args.apkUrl
@@ -95,7 +95,7 @@ if (!apkUrl) {
   if (!slug) {
     fail('Could not derive an APK url from the git remote. Pass --apk-url explicitly.')
   }
-  apkUrl = `https://github.com/${slug}/releases/download/v${versionName}/bookish-${versionName}.apk`
+  apkUrl = `https://github.com/${slug}/releases/download/v${versionName}/pages-${versionName}.apk`
   derived = true
 }
 

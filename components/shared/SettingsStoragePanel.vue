@@ -97,7 +97,7 @@ import {
   useApiEndpoint,
   writeStoredApiBaseUrl,
 } from '~/composables/useApiEndpoint'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useBooks } from '~/composables/useBooks'
 import { useBookStorage } from '~/composables/useBookStorage'
 import { useLibraryBackup } from '~/composables/useLibraryBackup'
@@ -105,9 +105,9 @@ import { useTTS } from '~/composables/useTTS'
 import { useToast } from '~/composables/useToast'
 
 const { fetchAllData } = useBooks()
-const { loadSettings } = useBookishSettings()
+const { loadSettings } = usePagesSettings()
 const { getStorageSummary } = useBookStorage()
-const { createDownload, importBookishData, wipeBookishData } = useLibraryBackup()
+const { createDownload, importPagesData, wipePagesData } = useLibraryBackup()
 const { stop: stopTTS } = useTTS()
 const { addToast } = useToast()
 
@@ -206,7 +206,7 @@ const importData = async (event) => {
   try {
     const backup = JSON.parse(await file.text())
     stopTTS()
-    await importBookishData(backup)
+    await importPagesData(backup)
     loadSettings()
     await fetchAllData(true)
     await refreshStorageSummary()
@@ -226,7 +226,7 @@ const wipeData = async () => {
   wipeLoading.value = true
   try {
     stopTTS()
-    await wipeBookishData()
+    await wipePagesData()
     loadSettings()
     await fetchAllData(true)
     await refreshStorageSummary()

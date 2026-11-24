@@ -149,7 +149,7 @@
         {{ speedLabel }}
       </button>
 
-      <BookishSelect
+      <PagesSelect
         v-if="ttsVoices.length > 0"
         compact
         :model-value="ttsVoiceId"
@@ -221,9 +221,9 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTTS } from '~/composables/useTTS'
 import { useBooks } from '~/composables/useBooks'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
-import BookishSelect from './BookishSelect.vue'
+import PagesSelect from './PagesSelect.vue'
 
 const router = useRouter()
 const { isTablet } = useDeviceArchitecture()
@@ -235,7 +235,7 @@ const {
   play, togglePlay, skipChunks, skipSeconds, seekToChunk, setSpeed, setVolume, setVoice, restoreLastSession,
 } = useTTS()
 
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const trackSplitting = computed(() => settings.value.trackSplitting)
 
 const { books, toggleFavourite } = useBooks()

@@ -12,7 +12,7 @@ import { documentTypeOf } from '~/composables/useDocumentReview';
 import { documentAnalysisDue, runDocumentIntelligence, setDocumentIntelligenceListener } from '~/composables/useDocumentIntelligence';
 import { wakeAutoMetadata } from '~/composables/useAutoMetadata';
 import { useApiEndpoint } from '~/composables/useApiEndpoint';
-import { readBookishSettings, useBookishSettings } from '~/composables/useBookishSettings';
+import { readPagesSettings, usePagesSettings } from '~/composables/usePagesSettings';
 import { appendSeriesRepairAudit, validateAutomaticSeriesMutation } from '~/composables/seriesMutationGuard';
 import { AUTHOR_DETAILS_VERSION, newestAuthorRecordFirst } from '~/utils/authorIntelligence';
 
@@ -81,7 +81,7 @@ export const groupBooksBySeries = (sourceBooks = []) => {
 export const useBooks = () => {
   const { apiUrl } = useApiEndpoint()
   const { getBookText } = useBookStorage()
-  const { settings: bookishSettings } = useBookishSettings()
+  const { settings: bookishSettings } = usePagesSettings()
   const books = useState('library:books', () => []);
   const collections = useState('library:collections', () => []);
   const loading = useState('library:loading', () => false);
@@ -248,7 +248,7 @@ export const useBooks = () => {
       // "Hide content" (Settings → Preferences) previews the app as though
       // the library were empty: nothing enters the in-memory library, while
       // IndexedDB keeps everything for when the toggle turns back off.
-      const { hideContent } = readBookishSettings();
+      const { hideContent } = readPagesSettings();
       // Hidden books stay in IndexedDB but never enter the in-memory library,
       // so they disappear from every page. Restore lives in Settings → Storage.
       books.value = hideContent ? [] : booksData
@@ -459,7 +459,7 @@ export const useBooks = () => {
       series: book?.series ? canonicalLibrarySeriesName(book.series) : book?.series,
     };
     const result = await store.addDeviceBookIfAbsent(normalized);
-    if (result.created && !result.book.isHidden && !readBookishSettings().hideContent) {
+    if (result.created && !result.book.isHidden && !readPagesSettings().hideContent) {
       books.value.unshift(result.book);
       if (documentTypeOf(result.book) === 'book') wakeAutoMetadata()
       if (result.book.author && documentTypeOf(result.book) === 'book') fetchAndStoreAuthorDetails(result.book.author);

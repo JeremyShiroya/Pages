@@ -21,11 +21,12 @@ import { metadataEligible } from './metadataPolicy'
 import { computed } from 'vue'
 import { useState, useRuntimeConfig } from '#app'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { fetchBookMetadataResults } from '~/composables/useBookMetadataSearch'
 import { metadataResultMatchesBook } from '~/composables/useAutoMetadata'
 import { mergeMetadataIntoBook } from '~/composables/useDeviceLibrarySync'
 import { isNativeCapacitorPlatform } from '~/composables/useNativePlatform'
+import { parseGoodreadsReview } from '~/composables/useGoodreadsRating'
 
 const loadDeviceSearch = () => import('~/composables/useDeviceMetadataSearch')
 
@@ -128,12 +129,15 @@ const readCache = (seriesName, neededInstallments = []) => {
 
 // The stored map regardless of whether it answers a particular gap — used by
 // the detail top-up pass and by hydration, which both want whatever is on disk.
+//
+// Stored details never expire for DISPLAY: a book's title, cover and year do not
+// change, so a month-old answer is still the right thing to paint. The TTLs only
+// decide when the background sweep may ask the network again (readCache).
 const readCacheRaw = (seriesName) => {
   if (typeof localStorage === 'undefined') return null
   try {
     const parsed = JSON.parse(localStorage.getItem(cacheKey(seriesName)) || 'null')
     if (!parsed?.installments) return null
-    if (Date.now() - (parsed.savedAt || 0) > CACHE_TTL_MS) return null
     return parsed.installments
   } catch {
     return null
@@ -146,6 +150,70 @@ const writeCache = (seriesName, installments) => {
     localStorage.setItem(cacheKey(seriesName), JSON.stringify({ savedAt: Date.now(), installments }))
   } catch {
     // Quota/private-mode — the suggestions just re-fetch next time.
+  }
+  // Copy the covers onto the device in the background, so the next open paints
+  // them from disk instead of waiting on the network for every image.
+  localizeSuggestionCovers(seriesName).catch(() => {})
+}
+
+// Rewrite the stored entry WITHOUT touching savedAt — saving a downloaded cover,
+// fetched details or a user edit must not reset the sweep's retry clock.
+const patchCache = (seriesName, installments) => {
+  if (typeof localStorage === 'undefined') return
+  try {
+    const parsed = JSON.parse(localStorage.getItem(cacheKey(seriesName)) || 'null') || {}
+    localStorage.setItem(cacheKey(seriesName), JSON.stringify({
+      savedAt: parsed.savedAt || Date.now(),
+      installments,
+    }))
+  } catch {
+    // Quota/private-mode — nothing else to do.
+  }
+}
+
+// The cover a suggestion should paint: the on-device copy first.
+// The local copy only counts while it is still a copy of the CURRENT cover — an
+// edited cover must not keep showing the old download.
+export const suggestionCover = (entry) => (
+  entry?.coverLocal && entry.coverLocalFor === entry.cover ? entry.coverLocal : entry?.cover || null
+)
+
+const _localizing = new Set()
+
+// Native only: copy every remote suggestion cover into the app's covers folder
+// (the same store library covers use) and remember the local file URL. On the
+// web there is no file store, and data URLs would blow the localStorage quota,
+// so the browser's own image cache does the job there.
+export const localizeSuggestionCovers = async (seriesName) => {
+  if (!seriesName || !isNativeCapacitorPlatform()) return 0
+  const key = normalizeSeriesKey(seriesName)
+  if (_localizing.has(key)) return 0
+  _localizing.add(key)
+  try {
+    const { assetsAvailable } = await import('~/composables/useDeviceAssets')
+    if (!assetsAvailable()) return 0
+    const { useCoverImageCache, isRemoteCoverUrl } = await import('~/composables/useCoverImageCache')
+    const { cacheCoverImage } = useCoverImageCache()
+    let saved = 0
+    const pending = Object.entries(readCacheRaw(seriesName) || {})
+      .filter(([, entry]) => isRemoteCoverUrl(entry?.cover) && entry?.coverLocalFor !== entry.cover)
+    for (const [installment, entry] of pending) {
+      const local = await cacheCoverImage(entry.cover).catch(() => null)
+      if (!local || local === entry.cover) continue
+      // Re-read: the sweep may have written this series while we downloaded.
+      const current = readCacheRaw(seriesName) || {}
+      if (!current[installment] || current[installment].cover !== entry.cover) continue
+      current[installment] = { ...current[installment], coverLocal: local, coverLocalFor: entry.cover }
+      patchCache(seriesName, current)
+      saved += 1
+    }
+    if (saved) {
+      const store = useSuggestionsStore()
+      store.value = { ...store.value, [key]: readCacheRaw(seriesName) || {} }
+    }
+    return saved
+  } finally {
+    _localizing.delete(key)
   }
 }
 
@@ -552,8 +620,14 @@ export function mergeInstallments(existing = {}, incoming = {}) {
   for (const [installment, entry] of Object.entries(incoming || {})) {
     if (!entry) continue
     const current = merged[installment]
+    // A suggestion the reader edited by hand is theirs: no roster overrides it.
+    if (current?.userEdited) continue
     merged[installment] = current
       ? {
+        // Keep every extra stored field (synopsis, genre, rating, the on-device
+        // cover) — the roster only knows the four display fields.
+        ...entry,
+        ...current,
         title: current.title || entry.title || null,
         author: current.author || entry.author || null,
         cover: current.cover || entry.cover || null,
@@ -593,10 +667,25 @@ function bumpAttemptCount(seriesName) {
 // Fetch (and cache) the resolvable installments for a series, seeded by the
 // books the user owns. `neededInstallments` — the numbers the library is
 // missing — decides whether a cached result is still useful.
-export const fetchSeriesInstallments = async (seriesName, seedBooks = [], neededInstallments = [], { forceRefresh = false } = {}) => {
+export const fetchSeriesInstallments = async (seriesName, seedBooks = [], neededInstallments = [], { forceRefresh = false, preferStored = false } = {}) => {
   if (!seriesName) return {}
   const store = useSuggestionsStore()
   const key = normalizeSeriesKey(seriesName)
+
+  // Opening a series page must not go back to the network for details already
+  // on the device — that is what made the cards repaint on every open. What is
+  // stored is shown as-is; the background sweep and the explicit "Search for
+  // missing books" action are what refresh an incomplete roster.
+  if (preferStored && !forceRefresh) {
+    const stored = readCacheRaw(seriesName)
+    if (stored && Object.keys(stored).length) {
+      store.value = { ...store.value, [key]: stored }
+      // Rosters saved before covers were kept on the device get their copies
+      // now, in the background — the cards already show the remote images.
+      localizeSuggestionCovers(seriesName).catch(() => {})
+      return stored
+    }
+  }
 
   // The explicit "Search for missing books" action bypasses the cache — the
   // roster on disk may be a stale partial page, and the whole point is to go
@@ -672,7 +761,7 @@ export const hydrateSeriesSuggestions = () => {
     try {
       const parsed = JSON.parse(localStorage.getItem(key) || 'null')
       if (!parsed?.installments) continue
-      if (Date.now() - (parsed.savedAt || 0) > CACHE_TTL_MS) continue
+      // No age check: stored details are always worth painting immediately.
       next[key.slice(CACHE_PREFIX.length)] = parsed.installments
       loaded += 1
     } catch {
@@ -1062,6 +1151,151 @@ export const useSeriesSuggestions = (seriesNameRef) => {
   }
 }
 
+// ── One suggested installment: detail page + edit page ─────────────────────
+
+// Route segment for a suggestion's pages. The series NAME (not the normalized
+// key) travels in the URL so the page can show it as written.
+export const suggestionPath = (seriesName, installment, suffix = '') => (
+  `/suggestion/${encodeURIComponent(String(seriesName || ''))}/${encodeURIComponent(String(installment))}${suffix}`
+)
+
+const ensureHydrated = () => {
+  if (_hydrated) return
+  _hydrated = true
+  hydrateSeriesSuggestions()
+}
+
+// The stored entry for one installment, read straight from the device.
+export const readSuggestion = (seriesName, installment) => (
+  readCacheRaw(seriesName)?.[String(installment)] || null
+)
+
+// A suggestion dressed as a book object, so the shared detail/edit UI and the
+// rating display can treat it like any library book.
+export const suggestionAsBook = (seriesName, installment, entry) => {
+  if (!entry) return null
+  const number = Number(installment)
+  return {
+    id: `suggestion:${normalizeSeriesKey(seriesName)}:${installment}`,
+    suggestion: true,
+    documentType: 'book',
+    title: entry.title || `Book ${installment}`,
+    author: entry.author || '',
+    cover: suggestionCover(entry),
+    coverRemote: entry.cover || null,
+    publishYear: entry.year || null,
+    series: seriesName,
+    seriesInstallment: Number.isFinite(number) ? number : installment,
+    seriesTotal: entry.seriesTotal || null,
+    genre: entry.genre || '',
+    blurb: entry.blurb || '',
+    publisher: entry.publisher || '',
+    pages: entry.pages || 0,
+    webReview: entry.webReview || null,
+    externalRatings: entry.externalRatings || null,
+    rating: entry.rating || 0,
+  }
+}
+
+// Live view of one suggested installment.
+export const useSeriesSuggestion = (seriesNameRef, installmentRef) => {
+  rememberPublicConfig()
+  ensureHydrated()
+  const store = useSuggestionsStore()
+  const entry = computed(() => (
+    store.value[normalizeSeriesKey(seriesNameRef?.value)]?.[String(installmentRef?.value)] || null
+  ))
+  const book = computed(() => suggestionAsBook(seriesNameRef?.value, installmentRef?.value, entry.value))
+  return { entry, book }
+}
+
+const writeSuggestionEntry = (seriesName, installment, entry) => {
+  const current = { ...(readCacheRaw(seriesName) || {}), [String(installment)]: entry }
+  patchCache(seriesName, current)
+  const store = useSuggestionsStore()
+  store.value = { ...store.value, [normalizeSeriesKey(seriesName)]: current }
+  return entry
+}
+
+// How long a details lookup that found nothing is left alone before retrying.
+const DETAILS_RETRY_MS = 1000 * 60 * 60 * 24 * 7
+
+// Does this suggestion still lack the fuller details the detail page shows?
+export const suggestionNeedsFullDetails = (entry, now = Date.now()) => {
+  if (!entry?.title) return false
+  if (entry.blurb && entry.genre) return false
+  return !entry.detailsCheckedAt || now - entry.detailsCheckedAt > DETAILS_RETRY_MS
+}
+
+// Fold a verified metadata result into a stored suggestion. Only empty fields
+// are filled, so a user edit is never overwritten.
+export const applyResultToSuggestion = (entry, result, now = Date.now()) => {
+  const next = { ...entry, detailsCheckedAt: now }
+  if (!result) return next
+  const fill = (field, value) => {
+    if (!next[field] && value) next[field] = value
+  }
+  fill('author', result.author)
+  fill('cover', result.cover)
+  fill('year', Number(result.publishYear) || null)
+  fill('blurb', result.blurb)
+  fill('genre', result.genre)
+  fill('publisher', result.publisher)
+  fill('pages', Number(result.pages || result.pageCount) || null)
+  fill('webReview', result.webReview)
+  if (!next.externalRatings?.goodreads && result.webReview) {
+    const parsed = parseGoodreadsReview(result.webReview)
+    if (parsed.hasRating) {
+      next.externalRatings = {
+        ...(next.externalRatings || {}),
+        goodreads: { rating: parsed.rating, ratingsCount: parsed.ratingsCount || null, url: result.goodreadsUrl || null, fetchedAt: now },
+      }
+    }
+  }
+  return next
+}
+
+const _detailLookups = new Map()
+
+// Fetch the synopsis, genre, rating and the rest for one suggestion — once — and
+// keep them on the device. Later opens paint straight from storage.
+export const fetchSuggestionDetails = (seriesName, installment, { force = false } = {}) => {
+  const lookupKey = `${normalizeSeriesKey(seriesName)}:${installment}`
+  if (_detailLookups.has(lookupKey)) return _detailLookups.get(lookupKey)
+  const run = (async () => {
+    const entry = readSuggestion(seriesName, installment)
+    if (!entry?.title) return entry
+    if (!force && !suggestionNeedsFullDetails(entry)) return entry
+    let result = null
+    try {
+      const results = await fetchBookMetadataResults(entry.title, entry.author || undefined, undefined, { light: true })
+      result = bestResultForInstallment(entry, results)
+    } catch {
+      // Offline or throttled — stamp nothing, so the next open tries again.
+      return entry
+    }
+    // Re-read: an edit or the sweep may have landed while the lookup ran.
+    const latest = readSuggestion(seriesName, installment) || entry
+    return writeSuggestionEntry(seriesName, installment, applyResultToSuggestion(latest, result))
+  })().finally(() => _detailLookups.delete(lookupKey))
+  _detailLookups.set(lookupKey, run)
+  return run
+}
+
+// Save the reader's own edits to a suggestion. Marked userEdited so the roster
+// merge and the background top-ups never write over them.
+export const saveSuggestionEdits = async (seriesName, installment, patch = {}) => {
+  const current = readSuggestion(seriesName, installment) || {}
+  const allowed = ['title', 'author', 'blurb', 'genre', 'publisher', 'cover', 'year', 'rating', 'pages']
+  const next = { ...current, userEdited: true, editedAt: Date.now() }
+  for (const field of allowed) {
+    if (field in patch) next[field] = patch[field] === '' ? null : patch[field]
+  }
+  writeSuggestionEntry(seriesName, installment, next)
+  localizeSuggestionCovers(seriesName).catch(() => {})
+  return next
+}
+
 // ── Background sweep ────────────────────────────────────────────────────────
 
 let _sweepInFlight = false
@@ -1189,7 +1423,9 @@ const topUpSuggestionDetails = async (seriesList) => {
     if (!cached) continue
 
     const gaps = Object.keys(cached)
-      .filter((installment) => installmentNeedsDetails(cached[installment]))
+      .filter((installment) => (
+        installmentNeedsDetails(cached[installment]) || suggestionNeedsFullDetails(cached[installment])
+      ))
       .slice(0, DETAIL_BATCH)
     if (!gaps.length) continue
 
@@ -1208,13 +1444,21 @@ const topUpSuggestionDetails = async (seriesList) => {
         // details just because the search returned something — and scan every
         // result for the real match, not just the first.
         const top = bestResultForInstallment(entry, results)
-        if (!top) continue
-        cached[installment] = {
+        if (!top) {
+          // Stamp the miss so the synopsis lookup waits a week before asking
+          // again (the four display fields keep their own every-cycle retry).
+          cached[installment] = { ...entry, detailsCheckedAt: Date.now() }
+          changed = true
+          continue
+        }
+        // The same lookup also carries the synopsis, genre and rating — keep
+        // them, so tapping the suggestion later needs no request at all.
+        cached[installment] = applyResultToSuggestion({
           ...entry,
           author: entry.author || top.author || null,
           cover: entry.cover || top.cover || null,
           year: entry.year || Number(top.publishYear) || null,
-        }
+        }, top)
         changed = true
       } catch {
         // Source down or throttled — try again on a later cycle.
@@ -1237,7 +1481,7 @@ export const startSeriesSuggestionSweep = ({ seriesList }) => {
   // Started from a plugin, so a Nuxt instance is live — the background sweep
   // later runs on a timer, where it would not be.
   rememberPublicConfig()
-  const { settings } = useBookishSettings()
+  const { settings } = usePagesSettings()
 
   const tick = () => {
     // Skip cycles while the app is backgrounded; Android throttles the timers

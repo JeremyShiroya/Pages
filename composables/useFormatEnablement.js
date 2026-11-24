@@ -4,8 +4,8 @@ import {
   enabledFormatsForMode,
   formatModeFor,
   normalizeEnabledFormats,
-  useBookishSettings,
-} from '~/composables/useBookishSettings'
+  usePagesSettings,
+} from '~/composables/usePagesSettings'
 import { useBooks } from '~/composables/useBooks'
 import { useBookStorage } from '~/composables/useBookStorage'
 import { useLibraryStore } from '~/composables/useLibraryStore'
@@ -57,7 +57,7 @@ export const formatsAddedBy = (currentFormats, nextFormats) => {
 
 export const useFormatEnablement = () => {
   const nuxtApp = useNuxtApp()
-  const { settings, updateSettings } = useBookishSettings()
+  const { settings, updateSettings } = usePagesSettings()
   const { books, seriesList, updateBook, fetchAllData } = useBooks()
   const { addToast } = useToast()
 

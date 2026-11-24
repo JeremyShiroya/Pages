@@ -360,7 +360,7 @@ import { useBooks } from '~/composables/useBooks'
 import { isRenderableSection, buildReadableChunks, buildReadableSectionChunks, useTTS } from '~/composables/useTTS'
 import { useBookStorage } from '~/composables/useBookStorage'
 import { recordBookActivity } from '~/composables/useBookAnalytics'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { sanitizeBookHtml } from '~/composables/useHtmlSanitizer'
 import {
   buildTextIndex,
@@ -401,7 +401,7 @@ const route = useRoute()
 const router = useRouter()
 const { books, initialized, fetchAllData, fetchBookById } = useBooks()
 const { getBookContent, saveBookContent } = useBookStorage()
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const {
   ttsBook,
   ttsChunkIdx,

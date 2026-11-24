@@ -43,12 +43,12 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useUserProfile } from '~/composables/useUserProfile'
 import MobileSettingsNav from './MobileSettingsNav.vue'
 import MobileTopNav from './MobileTopNav.vue'
 
-const { settings, updateSettings } = useBookishSettings()
+const { settings, updateSettings } = usePagesSettings()
 const { profile, activeAvatarPreset } = useUserProfile()
 const profileAvatarSrc = computed(() => profile.value.avatarType === 'image' ? profile.value.avatarValue : activeAvatarPreset.value.src)
 const firstName = computed(() => profile.value.displayName.trim().split(/\s+/)[0] || 'Reader')

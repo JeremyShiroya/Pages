@@ -19,11 +19,11 @@
 <script setup>
 import { computed } from 'vue'
 import { personalRatingForScale, personalRatingFromScale } from '~/composables/useBookRating'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 
 const props = defineProps({ modelValue: { type: [Number, String], default: 0 } })
 const emit = defineEmits(['update:modelValue'])
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const scale = computed(() => Number(settings.value.personalRatingScale) === 5 ? 5 : 10)
 const displayedValue = computed(() => personalRatingForScale(props.modelValue, scale.value))
 const select = (value) => emit('update:modelValue', personalRatingFromScale(value, scale.value))

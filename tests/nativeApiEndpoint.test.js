@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
-  BOOKISH_API_BASE_URL_KEY,
+  PAGES_API_BASE_URL_KEY,
   joinApiUrl,
   normalizeApiBaseUrl,
   readStoredApiBaseUrl,
@@ -46,11 +46,11 @@ describe('native API endpoint helper', () => {
     const storage = fakeStorage()
 
     expect(writeStoredApiBaseUrl(' https://phone-server.example// ', storage)).toBe('https://phone-server.example')
-    expect(storage.getItem(BOOKISH_API_BASE_URL_KEY)).toBe('https://phone-server.example')
+    expect(storage.getItem(PAGES_API_BASE_URL_KEY)).toBe('https://phone-server.example')
     expect(readStoredApiBaseUrl(storage)).toBe('https://phone-server.example')
 
     expect(writeStoredApiBaseUrl('', storage)).toBe('')
-    expect(storage.getItem(BOOKISH_API_BASE_URL_KEY)).toBeNull()
+    expect(storage.getItem(PAGES_API_BASE_URL_KEY)).toBeNull()
     expect(readStoredApiBaseUrl(storage)).toBe('')
   })
 })

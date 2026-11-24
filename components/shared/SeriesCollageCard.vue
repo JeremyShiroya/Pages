@@ -89,7 +89,7 @@
 
 <script setup>
 import { computed } from "vue";
-import { useBookishSettings } from "~/composables/useBookishSettings";
+import { usePagesSettings } from "~/composables/usePagesSettings";
 import { onCoverError } from "~/composables/useCoverFallback";
 
 const props = defineProps({
@@ -113,7 +113,7 @@ const onCardClick = () => {
   else emit("open", props.series);
 };
 
-const { settings } = useBookishSettings();
+const { settings } = usePagesSettings();
 const isPlaylist = computed(() => props.variant === "playlist");
 const layout = computed(() =>
   (isPlaylist.value ? settings.value.playlistCardLayout : settings.value.seriesCardLayout) || "fan",

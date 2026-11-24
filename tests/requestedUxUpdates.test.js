@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
-import { normalizeBookishSettings } from '../composables/useBookishSettings.js'
+import { normalizePagesSettings } from '../composables/usePagesSettings.js'
 import { normalizeMobileReaderPrefs, PDF_ZOOM_MIN } from '../composables/useMobileReaderPrefs.js'
 
 const root = resolve(process.cwd())
@@ -15,12 +15,12 @@ describe('requested mobile UX updates', () => {
   })
 
   test('legacy Edge narrators migrate to their replacements', () => {
-    expect(normalizeBookishSettings({ ttsVoice: 'en-US-ChristopherNeural' }).ttsVoice).toBe('en-CA-LiamNeural')
-    expect(normalizeBookishSettings({ ttsVoice: 'en-US-GuyNeural' }).ttsVoice).toBe('en-US-BrianNeural')
-    expect(normalizeBookishSettings({ ttsVoice: 'en-US-AriaNeural' }).ttsVoice).toBe('en-US-AvaNeural')
-    expect(normalizeBookishSettings({ ttsVoice: 'en-US-AnaNeural' }).ttsVoice).toBe('en-US-AvaNeural')
-    expect(normalizeBookishSettings({ ttsVoice: 'en-US-JennyNeural' }).ttsVoice).toBe('en-US-EmmaNeural')
-    expect(normalizeBookishSettings({ ttsVoice: 'en-US-DavisNeural' }).ttsVoice).toBe('en-US-AndrewNeural')
+    expect(normalizePagesSettings({ ttsVoice: 'en-US-ChristopherNeural' }).ttsVoice).toBe('en-CA-LiamNeural')
+    expect(normalizePagesSettings({ ttsVoice: 'en-US-GuyNeural' }).ttsVoice).toBe('en-US-BrianNeural')
+    expect(normalizePagesSettings({ ttsVoice: 'en-US-AriaNeural' }).ttsVoice).toBe('en-US-AvaNeural')
+    expect(normalizePagesSettings({ ttsVoice: 'en-US-AnaNeural' }).ttsVoice).toBe('en-US-AvaNeural')
+    expect(normalizePagesSettings({ ttsVoice: 'en-US-JennyNeural' }).ttsVoice).toBe('en-US-EmmaNeural')
+    expect(normalizePagesSettings({ ttsVoice: 'en-US-DavisNeural' }).ttsVoice).toBe('en-US-AndrewNeural')
   })
 
   test('the TTS server accepts every narrator offered by the player', () => {

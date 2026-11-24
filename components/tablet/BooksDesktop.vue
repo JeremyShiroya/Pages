@@ -417,7 +417,7 @@ import { useBooks } from "~/composables/useBooks";
 import { newDocumentReviews, documentTypeOf } from "~/composables/useDocumentReview";
 import { getBookRating, RATING_SOURCE_LABELS } from "~/composables/useBookRating";
 import { useTTS } from "~/composables/useTTS";
-import { useBookishSettings } from "~/composables/useBookishSettings";
+import { usePagesSettings } from "~/composables/usePagesSettings";
 import { useLibraryFilters } from "~/composables/useLibraryFilters";
 import { useToast } from "~/composables/useToast";
 import { bookEditLocation } from "~/composables/useBookEditNavigation";
@@ -435,7 +435,7 @@ const {
   fetchAllData,
 } = useBooks();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS()
-const { settings, updateSettings } = useBookishSettings();
+const { settings, updateSettings } = usePagesSettings();
 const selectedRatingLabel = computed(() => RATING_SOURCE_LABELS[settings.value.ratingSource] || 'Rating');
 const { addToast } = useToast();
 

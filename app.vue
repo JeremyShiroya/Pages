@@ -5,27 +5,16 @@
     <SpeechDownloadStatus />
     <DevicePermissionModal />
     <AppUpdateModal />
-    <!-- First boot only: picks which formats the app handles at all, before the
-         device scan has imported anything. -->
-    <FormatChoiceModal v-if="showFormatChoice" @done="showFormatChoice = false" />
+    <BackupPrompt />
   </NuxtLayout>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+// The first-boot format choice now lives in the setup flow (pages/welcome.vue),
+// which middleware/onboarding.global.js opens on first launch.
 import AppUpdateModal from '~/components/shared/AppUpdateModal.vue'
+import BackupPrompt from '~/components/shared/BackupPrompt.vue'
 import DevicePermissionModal from '~/components/shared/DevicePermissionModal.vue'
-import FormatChoiceModal from '~/components/shared/FormatChoiceModal.vue'
 import ToastComp from '~/components/shared/ToastComp.vue'
 import SpeechDownloadStatus from '~/components/shared/SpeechDownloadStatus.vue'
-import { useFormatEnablement } from '~/composables/useFormatEnablement'
-
-// Read on the client only: settings come from localStorage, so deciding on the
-// server would render the modal for everyone and then flash it away.
-const showFormatChoice = ref(false)
-
-onMounted(() => {
-  const { needsFormatChoice } = useFormatEnablement()
-  showFormatChoice.value = needsFormatChoice.value
-})
 </script>

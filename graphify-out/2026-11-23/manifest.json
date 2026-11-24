@@ -18,16 +18,16 @@
     "semantic_hash": "c3680fc576fd18fb779c503b08967dc2"
   },
   "android/app/build.gradle": {
-    "mtime": 1795381656.8942432,
-    "seen": 1795382314.4501476,
+    "mtime": 1795422582.5413587,
+    "seen": 1795422593.4072895,
     "ast_hash": "26e6acc4b517afc042c8e694fedad0f4",
     "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1795408533.952291,
-    "seen": 1795408568.6556475,
-    "ast_hash": "9d7ac48553a5fbe2dabfa1d735929c47",
-    "semantic_hash": "9d7ac48553a5fbe2dabfa1d735929c47"
+    "mtime": 1795422953.977168,
+    "seen": 1795423206.956369,
+    "ast_hash": "dd205cf8dcda283a9614db073900f03f",
+    "semantic_hash": ""
   },
   "android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java": {
     "mtime": 1781859670.0,
@@ -84,10 +84,10 @@
     "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1795408533.950294,
-    "seen": 1795408568.6614177,
-    "ast_hash": "27774e912a23b4f9786f7934cdc87d9e",
-    "semantic_hash": "27774e912a23b4f9786f7934cdc87d9e"
+    "mtime": 1795422953.9761505,
+    "seen": 1795423206.9564226,
+    "ast_hash": "68c47d8fe55c8ae39da1b247a51e1216",
+    "semantic_hash": ""
   },
   "android/gradlew": {
     "mtime": 1781859670.0,
@@ -114,10 +114,10 @@
     "semantic_hash": ""
   },
   "capacitor.config.ts": {
-    "mtime": 1784991630.1000955,
-    "seen": 1789126705.927221,
-    "ast_hash": "10a8a9a6c3d912f08cdf367958fdf128",
-    "semantic_hash": "10a8a9a6c3d912f08cdf367958fdf128"
+    "mtime": 1795422582.5674691,
+    "seen": 1795422593.407428,
+    "ast_hash": "6cad615a4fa564aebcf3bca6672f1b15",
+    "semantic_hash": ""
   },
   "components/mobile/AddBookMobile.vue": {
     "mtime": 1791545412.6714005,
@@ -228,8 +228,8 @@
     "semantic_hash": "b1ea933a896e0ec17f08f7b3b3c54e10"
   },
   "components/mobile/ReaderMobile.vue": {
-    "mtime": 1795389435.314462,
-    "seen": 1795391789.578545,
+    "mtime": 1795422582.5720394,
+    "seen": 1795422593.4075234,
     "ast_hash": "3c813400e2cf90d11681abcf8c1cf1ce",
     "semantic_hash": ""
   },
@@ -240,8 +240,8 @@
     "semantic_hash": "16748463913306b507168eb37e7ef926"
   },
   "components/mobile/ReaderPagedEpub.vue": {
-    "mtime": 1795385768.9667897,
-    "seen": 1795391789.5788891,
+    "mtime": 1795422582.575049,
+    "seen": 1795422593.407531,
     "ast_hash": "e47f32ef01e3b4e903ca71f1c50b58a4",
     "semantic_hash": ""
   },
@@ -558,10 +558,10 @@
     "semantic_hash": "890f2f643c0ad45677c5ab4a8e733a24"
   },
   "composables/appUpdateManifest.js": {
-    "mtime": 1786060166.2685447,
-    "seen": 1789126705.9275048,
-    "ast_hash": "584815606c791b5726b673ffa77dbbfe",
-    "semantic_hash": "584815606c791b5726b673ffa77dbbfe"
+    "mtime": 1795422582.5811107,
+    "seen": 1795422593.4078457,
+    "ast_hash": "dfc43521a59dc7ee109251c26d5595f8",
+    "semantic_hash": ""
   },
   "composables/kokoroTts.worker.js": {
     "mtime": 1779863089.443399,
@@ -624,10 +624,10 @@
     "semantic_hash": "1d62ac152432d4c5a591758e1f7606a0"
   },
   "composables/useAppUpdate.js": {
-    "mtime": 1786060184.0825155,
-    "seen": 1789126705.9275386,
-    "ast_hash": "43b4548f8b2274828887fb96826510bf",
-    "semantic_hash": "43b4548f8b2274828887fb96826510bf"
+    "mtime": 1795422582.5992644,
+    "seen": 1795422593.4079597,
+    "ast_hash": "767ba3ffd7ae15dc10d083226c0316ef",
+    "semantic_hash": ""
   },
   "composables/useAuthorDetails.js": {
     "mtime": 1781591230.6243582,
@@ -708,9 +708,9 @@
     "semantic_hash": "dfe5cafeed3319e38507059fd556cbc2"
   },
   "composables/useChunkSpans.js": {
-    "mtime": 1795386078.704459,
-    "seen": 1795391789.6254878,
-    "ast_hash": "9cbdcb9289de2602f2437b74d829ed90",
+    "mtime": 1795422582.601273,
+    "seen": 1795422593.4080453,
+    "ast_hash": "82c6efa452325bba4211a99c0ecfdf87",
     "semantic_hash": ""
   },
   "composables/useConnectionChecks.js": {
@@ -846,8 +846,8 @@
     "semantic_hash": ""
   },
   "composables/useLibraryStore.js": {
-    "mtime": 1795381983.2120283,
-    "seen": 1795382314.5314515,
+    "mtime": 1795422582.6077738,
+    "seen": 1795422593.4082007,
     "ast_hash": "23c5b628a08891427ead8b49a98d1004",
     "semantic_hash": ""
   },
@@ -1026,9 +1026,9 @@
     "semantic_hash": "14ebf8425a342a63bc65454e3e18afc8"
   },
   "composables/useTTS.js": {
-    "mtime": 1795389413.5648656,
-    "seen": 1795391789.6488569,
-    "ast_hash": "e44b4dbee24a72cea2fbb0eba732a998",
+    "mtime": 1795422582.6123464,
+    "seen": 1795422593.408371,
+    "ast_hash": "b6c47aa2d14c15b856a3de369f2fe136",
     "semantic_hash": ""
   },
   "composables/useTTS.test.js": {
@@ -1080,15 +1080,15 @@
     "semantic_hash": ""
   },
   "nuxt.config.ts": {
-    "mtime": 1791998089.1971521,
-    "seen": 1791998142.7943106,
-    "ast_hash": "4a01a8958b6c9fed068626bae28a711f",
+    "mtime": 1795422583.1481266,
+    "seen": 1795422593.4084184,
+    "ast_hash": "c3b2e5e1f1a3afeedf55731c3519b63d",
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1792051852.5354295,
-    "seen": 1792052200.8357325,
-    "ast_hash": "f66b15f56e1dca2811f0aa4aacd228e2",
+    "mtime": 1795422881.4079423,
+    "seen": 1795422905.8595936,
+    "ast_hash": "3eeda1b81b7870347952189b73ce56d8",
     "semantic_hash": ""
   },
   "pages/add.vue": {
@@ -1176,9 +1176,9 @@
     "semantic_hash": ""
   },
   "pages/reader/[id].vue": {
-    "mtime": 1795389425.8050094,
-    "seen": 1795391789.659669,
-    "ast_hash": "4ec88fcca5a2e980099ad29a0ebb0aa4",
+    "mtime": 1795422583.1683087,
+    "seen": 1795422593.4085178,
+    "ast_hash": "657e8aea723131727f4ddd2a9a9d5323",
     "semantic_hash": ""
   },
   "pages/serie/[id].vue": {
@@ -1272,10 +1272,10 @@
     "semantic_hash": "5d77b332ab59fbb22124bd76ecf84c40"
   },
   "plugins/disable-sw-native.client.js": {
-    "mtime": 1783266559.077791,
-    "seen": 1789126705.9278479,
-    "ast_hash": "1c1856fc95d56d8aaf1a9fdad40cf197",
-    "semantic_hash": "1c1856fc95d56d8aaf1a9fdad40cf197"
+    "mtime": 1795422583.1748607,
+    "seen": 1795422593.4086158,
+    "ast_hash": "43a23acdcca3ac099513ecbab9bc1849",
+    "semantic_hash": ""
   },
   "plugins/media-session.client.js": {
     "mtime": 1791998089.2011492,
@@ -1296,10 +1296,10 @@
     "semantic_hash": "298c495c0eda824df48ced3c1e8758db"
   },
   "scripts/generate-version-manifest.mjs": {
-    "mtime": 1784416083.3547492,
-    "seen": 1789126705.9278576,
-    "ast_hash": "10b8309d116f4e7005b352e7b2d9963a",
-    "semantic_hash": "10b8309d116f4e7005b352e7b2d9963a"
+    "mtime": 1795422583.1814091,
+    "seen": 1795422593.4086475,
+    "ast_hash": "ff6d61e2d112083062249aecea1bde2d",
+    "semantic_hash": ""
   },
   "scripts/sign-release-apk.sh": {
     "mtime": 1785594129.4918714,
@@ -1704,10 +1704,10 @@
     "semantic_hash": "8b6a4378a69cc9e117cc15ce65af8c6d"
   },
   "tests/appUpdate.test.js": {
-    "mtime": 1786060247.4425185,
-    "seen": 1789126705.9280207,
-    "ast_hash": "982f7a4afff4a6b370135e76707614d9",
-    "semantic_hash": "982f7a4afff4a6b370135e76707614d9"
+    "mtime": 1795422583.1844037,
+    "seen": 1795422593.409203,
+    "ast_hash": "7594662881c8b14ade3174dcf544d544",
+    "semantic_hash": ""
   },
   "tests/appVersioning.test.js": {
     "mtime": 1789130649.2000234,
@@ -2022,8 +2022,8 @@
     "semantic_hash": ""
   },
   "tests/uxBatchThree.test.js": {
-    "mtime": 1795381155.5478213,
-    "seen": 1795382314.6192176,
+    "mtime": 1795422583.1914823,
+    "seen": 1795422593.4094782,
     "ast_hash": "c9d6d02e59513c0acddeb887065c0575",
     "semantic_hash": ""
   },
@@ -2226,9 +2226,9 @@
     "semantic_hash": ""
   },
   ".github/workflows/publish-version-manifest.yml": {
-    "mtime": 1785500782.7065797,
-    "seen": 1789216826.6917906,
-    "ast_hash": "76fde703c865cd4f8d6d81fdc58d32e9",
+    "mtime": 1795422582.532258,
+    "seen": 1795422593.4095497,
+    "ast_hash": "33932e930623cb56202bef410c56aa15",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -2244,9 +2244,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1786711274.2764013,
-    "seen": 1789216826.6918108,
-    "ast_hash": "3c43d78d7f000930183d56db7837324d",
+    "mtime": 1795422582.5377765,
+    "seen": 1795422593.409563,
+    "ast_hash": "9e1919f6fd1e1c20143ff9f0319c1f24",
     "semantic_hash": ""
   },
   "design-qa.md": {
@@ -3061,20 +3061,20 @@
   },
   "server/database/migrations/0000_add-pages-column.sql": {
     "mtime": 1778139591.9198406,
-    "seen": 1792054380.0626812,
-    "ast_hash": "",
+    "seen": 1795422905.8598042,
+    "ast_hash": "fae8f00f3932a1e5e3f11be8ea24f3ea",
     "semantic_hash": ""
   },
   "server/database/migrations/0001_naive_stark_industries.sql": {
     "mtime": 1778224044.757941,
-    "seen": 1792054380.0626855,
-    "ast_hash": "",
+    "seen": 1795422905.8598077,
+    "ast_hash": "bcb6d05640ed56e698637c15d100f6e7",
     "semantic_hash": ""
   },
   "server/database/migrations/0002_drop_content_column.sql": {
     "mtime": 1778991194.1574428,
-    "seen": 1792054380.0626888,
-    "ast_hash": "",
+    "seen": 1795422905.8598113,
+    "ast_hash": "812224c49041ad46b8e8d1e772855b69",
     "semantic_hash": ""
   },
   "components/shared/BookProgressDisplay.vue": {
@@ -5622,39 +5622,39 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/LocalSpeechPlugin.java": {
-    "mtime": 1795390661.7655962,
-    "seen": 1795391789.5656717,
-    "ast_hash": "47fe1573fab3e1120eecec7d5e42ff75",
+    "mtime": 1795422582.554409,
+    "seen": 1795422593.4073303,
+    "ast_hash": "c362a2491d8a2256a05e78764f2070f8",
     "semantic_hash": ""
   },
   "components/shared/SpeechDownloadStatus.vue": {
-    "mtime": 1795381637.3913727,
-    "seen": 1795382314.4933138,
-    "ast_hash": "164c5ccafb7e83ff917a1733193579cd",
+    "mtime": 1795422582.577553,
+    "seen": 1795422593.4077518,
+    "ast_hash": "872116cebdf223b17cc4057a2bc3c020",
     "semantic_hash": ""
   },
   "composables/readingPositionStore.js": {
-    "mtime": 1795379809.5252554,
-    "seen": 1795382314.5070314,
+    "mtime": 1795422582.584102,
+    "seen": 1795422593.4078765,
     "ast_hash": "cd3ffcdf79dde283ac9695e751765c41",
     "semantic_hash": ""
   },
   "composables/readingPositionStore.test.js": {
-    "mtime": 1795379809.528795,
-    "seen": 1795382314.5070348,
+    "mtime": 1795422582.5876153,
+    "seen": 1795422593.4078803,
     "ast_hash": "b3a23e332f06cfc10248049157c7d7c7",
     "semantic_hash": ""
   },
   "composables/tts/localTtsDriver.js": {
-    "mtime": 1795391245.3958244,
-    "seen": 1795391789.6145365,
-    "ast_hash": "2940f1107976217e4b270da731707bcf",
+    "mtime": 1795422582.5900905,
+    "seen": 1795422593.4079006,
+    "ast_hash": "af5dbedef74035e5a420cdd92a1310e4",
     "semantic_hash": ""
   },
   "composables/tts/localTtsDriver.test.js": {
-    "mtime": 1795381541.3433821,
-    "seen": 1795382314.5085666,
-    "ast_hash": "89d41781611fc171fe3d465eb9ffe331",
+    "mtime": 1795422582.5931776,
+    "seen": 1795422593.4079041,
+    "ast_hash": "f69a333e0a28e9f4051655879ab764f5",
     "semantic_hash": ""
   },
   "scripts/prepare-local-speech.mjs": {
@@ -5676,8 +5676,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/pockettts/PocketTtsSynthesizer.kt": {
-    "mtime": 1795408009.9860673,
-    "seen": 1795408568.6602361,
+    "mtime": 1795422582.5624695,
+    "seen": 1795422593.4073634,
     "ast_hash": "28e3e4e4cbf8e29e454709754a4ca3ec",
     "semantic_hash": ""
   },
@@ -5694,45 +5694,69 @@
     "semantic_hash": ""
   },
   "composables/tts/silenceTrim.js": {
-    "mtime": 1795381714.317921,
-    "seen": 1795382314.5104554,
-    "ast_hash": "9de86601881792f4421a3b23e75172b1",
+    "mtime": 1795422582.595172,
+    "seen": 1795422593.4079301,
+    "ast_hash": "542546e4c177edca694654f36a68814c",
     "semantic_hash": ""
   },
   "composables/tts/silenceTrim.test.js": {
-    "mtime": 1795381716.9561608,
-    "seen": 1795382314.5104587,
-    "ast_hash": "ab85d74c5ad461b83e8768ce2853b5bd",
+    "mtime": 1795422582.596171,
+    "seen": 1795422593.407934,
+    "ast_hash": "93946f9d12a87e5402f237691a9a087e",
     "semantic_hash": ""
   },
   "error.vue": {
-    "mtime": 1795381976.1504984,
-    "seen": 1795382314.547244,
-    "ast_hash": "8eb77d3d763c741703c9b779da48938c",
+    "mtime": 1795422582.6143465,
+    "seen": 1795422593.4084055,
+    "ast_hash": "b0daa982118e8c6d7a87a26ff359528d",
     "semantic_hash": ""
   },
   "plugins/00.app-errors.client.js": {
-    "mtime": 1795381956.1571677,
-    "seen": 1795382314.5610697,
-    "ast_hash": "893565d80e4e807470f9121e71eb4eac",
+    "mtime": 1795422583.1718397,
+    "seen": 1795422593.4085906,
+    "ast_hash": "db1f159d18f6664a08d4938b1c8ef972",
     "semantic_hash": ""
   },
   "tests/startupResilience.test.js": {
-    "mtime": 1795381993.8616562,
-    "seen": 1795382314.6178892,
-    "ast_hash": "a08d0803f9bbe7483e448b70f914689b",
+    "mtime": 1795422583.1884425,
+    "seen": 1795422593.4094558,
+    "ast_hash": "df92a73e6e475dac5d1024408eeecbcf",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/LocalSpeechStream.java": {
-    "mtime": 1795391483.0212264,
-    "seen": 1795391789.565676,
-    "ast_hash": "0a660ca7f55bf8e314c4c11c5aed3cb2",
+    "mtime": 1795422582.5574093,
+    "seen": 1795422593.4073353,
+    "ast_hash": "c28c71fbae004ac19d3c75530ac4894d",
     "semantic_hash": ""
   },
   "composables/useChunkSpans.test.js": {
-    "mtime": 1795385916.440817,
-    "seen": 1795391789.6254914,
-    "ast_hash": "0738871ef6a465a0b1f17a035d949594",
+    "mtime": 1795422582.604268,
+    "seen": 1795422593.4080489,
+    "ast_hash": "9de3271ab3d4c5e3779f9a691aca405b",
+    "semantic_hash": ""
+  },
+  "composables/useLiveUpdate.js": {
+    "mtime": 1795422582.6098382,
+    "seen": 1795422593.4082174,
+    "ast_hash": "0ce5bbcc6b0c80dc7204a97a1e1d4ef1",
+    "semantic_hash": ""
+  },
+  "plugins/live-update.client.js": {
+    "mtime": 1795422583.17686,
+    "seen": 1795422593.4086194,
+    "ast_hash": "4294d8e45c9f4412e564a3fd5500f144",
+    "semantic_hash": ""
+  },
+  "scripts/build-web-bundle.mjs": {
+    "mtime": 1795423166.577883,
+    "seen": 1795423206.9571831,
+    "ast_hash": "c0bf8f157943fa9c02665d3b20428513",
+    "semantic_hash": ""
+  },
+  "tests/liveUpdate.test.js": {
+    "mtime": 1795422583.1864023,
+    "seen": 1795422593.409244,
+    "ast_hash": "ee5e2211a714fe7ec3f35b17a6c80ba0",
     "semantic_hash": ""
   }
 }

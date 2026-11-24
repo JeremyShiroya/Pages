@@ -2,35 +2,35 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import {
-  DEFAULT_BOOKISH_SETTINGS,
+  DEFAULT_PAGES_SETTINGS,
   FORMAT_FILTER_CHOICES,
   matchesFormatFilter,
-  normalizeBookishSettings,
-} from '../composables/useBookishSettings.js'
+  normalizePagesSettings,
+} from '../composables/usePagesSettings.js'
 
 const root = resolve(process.cwd())
 const read = (path) => readFileSync(resolve(root, path), 'utf8')
 
 describe('appearance preferences', () => {
   test('new preference keys have sane defaults', () => {
-    expect(DEFAULT_BOOKISH_SETTINGS.appBackground).toBe('white')
-    expect(DEFAULT_BOOKISH_SETTINGS.darkAppBackground).toBe('muted')
-    expect(DEFAULT_BOOKISH_SETTINGS.seriesCardBackground).toBe('blur')
-    expect(DEFAULT_BOOKISH_SETTINGS.seriesCardLayout).toBe('fan')
-    expect(DEFAULT_BOOKISH_SETTINGS.favouritesCardBackground).toBe('blur')
-    expect(DEFAULT_BOOKISH_SETTINGS.favouritesCardLayout).toBe('list')
-    expect(DEFAULT_BOOKISH_SETTINGS.profileFavouritesLayout).toBe('grid')
+    expect(DEFAULT_PAGES_SETTINGS.appBackground).toBe('white')
+    expect(DEFAULT_PAGES_SETTINGS.darkAppBackground).toBe('muted')
+    expect(DEFAULT_PAGES_SETTINGS.seriesCardBackground).toBe('blur')
+    expect(DEFAULT_PAGES_SETTINGS.seriesCardLayout).toBe('fan')
+    expect(DEFAULT_PAGES_SETTINGS.favouritesCardBackground).toBe('blur')
+    expect(DEFAULT_PAGES_SETTINGS.favouritesCardLayout).toBe('list')
+    expect(DEFAULT_PAGES_SETTINGS.profileFavouritesLayout).toBe('grid')
     // Playlist cards default to the same look as series cards.
-    expect(DEFAULT_BOOKISH_SETTINGS.playlistCardBackground).toBe('blur')
-    expect(DEFAULT_BOOKISH_SETTINGS.playlistCardLayout).toBe('fan')
-    expect(DEFAULT_BOOKISH_SETTINGS.bookActionDisplay).toBe('minimal')
-    expect(DEFAULT_BOOKISH_SETTINGS).not.toHaveProperty('bookProgressDisplay')
-    expect(DEFAULT_BOOKISH_SETTINGS.ratingSource).toBe('goodreads')
-    expect(DEFAULT_BOOKISH_SETTINGS.personalRatingScale).toBe(10)
-    expect(DEFAULT_BOOKISH_SETTINGS.readerHighlight).toBe(true)
-    expect(DEFAULT_BOOKISH_SETTINGS.listenCoverBlur).toBe(true)
-    expect(DEFAULT_BOOKISH_SETTINGS.showStreak).toBe(true)
-    expect(DEFAULT_BOOKISH_SETTINGS.formatFilter).toBe('all')
+    expect(DEFAULT_PAGES_SETTINGS.playlistCardBackground).toBe('blur')
+    expect(DEFAULT_PAGES_SETTINGS.playlistCardLayout).toBe('fan')
+    expect(DEFAULT_PAGES_SETTINGS.bookActionDisplay).toBe('minimal')
+    expect(DEFAULT_PAGES_SETTINGS).not.toHaveProperty('bookProgressDisplay')
+    expect(DEFAULT_PAGES_SETTINGS.ratingSource).toBe('goodreads')
+    expect(DEFAULT_PAGES_SETTINGS.personalRatingScale).toBe(10)
+    expect(DEFAULT_PAGES_SETTINGS.readerHighlight).toBe(true)
+    expect(DEFAULT_PAGES_SETTINGS.listenCoverBlur).toBe(true)
+    expect(DEFAULT_PAGES_SETTINGS.showStreak).toBe(true)
+    expect(DEFAULT_PAGES_SETTINGS.formatFilter).toBe('all')
   })
 
   test('format filter offers all / epub / pdf and matches case-insensitively', () => {
@@ -50,7 +50,7 @@ describe('appearance preferences', () => {
   })
 
   test('normalize validates preference values and rejects junk', () => {
-    const ok = normalizeBookishSettings({
+    const ok = normalizePagesSettings({
       seriesCardBackground: 'blur',
       seriesCardLayout: 'cover',
       favouritesCardBackground: 'blank',
@@ -71,7 +71,7 @@ describe('appearance preferences', () => {
     expect(ok.showStreak).toBe(false)
     expect(ok.formatFilter).toBe('epub')
 
-    const junk = normalizeBookishSettings({
+    const junk = normalizePagesSettings({
       seriesCardLayout: 'nonsense',
       favouritesCardLayout: 'nope',
       profileFavouritesLayout: 'nope',

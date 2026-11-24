@@ -5,7 +5,7 @@
 
 ## Goal
 
-Make Bookish's read-aloud highlighting faster and more accurate, and make PDF
+Make Pages's read-aloud highlighting faster and more accurate, and make PDF
 rendering faster, **while keeping the cloud Microsoft Edge TTS engine**. Three
 independent changes, built and committed in this order:
 

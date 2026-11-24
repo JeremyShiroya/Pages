@@ -178,7 +178,7 @@ import SelectionActionsBar from '~/components/shared/SelectionActionsBar.vue';
 import PlaylistDeleteModal from '~/components/shared/PlaylistDeleteModal.vue';
 import PlaylistEditModal from '~/components/shared/PlaylistEditModal.vue';
 import { useLibraryFilters } from '~/composables/useLibraryFilters';
-import { useBookishSettings } from '~/composables/useBookishSettings';
+import { usePagesSettings } from '~/composables/usePagesSettings';
 import { useBooks } from '~/composables/useBooks';
 import { useToast } from '~/composables/useToast';
 import { useTTS } from '~/composables/useTTS';
@@ -190,7 +190,7 @@ const route = useRoute();
 const router = useRouter();
 const { books, collections, updatePlaylist, deletePlaylist, deleteBook, toggleFavourite, hideBook } = useBooks();
 const { addToast } = useToast();
-const { settings } = useBookishSettings();
+const { settings } = usePagesSettings();
 const { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } = useTTS();
 // Each playlist remembers its own filters — filtering one is not a statement
 // about the others.

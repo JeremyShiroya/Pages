@@ -111,14 +111,14 @@ The native app can also store or change this URL from Settings -> Storage.
 Optional AI metadata verification:
 
 ```env
-BOOKISH_AI_PROVIDER=gemini
+PAGES_AI_PROVIDER=gemini
 GEMINI_API_KEY=<your-google-ai-studio-key>
 # Evergreen alias — pinned versions (e.g. gemini-2.5-flash) eventually retire
 # and return 404 "no longer available to new users" on newly issued keys.
 GEMINI_MODEL=gemini-flash-latest
 
 # Or use Groq instead
-# BOOKISH_AI_PROVIDER=groq
+# PAGES_AI_PROVIDER=groq
 # GROQ_API_KEY=<your-groq-key>
 # GROQ_MODEL=llama-3.3-70b-versatile
 ```
@@ -225,7 +225,7 @@ exists. On native startup the app fetches a small `version.json` and offers the
 download when its `versionCode` beats the installed one.
 
 ```env
-BOOKISH_UPDATE_MANIFEST_URL=https://github.com/<owner>/<repo>/releases/latest/download/version.json
+PAGES_UPDATE_MANIFEST_URL=https://github.com/<owner>/<repo>/releases/latest/download/version.json
 ```
 
 This is **baked into the APK at build time**, and an empty value disables the
@@ -238,7 +238,7 @@ To cut a release:
 1. Bump `version` in `package.json` and commit (`versionCode` is the git commit
    count, so it must move forward — Android refuses a lower one).
 2. Tag `v<version>` and publish a GitHub Release.
-3. Attach the signed APK named exactly `bookish-<version>.apk`.
+3. Attach the signed APK named exactly `pages-<version>.apk`.
 
 `.github/workflows/publish-version-manifest.yml` then generates `version.json`
 and attaches it to that release. It fails loudly if the tag disagrees with
@@ -259,7 +259,7 @@ To add a web update to a release, after building the APK from the release commit
 npm run release:web
 ```
 
-and attach both outputs, `release/bookish-web-<version>.zip` and `.json`, to the
+and attach both outputs, `release/pages-web-<version>.zip` and `.json`, to the
 release next to the APK **before publishing it** (or re-run the workflow from the
 Actions tab afterwards). The workflow verifies them and adds them to
 `version.json`; a release without them simply stays APK-only.
@@ -279,7 +279,7 @@ How it stays safe:
 Optional build number override:
 
 ```env
-BOOKISH_BUILD_NUMBER=123
+PAGES_BUILD_NUMBER=123
 ```
 
 ### 4. Start the development server

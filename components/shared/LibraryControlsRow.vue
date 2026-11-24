@@ -71,8 +71,8 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import {
   FORMAT_FILTER_CHOICES,
-  useBookishSettings,
-} from '~/composables/useBookishSettings';
+  usePagesSettings,
+} from '~/composables/usePagesSettings';
 
 const props = defineProps({
   status: {
@@ -118,7 +118,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:status', 'update:format', 'update:view', 'update:values']);
 
-const { settings } = useBookishSettings();
+const { settings } = usePagesSettings();
 
 const readingStatuses = ['Unread', 'Reading', 'Read'];
 const filterOpen = ref(false);

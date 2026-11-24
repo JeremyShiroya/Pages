@@ -2,12 +2,14 @@
   <div
     :ref="setReaderPage"
     class="reader-mobile-page"
-    :class="[readerTheme, {
+    :class="[pageTheme, {
       sepia: prefs.background === 'sepia',
+      paper: prefs.background === 'paper',
+      night: prefs.background === 'night',
       'listen-blur': readerMode === 'listen' && listenBlurEnabled,
     }]"
     :style="readerStyleVars"
-    :data-system-bar-icons="pageSyncOpen ? 'light' : (pageSyncWorking || pageSyncError ? 'dark' : readerMode === 'listen' && listenBlurEnabled ? 'light' : (readerTheme === 'dark' ? 'light' : 'dark'))"
+    :data-system-bar-icons="pageSyncOpen ? 'light' : (pageSyncWorking || pageSyncError ? 'dark' : readerMode === 'listen' && listenBlurEnabled ? 'light' : (pageTheme === 'dark' ? 'light' : 'dark'))"
     :data-system-bar-color="pageSyncOpen || (readerMode === 'listen' && listenBlurEnabled) ? 'transparent' : undefined"
   >
     <header v-show="!chromeHidden" class="reader-mobile-topbar">
@@ -45,10 +47,11 @@
         <button
           type="button"
           class="reader-nav-btn"
-          aria-label="Read settings"
-          @click="openReadSettings"
+          aria-label="Display settings"
+          :aria-expanded="displayOpen"
+          @click="displayOpen = true"
         >
-          <i class="ri-settings-3-line"></i>
+          <i class="ri-font-size-2"></i>
         </button>
       </div>
       <div v-else class="reader-top-actions">
@@ -455,6 +458,24 @@
 
 
 
+    <!-- Brightness: a dimming layer over the whole reader, never touchable. -->
+    <div
+      v-if="readerMode === 'read' && prefs.brightness < 100"
+      class="reader-dim-layer"
+      aria-hidden="true"
+      :style="{ opacity: ((100 - prefs.brightness) / 100) * 0.8 }"
+    ></div>
+
+    <!-- Display settings: a sheet over the page, so every change shows on the
+         book itself. Drag it up for the fine-tuning controls. -->
+    <ReaderDisplaySheet
+      :open="displayOpen"
+      :theme="pageTheme"
+      :is-pdf-document="isPdfDocument"
+      :pdf-reflow-available="pdfReflowAvailable"
+      @close="displayOpen = false"
+    />
+
     <!-- Narrator picker (opened from the Listen controls) -->
     <Teleport to="body">
       <div v-if="narratorOpen" class="reader-media-layer" :class="{ 'tablet-narrator-layer': tabletMode }">
@@ -616,7 +637,7 @@ import SkeletonLoader from "~/components/shared/SkeletonLoader.vue";
 import { formatDuration, useTTS } from "~/composables/useTTS";
 import { estimatedListenTimeline, scopedListenProgress } from "~/composables/useListenProgress";
 import { isNativeCapacitorPlatform } from "~/composables/useNativePlatform";
-import { useBookishSettings } from "~/composables/useBookishSettings";
+import { usePagesSettings } from "~/composables/usePagesSettings";
 import { wrapSectionHtml, collectChunkSpans } from "~/composables/useChunkSpans";
 import {
   PDF_ZOOM_MAX,
@@ -652,6 +673,7 @@ import {
 } from "~/composables/useAnnotations";
 import ReaderFigureViewer from "./ReaderFigureViewer.vue";
 import ReaderPagedEpub from "./ReaderPagedEpub.vue";
+import ReaderDisplaySheet from "./ReaderDisplaySheet.vue";
 import ReaderNoteEditor from "./ReaderNoteEditor.vue";
 import ReaderSelectionMenu from "./ReaderSelectionMenu.vue";
 
@@ -832,7 +854,17 @@ const usePagedReader = computed(() => !props.isPdfBook && prefs.value.readingMod
 const isPdfDocument = computed(() => String(props.book?.format || "").toLowerCase() === "pdf");
 const layoutHash = computed(() => `${readerPrefsLayoutHash(prefs.value)}|${prefs.value.pdfViewMode}|${props.sectionCounts.join(",")}`);
 
+// The page colour a reader picked wins over the app theme: Night is dark even
+// in a light app, Paper and Sepia are light even in a dark one.
+const pageTheme = computed(() => {
+  if (prefs.value.background === "night") return "dark";
+  if (prefs.value.background === "paper" || prefs.value.background === "sepia") return "light";
+  return props.readerTheme;
+});
+
 const readerStyleVars = computed(() => ({
+  "--mr-margin": `${prefs.value.pageMargin}px`,
+  "--mr-letter-spacing": `${(2 + prefs.value.letterSpacing) / 1000}em`,
   "--mr-font-size": `${prefs.value.fontSize}px`,
   "--mr-font-family": readerFontStack(prefs.value.fontFamily),
   "--mr-font-weight": String(prefs.value.fontWeight),
@@ -888,6 +920,10 @@ const measureStyle = computed(() => ({
   columnWidth: `${pageGeometry.value.width}px`,
   columnGap: `${pageGeometry.value.gap}px`,
 }));
+
+// Margins change the text width, so the page geometry (and with it the page
+// map, keyed on layoutHash) has to be measured again.
+watch(() => prefs.value.pageMargin, () => nextTick(() => updatePageGeometry()));
 
 const updatePageGeometry = () => {
   const host = measureHostRef.value;
@@ -1418,12 +1454,14 @@ const playFromHere = () => {
 
 const READER_MODE_KEY = "bookish:reader-mode";
 
-const { settings: appSettings } = useBookishSettings();
+const { settings: appSettings } = usePagesSettings();
 const router = useRouter();
-const openReadSettings = () => router.push(`/read-settings/${encodeURIComponent(String(props.book.id))}?format=${isPdfDocument.value ? "pdf" : "epub"}&reflow=${props.pdfReflowAvailable ? "1" : "0"}`);
+// Display settings open as a sheet over the reader (not a separate page), so
+// the effect of each change is visible on the page behind it.
+const displayOpen = ref(false);
 
 const openListenSettings = () => router.push(`/listen-settings/${encodeURIComponent(String(props.book.id))}`);
-const listenSummaryMode = ref("remaining");
+const listenSummaryMode = ref("listened");
 const listenBackSeconds = computed(() => appSettings.value.listenBackSeconds);
 const listenForwardSeconds = computed(() => appSettings.value.listenForwardSeconds);
 const { addToast } = useToast();
@@ -1502,7 +1540,7 @@ const scheduleChromeAutoHide = () => {
     // still using it.
     if (readerMode.value !== "read") return;
     if (selectionMenu.value.visible || noteEditor.value.visible) return;
-    if (tocModalOpen.value || narratorOpen.value) return;
+    if (tocModalOpen.value || narratorOpen.value || displayOpen.value) return;
     if (resumeChoice.value.visible) return;
     chromeHidden.value = true;
   }, CHROME_AUTOHIDE_MS);
@@ -2648,8 +2686,34 @@ onUnmounted(() => {
    one exception: it is scroll runway, not a gap, so the last lines of the book
    can still be scrolled clear of the dock. */
 .reader-mobile-content {
-  padding: calc(env(safe-area-inset-top) + 10px) 20px
+  padding: calc(env(safe-area-inset-top) + 10px) var(--mr-margin, 20px)
     calc(env(safe-area-inset-bottom) + 96px);
+}
+
+/* Brightness dimmer: above the page and its chrome, below the sheets. */
+.reader-dim-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  background: #000;
+  pointer-events: none;
+  transition: opacity 0.12s linear;
+}
+
+/* Paper: a soft warm white. Night: a deep blue-black that stays dark even in
+   the light app theme. Declared after .dark so a pinned colour wins. */
+.reader-mobile-page.paper {
+  --mobile-reader-bg: #f7f2e8;
+  --mobile-reader-text: #2b2620;
+  --mobile-reader-muted: #8b8172;
+  --mobile-reader-surface: #fffaf0;
+}
+
+.reader-mobile-page.night {
+  --mobile-reader-bg: #14161c;
+  --mobile-reader-text: #d9d6cf;
+  --mobile-reader-muted: #8c8a86;
+  --mobile-reader-surface: #1d2028;
 }
 
 /* ── Listen mode ──────────────────────────────────────────────────────────
@@ -3171,117 +3235,6 @@ onUnmounted(() => {
   .listen-sentence-leave-active { transition: none; }
 }
 
-/* ── Display settings sheet ──────────────────────────────────────────────── */
-
-.reader-display-sheet {
-  max-height: 78vh;
-  overflow-y: auto;
-  text-align: left;
-}
-
-.reader-display-sheet h2 {
-  text-align: center;
-}
-
-.display-row {
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
-  min-height: 44px;
-  padding: 4px 0;
-}
-
-.display-label {
-  color: var(--sheet-control-text);
-  font-size: 12.5px;
-  font-weight: 600;
-}
-
-.seg-group {
-  display: flex;
-  gap: 4px;
-  padding: 3px;
-  border-radius: 9px;
-  background: var(--sheet-list-bg);
-}
-
-.seg-btn {
-  flex: 1;
-  min-height: 32px;
-  padding: 0 6px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--sheet-text);
-  cursor: pointer;
-  font-size: 12.5px;
-  white-space: nowrap;
-}
-
-.seg-btn.active {
-  background: var(--sheet-option-active-bg);
-  color: var(--color-brand-primary);
-  font-weight: 600;
-}
-
-.seg-btn:disabled {
-  cursor: default;
-  opacity: 0.4;
-}
-
-/* Explains a disabled control rather than leaving it looking broken. */
-.display-note {
-  margin: -2px 0 10px;
-  color: var(--sheet-muted, var(--color-text-muted));
-  font-size: 11.5px;
-  line-height: 1.4;
-}
-
-.seg-sepia.active {
-  background: #ecdfc8;
-  color: #43331f;
-}
-
-.size-stepper {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
-  align-items: center;
-  padding: 3px;
-  border-radius: 9px;
-  background: var(--sheet-list-bg);
-  text-align: center;
-}
-
-.size-stepper button {
-  min-height: 32px;
-  border: 0;
-  border-radius: 7px;
-  background: var(--sheet-option-active-bg);
-  color: var(--sheet-text);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.size-stepper span {
-  color: var(--sheet-text);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.size-stepper button:disabled {
-  cursor: default;
-  opacity: 0.4;
-}
-
-.display-pdf-note {
-  margin: 0.5rem 0 1rem;
-  color: var(--sheet-control-text);
-  font-size: 13.5px;
-  text-align: center;
-}
-
 /* Offscreen page-map measurer: participates in layout (visibility, not
    display, keeps real geometry) but is invisible and untouchable. */
 .page-map-measurer {
@@ -3367,7 +3320,7 @@ onUnmounted(() => {
      `font-weight: 400 !important` on p/div/span app-wide. */
   font-weight: var(--mr-font-weight, 400) !important;
   line-height: var(--mr-line-height, 1.62);
-  letter-spacing: 0.002em;
+  letter-spacing: var(--mr-letter-spacing, 0.002em);
   text-align: var(--mr-text-align, justify);
   text-justify: inter-word;
   hyphens: auto;

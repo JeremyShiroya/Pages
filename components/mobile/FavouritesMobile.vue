@@ -91,7 +91,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useBooks } from "~/composables/useBooks";
-import { useBookishSettings } from '~/composables/useBookishSettings';
+import { usePagesSettings } from '~/composables/usePagesSettings';
 import { useLibraryFilters } from '~/composables/useLibraryFilters';
 import { useToast } from '~/composables/useToast';
 import { useTTS } from '~/composables/useTTS';
@@ -106,7 +106,7 @@ import MobileSkeleton from './MobileSkeleton.vue';
 import MobileTopNav from './MobileTopNav.vue';
 
 const { favourites, toggleFavourite, deleteBook, hideBook, loading, initialized } = useBooks();
-const { settings, updateSettings } = useBookishSettings();
+const { settings, updateSettings } = usePagesSettings();
 const { addToast } = useToast();
 const favouritesLayout = computed(() => settings.value.favouritesCardLayout || 'list');
 const favouritesBackground = computed(() => settings.value.favouritesCardBackground || 'blur');

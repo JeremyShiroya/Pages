@@ -15,7 +15,7 @@ const SIG = 'A'.repeat(342) + '=='
 const web = (overrides = {}) => ({
   versionCode: 300,
   minNativeCode: 290,
-  url: 'https://github.com/o/r/releases/download/v1.4.0/bookish-web-1.4.0.zip',
+  url: 'https://github.com/o/r/releases/download/v1.4.0/pages-web-1.4.0.zip',
   sha256: 'a'.repeat(64),
   signature: SIG,
   size: 13_000_000,

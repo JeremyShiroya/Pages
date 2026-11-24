@@ -27,7 +27,7 @@
 <script setup>
 import { computed } from 'vue'
 import { getBookRating, RATING_SOURCE_LABELS } from '~/composables/useBookRating'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import RatingProviderIcon from './RatingProviderIcon.vue'
 
 const props = defineProps({
@@ -38,7 +38,7 @@ const props = defineProps({
   showEmpty: { type: Boolean, default: false },
 })
 
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const source = computed(() => props.source || settings.value.ratingSource)
 const sourceLabel = computed(() => RATING_SOURCE_LABELS[source.value] || 'Rating')
 const rating = computed(() => getBookRating(props.book, source.value, settings.value.personalRatingScale))

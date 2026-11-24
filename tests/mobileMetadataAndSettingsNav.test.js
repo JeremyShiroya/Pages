@@ -29,7 +29,7 @@ describe('mobile metadata modal and settings pages', () => {
     for (const file of ['components/mobile/AddBookMobile.vue', 'components/mobile/EditBookMobile.vue']) {
       const source = read(file)
       expect(source, file).toContain('MobileSettingsNav')
-      expect(source, file).toContain("import BookishSelect from '~/components/shared/BookishSelect.vue'")
+      expect(source, file).toContain("import PagesSelect from '~/components/shared/PagesSelect.vue'")
       expect(source, file).toContain('Reading Status')
     }
 

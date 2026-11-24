@@ -1,7 +1,7 @@
 import { IDBFactory } from 'fake-indexeddb'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useBookStorage } from './useBookStorage.js'
-import { writeBookishSettings } from './useBookishSettings.js'
+import { writePagesSettings } from './usePagesSettings.js'
 import { useLibraryBackup } from './useLibraryBackup.js'
 import { useLibraryStore } from './useLibraryStore.js'
 import { writeStoredTtsSession } from './useTTS.js'
@@ -18,14 +18,14 @@ beforeEach(() => {
 })
 
 describe('useLibraryBackup', () => {
-  it('exports, wipes, and imports the full local Bookish data set', async () => {
+  it('exports, wipes, and imports the full local Pages data set', async () => {
     const library = useLibraryStore()
     const storage = useBookStorage()
     const backup = useLibraryBackup()
 
     const book = await library.addBook({
       title: 'Portable Book',
-      author: 'Bookish',
+      author: 'Pages',
       progress: 42,
       status: 'Reading',
     })
@@ -41,7 +41,7 @@ describe('useLibraryBackup', () => {
       source: new TextEncoder().encode('pdf bytes').buffer,
       format: 'pdf',
     })
-    writeBookishSettings({ readerTheme: 'dark', libraryItemsPerPage: 50 })
+    writePagesSettings({ readerTheme: 'dark', libraryItemsPerPage: 50 })
     writeStoredTtsSession({
       bookId: book.id,
       chunkIdx: 7,
@@ -52,20 +52,20 @@ describe('useLibraryBackup', () => {
       currentChunk: 'Hello',
     })
 
-    const exported = await backup.exportBookishData()
+    const exported = await backup.exportPagesData()
     expect(exported.indexedDB['bookish-library'].books).toHaveLength(1)
     expect(exported.indexedDB['bookish-library'].collections).toHaveLength(1)
     expect(exported.indexedDB['bookish-library'].profiles).toHaveLength(1)
     expect(exported.indexedDB['bookish-storage']['book-content']).toHaveLength(1)
     expect(exported.indexedDB['bookish-storage']['book-pdf-source']).toHaveLength(1)
 
-    await backup.wipeBookishData()
+    await backup.wipePagesData()
     expect(await library.getBooks()).toEqual([])
     expect(await library.getCollections()).toEqual([])
     expect(await library.getProfile()).toMatchObject({ displayName: 'Reader' })
     expect(await storage.getBookContent(book.id)).toBeNull()
 
-    await backup.importBookishData(exported)
+    await backup.importPagesData(exported)
     const restoredBooks = await library.getBooks()
     const restoredCollections = await library.getCollections()
     const restoredProfile = await library.getProfile()

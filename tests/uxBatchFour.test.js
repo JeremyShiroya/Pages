@@ -70,7 +70,7 @@ describe('system bar icons follow the theme', () => {
   })
 
   test('the theme switch is what calls it', () => {
-    const settings = read('composables/useBookishSettings.js')
+    const settings = read('composables/usePagesSettings.js')
     expect(settings).toContain('syncSystemBarAppearance')
     // Called from the single place the theme is applied, with dark = dark theme.
     expect(settings).toMatch(/syncSystemBarAppearance\(normalizedTheme === 'dark'\)/)

@@ -6,19 +6,19 @@
 #
 #   https://github.com/<owner>/<repo>/releases/latest/download/version.json
 #
-# Set that as BOOKISH_UPDATE_MANIFEST_URL when building the APK. It is baked in
+# Set that as PAGES_UPDATE_MANIFEST_URL when building the APK. It is baked in
 # at build time (nuxt.config.ts runtimeConfig.public.updateManifestUrl), and an
 # empty value disables the update check completely — which is why a build made
 # without it never prompts, however many releases are published afterwards.
 #
-# Silent web updates: when the release also carries bookish-web-<version>.zip
+# Silent web updates: when the release also carries pages-web-<version>.zip
 # and .json (from `npm run release:web`), they are verified here and added to
 # the manifest as `web`. Phones whose APK already has the native code that web
 # build needs switch to it silently on next launch; others get the APK prompt.
 # A release without them behaves exactly as before (APK prompt only).
 #
 # This workflow publishes the MANIFEST only; it does not build or sign the APK.
-# Attach the APK to the release yourself (named bookish-<version>.apk), and the
+# Attach the APK to the release yourself (named pages-<version>.apk), and the
 # manifest will be generated to point at it. The job fails loudly rather than
 # publishing a manifest whose download url would 404.
 
@@ -90,7 +90,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          EXPECTED="bookish-${VERSION}.apk"
+          EXPECTED="pages-${VERSION}.apk"
           FOUND="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" \
             --json assets --jq ".assets[] | select(.name == \"$EXPECTED\") | .name")"
           if [ -z "$FOUND" ]; then
@@ -118,8 +118,8 @@ jobs:
           CODE: ${{ steps.version.outputs.code }}
         run: |
           set -euo pipefail
-          ZIP="bookish-web-${VERSION}.zip"
-          META="bookish-web-${VERSION}.json"
+          ZIP="pages-web-${VERSION}.zip"
+          META="pages-web-${VERSION}.json"
           NAMES="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')"
           if ! grep -qxF "$ZIP" <<<"$NAMES" || ! grep -qxF "$META" <<<"$NAMES"; then
             echo "No web bundle on $TAG - publishing an APK-only manifest."
@@ -179,5 +179,5 @@ jobs:
             echo "- version: \`${{ steps.version.outputs.version }}\` (versionCode \`${{ steps.version.outputs.code }}\`)"
             echo "- manifest: https://github.com/$GITHUB_REPOSITORY/releases/latest/download/version.json"
             echo
-            echo "Devices running a build with \`BOOKISH_UPDATE_MANIFEST_URL\` set to that url will offer this release."
+            echo "Devices running a build with \`PAGES_UPDATE_MANIFEST_URL\` set to that url will offer this release."
           } >> "$GITHUB_STEP_SUMMARY"

@@ -41,7 +41,7 @@ function compact(value: unknown) {
 }
 
 function resolveConfig(env: Record<string, string | undefined>): AiProviderConfig | null {
-  const requested = compact(env.BOOKISH_AI_PROVIDER).toLowerCase()
+  const requested = compact(env.PAGES_AI_PROVIDER || env.BOOKISH_AI_PROVIDER).toLowerCase()
   if (requested === 'off' || requested === 'none' || requested === 'false') return null
 
   const geminiKey = env.GEMINI_API_KEY || env.GOOGLE_AI_API_KEY

@@ -285,7 +285,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="status">Reading Status</label>
-              <BookishSelect
+              <PagesSelect
                 input-id="status"
                 v-model="editBook.status"
                 :options="['Unread', 'Reading', 'Read']"
@@ -335,12 +335,12 @@ import { propagateSeriesTotal } from '~/composables/useSeriesProgress'
 import { hasManualSeriesDecisionChanged, protectManualSeriesDecision } from '~/composables/seriesMutationGuard'
 import { useCoverImageCache } from '~/composables/useCoverImageCache'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
-import BookishSelect from './BookishSelect.vue'
+import PagesSelect from './PagesSelect.vue'
 import CoverImageModal from './CoverImageModal.vue'
 import GoodreadsRatingDisplay from './GoodreadsRatingDisplay.vue'
 import BookRatingDisplay from './BookRatingDisplay.vue'
 import PersonalRatingInput from './PersonalRatingInput.vue'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import MultiStepLoader from './MultiStepLoader.vue'
 import DocumentTypePicker from './DocumentTypePicker.vue'
 import SeriesMembershipPicker from './SeriesMembershipPicker.vue'
@@ -360,7 +360,7 @@ const { fetchBookById, updateBook, books } = useBooks()
 const { addToast } = useToast()
 const { cacheCoverImage } = useCoverImageCache()
 const { apiUrl } = useApiEndpoint()
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 
 const editBook = ref({
   title: '',

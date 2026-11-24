@@ -291,7 +291,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="status">Reading Status</label>
-            <BookishSelect
+            <PagesSelect
               input-id="status"
               v-model="newBook.status"
               :options="['Unread', 'Reading', 'Read']"
@@ -340,13 +340,13 @@ import { fetchCoverImageResults } from '~/composables/useCoverSearch'
 import { propagateSeriesTotal } from '~/composables/useSeriesProgress'
 import { useCoverImageCache } from '~/composables/useCoverImageCache'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
-import { useBookishSettings } from '~/composables/useBookishSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 import { withDocumentType } from '~/composables/useDocumentReview'
 import { collectDocumentEvidence, createIntelligenceSnapshot } from '~/composables/documentIntelligence'
 import { useDocumentIntelligenceStore } from '~/composables/useDocumentIntelligenceStore'
 import { runDocumentIntelligence } from '~/composables/useDocumentIntelligence'
-import { readBookishSettings } from '~/composables/useBookishSettings'
-import BookishSelect from '~/components/shared/BookishSelect.vue'
+import { readPagesSettings } from '~/composables/usePagesSettings'
+import PagesSelect from '~/components/shared/PagesSelect.vue'
 import CoverImageModal from '~/components/shared/CoverImageModal.vue'
 import GoodreadsRatingDisplay from '~/components/shared/GoodreadsRatingDisplay.vue'
 import BookRatingDisplay from '~/components/shared/BookRatingDisplay.vue'
@@ -362,7 +362,7 @@ const { addToast } = useToast()
 const { saveBookContent } = useBookStorage()
 const { cacheCoverImage } = useCoverImageCache()
 const { apiUrl } = useApiEndpoint()
-const { settings } = useBookishSettings()
+const { settings } = usePagesSettings()
 const extractedContent = ref(null)
 const extractedTocTitles = ref([])
 const extractedSource = ref(null)
@@ -880,7 +880,7 @@ const saveBook = async () => {
       }
     }
 
-    if (savedBook.format === 'pdf') void runDocumentIntelligence(savedBook.id, { searchEnabled: readBookishSettings().metadataAutoFill === true }).catch((error) => console.warn('[DocumentIntelligence] Analysis will retry', error));
+    if (savedBook.format === 'pdf') void runDocumentIntelligence(savedBook.id, { searchEnabled: readPagesSettings().metadataAutoFill === true }).catch((error) => console.warn('[DocumentIntelligence] Analysis will retry', error));
     addToast('Book added to library successfully', 'success');
     router.push('/books');
   } catch (error) {
