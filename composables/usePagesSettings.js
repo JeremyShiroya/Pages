@@ -233,20 +233,16 @@ export function normalizePagesSettings(value) {
     trackSplitting: source.trackSplitting === undefined
       ? DEFAULT_PAGES_SETTINGS.trackSplitting
       : source.trackSplitting === true,
-    appBackground: APP_BACKGROUND_OPTIONS.includes(source.appBackground)
-      ? source.appBackground
-      : DEFAULT_PAGES_SETTINGS.appBackground,
-    darkAppBackground: DARK_APP_BACKGROUND_OPTIONS.includes(source.darkAppBackground)
-      ? source.darkAppBackground
-      : DEFAULT_PAGES_SETTINGS.darkAppBackground,
-    mobileTopNavDisplay: MOBILE_TOP_NAV_DISPLAY_OPTIONS.includes(source.mobileTopNavDisplay)
-      ? source.mobileTopNavDisplay
-      : DEFAULT_PAGES_SETTINGS.mobileTopNavDisplay,
+    // The canvas colours, the top bar and the nav size are no longer choices in
+    // Preferences: every install uses Bright (light), Muted (dark), "Logo and
+    // title" and the compact bar, including ones that had picked otherwise.
+    appBackground: DEFAULT_PAGES_SETTINGS.appBackground,
+    darkAppBackground: DEFAULT_PAGES_SETTINGS.darkAppBackground,
+    mobileTopNavDisplay: DEFAULT_PAGES_SETTINGS.mobileTopNavDisplay,
     mobileNavStyle: MOBILE_NAV_STYLE_OPTIONS.includes(source.mobileNavStyle)
       ? source.mobileNavStyle
       : DEFAULT_PAGES_SETTINGS.mobileNavStyle,
-    mobileNavSize: MOBILE_NAV_SIZE_OPTIONS.includes(source.mobileNavSize)
-      ? source.mobileNavSize : DEFAULT_PAGES_SETTINGS.mobileNavSize,
+    mobileNavSize: DEFAULT_PAGES_SETTINGS.mobileNavSize,
     mobileNavOpacity: numberOrDefault(source.mobileNavOpacity, DEFAULT_PAGES_SETTINGS.mobileNavOpacity, 50, 100),
     mobileNavBlur: numberOrDefault(source.mobileNavBlur, DEFAULT_PAGES_SETTINGS.mobileNavBlur, 0, 30),
     mobileNavMaterial: MOBILE_NAV_MATERIAL_OPTIONS.includes(source.mobileNavMaterial)

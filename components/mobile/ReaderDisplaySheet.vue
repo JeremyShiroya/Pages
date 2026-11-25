@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
-    <Transition name="rds">
-      <div v-if="open" class="rds-layer" :class="theme">
+    <Transition name="rds" @after-enter="resyncSystemBars" @after-leave="resyncSystemBars">
+      <div v-if="open" class="rds-layer" :class="theme" data-system-bar-undimmed>
         <button type="button" class="rds-backdrop" aria-label="Close display settings" :style="{ opacity: backdropOpacity }" @click="close"></button>
 
         <section
@@ -100,7 +100,7 @@
               <!-- Quick tiles: font, size and brightness. -->
               <div class="rds-tiles">
                 <button type="button" class="rds-font-tile" @click="cycleFont">
-                  <span class="rds-font-glyph" :style="{ fontFamily: currentFontStack, fontWeight: prefs.fontWeight }">Aa</span>
+                  <span class="rds-font-glyph" :style="{ fontFamily: currentFontStack, '--rds-weight': prefs.fontWeight }">Aa</span>
                   <span class="rds-tile-title">{{ currentFontLabel }}</span>
                   <span class="rds-tile-hint">Tap to switch font</span>
                 </button>
@@ -200,7 +200,8 @@
                     type="button"
                     :class="{ active: prefs.fontWeight === weight.id }"
                     :aria-pressed="prefs.fontWeight === weight.id"
-                    :style="{ fontWeight: weight.id }"
+                    class="rds-weight-btn"
+                    :style="{ '--rds-weight': weight.id }"
                     @click="updatePrefs({ fontWeight: weight.id })"
                   >{{ weight.label }}</button>
                 </div>
@@ -302,7 +303,7 @@ const previewThemeClass = computed(() => `bg-${prefs.value.background}`)
 const previewStyle = computed(() => ({
   fontFamily: currentFontStack.value,
   fontSize: `${prefs.value.fontSize}px`,
-  fontWeight: prefs.value.fontWeight,
+  '--rds-weight': prefs.value.fontWeight,
   lineHeight: prefs.value.lineSpacing,
   textAlign: prefs.value.textAlign,
   letterSpacing: `${0.002 + prefs.value.letterSpacing / 1000}em`,
@@ -373,6 +374,12 @@ const backdropOpacity = computed(() => {
 })
 
 const close = () => emit('close')
+// The system bars take their colour from whatever is under them. While the sheet
+// is up that is the sheet, so once it has finished sliding in or out the bars
+// re-sample: otherwise the navigation bar keeps the sheet's colour over the page.
+const resyncSystemBars = () => {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('bookish:system-bars-change'))
+}
 const toggleSnap = () => {
   snap.value = snap.value === 'full' ? 'peek' : 'full'
   if (snap.value === 'peek') nextTick(() => { if (bodyRef.value) bodyRef.value.scrollTop = 0 })
@@ -556,6 +563,12 @@ onBeforeUnmount(() => {
 .rds-preview.bg-night { background: #14161c; color: #d9d6cf; }
 .rds-layer.dark .rds-preview.bg-default { background: #1d1b22; color: #e6e3ea; }
 .rds-preview p { margin: 0; hyphens: auto; }
+/* main.css forces `font-weight: 400 !important` on p/span/button app-wide, so
+   the sample and the weight buttons must out-rank it, or Thickness shows no
+   change here even though it reaches the book text. */
+.rds-preview p,
+.rds-font-glyph,
+.rds-weight-btn { font-weight: var(--rds-weight, 400) !important; }
 
 .rds-block { margin-bottom: 16px; }
 .rds-label { margin: 0 0 8px 2px; color: var(--rds-muted); font-size: 12px; font-weight: 600; }

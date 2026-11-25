@@ -11,6 +11,7 @@
     :style="readerStyleVars"
     :data-system-bar-icons="pageSyncOpen ? 'light' : (pageSyncWorking || pageSyncError ? 'dark' : readerMode === 'listen' && listenBlurEnabled ? 'light' : (pageTheme === 'dark' ? 'light' : 'dark'))"
     :data-system-bar-color="pageSyncOpen || (readerMode === 'listen' && listenBlurEnabled) ? 'transparent' : undefined"
+    :data-system-bar-dim="dimOpacity ? String(dimOpacity) : undefined"
   >
     <header v-show="!chromeHidden" class="reader-mobile-topbar">
       <button
@@ -56,7 +57,7 @@
       </div>
       <div v-else class="reader-top-actions">
         <button type="button" class="reader-nav-btn" aria-label="Listen settings" @click="openListenSettings">
-          <i class="ri-settings-3-line"></i>
+          <i class="ri-more-2-fill"></i>
         </button>
       </div>
     </header>
@@ -460,10 +461,10 @@
 
     <!-- Brightness: a dimming layer over the whole reader, never touchable. -->
     <div
-      v-if="readerMode === 'read' && prefs.brightness < 100"
+      v-if="dimOpacity"
       class="reader-dim-layer"
       aria-hidden="true"
-      :style="{ opacity: ((100 - prefs.brightness) / 100) * 0.8 }"
+      :style="{ opacity: dimOpacity }"
     ></div>
 
     <!-- Display settings: a sheet over the page, so every change shows on the
@@ -494,7 +495,15 @@
           aria-label="Choose narrator"
         >
           <div class="sheet-grabber"></div>
-          <h2>Narrator</h2>
+          <header class="narrator-head">
+            <div class="narrator-head-copy">
+              <h2>Narrator</h2>
+              <p>{{ activeNarratorName ? `Reading as ${activeNarratorName}` : 'Choose who reads to you' }}</p>
+            </div>
+            <button type="button" class="narrator-close" aria-label="Close narrator picker" @click="narratorOpen = false">
+              <i class="ri-close-line" aria-hidden="true"></i>
+            </button>
+          </header>
 
           <!-- One dropped fetch flips narration to the phone's own voices for
                the rest of the session, with no way back. This is the way back. -->
@@ -505,46 +514,59 @@
             :disabled="retryingOnlineVoices"
             @click="retryNaturalVoices"
           >
-            <i :class="retryingOnlineVoices ? 'ri-loader-4-line spin' : 'ri-refresh-line'"></i>
+            <i :class="retryingOnlineVoices ? 'ri-loader-4-line spin' : 'ri-wifi-line'"></i>
             {{ retryingOnlineVoices ? 'Checking Edge voices…' : 'Try Edge voices again' }}
           </button>
 
           <div class="voice-list" role="listbox" aria-label="Narrator voices">
-            <div v-for="voice in displayVoices" :key="voice.id" class="voice-row">
-              <button
-                type="button"
-                class="voice-option"
-                :class="{ active: voice.id === activeVoiceId, 'needs-download': needsDownload(voice.id) }"
-                role="option"
-                :aria-selected="voice.id === activeVoiceId"
-                @click="chooseNarrator(voice.id)"
-              >
-                <span class="voice-label">
-                  {{ voice.name }}
-                  <i v-if="featuredNarrators.has(voice.id)" class="ri-star-fill voice-star" aria-hidden="true"></i>
-                </span>
-                <i v-if="voice.id === activeVoiceId" class="ri-check-line"></i>
-              </button>
-              <!-- On-device narrators are not bundled with the app: each is a
-                   one-time download, started here. -->
-              <button
-                v-if="needsDownload(voice.id)"
-                type="button"
-                class="voice-download"
-                :disabled="!!localVoiceDownloading && localVoiceDownloading !== voice.id"
-                :aria-label="localVoiceDownloading === voice.id ? `Downloading ${voice.name}` : `Download ${voice.name} (${voiceDownloadSize(voice.id)} MB)`"
-                @click="startVoiceDownload(voice.id)"
-              >
-                <template v-if="localVoiceDownloading === voice.id">
-                  <i class="ri-loader-4-line spin" aria-hidden="true"></i>
-                  <span>{{ voiceDownloadPercent(voice.id) }}</span>
-                </template>
-                <template v-else>
-                  <i class="ri-download-2-line" aria-hidden="true"></i>
-                  <span>{{ voiceDownloadSize(voice.id) }} MB</span>
-                </template>
-              </button>
-            </div>
+            <section v-for="group in narratorGroups" :key="group.id" class="voice-group" :aria-label="group.label">
+              <p class="voice-group-title">{{ group.label }}</p>
+              <div v-for="voice in group.voices" :key="voice.id" class="voice-row" :class="{ active: voice.id === activeVoiceId }">
+                <button
+                  type="button"
+                  class="voice-option"
+                  :class="{ active: voice.id === activeVoiceId, 'needs-download': needsDownload(voice.id) }"
+                  role="option"
+                  :aria-selected="voice.id === activeVoiceId"
+                  @click="chooseNarrator(voice.id)"
+                >
+                  <span class="voice-avatar" :class="voicePortrait(voice.id) ? 'has-portrait' : `tone-${voiceTone(voice.id)}`" aria-hidden="true">
+                    <img v-if="voicePortrait(voice.id)" :src="voicePortrait(voice.id)" alt="" loading="lazy" decoding="async" />
+                    <template v-else>{{ voiceParts(voice.name).first.charAt(0) }}</template>
+                    <img v-if="voiceFlag(voice)" class="voice-flag" :src="`/images/Flags/thumbs/${voiceFlag(voice)}.webp`" alt="" />
+                  </span>
+                  <span class="voice-text">
+                    <span class="voice-label">
+                      {{ voiceParts(voice.name).first }}
+                      <i v-if="featuredNarrators.has(voice.id)" class="ri-verified-badge-fill voice-verified" aria-label="Recommended narrator"></i>
+                    </span>
+                    <span class="voice-meta">
+                      <span v-if="voiceFlag(voice)" class="sr-only">{{ FLAG_NAMES[voiceFlag(voice)] }} · </span>{{ voiceMeta(voice) }}
+                    </span>
+                  </span>
+                  <i v-if="voice.id === activeVoiceId" class="ri-check-line voice-check" aria-hidden="true"></i>
+                </button>
+                <!-- On-device narrators are not bundled with the app: each is a
+                     one-time download, started here. -->
+                <button
+                  v-if="needsDownload(voice.id)"
+                  type="button"
+                  class="voice-download"
+                  :disabled="!!localVoiceDownloading && localVoiceDownloading !== voice.id"
+                  :aria-label="localVoiceDownloading === voice.id ? `Downloading ${voice.name}` : `Download ${voice.name} (${voiceDownloadSize(voice.id)} MB)`"
+                  @click="startVoiceDownload(voice.id)"
+                >
+                  <template v-if="localVoiceDownloading === voice.id">
+                    <i class="ri-loader-4-line spin" aria-hidden="true"></i>
+                    <span>{{ voiceDownloadPercent(voice.id) }}</span>
+                  </template>
+                  <template v-else>
+                    <i class="ri-download-2-line" aria-hidden="true"></i>
+                    <span>{{ voiceDownloadSize(voice.id) }} MB</span>
+                  </template>
+                </button>
+              </div>
+            </section>
           </div>
         </section>
       </div>
@@ -862,6 +884,14 @@ const pageTheme = computed(() => {
   return props.readerTheme;
 });
 
+// Brightness below 100% is a black layer over the reader. The same opacity is
+// handed to the system-bar sync so the status and navigation bars dim with it.
+const dimOpacity = computed(() => (
+  readerMode.value === "read" && prefs.value.brightness < 100
+    ? Math.round(((100 - prefs.value.brightness) / 100) * 0.8 * 1000) / 1000
+    : 0
+));
+
 const readerStyleVars = computed(() => ({
   "--mr-margin": `${prefs.value.pageMargin}px`,
   "--mr-letter-spacing": `${(2 + prefs.value.letterSpacing) / 1000}em`,
@@ -1159,6 +1189,70 @@ watch(
 onUnmounted(() => clearTimeout(skeletonTimer));
 
 const featuredNarrators = new Set(['pocket:charles', 'kokoro:af_nicole']);
+
+// Narrator picker: the same voices, grouped by where they come from so it is
+// clear which work offline, which need a connection, and which are the phone's.
+const narratorGroups = computed(() => {
+  const local = [], online = [], device = [];
+  for (const voice of displayVoices.value) {
+    if (isLocalTtsVoice(voice.id)) local.push(voice);
+    else if (String(voice.id).startsWith("native:")) device.push(voice);
+    else online.push(voice);
+  }
+  return [
+    { id: "local", label: "On this device", voices: local },
+    { id: "online", label: "Online voices", voices: online },
+    { id: "device", label: "Phone voices", voices: device },
+  ].filter((group) => group.voices.length);
+});
+// "Liam (Canada)" → { first: "Liam", region: "Canada" }.
+const voiceParts = (name) => {
+  const match = /^(.*?)\s*\(([^)]+)\)\s*$/.exec(String(name || ""));
+  return match ? { first: match[1], region: match[2] } : { first: String(name || "Voice"), region: "" };
+};
+const voiceTone = (id) => {
+  let hash = 0;
+  for (const char of String(id)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return hash % 5;
+};
+// Portraits and nationality flags for the named narrators (public/images,
+// shrunk to thumbs/ for the 44px avatar). Phone voices keep a lettered avatar.
+const NARRATOR_PORTRAITS = Object.freeze({
+  "en-CA-LiamNeural": "liam", "en-US-EmmaNeural": "emma", "en-US-AvaNeural": "ava",
+  "en-US-BrianNeural": "brain", "en-US-AndrewNeural": "andrew", "en-GB-SoniaNeural": "sonia",
+  "en-GB-RyanNeural": "ryan", "en-AU-NatashaNeural": "natasha",
+  "pocket:charles": "charles", "kokoro:af_nicole": "nicole",
+});
+const NARRATOR_FLAGS = Object.freeze({ US: "us", UK: "uk", Canada: "ca", AU: "au" });
+const FLAG_NAMES = Object.freeze({ us: "United States", uk: "United Kingdom", ca: "Canada", au: "Australia" });
+// Each online narrator's character, word for word from the VoicePersonalities
+// tags in Microsoft's Edge read-aloud voice list (the same service that speaks
+// them). The on-device narrators (Charles: Kyutai Pocket TTS, from the VCTK
+// corpus; Nicole: Kokoro) have no published description; theirs were chosen
+// by the app's author.
+const NARRATOR_PERSONALITIES = Object.freeze({
+  "pocket:charles": ["Deep", "Mature"],
+  "kokoro:af_nicole": ["Calm", "Soothing"],
+  "en-CA-LiamNeural": ["Friendly", "Positive"],
+  "en-US-EmmaNeural": ["Cheerful", "Clear", "Conversational"],
+  "en-US-AvaNeural": ["Expressive", "Caring", "Pleasant", "Friendly"],
+  "en-US-BrianNeural": ["Approachable", "Casual", "Sincere"],
+  "en-US-AndrewNeural": ["Warm", "Confident", "Authentic", "Honest"],
+  "en-GB-SoniaNeural": ["Friendly", "Positive"],
+  "en-GB-RyanNeural": ["Friendly", "Positive"],
+  "en-AU-NatashaNeural": ["Friendly", "Positive"],
+});
+const voicePortrait = (id) => (NARRATOR_PORTRAITS[id] ? `/images/Narrators/thumbs/${NARRATOR_PORTRAITS[id]}.webp` : "");
+const voiceFlag = (voice) => NARRATOR_FLAGS[voiceParts(voice.name).region] || "";
+const voiceMeta = (voice) => {
+  if (isLocalTtsVoice(voice.id) && localVoiceDownloading.value === voice.id) return "Downloading…";
+  if (String(voice.id).startsWith("native:")) return voice.id === "native:-1" ? "Automatic · best match on this phone" : "Built into your phone";
+  return (NARRATOR_PERSONALITIES[voice.id] || []).join(" · ");
+};
+const activeNarratorName = computed(() => {
+  const voice = displayVoices.value.find((item) => item.id === activeVoiceId.value);
+  return voice ? voiceParts(voice.name).first : "";
+});
 
 // A local narrator needs its one-time download until the device confirms it is
 // installed. Before the first answer arrives the button stays hidden rather
@@ -3864,21 +3958,38 @@ onUnmounted(() => {
 /* Narrator picker (opened from the Listen controls) is a compact voice list. */
 .reader-narrator-sheet {
   min-height: 0;
+  max-width: 560px;
+  padding-inline: 14px;
 }
 
-.reader-narrator-sheet h2 {
-  margin: 0 0 14px;
+.narrator-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 0 4px 14px; text-align: left; }
+.narrator-head-copy { min-width: 0; }
+.reader-narrator-sheet .narrator-head h2 { margin: 0; color: var(--sheet-strong); font-size: 20px; }
+.narrator-head p { margin: 3px 0 0; color: var(--sheet-control-text); font-size: 13px; }
+.narrator-close {
+  display: grid;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sheet-control);
+  color: var(--sheet-text);
+  font-size: 18px;
+  cursor: pointer;
 }
 
 .reader-narrator-sheet .voice-list {
-  max-height: 46vh;
+  max-height: min(62vh, 520px);
 }
+.reader-narrator-sheet .retry-online-voices { margin-bottom: 14px; }
 
 .tablet-narrator-layer .reader-media-backdrop { background: transparent; }
 .tablet-narrator-layer .reader-narrator-sheet {
-  width: 280px;
+  width: 320px;
   min-height: 0;
-  max-height: 360px;
+  max-height: 460px;
   overflow-y: auto;
   padding: 16px;
   border: 1px solid var(--color-border-card);
@@ -3887,7 +3998,9 @@ onUnmounted(() => {
   text-align: left;
 }
 .tablet-narrator-layer .sheet-grabber { display: none; }
-.tablet-narrator-layer .reader-narrator-sheet h2 { margin-bottom: 8px; font-size: 15px; }
+.tablet-narrator-layer .reader-narrator-sheet .narrator-head h2 { font-size: 16px; }
+.tablet-narrator-layer .narrator-close { display: none; }
+.tablet-narrator-layer .reader-narrator-sheet .voice-list { max-height: none; }
 
 /* Table-of-contents sheet — a scrollable chapter list. */
 .reader-toc-sheet {
@@ -3975,62 +4088,123 @@ onUnmounted(() => {
 
 .voice-list {
   display: grid;
-  gap: 2px;
+  gap: 14px;
   max-height: 210px;
-  margin: 0 auto 16px;
-  padding: 6px;
+  margin: 0 auto 4px;
   overflow-y: auto;
-  width: min(100%, 320px);
-  border-radius: 10px;
-  background: var(--sheet-list-bg);
+  overscroll-behavior: contain;
+  width: 100%;
+  text-align: left;
 }
+
+.voice-group { display: grid; gap: 2px; padding: 6px; border-radius: 16px; background: var(--sheet-list-bg); }
+.voice-group-title {
+  margin: 4px 10px 6px;
+  color: var(--sheet-control-text);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.voice-row { display: flex; align-items: center; gap: 6px; padding-right: 6px; border-radius: 12px; transition: background 0.15s ease; }
+.voice-row.active { background: var(--sheet-option-active-bg); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08); }
 
 .voice-option {
   display: flex;
+  flex: 1;
+  min-width: 0;
   align-items: center;
-  justify-content: space-between;
-  min-height: 40px;
-  padding: 0 12px;
+  gap: 12px;
+  min-height: 58px;
+  padding: 8px 10px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 12px;
   background: transparent;
   color: var(--sheet-text);
   cursor: pointer;
-  font-size: 14px;
+  font: inherit;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
 }
+.voice-option:active { transform: scale(0.99); }
+.voice-option.needs-download .voice-avatar { filter: grayscale(0.6); opacity: 0.75; }
 
-.voice-option.active {
-  background: var(--sheet-option-active-bg);
-  color: var(--color-brand-primary);
-  font-weight: 600;
+.voice-avatar {
+  position: relative;
+  display: grid;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 17px;
 }
-
-.voice-option i {
-  font-size: 16px;
+.voice-avatar.has-portrait { background: var(--sheet-control); }
+.voice-avatar > img:not(.voice-flag) {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
+/* Nationality: a small flag disc tucked into the avatar's bottom-right. */
+.voice-flag {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 17px;
+  height: 17px;
+  border: 2px solid var(--sheet-list-bg);
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--sheet-list-bg);
+}
+.voice-row.active .voice-flag { border-color: var(--sheet-option-active-bg); }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.voice-avatar.tone-0 { background: linear-gradient(135deg, #7c6cf2, #5546d6); }
+.voice-avatar.tone-1 { background: linear-gradient(135deg, #f08a5d, #d9603b); }
+.voice-avatar.tone-2 { background: linear-gradient(135deg, #3fb68b, #23926b); }
+.voice-avatar.tone-3 { background: linear-gradient(135deg, #4d9de0, #2f78bf); }
+.voice-avatar.tone-4 { background: linear-gradient(135deg, #d36fa8, #b04c86); }
 
-.voice-row { display: flex; align-items: center; gap: 6px; }
-.voice-row .voice-option { flex: 1; min-width: 0; }
-.voice-option.needs-download { opacity: 0.72; }
+.voice-text { display: grid; flex: 1; min-width: 0; gap: 2px; }
+.voice-label { display: flex; align-items: center; gap: 8px; color: var(--sheet-strong); font-size: 15px; }
+.voice-label { gap: 5px; }
+.voice-verified { color: #1d9bf0; font-size: 16px; line-height: 1; }
+.voice-meta { overflow: hidden; color: var(--sheet-control-text); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+
+/* The chosen narrator: a plain check, no filled circle. */
+.voice-check { flex: none; color: var(--sheet-strong); font-size: 21px; }
+
+/* Download: a quiet outlined pill that sits with the sheet instead of a
+   brand-coloured button competing with the voices. */
 .voice-download {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex: none;
   min-height: 32px;
-  padding: 0 10px;
-  border: 0;
+  padding: 0 12px 0 10px;
+  border: 1px solid color-mix(in srgb, var(--sheet-text) 18%, transparent);
   border-radius: 999px;
   background: var(--sheet-option-active-bg);
-  color: var(--color-brand-primary);
+  color: var(--sheet-strong);
+  font: inherit;
   font-size: 12px;
-  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
+.voice-download:active { background: var(--sheet-control); }
 .voice-download:disabled { opacity: 0.45; cursor: default; }
-.voice-download i { font-size: 15px; }
-.voice-label { display: inline-flex; align-items: center; gap: 6px; }
-.voice-option .voice-star { color: #e7aa35; font-size: 14px; }
+.voice-download i { font-size: 15px; color: var(--sheet-control-text); }
 
 .media-buttons {
   display: flex;

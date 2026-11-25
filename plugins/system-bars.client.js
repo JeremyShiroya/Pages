@@ -21,13 +21,31 @@ const hasImageBackground = (style) => (
   style.backgroundImage && style.backgroundImage !== 'none'
 )
 
+// The reader's brightness control is a black layer over the page. It ignores
+// touches, so elementsFromPoint never returns it and a solid native scrim would
+// paint an undimmed strip above it. Pages that dim declare the layer's opacity
+// in data-system-bar-dim; surfaces that sit above the dimmer (the display
+// sheet) opt out with data-system-bar-undimmed.
+const dimAmount = () => {
+  const value = Number(document.querySelector('[data-system-bar-dim]')?.dataset.systemBarDim)
+  return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0
+}
+
+const dimmed = (color, element, amount) => {
+  if (!amount || element?.closest?.('[data-system-bar-undimmed]')) return color
+  const keep = 1 - amount
+  return { ...color, red: color.red * keep, green: color.green * keep, blue: color.blue * keep }
+}
+
 const surfaceAt = (x, y) => {
   let fallbackColor = null
+  const dim = dimAmount()
 
   for (const element of document.elementsFromPoint(x, y)) {
     if (!(element instanceof Element)) continue
     const style = getComputedStyle(element)
-    const color = parseCssColor(style.backgroundColor)
+    const raw = parseCssColor(style.backgroundColor)
+    const color = raw && dimmed(raw, element, dim)
 
     // A native solid scrim would flatten gradients and cover art. Keeping the
     // bar transparent lets the real page continue through the safe-area strip.
@@ -48,7 +66,8 @@ const surfaceAt = (x, y) => {
     parseCssColor(getComputedStyle(document.body).backgroundColor),
     parseCssColor(getComputedStyle(document.documentElement).backgroundColor),
   ]
-  const rootColor = documentColors.find((color) => color?.alpha > 0.02) || null
+  const found = documentColors.find((color) => color?.alpha > 0.02) || null
+  const rootColor = found && dimmed(found, null, dim)
   return {
     color: rootColor ? toAndroidColor(rootColor) : '#00000000',
     sample: rootColor,
@@ -107,12 +126,12 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const observePagePreference = () => {
     pageObserver?.disconnect()
-    const target = document.querySelector('[data-system-bar-icons], [data-system-bar-color]')
+    const target = document.querySelector('[data-system-bar-icons], [data-system-bar-color], [data-system-bar-dim]')
     if (!target) return
     pageObserver = new MutationObserver(scheduleSync)
     pageObserver.observe(target, {
       attributes: true,
-      attributeFilter: ['class', 'style', 'data-system-bar-icons', 'data-system-bar-color'],
+      attributeFilter: ['class', 'style', 'data-system-bar-icons', 'data-system-bar-color', 'data-system-bar-dim'],
     })
   }
 

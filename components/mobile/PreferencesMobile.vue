@@ -4,79 +4,9 @@
 
     <div class="preferences-body">
       <section class="pref-group">
-        <h2 class="pref-group-title">Appearance</h2>
-
-        <div class="pref-block">
-          <div class="pref-copy">
-            <span class="pref-label">Light mode</span>
-            <span class="pref-hint">Choose a bright white canvas or the original muted grey.</span>
-          </div>
-          <div class="option-grid" role="group" aria-label="Light mode background">
-            <button
-              v-for="opt in appBackgroundOptions"
-              :key="opt.value"
-              type="button"
-              class="option palette-option"
-              :class="{ active: settings.appBackground === opt.value }"
-              :aria-pressed="settings.appBackground === opt.value"
-              @click="chooseAppearance('light', 'appBackground', opt.value)"
-            >
-              <span class="preview palette-preview" :class="`palette-preview--${opt.preview}`" aria-hidden="true">
-                <span class="palette-sidebar">
-                  <i></i><i></i><i></i>
-                </span>
-                <span class="palette-content">
-                  <i class="palette-heading"></i>
-                  <span class="palette-cards"><i></i><i></i></span>
-                  <i class="palette-line"></i>
-                </span>
-              </span>
-              <span class="option-label">
-                {{ opt.label }}
-                <i v-if="settings.appBackground === opt.value" class="ri-check-line"></i>
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <div class="pref-block">
-          <div class="pref-copy">
-            <span class="pref-label">Dark mode</span>
-            <span class="pref-hint">Choose pure black or the current muted charcoal.</span>
-          </div>
-          <div class="option-grid" role="group" aria-label="Dark mode background">
-            <button
-              v-for="opt in darkAppBackgroundOptions"
-              :key="opt.value"
-              type="button"
-              class="option palette-option"
-              :class="{ active: settings.darkAppBackground === opt.value }"
-              :aria-pressed="settings.darkAppBackground === opt.value"
-              @click="chooseAppearance('dark', 'darkAppBackground', opt.value)"
-            >
-              <span class="preview palette-preview" :class="`palette-preview--${opt.preview}`" aria-hidden="true">
-                <span class="palette-sidebar">
-                  <i></i><i></i><i></i>
-                </span>
-                <span class="palette-content">
-                  <i class="palette-heading"></i>
-                  <span class="palette-cards"><i></i><i></i></span>
-                  <i class="palette-line"></i>
-                </span>
-              </span>
-              <span class="option-label">
-                {{ opt.label }}
-                <i v-if="settings.darkAppBackground === opt.value" class="ri-check-line"></i>
-              </span>
-            </button>
-          </div>
-        </div>
+        <h2 class="pref-group-title">Navigation</h2>
 
         <div class="navigation-links">
-          <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/top-navigation">
-            <span><strong>Top navigation</strong><small>Logo and title, or your avatar and greeting</small></span>
-            <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
-          </NuxtLink>
           <NuxtLink class="pref-destination nav-pref-destination" to="/settings/preferences/bottom-navigation">
             <span><strong>Bottom navigation</strong><small>Layout, frosted glass, selected tab, opacity and blur</small></span>
             <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
@@ -336,16 +266,13 @@
             <span class="pref-label">Book format</span>
             <span class="pref-hint">Which formats appear in your library.</span>
           </div>
-          <div class="segmented" role="group" aria-label="Book format filter">
-            <button
-              v-for="opt in formatFilterOptions"
-              :key="opt.value"
-              type="button"
-              class="segment"
-              :class="{ active: settings.formatFilter === opt.value }"
-              @click="set('formatFilter', opt.value)"
-            >{{ opt.label }}</button>
-          </div>
+          <PrefSelectMobile
+            :model-value="settings.formatFilter"
+            :options="formatFilterOptions"
+            label="Show in library"
+            icon="ri-filter-3-line"
+            @update:model-value="set('formatFilter', $event)"
+          />
         </div>
 
         <!-- And this one REMOVES: those books leave the library and the app
@@ -359,17 +286,14 @@
               device, so turning it back on re-imports them.
             </span>
           </div>
-          <div class="segmented" role="group" aria-label="Book formats Pages handles">
-            <button
-              v-for="opt in formatModeOptions"
-              :key="opt.value"
-              type="button"
-              class="segment"
-              :class="{ active: formatMode === opt.value }"
-              :disabled="applyingFormat"
-              @click="chooseFormatMode(opt.value)"
-            >{{ opt.label }}</button>
-          </div>
+          <PrefSelectMobile
+            :model-value="formatMode"
+            :options="formatModeOptions"
+            label="Formats Pages reads"
+            icon="ri-file-list-2-line"
+            :disabled="applyingFormat"
+            @update:model-value="chooseFormatMode"
+          />
         </div>
       </section>
     </div>
@@ -407,6 +331,7 @@ import { formatLabel, formatsRemovedBy, useFormatEnablement } from '~/composable
 import { useToast } from '~/composables/useToast'
 import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import MobileSettingsNav from './MobileSettingsNav.vue'
+import PrefSelectMobile from './PrefSelectMobile.vue'
 import BookActionsPreview from '../shared/previews/BookActionsPreview.vue'
 import BookRatingDisplay from '../shared/BookRatingDisplay.vue'
 import ReadingPreview from '../shared/previews/ReadingPreview.vue'
@@ -420,17 +345,8 @@ const { books, updateBook, fetchAllData } = useBooks()
 const ratingSync = useRatingSync()
 
 const set = (key, value) => updateSettings({ [key]: value })
-const chooseAppearance = (theme, key, value) => updateSettings({ readerTheme: theme, [key]: value })
-
-const appBackgroundOptions = [
-  { value: 'white', label: 'Bright', preview: 'bright' },
-  { value: 'muted', label: 'Muted', preview: 'light-muted' },
-]
-
-const darkAppBackgroundOptions = [
-  { value: 'dark', label: 'Dark', preview: 'dark' },
-  { value: 'muted', label: 'Muted', preview: 'dark-muted' },
-]
+// Light mode is always Bright and dark mode always Muted (see
+// normalizePagesSettings), so the canvas choices are gone from this page.
 
 const bookActionDisplayOptions = [
   { value: 'minimal', label: 'Minimal' },
@@ -493,17 +409,17 @@ const toggleOptions = [
 ]
 // "Book format" — an app-wide HIDE. Only offers formats the app still handles.
 const formatFilterOptions = computed(() => [
-  { value: 'all', label: 'All' },
-  ...enabledFormats.value.map((format) => ({ value: format, label: formatLabel(format) })),
+  { value: 'all', label: 'All formats', hint: 'Every book Pages reads' },
+  ...enabledFormats.value.map((format) => ({ value: format, label: formatLabel(format), hint: `Only ${formatLabel(format)} books` })),
 ])
 
 // "Formats Pages reads" — the app-level choice. See useFormatEnablement:
 // turning one off purges its books and stops the device scanner detecting the
 // extension. Not a filter, which is why it is its own row.
 const formatModeOptions = [
-  { value: 'both', label: 'All' },
-  { value: 'pdf', label: 'PDF' },
-  { value: 'epub', label: 'EPUB' },
+  { value: 'both', label: 'PDF and EPUB', hint: 'Read both formats' },
+  { value: 'pdf', label: 'PDF only', hint: 'Stop detecting EPUB' },
+  { value: 'epub', label: 'EPUB only', hint: 'Stop detecting PDF' },
 ]
 
 const { enabledFormats, formatMode, countAffected, applyFormatMode } = useFormatEnablement()
@@ -573,58 +489,66 @@ const confirmFormatMode = async () => {
 
 .preferences-body {
   display: grid;
-  gap: 32px;
-  padding: 28px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
+  gap: calc(var(--settings-section-gap) + var(--settings-header-size) + var(--settings-header-gap));
+  padding: calc(var(--settings-header-size) + var(--settings-header-gap) + 18px) var(--settings-gutter) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
 }
 
+/* Rows sit flush in the card with dividers between them, as in the main
+   Settings list; the section name sits above the card in line with the text. */
 .pref-group {
   position: relative;
   display: grid;
-  gap: 14px;
-  padding: 14px;
+  padding: 0 var(--settings-row-inset);
   border: 0;
-  border-radius: 16px;
+  border-radius: var(--settings-radius);
   background: var(--color-settings-group);
 }
 
 .pref-group-title {
   position: absolute;
-  bottom: calc(100% + 9px);
-  left: 4px;
+  bottom: calc(100% + var(--settings-header-gap));
+  left: var(--settings-row-inset);
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: 0.07em;
+  font-size: var(--settings-header-size);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
 /* Block = a label + a row of visual option cards. */
 .pref-block {
   display: grid;
-  gap: 10px;
+  gap: 12px;
+  padding: 16px 0 18px;
 }
 
-.pref-block + .pref-block,
-.pref-row + .pref-row {
-  padding-top: 14px;
+.pref-group > * + * {
   border-top: 1px solid var(--color-border-subtle);
+}
+
+.pref-group > .pref-group-title + * {
+  border-top: 0;
+}
+
+.pref-group > .rating-sync {
+  margin-bottom: 14px;
+  border-top: 0;
 }
 
 .pref-copy {
   display: grid;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
 .pref-label {
   color: var(--color-text-primary);
-  font-size: 15.5px;
+  font-size: var(--settings-label-size);
 }
 
 .pref-hint {
   color: var(--color-text-muted);
-  font-size: 12.5px;
+  font-size: var(--settings-caption-size);
   line-height: 1.35;
 }
 
@@ -635,8 +559,10 @@ const confirmFormatMode = async () => {
 }
 
 .pref-destination { display: grid; grid-template-columns: 40px minmax(0, 1fr) 20px; align-items: center; gap: 12px; min-height: 64px; padding: 10px; border-radius: 16px; background: var(--color-surface-card); color: var(--color-text-primary); text-decoration: none; }
-.navigation-links { display: grid; gap: 6px; }
-.nav-pref-destination { border: 1px solid var(--color-border-card); border-radius: 14px; background: var(--color-surface-secondary); grid-template-columns: minmax(0, 1fr) 20px; padding: 12px 16px; }
+.navigation-links { display: grid; }
+.nav-pref-destination { min-height: var(--settings-row-min); border: 0; border-radius: 0; background: transparent; grid-template-columns: minmax(0, 1fr) 20px; padding: 14px 0; }
+.nav-pref-destination strong { color: var(--color-text-primary); font-size: var(--settings-label-size); }
+.nav-pref-destination small { font-size: var(--settings-caption-size); }
 .pref-destination-icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 12px; background: var(--color-brand-primary-faint); color: var(--color-brand-primary); font-size: 20px; }
 .pref-destination strong, .pref-destination small { display: block; }
 .pref-destination small { margin-top: 3px; color: var(--color-text-muted); font-size: 12px; line-height: 1.3; }
@@ -962,10 +888,11 @@ const confirmFormatMode = async () => {
 /* Simple rows for toggles / format. */
 .pref-row {
   display: flex;
+  min-height: var(--settings-row-min);
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 0 2px;
+  padding: 14px 0;
 }
 
 .segmented {
@@ -998,8 +925,8 @@ const confirmFormatMode = async () => {
 .pref-toggle {
   position: relative;
   flex: 0 0 auto;
-  width: 46px;
-  height: 27px;
+  width: var(--settings-switch-width);
+  height: var(--settings-switch-height);
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -1014,10 +941,10 @@ const confirmFormatMode = async () => {
 
 .pref-toggle .knob {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 21px;
-  height: 21px;
+  top: 2px;
+  left: 2px;
+  width: var(--settings-switch-knob);
+  height: var(--settings-switch-knob);
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 2px 5px rgba(15, 23, 42, 0.25);
@@ -1025,7 +952,7 @@ const confirmFormatMode = async () => {
 }
 
 .pref-toggle.on .knob {
-  transform: translateX(19px);
+  transform: translateX(calc(var(--settings-switch-width) - var(--settings-switch-knob) - 4px));
 }
 
 .format-confirm-overlay {

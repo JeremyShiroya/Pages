@@ -284,8 +284,8 @@ watch(() => prefs.value.lastBackupAt, () => loadVersions())
 </script>
 
 <style scoped>
-.backup-page { display: grid; gap: 28px; max-width: 760px; margin: 0 auto; padding: 20px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 32px); font-family: var(--mobile-font-family); color: var(--color-text-primary); }
-.backup-hero { display: grid; gap: 16px; padding: 20px 18px; border-radius: 20px; background: var(--color-settings-group); }
+.backup-page { display: grid; gap: var(--settings-section-gap); max-width: 760px; margin: 0 auto; padding: 18px var(--settings-gutter) calc(var(--mobile-bottom-nav-height, 72px) + 32px); font-family: var(--mobile-font-family); color: var(--color-text-primary); }
+.backup-hero { display: grid; gap: 16px; padding: 20px var(--settings-row-inset); border-radius: var(--settings-radius); background: var(--color-settings-group); }
 .backup-hero.empty { justify-items: center; text-align: center; }
 .backup-hero.empty h2 { margin: 0; font-size: 24px; letter-spacing: -0.02em; }
 .backup-hero.empty p { margin: 0; color: var(--color-text-muted); font-size: 14px; line-height: 1.5; }
@@ -295,21 +295,21 @@ watch(() => prefs.value.lastBackupAt, () => loadVersions())
 .status-icon { display: grid; flex: none; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--color-brand-primary-soft); color: var(--color-brand-primary); font-size: 26px; }
 .tone-ok .status-icon { background: rgba(22, 163, 74, 0.12); color: #16a34a; }
 .tone-error .status-icon { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
-.eyebrow, .section h2 { margin: 0 0 10px 3px; color: var(--color-text-muted); font-size: 12px; letter-spacing: .07em; text-transform: uppercase; }
+.eyebrow, .section h2 { margin: 0 0 var(--settings-header-gap) var(--settings-row-inset); color: var(--color-text-muted); font-size: var(--settings-header-size); letter-spacing: .02em; text-transform: uppercase; }
 .hero-copy .eyebrow { margin: 0 0 2px; }
 .muted { margin: 0; color: var(--color-text-muted); font-size: 13px; line-height: 1.45; }
 .muted.small { display: flex; gap: 6px; font-size: 12.5px; }
 .section { min-width: 0; }
-.surface { display: grid; gap: 16px; padding: 18px; border-radius: 16px; background: var(--color-settings-group); }
+.surface { display: grid; gap: 16px; padding: 18px var(--settings-row-inset); border-radius: var(--settings-radius); background: var(--color-settings-group); }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .setting-row.divided { padding-top: 16px; border-top: 1px solid var(--color-border-subtle); }
 .setting-copy { display: grid; flex: 1; gap: 4px; min-width: 0; text-align: left; }
-.setting-copy strong { font-size: 15px; }
-.setting-copy span { color: var(--color-text-muted); font-size: 13px; line-height: 1.4; }
-.switch { position: relative; flex: 0 0 auto; appearance: none; width: 46px; height: 27px; margin: 0; border: 0; border-radius: 99px; background: var(--color-border-card); cursor: pointer; transition: background-color .2s; }
-.switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; border-radius: 50%; background: white; box-shadow: 0 1px 4px #0003; transition: transform .2s; }
+.setting-copy strong { font-size: var(--settings-label-size); }
+.setting-copy span { color: var(--color-text-muted); font-size: var(--settings-caption-size); line-height: 1.4; }
+.switch { position: relative; flex: 0 0 auto; appearance: none; width: var(--settings-switch-width); height: var(--settings-switch-height); margin: 0; border: 0; border-radius: 99px; background: var(--color-border-card); cursor: pointer; transition: background-color .2s; }
+.switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: var(--settings-switch-knob); height: var(--settings-switch-knob); border-radius: 50%; background: white; box-shadow: 0 1px 4px #0003; transition: transform .2s; }
 .switch:checked { background: var(--color-brand-primary); }
-.switch:checked::after { transform: translateX(19px); }
+.switch:checked::after { transform: translateX(calc(var(--settings-switch-width) - var(--settings-switch-knob) - 4px)); }
 .choice-list { display: grid; gap: 8px; transition: opacity .2s; }
 .choice-list.disabled { opacity: .45; }
 .choice { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border: 1px solid var(--color-border-card); border-radius: 12px; background: var(--color-surface-card); color: inherit; font: inherit; }

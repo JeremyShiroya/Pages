@@ -48,14 +48,14 @@ import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
   max-width: 520px;
   min-height: calc(100vh - 70px);
   margin: 0 auto;
-  padding: 4px 16px 24px;
+  padding: 12px var(--settings-gutter) 24px;
   color: var(--color-text-primary);
   background: var(--color-settings-background);
 }
 
 .about-card {
   padding: 18px;
-  border-radius: 20px;
+  border-radius: var(--settings-radius);
   background: var(--color-settings-group);
   line-height: 1.55;
 }

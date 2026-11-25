@@ -186,14 +186,14 @@ import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
   max-width: 560px;
   min-height: calc(100vh - 70px);
   margin: 0 auto;
-  padding: 4px 16px 34px;
+  padding: 12px var(--settings-gutter) 34px;
   color: var(--color-text-primary);
   background: var(--color-settings-background);
 }
 
 .policy-card {
   padding: 18px;
-  border-radius: 20px;
+  border-radius: var(--settings-radius);
   background: var(--color-settings-group);
   line-height: 1.6;
 }

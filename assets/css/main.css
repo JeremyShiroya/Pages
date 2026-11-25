@@ -845,3 +845,28 @@ textarea {
     backdrop-filter: none;
   }
 }
+
+/* ── Settings pages ───────────────────────────────────────────────────────
+   One set of measurements for every settings screen (Settings, Preferences,
+   Listen settings, Backup, Storage…): wider page gutters, taller rows with
+   17px labels, section headers outside the card aligned with the row text,
+   iOS-sized switches and a round filled back button. */
+:root {
+  --settings-gutter: 20px;
+  --settings-row-inset: 18px;
+  --settings-row-min: 58px;
+  --settings-radius: 16px;
+  --settings-label-size: 17px;
+  --settings-caption-size: 13.5px;
+  --settings-header-size: 13.5px;
+  --settings-section-gap: 38px;
+  --settings-header-gap: 9px;
+  --settings-switch-width: 51px;
+  --settings-switch-height: 31px;
+  --settings-switch-knob: 27px;
+  --settings-back-surface: rgba(118, 118, 128, 0.12);
+}
+
+:root[data-theme="dark"] {
+  --settings-back-surface: rgba(118, 118, 128, 0.26);
+}

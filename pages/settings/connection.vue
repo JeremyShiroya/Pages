@@ -32,7 +32,7 @@ onMounted(() => {
 }
 
 .connection-body {
-  padding: 0 var(--mobile-page-padding-inline, 16px)
+  padding: 0 var(--settings-gutter)
     calc(var(--mobile-bottom-nav-height, 72px) + env(safe-area-inset-bottom));
 }
 </style>

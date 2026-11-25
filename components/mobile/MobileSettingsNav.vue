@@ -97,20 +97,29 @@ const goBack = () => {
     display: grid;
     grid-template-columns: 44px minmax(0, 1fr) auto;
     align-items: center;
-    padding: 0 16px;
-    min-height: 70px;
+    padding: 4px var(--settings-gutter, 16px) 0;
+    min-height: 66px;
     color: var(--color-text-primary);
     font-family: var(--mobile-font-family);
   }
 
+  /* A round, filled back button, like the system settings pattern. */
   .left {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 44px;
-    height: 44px;
-    font-size: 20px;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--settings-back-surface, transparent);
+    font-size: 21px;
     line-height: 1;
+    cursor: pointer;
+    transition: transform 0.12s ease, background-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .left:active {
+    transform: scale(0.94);
   }
 
   .left:focus-visible {
@@ -127,8 +136,9 @@ const goBack = () => {
     overflow: hidden;
     margin: 0;
     max-width: 100%;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
+    letter-spacing: -0.01em;
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;

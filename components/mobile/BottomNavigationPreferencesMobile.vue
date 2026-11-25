@@ -15,16 +15,6 @@
         </div>
       </section>
 
-      <section class="setting-card" aria-labelledby="size-title">
-        <div class="section-heading"><h2 id="size-title">Size</h2><p>Keep the full-size bar or use a more contained, compact bar.</p></div>
-        <div class="choice-grid" role="group" aria-label="Bottom navigation size">
-          <button v-for="choice in sizeChoices" :key="choice.value" type="button" class="visual-choice" :class="{ selected: settings.mobileNavSize === choice.value }" :aria-pressed="settings.mobileNavSize === choice.value" @click="set('mobileNavSize', choice.value)">
-            <span class="choice-art art-size" :class="`art-size-${choice.value}`" aria-hidden="true"><span class="size-bar"><i></i><i></i><i></i><i></i></span></span>
-            <span class="choice-label">{{ choice.label }}<i v-if="settings.mobileNavSize === choice.value" class="ri-check-line"></i></span>
-          </button>
-        </div>
-      </section>
-
       <section class="setting-card" aria-labelledby="material-title">
         <div class="section-heading"><h2 id="material-title">Bar material</h2><p>Choose the surface behind the tabs.</p></div>
         <div class="choice-grid material-grid" role="group" aria-label="Bar material">
@@ -101,7 +91,6 @@ const { profile, activeAvatarPreset } = useUserProfile()
 const profileAvatarSrc = computed(() => profile.value.avatarType === 'image' ? profile.value.avatarValue : activeAvatarPreset.value.src)
 const set = (key, value) => updateSettings({ [key]: value })
 const layoutChoices = [{ value: 'standard', label: 'Standard' }, { value: 'floating', label: 'Floating' }]
-const sizeChoices = [{ value: 'standard', label: 'Standard' }, { value: 'compact', label: 'Compact' }]
 const materialChoices = [{ value: 'current', label: 'Flat' }, { value: 'frosted', label: 'Frosted glass' }]
 const highlightChoices = [{ value: 'soft', label: 'Soft' }, { value: 'none', label: 'None' }]
 const iconChoices = [{ value: 'fill', label: 'Fill' }, { value: 'line', label: 'Line' }]
@@ -115,11 +104,11 @@ const restoreAll = () => updateSettings(Object.fromEntries(
 
 <style scoped>
 .bottom-nav-settings { min-height: 100vh; background: var(--color-settings-background); color: var(--color-text-primary); font-family: var(--mobile-font-family); }
-.settings-scroll { display: grid; gap: 28px; width: min(760px, 100%); margin: 0 auto; padding: 8px 16px calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 28px); }
-.intro { margin: 0 0 2px; color: var(--color-text-secondary); font-size: 14px; line-height: 1.5; }
-.setting-card { display: grid; gap: 16px; padding: 18px; border: 1px solid var(--color-border-card); border-radius: 22px; background: var(--color-settings-group); }
-.section-heading h2 { margin: 0; font-size: 17px; font-weight: 600; }
-.section-heading p { margin: 5px 0 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.4; }
+.settings-scroll { display: grid; gap: 24px; width: min(760px, 100%); margin: 0 auto; padding: 8px var(--settings-gutter) calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 28px); }
+.intro { margin: 0 var(--settings-row-inset) 2px; color: var(--color-text-secondary); font-size: 14px; line-height: 1.5; }
+.setting-card { display: grid; gap: 16px; padding: 18px var(--settings-row-inset); border: 0; border-radius: var(--settings-radius); background: var(--color-settings-group); }
+.section-heading h2 { margin: 0; font-size: var(--settings-label-size); }
+.section-heading p { margin: 4px 0 0; color: var(--color-text-muted); font-size: var(--settings-caption-size); line-height: 1.4; }
 .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .visual-choice { display: grid; min-width: 0; gap: 7px; padding: 6px; border: 1px solid var(--color-border-card); border-radius: 17px; background: var(--color-surface-card); color: var(--color-text-primary); cursor: pointer; text-align: left; }
 .visual-choice.selected { border-color: var(--color-brand-primary); box-shadow: 0 0 0 1px var(--color-brand-primary); }
@@ -127,13 +116,6 @@ const restoreAll = () => updateSettings(Object.fromEntries(
 .art-lines { display: grid; gap: 6px; padding: 12px; }.art-lines i { width: 70%; height: 6px; border-radius: 20px; background: var(--color-border-card); }.art-lines i + i { width: 45%; }
 .art-bar { position: absolute; right: 7px; bottom: 5px; left: 7px; display: grid; grid-template-columns: repeat(4, 1fr); height: 27px; align-items: center; border: 1px solid var(--color-border-card); border-radius: 99px; background: var(--color-settings-group); box-shadow: 0 3px 8px #0002; }.art-bar i { width: 8px; height: 8px; justify-self: center; border-radius: 50%; background: var(--color-text-muted); }.art-bar i:first-child { width: 75%; height: 21px; background: var(--color-brand-primary-muted); }
 .art-layout-standard .art-bar { right: 0; bottom: 0; left: 0; border-radius: 0; }.art-layout-standard .art-bar i:first-child { width: 8px; height: 8px; background: var(--color-brand-primary); }
-.art-size { display: grid; place-items: end center; padding-bottom: 9px; }
-.size-bar { display: grid; width: 91%; height: 30px; grid-template-columns: repeat(4, 1fr); align-items: center; border: 1px solid var(--color-border-card); border-radius: 99px; background: var(--color-settings-group); box-shadow: 0 3px 8px #0002; }
-.size-bar i { width: 8px; height: 8px; justify-self: center; border-radius: 50%; background: var(--color-text-muted); }
-.size-bar i:first-child { width: 70%; height: 23px; background: var(--color-brand-primary-muted); }
-.art-size-compact .size-bar { width: 76%; height: 24px; }
-.art-size-compact .size-bar i { width: 7px; height: 7px; }
-.art-size-compact .size-bar i:first-child { width: 72%; height: 19px; }
 .choice-label { display: flex; align-items: center; justify-content: space-between; gap: 2px; min-height: 26px; padding: 0 3px; font-size: 11px; line-height: 1.2; }.choice-label i { color: var(--color-brand-primary); font-size: 16px; }
 .art-material { background: linear-gradient(125deg, #062f3a, #26a6b5 55%, #083137); }.material-orb { position: absolute; top: 8px; right: 16px; width: 42px; height: 42px; border-radius: 50%; background: #b9f5ff88; filter: blur(5px); }.material-surface { position: absolute; right: 8px; bottom: 10px; left: 8px; height: 26px; border-radius: 99px; background: #eafcffeb; }
 .art-material-frosted .material-surface { background: #eafcff88; border: 1px solid #fff9; backdrop-filter: blur(8px); box-shadow: 0 3px 7px #0003; }

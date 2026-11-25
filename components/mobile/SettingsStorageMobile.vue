@@ -454,8 +454,8 @@ onMounted(() => {
   display: grid;
   min-height: calc(100vh - 70px);
   align-content: start;
-  gap: 30px;
-  padding: 10px var(--mobile-page-padding-inline, 16px) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
+  gap: var(--settings-section-gap);
+  padding: 10px var(--settings-gutter) calc(var(--mobile-bottom-nav-height, 72px) + 32px);
   font-family: var(--mobile-font-family);
   background: var(--color-settings-background);
 }
@@ -463,9 +463,9 @@ onMounted(() => {
 .storage-hero {
   display: grid;
   gap: 18px;
-  padding: 20px;
+  padding: 20px var(--settings-row-inset);
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: var(--settings-radius);
   background: var(--color-brand-primary);
   color: var(--color-text-on-brand, #fff);
   box-shadow: 0 14px 34px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
@@ -515,15 +515,18 @@ onMounted(() => {
 .storage-section { position: relative; }
 
 .section-kicker {
-  margin: 0 0 9px 4px;
+  margin: 0 0 var(--settings-header-gap) var(--settings-row-inset);
   color: var(--color-text-muted);
+  font-size: var(--settings-header-size);
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 .storage-group {
   display: grid;
   gap: 14px;
-  padding: 16px;
-  border-radius: 16px;
+  padding: 16px var(--settings-row-inset);
+  border-radius: var(--settings-radius);
   background: var(--color-settings-group);
 }
 
@@ -550,14 +553,14 @@ onMounted(() => {
 .group-heading h2 {
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 16px;
+  font-size: var(--settings-label-size);
   font-weight: 600;
 }
 
 .group-heading p {
   margin: 3px 0 0;
   color: var(--color-text-muted);
-  font-size: 12.5px;
+  font-size: var(--settings-caption-size);
   line-height: 1.4;
 }
 
@@ -881,8 +884,8 @@ onMounted(() => {
   position: relative;
   appearance: none;
   flex-shrink: 0;
-  width: 44px;
-  height: 26px;
+  width: var(--settings-switch-width);
+  height: var(--settings-switch-height);
   border: 0;
   border-radius: 999px;
   background: var(--color-border-card);
@@ -893,10 +896,10 @@ onMounted(() => {
 .auto-switch::after {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
+  top: 2px;
+  left: 2px;
+  width: var(--settings-switch-knob);
+  height: var(--settings-switch-knob);
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
@@ -908,7 +911,7 @@ onMounted(() => {
 }
 
 .auto-switch:checked::after {
-  transform: translateX(18px);
+  transform: translateX(calc(var(--settings-switch-width) - var(--settings-switch-knob) - 4px));
 }
 
 @media (orientation: portrait) and (min-width: 600px) {

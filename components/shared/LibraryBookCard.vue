@@ -145,12 +145,29 @@
   </article>
 </template>
 
+<script>
+import { computed as sharedComputed } from 'vue'
+
+// Shared by every card. Generated placeholder covers read seven theme colours
+// through getComputedStyle; cached per title and theme they are built once
+// instead of on every mount.
+const placeholderCache = new Map()
+// One set of playlist book ids for the whole library, instead of each card
+// scanning every playlist for itself.
+let playlistIdSet = null
+const sharedPlaylistIds = (collections) => {
+  playlistIdSet ||= sharedComputed(() => new Set(
+    (collections.value || []).flatMap((playlist) => (playlist.bookIds || []).map(String)),
+  ))
+  return playlistIdSet.value
+}
+</script>
+
 <script setup>
 import { seriesDisplayLabel } from '~/utils/bookSeriesState'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import BookProgressDisplay from './BookProgressDisplay.vue'
 import BookRatingDisplay from './BookRatingDisplay.vue'
-import { useBooks } from '~/composables/useBooks'
 import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import { useRouter } from 'vue-router'
@@ -221,8 +238,8 @@ const onCardClick = () => {
 // Whether this book sits in any playlist, so the playlist icon can fill the
 // way the favourite heart does. Reactive on the shared collections list, so
 // adding/removing in the sheet updates every card at once.
-const { bookInAnyPlaylist } = useBooks()
-const inPlaylist = computed(() => bookInAnyPlaylist(props.book.id))
+const libraryCollections = useState('library:collections', () => [])
+const inPlaylist = computed(() => sharedPlaylistIds(libraryCollections).has(String(props.book.id)))
 const cardElement = ref(null)
 const moreButtonElement = ref(null)
 const menuElement = ref(null)
@@ -273,18 +290,31 @@ watch(showActionMenu, (visible) => {
   if (!visible) menuOpen.value = false
 })
 
-onMounted(() => {
-  document.addEventListener('pointerdown', closeMenuOutside)
-  window.addEventListener('scroll', closeMenu, true)
-  window.addEventListener('resize', closeMenu)
-})
-onUnmounted(() => {
-  document.removeEventListener('pointerdown', closeMenuOutside)
-  window.removeEventListener('scroll', closeMenu, true)
-  window.removeEventListener('resize', closeMenu)
-})
+// The dismiss listeners exist only while this card's menu is open. Attached on
+// mount, a 300-book library carried ~900 global listeners — including a
+// capture-phase scroll handler per card that ran on every scroll frame — and
+// paid to add and remove them all on each page switch.
+const menuListeners = (attach) => {
+  const method = attach ? 'addEventListener' : 'removeEventListener'
+  document[method]('pointerdown', closeMenuOutside)
+  window[method]('scroll', closeMenu, true)
+  window[method]('resize', closeMenu)
+}
+watch(menuOpen, (open) => menuListeners(open))
+onUnmounted(() => { if (menuOpen.value) menuListeners(false) })
 const generateCoverPlaceholder = (title) => {
   const safeTitle = String(title || 'Book')
+  const root = document.documentElement.dataset
+  const cacheKey = `${root.theme}|${root.appBackground}|${root.darkAppBackground}|${safeTitle}`
+  const cached = placeholderCache.get(cacheKey)
+  if (cached) return cached
+  const url = buildCoverPlaceholder(safeTitle)
+  if (placeholderCache.size > 2000) placeholderCache.clear()
+  placeholderCache.set(cacheKey, url)
+  return url
+}
+
+const buildCoverPlaceholder = (safeTitle) => {
   const colors = getThemeCssVars([
     { name: '--color-book-cover-placeholder-one', fallback: '#8A2BE2' },
     { name: '--color-book-cover-placeholder-two', fallback: '#6A0DAD' },

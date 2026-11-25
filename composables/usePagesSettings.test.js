@@ -42,7 +42,7 @@ describe('usePagesSettings storage helpers', () => {
       mobileNavShowTitles: true,
     }))
     expect(readPagesSettings(storage)).toMatchObject({
-      settingsVersion: 4, readerTheme: 'dark', appBackground: 'muted',
+      settingsVersion: 4, readerTheme: 'dark', appBackground: 'white',
       mobileNavStyle: 'floating', mobileNavSize: 'compact',
       mobileNavMaterial: 'frosted', mobileNavProfileDisplay: 'avatar',
       mobileNavActiveIconStyle: 'fill', mobileNavShowTitles: true,
@@ -56,7 +56,7 @@ describe('usePagesSettings storage helpers', () => {
       settingsVersion: 3, mobileNavHighlight: 'none',
     }))
     expect(readPagesSettings(storage)).toMatchObject({
-      mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95,
+      mobileNavStyle: 'standard', mobileNavSize: 'compact', mobileNavOpacity: 95,
       mobileNavMaterial: 'current', mobileNavHighlight: 'none',
       mobileNavProfileDisplay: 'icon', mobileNavShowTitles: true,
     })
@@ -79,26 +79,27 @@ describe('usePagesSettings storage helpers', () => {
     expect(normalizePagesSettings({ personalRatingScale: 5 }).personalRatingScale).toBe(5)
   })
 
-  it('defaults to white and validates the original muted app background', () => {
-    expect(normalizePagesSettings({}).appBackground).toBe('white')
-    expect(normalizePagesSettings({ appBackground: 'muted' }).appBackground).toBe('muted')
-    expect(normalizePagesSettings({ appBackground: 'invalid' }).appBackground).toBe('white')
-  })
-
-  it('defaults dark mode to muted and validates the pure-black alternative', () => {
-    expect(normalizePagesSettings({}).darkAppBackground).toBe('muted')
-    expect(normalizePagesSettings({ darkAppBackground: 'dark' }).darkAppBackground).toBe('dark')
-    expect(normalizePagesSettings({ darkAppBackground: 'invalid' }).darkAppBackground).toBe('muted')
-  })
-
-  it('defaults the shared mobile header to logo and title and persists each display choice', () => {
-    const storage = createMemoryStorage()
-    expect(normalizePagesSettings({}).mobileTopNavDisplay).toBe('logo-title')
-    for (const display of ['logo-title', 'greeting']) {
-      writePagesSettings({ mobileTopNavDisplay: display }, storage)
-      expect(readPagesSettings(storage).mobileTopNavDisplay).toBe(display)
+  it('always uses the Bright light canvas and the Muted dark canvas', () => {
+    for (const appBackground of [undefined, 'muted', 'invalid']) {
+      expect(normalizePagesSettings({ appBackground }).appBackground).toBe('white')
     }
-    expect(normalizePagesSettings({ mobileTopNavDisplay: 'unknown' }).mobileTopNavDisplay).toBe('logo-title')
+    for (const darkAppBackground of [undefined, 'dark', 'invalid']) {
+      expect(normalizePagesSettings({ darkAppBackground }).darkAppBackground).toBe('muted')
+    }
+  })
+
+  it('always shows logo and title in the shared mobile header', () => {
+    const storage = createMemoryStorage()
+    for (const display of [undefined, 'greeting', 'unknown']) {
+      writePagesSettings({ mobileTopNavDisplay: display }, storage)
+      expect(readPagesSettings(storage).mobileTopNavDisplay).toBe('logo-title')
+    }
+  })
+
+  it('always uses the compact bottom navigation size', () => {
+    for (const mobileNavSize of [undefined, 'standard', 'compact']) {
+      expect(normalizePagesSettings({ mobileNavSize }).mobileNavSize).toBe('compact')
+    }
   })
 
   it('validates bottom navigation style, opacity, and blur', () => {

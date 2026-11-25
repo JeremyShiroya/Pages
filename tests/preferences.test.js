@@ -98,13 +98,17 @@ describe('appearance preferences', () => {
     expect(settings).not.toMatch(/Preferences[^}]*comingSoon/)
 
     const prefs = read('components/mobile/PreferencesMobile.vue')
-    for (const key of ['appBackground', 'darkAppBackground', 'bookActionDisplay', 'readerHighlight', 'listenCoverBlur', 'showStreak', 'seriesSuggestions']) {
+    for (const key of ['bookActionDisplay', 'readerHighlight', 'listenCoverBlur', 'showStreak', 'seriesSuggestions']) {
       expect(prefs, key).toContain(key)
     }
 
-    expect(prefs).toContain("{ value: 'white', label: 'Bright', preview: 'bright' }")
-    expect(prefs).toContain("{ value: 'dark', label: 'Dark', preview: 'dark' }")
-    expect(prefs).toContain('palette-preview--dark-muted')
+    // Light is always Bright and dark always Muted: no canvas choice, and no
+    // top-navigation page (the header is always "Logo and title").
+    expect(prefs).not.toContain('appBackgroundOptions')
+    expect(prefs).not.toContain('/settings/preferences/top-navigation')
+    expect(existsSync(resolve(root, 'pages/settings/preferences/top-navigation.vue'))).toBe(false)
+    // The two format rows are dropdowns styled after the Books filter.
+    expect(prefs).toContain('<PrefSelectMobile')
     expect(prefs).toMatch(/\.pref-group\s*\{[^}]*border:[^}]*border-radius:[^}]*background:/s)
 
     const theme = read('assets/css/main.css')

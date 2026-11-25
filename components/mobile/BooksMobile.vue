@@ -614,7 +614,22 @@ const updateViewHighlight = async () => {
 watch([activeViewIndex, viewHoverIndex], updateViewHighlight);
 
 // Mobile shows the full filtered library in one scrollable list — no paging.
-const displayedBooks = computed(() => filteredBooks.value);
+// It is mounted in steps though: building every card of a large library before
+// the first paint was the stall when switching to this tab. The first screenful
+// renders at once and the rest follows over the next few frames.
+const FIRST_RENDER = 24;
+const RENDER_STEP = 36;
+const renderLimit = ref(Infinity);
+let renderFrame = null;
+const growRenderLimit = () => {
+  renderFrame = null;
+  if (renderLimit.value >= filteredBooks.value.length) { renderLimit.value = Infinity; return; }
+  renderLimit.value += RENDER_STEP;
+  renderFrame = requestAnimationFrame(growRenderLimit);
+};
+const displayedBooks = computed(() => (
+  Number.isFinite(renderLimit.value) ? filteredBooks.value.slice(0, renderLimit.value) : filteredBooks.value
+));
 
 let pendingEditScroll = null;
 const restoreEditScroll = async () => {
@@ -703,8 +718,19 @@ const handleResize = () => {
   updateViewHighlight();
 };
 
+// Only a fresh visit renders in steps. Coming back (history has a forward
+// entry) or returning from the editor restores a scroll position that needs the
+// whole list laid out, so those render everything at once as before.
+const cameBack = typeof window !== "undefined" && Boolean(window.history.state?.forward);
+if (!cameBack) renderLimit.value = FIRST_RENDER;
+
 onMounted(() => {
   pendingEditScroll = takeBooksEditScroll(route.fullPath);
+  if (pendingEditScroll !== null) renderLimit.value = Infinity;
+  else if (Number.isFinite(renderLimit.value)) {
+    // Two frames: let the first screenful paint before mounting more.
+    renderFrame = requestAnimationFrame(() => { renderFrame = requestAnimationFrame(growRenderLimit); });
+  }
   restoreEditScroll();
   handleResize();
   setTimeout(() => {
@@ -715,6 +741,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  if (renderFrame !== null) cancelAnimationFrame(renderFrame);
   window.removeEventListener("resize", handleResize);
   document.removeEventListener("click", handleClickOutside);
 });
