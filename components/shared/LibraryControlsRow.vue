@@ -59,7 +59,7 @@
           title="List view"
           @click="emit('update:view', 'list')"
         >
-          <i class="ri-list-unordered"></i>
+          <i class="ri-list-ordered-2"></i>
         </button>
       </div>
       </slot>

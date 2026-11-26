@@ -65,7 +65,8 @@ describe('appearance preferences', () => {
     expect(ok.seriesCardLayout).toBe('fan')
     expect(ok.favouritesCardBackground).toBe('blank')
     expect(ok.favouritesCardLayout).toBe('list')
-    expect(ok.profileFavouritesLayout).toBe('list')
+    // Profile favourites are no longer a choice: always a grid.
+    expect(ok.profileFavouritesLayout).toBe('grid')
     expect(ok.bookActionDisplay).toBe('visible')
     expect(ok.readerHighlight).toBe(false)
     expect(ok.showStreak).toBe(false)
@@ -98,7 +99,7 @@ describe('appearance preferences', () => {
     expect(settings).not.toMatch(/Preferences[^}]*comingSoon/)
 
     const prefs = read('components/mobile/PreferencesMobile.vue')
-    for (const key of ['bookActionDisplay', 'readerHighlight', 'listenCoverBlur', 'showStreak', 'seriesSuggestions']) {
+    for (const key of ['bookActionDisplay', 'readerHighlight', 'listenCoverBlur', 'seriesSuggestions']) {
       expect(prefs, key).toContain(key)
     }
 
@@ -107,8 +108,16 @@ describe('appearance preferences', () => {
     expect(prefs).not.toContain('appBackgroundOptions')
     expect(prefs).not.toContain('/settings/preferences/top-navigation')
     expect(existsSync(resolve(root, 'pages/settings/preferences/top-navigation.vue'))).toBe(false)
-    // The two format rows are dropdowns styled after the Books filter.
-    expect(prefs).toContain('<PrefSelectMobile')
+    // Interface choices with more than on/off open their own page of radio
+    // options: the streak, which formats show, and which formats Pages reads.
+    for (const route of ['streak', 'book-format', 'formats']) {
+      expect(prefs).toContain(`to="/settings/preferences/${route}"`)
+      expect(existsSync(resolve(root, `pages/settings/preferences/${route}.vue`))).toBe(true)
+    }
+    const streakPrefs = read('components/mobile/StreakPreferencesMobile.vue')
+    expect(streakPrefs).toContain('showStreak')
+    expect(streakPrefs).toContain('streakIcon')
+    expect(streakPrefs).toContain('streakBackground')
     expect(prefs).toMatch(/\.pref-group\s*\{[^}]*border:[^}]*border-radius:[^}]*background:/s)
 
     const theme = read('assets/css/main.css')
@@ -120,27 +129,32 @@ describe('appearance preferences', () => {
     const reader = read('components/mobile/ReaderMobile.vue')
     expect(reader).toContain('--mobile-reader-bg: var(--color-reader-light-background)')
 
+    // The streak page uses the borderless grouped cards of the settings pages.
     const streak = read('components/mobile/StreakCalendarMobile.vue')
-    expect(streak).toContain('border: 1px solid var(--color-raised-surface-border)')
+    expect(streak).toContain('background: var(--color-settings-group)')
 
-    // TWO format rows, and they do different things. "Book format" hides
-    // (the app still handles both); "Formats Pages reads" removes (purges the
-    // books and stops the scanner detecting the extension).
-    expect(prefs).toContain("set('formatFilter'")
-    expect(prefs).toContain('useFormatEnablement')
-    expect(prefs).toContain('chooseFormatMode')
+    // TWO format choices, and they do different things. "Show in Library"
+    // hides (the app still handles both); "Formats Pages Reads" removes (purges
+    // the books and stops the scanner detecting the extension).
+    const bookFormat = read('components/mobile/BookFormatPreferencesMobile.vue')
+    const readFormats = read('components/mobile/ReadFormatsPreferencesMobile.vue')
+    expect(bookFormat).toContain('formatFilter')
+    expect(readFormats).toContain('useFormatEnablement')
+    expect(readFormats).toContain('chooseFormatMode')
     // Hiding between formats is meaningless once only one is handled.
     expect(prefs).toContain('v-if="enabledFormats.length > 1"')
 
-    // The standalone Favourites page still owns its own view toggle, while
-    // Profile gets a separate persisted grid/list preference here.
+    // The standalone Favourites page still owns its own view toggle, and
+    // Profile favourites are always a grid, so neither is chosen here.
     expect(prefs).not.toContain("set('favouritesCardLayout'")
     expect(prefs).not.toContain('favouritesCardBackground')
-    expect(prefs).toContain("set('profileFavouritesLayout'")
+    expect(prefs).not.toContain('profileFavouritesLayout')
 
-    // Every Reading option is illustrated, like the card sections above it.
-    expect(prefs).toContain('ReadingPreview')
-    expect(existsSync(resolve(root, 'components/shared/previews/ReadingPreview.vue'))).toBe(true)
+    // Ratings open their own page; the two Reading options are plain switches.
+    expect(prefs).toContain('to="/settings/preferences/ratings"')
+    expect(existsSync(resolve(root, 'pages/settings/preferences/ratings.vue'))).toBe(true)
+    expect(prefs).toContain("set('readerHighlight'")
+    expect(prefs).toContain("set('listenCoverBlur'")
     expect(existsSync(resolve(root, 'components/shared/previews/BookActionsPreview.vue'))).toBe(true)
   })
 
@@ -173,7 +187,14 @@ describe('appearance preferences', () => {
 
     const bookDetail = read('components/mobile/BookDetailMobile.vue')
     expect(bookDetail).toContain('minimalActions')
-    expect(bookDetail).toContain('detail-more-menu')
+    // The "more" options open as an Apple-style bottom action sheet, grouped
+    // by what each action does, with Delete the only destructive (red) row.
+    expect(bookDetail).toContain('<BookActionSheet')
+    const actionSheet = read('components/shared/BookActionSheet.vue')
+    for (const group of ["id: 'collect'", "id: 'details'", "id: 'share'", "id: 'remove'"]) {
+      expect(actionSheet).toContain(group)
+    }
+    expect(actionSheet).toContain("action: 'delete', icon: 'ri-delete-bin-line', label: 'Delete Book', destructive: true")
 
     const topNav = read('components/mobile/MobileTopNav.vue')
     expect(topNav).toContain('v-if="showStreak"')
@@ -186,7 +207,8 @@ describe('appearance preferences', () => {
     expect(books).toContain('formatFilters.length > 1')
     expect(books).toContain(':collapse-actions="collapseBookActions"')
     expect(books).toContain('isPhone.value || settings.value.bookActionDisplay === "minimal"')
-    expect(prefs).toContain('<section v-if="isTablet" class="pref-group">')
+    // Book actions is a tablet-only choice inside Appearance.
+    expect(prefs).toContain('<div v-if="isTablet" class="pref-block">')
 
     const reader = read('pages/reader/[id].vue')
     expect(reader).toContain('highlightEnabled')

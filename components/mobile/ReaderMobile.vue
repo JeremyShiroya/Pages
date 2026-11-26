@@ -507,20 +507,29 @@
 
           <!-- One dropped fetch flips narration to the phone's own voices for
                the rest of the session, with no way back. This is the way back. -->
-          <button
-            v-if="useOfflineVoice"
-            type="button"
-            class="retry-online-voices"
-            :disabled="retryingOnlineVoices"
-            @click="retryNaturalVoices"
-          >
-            <i :class="retryingOnlineVoices ? 'ri-loader-4-line spin' : 'ri-wifi-line'"></i>
-            {{ retryingOnlineVoices ? 'Checking Edge voices…' : 'Try Edge voices again' }}
-          </button>
+          <!-- An inline notice, as iOS shows a lost connection: what happened on
+               the left, a plain blue action on the right. -->
+          <div v-if="useOfflineVoice" class="retry-online-voices" role="status">
+            <span class="retry-icon" aria-hidden="true"><i class="ri-wifi-off-line"></i></span>
+            <span class="retry-copy">
+              <strong>Online voices unavailable</strong>
+              <small>Reading with voices on this phone.</small>
+            </span>
+            <button
+              type="button"
+              class="retry-action"
+              :disabled="retryingOnlineVoices"
+              :aria-label="retryingOnlineVoices ? 'Checking Edge voices…' : 'Try Edge voices again'"
+              @click="retryNaturalVoices"
+            >
+              <i v-if="retryingOnlineVoices" class="ri-loader-4-line spin" aria-hidden="true"></i>
+              <span v-else>Try Again</span>
+            </button>
+          </div>
 
           <div class="voice-list" role="listbox" aria-label="Narrator voices">
-            <section v-for="group in narratorGroups" :key="group.id" class="voice-group" :aria-label="group.label">
-              <p class="voice-group-title">{{ group.label }}</p>
+            <section v-for="group in narratorGroups" :key="group.id" class="voice-group" :aria-label="group.label || 'Narrators'">
+              <p v-if="group.label" class="voice-group-title">{{ group.label }}</p>
               <div v-for="voice in group.voices" :key="voice.id" class="voice-row" :class="{ active: voice.id === activeVoiceId }">
                 <button
                   type="button"
@@ -1190,8 +1199,9 @@ onUnmounted(() => clearTimeout(skeletonTimer));
 
 const featuredNarrators = new Set(['pocket:charles', 'kokoro:af_nicole']);
 
-// Narrator picker: the same voices, grouped by where they come from so it is
-// clear which work offline, which need a connection, and which are the phone's.
+// Narrator picker: the narrators in one untitled list, on-device ones first
+// (each row already says whether it works offline). The phone's own voices,
+// which only appear as the offline fallback, keep a labelled group of their own.
 const narratorGroups = computed(() => {
   const local = [], online = [], device = [];
   for (const voice of displayVoices.value) {
@@ -1200,9 +1210,8 @@ const narratorGroups = computed(() => {
     else online.push(voice);
   }
   return [
-    { id: "local", label: "On this device", voices: local },
-    { id: "online", label: "Online voices", voices: online },
-    { id: "device", label: "Phone voices", voices: device },
+    { id: "narrators", label: "", voices: [...local, ...online] },
+    { id: "device", label: "Phone Voices", voices: device },
   ].filter((group) => group.voices.length);
 });
 // "Liam (Canada)" → { first: "Liam", region: "Canada" }.
@@ -3698,30 +3707,73 @@ onUnmounted(() => {
    recalculation of the entire book subtree on every toggle, which on a long
    book was a visible stall. The chrome is fixed and opaque, so showing it never
    moves a word of text. */
+/* Offline notice in the narrator sheet: an inset row with an orange icon, a
+   short explanation, and a plain blue "Try Again". */
 .retry-online-voices {
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 12px;
   margin-bottom: 12px;
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--color-brand-primary);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
-  color: var(--color-brand-primary);
-  cursor: pointer;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--sheet-list-bg);
+  text-align: left;
 }
 
-.retry-online-voices:disabled {
+.retry-icon {
+  display: grid;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, #ff9500 18%, transparent);
+  color: #ff9500;
+  font-size: 17px;
+}
+
+.retry-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 1px;
+}
+
+.retry-copy strong {
+  color: var(--sheet-strong);
+  font-size: 15px;
+  font-weight: 500 !important;
+}
+
+.retry-copy small {
+  color: var(--sheet-control-text);
+  font-size: 13px;
+}
+
+.retry-action {
+  flex: none;
+  min-width: 72px;
+  min-height: 32px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #007aff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500 !important;
+  cursor: pointer;
+}
+
+.reader-media-sheet.dark .retry-action { color: #0a84ff; }
+
+.retry-action:disabled {
   opacity: 0.6;
+  cursor: default;
 }
 
 .retry-online-voices .spin {
+  display: inline-block;
   animation: reader-spin 0.9s linear infinite;
 }
 

@@ -310,9 +310,16 @@ export const useBooks = () => {
   const seriesList = computed(() => groupBooksBySeries(books.value));
 
 
-  const toggleFavourite = async (bookId) => {
+  // Every single add/remove confirms with a toast. Bulk actions pass
+  // { announce: false } and report the whole batch once themselves.
+  const toggleFavourite = async (bookId, { announce = true } = {}) => {
     const book = books.value.find(b => b.id === bookId);
-    if (book) await updateBook({ ...book, isFavourite: !book.isFavourite });
+    if (!book) return;
+    const makeFavourite = !book.isFavourite;
+    await updateBook({ ...book, isFavourite: makeFavourite });
+    if (announce) {
+      useToast().addToast(makeFavourite ? 'Added to Favourites' : 'Removed from Favourites', 'success');
+    }
   };
 
   // Hide a book from the whole app without deleting it or its content.

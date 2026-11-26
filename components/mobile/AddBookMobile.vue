@@ -939,11 +939,11 @@ const saveBook = async () => {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 3rem;
-  background: var(--color-surface-card);
+  background: transparent;
   padding: 2.5rem;
   border-radius: 20px;
-  border: 1px solid var(--color-border-card);
-  box-shadow: var(--shadow-form-shell);
+  border: 0;
+  box-shadow: none;
 }
 
 .media-column {

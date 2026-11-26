@@ -300,9 +300,9 @@ watch(() => prefs.value.lastBackupAt, () => loadVersions())
 .muted { margin: 0; color: var(--color-text-muted); font-size: 13px; line-height: 1.45; }
 .muted.small { display: flex; gap: 6px; font-size: 12.5px; }
 .section { min-width: 0; }
-.surface { display: grid; gap: 16px; padding: 18px var(--settings-row-inset); border-radius: var(--settings-radius); background: var(--color-settings-group); }
+.surface { display: grid; gap: 20px; padding: var(--settings-row-pad-y) var(--settings-row-inset); border-radius: var(--settings-radius); background: var(--color-settings-group); }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.setting-row.divided { padding-top: 16px; border-top: 1px solid var(--color-border-subtle); }
+.setting-row.divided { padding-top: var(--settings-row-pad-y); border-top: 1px solid var(--color-border-subtle); }
 .setting-copy { display: grid; flex: 1; gap: 4px; min-width: 0; text-align: left; }
 .setting-copy strong { font-size: var(--settings-label-size); }
 .setting-copy span { color: var(--color-text-muted); font-size: var(--settings-caption-size); line-height: 1.4; }

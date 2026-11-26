@@ -897,10 +897,10 @@ const handleUpdateBook = async () => {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 3rem;
-  background: var(--color-surface-card);
+  background: transparent;
   padding: 2.5rem;
   border-radius: 20px;
-  border: 1px solid var(--color-border-card);
+  border: 0;
 }
 
 .media-column {

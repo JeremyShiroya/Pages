@@ -90,7 +90,7 @@ const changeListenSkip = (direction, delta) => {
 .listen-settings-content { display: grid; gap: calc(var(--settings-section-gap) + var(--settings-header-size) + var(--settings-header-gap)); max-width: 600px; margin: 0 auto; padding: calc(var(--settings-header-size) + var(--settings-header-gap) + 18px) var(--settings-gutter) calc(60px + env(safe-area-inset-bottom)); }
 .listen-settings-group { position: relative; display: grid; padding: 0 var(--settings-row-inset); border-radius: var(--settings-radius); background: var(--color-settings-group); }
 .listen-settings-group-title { position: absolute; bottom: calc(100% + var(--settings-header-gap)); left: var(--settings-row-inset); margin: 0; color: var(--color-text-muted); font-size: var(--settings-header-size); letter-spacing: .02em; text-transform: uppercase; }
-.listen-setting-block { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: var(--settings-row-min); padding: 14px 0; }
+.listen-setting-block { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: var(--settings-row-min); padding: var(--settings-row-pad-y) 0; }
 .listen-setting-block + .listen-setting-block { border-top: 1px solid var(--color-border-subtle); }
 .listen-setting-copy { display: grid; gap: 3px; min-width: 0; }
 .listen-setting-label { font-size: var(--settings-label-size); }
@@ -99,7 +99,7 @@ const changeListenSkip = (direction, delta) => {
 .listen-skip-counter button { display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: 8px; background: var(--color-surface-card); color: var(--color-text-primary); font-size: 18px; cursor: pointer; }
 .listen-skip-counter button:disabled { opacity: .35; cursor: default; }
 .listen-skip-counter output { min-width: 52px; font-size: 13px; font-weight: 400; text-align: center; }
-.listen-progress-choice { display: grid; gap: 12px; padding: 16px 0 18px; }
+.listen-progress-choice { display: grid; gap: 12px; padding: var(--settings-row-pad-y) 0 22px; }
 .listen-scope-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .listen-scope-card { display: grid; gap: 10px; padding: 12px; border: 1.5px solid var(--color-border-subtle); border-radius: 14px; background: var(--color-surface-secondary); color: var(--color-text-primary); font: inherit; text-align: left; cursor: pointer; transition: border-color .15s ease, background .15s ease, transform .1s ease; -webkit-tap-highlight-color: transparent; }
 .listen-scope-card:active { transform: scale(.98); }

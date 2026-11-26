@@ -24,8 +24,8 @@
     "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1795626613.294211,
-    "seen": 1795626647.4307835,
+    "mtime": 1795627385.1802695,
+    "seen": 1795627467.4490697,
     "ast_hash": "a3f5186283b43c363a376a7b27dc2224",
     "semantic_hash": ""
   },
@@ -84,8 +84,8 @@
     "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1795626613.2932117,
-    "seen": 1795626647.439294,
+    "mtime": 1795627385.175377,
+    "seen": 1795627467.462837,
     "ast_hash": "b4d9264dcc0a0263b7dc995cd6fed430",
     "semantic_hash": ""
   },
@@ -228,9 +228,9 @@
     "semantic_hash": "b1ea933a896e0ec17f08f7b3b3c54e10"
   },
   "components/mobile/ReaderMobile.vue": {
-    "mtime": 1795626533.066421,
-    "seen": 1795626647.4602182,
-    "ast_hash": "b5c182b1c81853901adfcb8be0e7d942",
+    "mtime": 1795626978.965173,
+    "seen": 1795627467.4899888,
+    "ast_hash": "1be9b29b66774b39d2e9657c93089d2d",
     "semantic_hash": ""
   },
   "components/mobile/ReaderNoteEditor.vue": {
@@ -2856,75 +2856,75 @@
     "semantic_hash": ""
   },
   "public/images/Empty State 1.png": {
-    "mtime": 1785794692.6276653,
-    "seen": 1789216826.6923215,
-    "ast_hash": "66575d88bf36e76a8aac9b7e5c306bf2",
+    "mtime": 1795626947.4109778,
+    "seen": 1795627468.0339487,
+    "ast_hash": "0bf65dfd67bfc7c193bbe4e299b4ce18",
     "semantic_hash": ""
   },
   "public/images/Empty State 2.png": {
-    "mtime": 1785796861.082862,
-    "seen": 1789216826.692326,
-    "ast_hash": "e0da7202c46d00657e5b81be13d9eb1f",
+    "mtime": 1795626950.4805753,
+    "seen": 1795627468.0339544,
+    "ast_hash": "b038e75cce29a36b0fcd89ab2b3a851e",
     "semantic_hash": ""
   },
   "public/images/Empty State 3.png": {
-    "mtime": 1785831857.4964077,
-    "seen": 1789216826.692331,
-    "ast_hash": "8ecfa25bc8dc65d756d6a86ffddfdcd8",
+    "mtime": 1795626953.517235,
+    "seen": 1795627468.0339596,
+    "ast_hash": "8f19b417aded2ec311d24129b9262a49",
     "semantic_hash": ""
   },
   "public/images/Empty-state.png": {
-    "mtime": 1783682533.596378,
-    "seen": 1789216826.692336,
-    "ast_hash": "23a2d1b9adde206a6935b646e32273bb",
+    "mtime": 1795626953.5575728,
+    "seen": 1795627468.0339658,
+    "ast_hash": "6a147f899d3bc7c9818b8c3587676ae9",
     "semantic_hash": ""
   },
   "public/images/Favourites empty-state.png": {
-    "mtime": 1786791580.0548134,
-    "seen": 1789216826.6923413,
-    "ast_hash": "ce6928382fa5c8fac5f457870af49998",
+    "mtime": 1795626954.6447778,
+    "seen": 1795627468.0339713,
+    "ast_hash": "9a5874c0ffe6f2cfba5c52c28e5878c0",
     "semantic_hash": ""
   },
   "public/images/Flame.png": {
-    "mtime": 1788943392.8476906,
-    "seen": 1789216826.6923468,
-    "ast_hash": "07ae16c543938587b1dac23022fef5e1",
+    "mtime": 1795626954.8489008,
+    "seen": 1795627468.036814,
+    "ast_hash": "c618822ed7391c39a6a2fd36e83cc4f0",
     "semantic_hash": ""
   },
   "public/images/Logo 1.png": {
-    "mtime": 1784991630.2790446,
-    "seen": 1789216826.692352,
-    "ast_hash": "1096b5128da9225af8f1a77c41beb7a3",
+    "mtime": 1795626957.63706,
+    "seen": 1795627468.0368242,
+    "ast_hash": "c9571fb9f483f66e8e9ebac9030b0cc9",
     "semantic_hash": ""
   },
   "public/images/Logo 2.png": {
-    "mtime": 1776090015.0247328,
-    "seen": 1789216826.6923566,
-    "ast_hash": "18ab0225eda24e053f2977cc0acd131f",
+    "mtime": 1795626957.7092888,
+    "seen": 1795627468.036831,
+    "ast_hash": "baa431b44f7af10590e54f10f91216dd",
     "semantic_hash": ""
   },
   "public/images/Logo.png": {
-    "mtime": 1778224656.9868689,
-    "seen": 1789216826.6923614,
-    "ast_hash": "ead67d34ca66a863e7c36a547fb8e173",
+    "mtime": 1795626957.7898986,
+    "seen": 1795627468.0368373,
+    "ast_hash": "8a6c48d8e515b0244ac9cc3503be71c7",
     "semantic_hash": ""
   },
   "public/images/P Logo.png": {
-    "mtime": 1785763895.260803,
-    "seen": 1789216826.6923666,
-    "ast_hash": "8f77a4e19d1a3bb33f805d527db52397",
+    "mtime": 1795626957.902854,
+    "seen": 1795627468.046697,
+    "ast_hash": "88e9b093ba078d48450aead2da7594d4",
     "semantic_hash": ""
   },
   "public/images/Pages-Logo.png": {
-    "mtime": 1784991630.291413,
-    "seen": 1789216826.6923711,
-    "ast_hash": "58a798deeadc449bf7079e07aaa6870e",
+    "mtime": 1795626959.8242111,
+    "seen": 1795627468.0467036,
+    "ast_hash": "0bd4101b43860aae570aed59296e00ee",
     "semantic_hash": ""
   },
   "public/images/Playlist empty-state.png": {
-    "mtime": 1786792363.3690825,
-    "seen": 1789216826.6923761,
-    "ast_hash": "3dd0bffdbdc3bdbf6e1d609da988c00d",
+    "mtime": 1795626961.0330508,
+    "seen": 1795627468.046709,
+    "ast_hash": "17c7a884a37ba447687c63c2725dbe8d",
     "semantic_hash": ""
   },
   "public/images/User Avatars/01.png": {
@@ -3186,9 +3186,9 @@
     "semantic_hash": ""
   },
   "public/images/Streak.png": {
-    "mtime": 1789946786.5672698,
-    "seen": 1789947801.4759512,
-    "ast_hash": "af10b32e4ec4b9cd7f939d53bd8fd3ae",
+    "mtime": 1795626962.0455751,
+    "seen": 1795627468.0467148,
+    "ast_hash": "644a481463a6951edf91431742459067",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/AppResetPlugin.java": {
@@ -5856,39 +5856,39 @@
     "semantic_hash": ""
   },
   "public/images/Book.png": {
-    "mtime": 1795516391.2624373,
-    "seen": 1795519501.9109538,
-    "ast_hash": "66b45a98c3145040305dc0b574cf12a3",
+    "mtime": 1795626945.4564877,
+    "seen": 1795627468.033935,
+    "ast_hash": "a325c4c158676d6e2440e8e287abe42c",
     "semantic_hash": ""
   },
   "public/images/Copy.png": {
-    "mtime": 1795514996.153715,
-    "seen": 1795519501.9109573,
-    "ast_hash": "88a6f2b1e32f4c49397569c42c5dcb1f",
+    "mtime": 1795626945.515781,
+    "seen": 1795627468.033943,
+    "ast_hash": "ae11e1d86f5d217e2db7c16b73feaa8a",
     "semantic_hash": ""
   },
   "public/images/Files.png": {
-    "mtime": 1795511073.6154666,
-    "seen": 1795519501.9126668,
-    "ast_hash": "5aeb4b1f7162701b772ed9c0862213ee",
+    "mtime": 1795626954.6982093,
+    "seen": 1795627468.0339775,
+    "ast_hash": "2ca526ccdb3d6094c75a87639c47f5ef",
     "semantic_hash": ""
   },
   "public/images/Find.png": {
-    "mtime": 1795516150.0361018,
-    "seen": 1795519501.9126692,
-    "ast_hash": "daf9271c1aa89ec4150f0111758b207e",
+    "mtime": 1795626954.7524004,
+    "seen": 1795627468.0339828,
+    "ast_hash": "2993d97bdbba3940f92a1ac0f9219d47",
     "semantic_hash": ""
   },
   "public/images/Google.png": {
-    "mtime": 1795517507.8019211,
-    "seen": 1795519501.913059,
-    "ast_hash": "232c9833b0d8221e3b7a85c19f085ec3",
+    "mtime": 1795626955.0688946,
+    "seen": 1795627468.0368197,
+    "ast_hash": "b2bf34a815f10c5a6408bf8dbdfab093",
     "semantic_hash": ""
   },
   "public/images/Trash.png": {
-    "mtime": 1795514300.0210953,
-    "seen": 1795519501.9166055,
-    "ast_hash": "90a55a960093bdb57590ca75a4b04dc2",
+    "mtime": 1795626962.1348102,
+    "seen": 1795627468.0467212,
+    "ast_hash": "953c6fdfa1e5d8599649092d2325a65e",
     "semantic_hash": ""
   },
   "supabase/migrations/20261124010000_keepalive.sql": {

@@ -2,17 +2,18 @@
   <div class="profile">
     <MobileSettingsNav title="Settings" back-to="/" aria-label="Settings navigation" />
 
-    <div class="profile-container">
+    <div class="profile-container" :class="{ 'no-icons': !showIcons }">
       <section v-for="group in settingsGroups" :key="group.label" class="section">
         <h2 class="section-title">{{ group.label }}</h2>
         <div
           v-for="row in group.rows"
           :key="row.label"
           class="setting-item"
+          :class="{ 'has-switch': row.type === 'theme' || row.type === 'developerMode' }"
           @click="handleSettingsRow(row)"
         >
           <div class="setting-info">
-            <i :class="row.icon"></i>
+            <i v-if="showIcons" :class="row.icon"></i>
             <span>{{ row.label }}</span>
           </div>
 
@@ -34,7 +35,7 @@
           >
             <span></span>
           </span>
-          <i v-else class="ri-arrow-right-s-line right-icon"></i>
+          <i v-else-if="showArrows" class="ri-arrow-right-s-line right-icon"></i>
         </div>
 
       </section>
@@ -59,6 +60,9 @@ const { canShareApp, shareApp } = useShareApp()
 const { addToast } = useToast()
 const router = useRouter()
 const appVersion = computed(() => runtimeConfig.public.appVersion || '0.0.0')
+// Developer-only preview (Preferences → Interface) of the list without icons.
+const showIcons = computed(() => settings.value.settingsIcons !== false)
+const showArrows = computed(() => settings.value.settingsArrows !== false)
 
 const versionClickCount = ref(0)
 let versionClickTimer = null
@@ -182,11 +186,25 @@ const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
   min-height: var(--settings-row-min);
   align-items: center;
   grid-template-columns: minmax(0, 1fr) auto;
-  padding: 0 var(--settings-row-inset);
+  padding: var(--settings-row-pad-y) var(--settings-row-inset);
   border: 0;
   background-color: transparent;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Rows that carry a switch are a little taller, as in the system pattern. */
+.setting-item.has-switch {
+  min-height: var(--settings-switch-row-min);
+}
+
+/* Developer preview: the same list without the leading icons. */
+.no-icons .setting-info {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.no-icons .setting-item + .setting-item::before {
+  left: var(--settings-row-inset);
 }
 
 .setting-item:first-of-type { border-radius: var(--settings-radius) var(--settings-radius) 0 0; }

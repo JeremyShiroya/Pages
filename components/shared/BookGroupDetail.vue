@@ -320,7 +320,7 @@ const runBulkAction = async (key) => {
   if (key === 'delete') return (bulkDeleteBooks.value = chosen);
   if (key === 'favourite') {
     const makeFavourite = chosen.some((book) => !book.isFavourite);
-    for (const book of chosen) if (!!book.isFavourite !== makeFavourite) await toggleFavourite(book.id);
+    for (const book of chosen) if (!!book.isFavourite !== makeFavourite) await toggleFavourite(book.id, { announce: false });
     addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} ${makeFavourite ? 'added to' : 'removed from'} favourites.`, 'success');
     clearSelection();
     return;

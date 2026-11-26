@@ -1,15 +1,13 @@
-const SYSTEM_BAR_CHANGE_EVENT = 'bookish:system-bars-change'
+import {
+  SYSTEM_BAR_CHANGE_EVENT,
+  compositeOver,
+  hasModalOverlay,
+  isFullScreenLayer,
+  isModalLikeNode,
+  parseCssColor,
+} from '~/utils/systemBarOverlay'
 
-const parseCssColor = (value) => {
-  const parts = String(value || '').match(/[\d.]+/g)?.map(Number) || []
-  if (parts.length < 3) return null
-  return {
-    red: Math.max(0, Math.min(255, parts[0])),
-    green: Math.max(0, Math.min(255, parts[1])),
-    blue: Math.max(0, Math.min(255, parts[2])),
-    alpha: parts.length > 3 ? Math.max(0, Math.min(1, parts[3])) : 1,
-  }
-}
+const TRANSPARENT = '#00000000'
 
 const toAndroidColor = ({ red, green, blue }) => (
   `#${[red, green, blue]
@@ -37,9 +35,13 @@ const dimmed = (color, element, amount) => {
   return { ...color, red: color.red * keep, green: color.green * keep, blue: color.blue * keep }
 }
 
+const layered = (overlays, base) => overlays.reduceRight((result, layer) => compositeOver(layer, result), base)
+
 const surfaceAt = (x, y) => {
-  let fallbackColor = null
   const dim = dimAmount()
+  // Full-screen translucent backdrops (an open modal) above the surface. They
+  // are composited onto it so the bar dims exactly like the page under it.
+  const overlays = []
 
   for (const element of document.elementsFromPoint(x, y)) {
     if (!(element instanceof Element)) continue
@@ -50,16 +52,25 @@ const surfaceAt = (x, y) => {
     // A native solid scrim would flatten gradients and cover art. Keeping the
     // bar transparent lets the real page continue through the safe-area strip.
     if (hasImageBackground(style)) {
-      return { color: '#00000000', sample: fallbackColor }
+      return { color: TRANSPARENT, sample: overlays.length ? layered(overlays, { red: 128, green: 128, blue: 128, alpha: 1 }) : null }
     }
 
     if (!color || color.alpha <= 0.02) continue
-    fallbackColor = color
-    if (color.alpha >= 0.98) return { color: toAndroidColor(color), sample: color }
 
-    // Layering the same translucent surface in a native scrim doubles it, so
-    // preserve the WebView rendering and use the colour only for contrast.
-    return { color: '#00000000', sample: color }
+    if (color.alpha >= 0.98) {
+      const solid = layered(overlays, color)
+      return { color: toAndroidColor(solid), sample: solid }
+    }
+
+    if (isFullScreenLayer(element)) {
+      overlays.push(color)
+      continue
+    }
+
+    // A translucent bar or card (frosted navigation): layering the same
+    // surface in a native scrim would double it, so keep the WebView rendering
+    // and use the colour only for icon contrast.
+    return { color: TRANSPARENT, sample: color }
   }
 
   const documentColors = [
@@ -67,9 +78,9 @@ const surfaceAt = (x, y) => {
     parseCssColor(getComputedStyle(document.documentElement).backgroundColor),
   ]
   const found = documentColors.find((color) => color?.alpha > 0.02) || null
-  const rootColor = found && dimmed(found, null, dim)
+  const rootColor = found && layered(overlays, dimmed(found, null, dim))
   return {
-    color: rootColor ? toAndroidColor(rootColor) : '#00000000',
+    color: rootColor ? toAndroidColor(rootColor) : TRANSPARENT,
     sample: rootColor,
   }
 }
@@ -81,41 +92,47 @@ const isDarkSurface = (sample, fallbackDark) => {
   return luminance < 0.56
 }
 
+const isSettingsPalettePage = () => (
+  window.location.pathname.startsWith('/settings')
+  || window.location.pathname.startsWith('/listen-settings')
+  || window.location.pathname.startsWith('/editprofilepage')
+)
+
 export default defineNuxtPlugin((nuxtApp) => {
   let frame = null
+  let lateSync = null
   let themeObserver = null
   let pageObserver = null
+  let modalObserver = null
 
   const sync = () => {
     frame = null
     const bridge = globalThis.Capacitor
     if (!bridge?.isNativePlatform?.()) return
-    // Settings and Edit Profile use their own palette rather than the normal app canvas. Their
-    // dedicated plugin owns both system bars so the generic surface sampler
-    // cannot race it with a colour from the header or responsive shell.
-    if (
-      window.location.pathname.startsWith('/settings')
-      || window.location.pathname.startsWith('/listen-settings')
-      || window.location.pathname.startsWith('/editprofilepage')
-    ) return
+    // Settings and Edit Profile use their own palette rather than the normal app
+    // canvas, and their dedicated plugin owns both bars, so the sampler cannot
+    // race it with a colour from the header or responsive shell. The exception
+    // is an open modal: its backdrop is sampled here on every page.
+    if (isSettingsPalettePage() && !hasModalOverlay()) return
 
     const width = Math.max(1, window.innerWidth)
     const height = Math.max(1, window.innerHeight)
     const status = surfaceAt(width / 2, 1)
     const navigation = surfaceAt(width / 2, height - 1)
-    const pagePreference = document.querySelector('[data-system-bar-icons]')?.dataset.systemBarIcons
+    const overlayOpen = hasModalOverlay()
+    const pagePreference = overlayOpen ? null : document.querySelector('[data-system-bar-icons]')?.dataset.systemBarIcons
     const fallbackDark = document.documentElement.dataset.theme === 'dark'
     const forcedDark = pagePreference === 'light'
       ? true
       : pagePreference === 'dark' ? false : null
-    const forceTransparent = document.querySelector('[data-system-bar-color="transparent"]') !== null
+    const forceTransparent = !overlayOpen && document.querySelector('[data-system-bar-color="transparent"]') !== null
 
     bridge.Plugins?.SystemBars?.setAppearance?.({
       dark: fallbackDark,
       statusBarDark: forcedDark ?? isDarkSurface(status.sample, fallbackDark),
       navigationBarDark: forcedDark ?? isDarkSurface(navigation.sample, fallbackDark),
-      statusBarColor: forceTransparent ? '#00000000' : status.color,
-      navigationBarColor: forceTransparent ? '#00000000' : navigation.color,
+      statusBarColor: forceTransparent ? TRANSPARENT : status.color,
+      navigationBarColor: forceTransparent ? TRANSPARENT : navigation.color,
     })?.catch?.(() => {})
   }
 
@@ -140,7 +157,29 @@ export default defineNuxtPlugin((nuxtApp) => {
     scheduleSync()
   }
 
-  nuxtApp.hook('app:mounted', syncPage)
+  // A modal opening or closing changes what sits under the bars. Re-sample
+  // straight away, and once more after enter/leave transitions have settled.
+  const onModalChange = () => {
+    scheduleSync()
+    clearTimeout(lateSync)
+    lateSync = setTimeout(() => {
+      window.dispatchEvent(new Event(SYSTEM_BAR_CHANGE_EVENT))
+    }, 360)
+  }
+  const watchModals = () => {
+    modalObserver = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) if (isModalLikeNode(node)) return onModalChange()
+        for (const node of record.removedNodes) if (isModalLikeNode(node)) return onModalChange()
+      }
+    })
+    modalObserver.observe(document.body, { childList: true, subtree: true })
+  }
+
+  nuxtApp.hook('app:mounted', () => {
+    syncPage()
+    watchModals()
+  })
   nuxtApp.hook('page:finish', syncPage)
 
   themeObserver = new MutationObserver(scheduleSync)
@@ -154,8 +193,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   nuxtApp.hook('app:beforeUnmount', () => {
     if (frame !== null) cancelAnimationFrame(frame)
+    clearTimeout(lateSync)
     themeObserver?.disconnect()
     pageObserver?.disconnect()
+    modalObserver?.disconnect()
     window.removeEventListener('resize', scheduleSync)
     window.removeEventListener('orientationchange', scheduleSync)
     window.removeEventListener(SYSTEM_BAR_CHANGE_EVENT, syncPage)

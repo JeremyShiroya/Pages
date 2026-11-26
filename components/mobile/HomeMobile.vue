@@ -282,11 +282,12 @@ const retryLoadLibrary = () => {
   align-items: center;
   gap: 10px;
   padding: 0 12px;
-  border: 1px solid var(--color-border-card);
+  /* A filled field with no outline or shadow: a slightly darker shade than the
+     page is enough to read as a search bar (same fill as the settings cards). */
+  border: 0;
   border-radius: var(--mobile-control-radius);
-  background: var(--color-surface-input);
+  background: var(--color-settings-group);
   color: var(--color-text-muted);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
 .mobile-search-placeholder { position: absolute; left: 42px; display: flex; gap: 4px; align-items: center; color: var(--color-text-muted); font-size: var(--mobile-subtext-size); pointer-events: none; }

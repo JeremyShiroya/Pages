@@ -23,8 +23,8 @@
     </button>
 
     <div class="nav-actions">
-      <button v-if="showStreak" type="button" class="streak-pill" title="Open streak calendar" aria-label="Open streak calendar" @click="openStreak">
-        <i class="ri-fire-fill"></i>
+      <button v-if="showStreak" type="button" class="streak-pill" :class="{ plain: !streakBackground }" title="Open streak calendar" aria-label="Open streak calendar" @click="openStreak">
+        <i :class="streakIconClass"></i>
         <span>{{ streakCount }}</span>
       </button>
       <button
@@ -58,6 +58,8 @@ const { streakCount } = useStreak();
 const { settings } = usePagesSettings();
 const topNavDisplay = computed(() => settings.value.mobileTopNavDisplay || 'logo-title');
 const showStreak = computed(() => settings.value.showStreak !== false);
+const streakIconClass = computed(() => (settings.value.streakIcon === 'lightning' ? 'ri-flashlight-fill' : 'ri-fire-fill'));
+const streakBackground = computed(() => settings.value.streakBackground !== false);
 const { profile, activeAvatarPreset, loadProfile } = useUserProfile();
 const isFirstBoot = ref(true);
 const LAUNCHED_KEY = 'bookish:has-launched';
@@ -228,6 +230,13 @@ onBeforeUnmount(() => {
 
 .streak-pill i {
   font-size: 18px;
+}
+
+/* Streak settings → Background off: icon and count without the capsule. */
+.streak-pill.plain {
+  min-width: 0;
+  padding: 0 6px;
+  background: transparent;
 }
 
 .mobile-menu-button {

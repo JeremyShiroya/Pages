@@ -5,7 +5,16 @@
    identically — CSS font-matching collapsed 300 and 500 onto 400. Literata is a
    variable face covering 200-900, so every thickness step is visibly different. */
 @import url("https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300..700&display=swap");
-@import url("https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap");
+/* General Sans, bundled as ONE variable file (weights 200-700) instead of five
+   static weights from Fontshare: in-between weights such as 450 render for real
+   (static faces snap to the nearest), and the app font works offline. */
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-Variable.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 *,
 *::before,
@@ -263,6 +272,7 @@
 }
 
 :root[data-theme="dark"] {
+  --mobile-divider-color: #38383a;
   color-scheme: dark;
 
   /* Brand */
@@ -284,54 +294,54 @@
   --color-book-cover-placeholder-text-soft: rgba(255, 255, 255, 0.28);
 
   /* App backgrounds */
-  --color-background-app: #111018;
-  --color-background-page: #171621;
-  --color-background-sidebar: #171621;
-  --color-background-reader: #18171c;
+  --color-background-app: #121212;
+  --color-background-page: #1a1a1a;
+  --color-background-sidebar: #1a1a1a;
+  --color-background-reader: #161616;
   --color-background-overlay: rgba(0, 0, 0, 0.68);
   --color-background-overlay-strong: rgba(0, 0, 0, 0.76);
   --color-background-overlay-soft: rgba(0, 0, 0, 0.58);
   --color-background-overlay-faint: rgba(0, 0, 0, 0.42);
   --color-settings-background: var(--color-background-app);
-  --color-settings-group: #1f1d29;
+  --color-settings-group: #1e1e1e;
 
   /* Surfaces */
-  --color-surface-primary: #1f1d29;
-  --color-surface-secondary: rgba(168, 85, 247, 0.08);
-  --color-surface-tertiary: rgba(168, 85, 247, 0.12);
-  --color-surface-muted: rgba(168, 85, 247, 0.09);
-  --color-surface-hover: rgba(168, 85, 247, 0.22);
-  --color-table-row-hover: #302e3b;
-  --color-surface-active: rgba(168, 85, 247, 0.28);
-  --color-surface-modal: #1f1d29;
+  --color-surface-primary: #1e1e1e;
+  --color-surface-secondary: rgba(255, 255, 255, 0.05);
+  --color-surface-tertiary: rgba(255, 255, 255, 0.08);
+  --color-surface-muted: rgba(255, 255, 255, 0.06);
+  --color-surface-hover: rgba(255, 255, 255, 0.1);
+  --color-table-row-hover: #2a2a2a;
+  --color-surface-active: rgba(255, 255, 255, 0.14);
+  --color-surface-modal: #1e1e1e;
   --color-surface-input: rgba(255, 255, 255, 0.06);
   --color-surface-input-focus: rgba(255, 255, 255, 0.1);
-  --color-surface-glass: rgba(31, 29, 41, 0.95);
+  --color-surface-glass: rgba(30, 30, 30, 0.95);
   --color-surface-card: transparent;
   --color-surface-on-image: rgba(255, 255, 255, 0.12);
   --color-surface-on-image-soft: rgba(255, 255, 255, 0.05);
   --color-surface-on-image-hover: rgba(255, 255, 255, 0.22);
-  --color-surface-inverse: #f8fafc;
+  --color-surface-inverse: #f5f5f7;
 
   /* Text */
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #e2e8f0;
-  --color-text-muted: #a8b1c2;
-  --color-text-subtle: #7f889a;
-  --color-text-placeholder: #7f889a;
-  --color-text-inverse: #111827;
+  --color-text-primary: #f5f5f7;
+  --color-text-secondary: #e5e5ea;
+  --color-text-muted: #a1a1a6;
+  --color-text-subtle: #8e8e93;
+  --color-text-placeholder: #8e8e93;
+  --color-text-inverse: #111111;
   --color-text-on-brand: #ffffff;
   --color-text-on-image-primary: #ffffff;
   --color-text-on-image-secondary: rgba(255, 255, 255, 0.86);
   --color-text-on-image-muted: rgba(255, 255, 255, 0.72);
   --color-text-on-image-subtle: rgba(255, 255, 255, 0.62);
-  --color-text-sidebar: #e2e8f0;
+  --color-text-sidebar: #e5e5ea;
   --color-text-logo: #ffffff;
 
   /* Borders */
-  --color-border-subtle: #3f3b50;
-  --color-border-strong: #524d63;
-  --color-border-card: #3f3b50;
+  --color-border-subtle: #38383a;
+  --color-border-strong: #48484a;
+  --color-border-card: #38383a;
   --color-border-focus: #a855f7;
   --color-border-focus-ring: rgba(168, 85, 247, 0.2);
   --color-border-on-image: rgba(255, 255, 255, 0.16);
@@ -386,14 +396,14 @@
   );
   --gradient-image-card-overlay: linear-gradient(
     135deg,
-    rgba(10, 8, 16, 0.82) 0%,
-    rgba(10, 8, 16, 0.54) 100%
+    rgba(10, 10, 10, 0.82) 0%,
+    rgba(10, 10, 10, 0.54) 100%
   );
   --gradient-cover-action-overlay: linear-gradient(
     to bottom,
-    rgba(10, 8, 16, 0.48) 0%,
-    rgba(10, 8, 16, 0.12) 50%,
-    rgba(10, 8, 16, 0.82) 100%
+    rgba(10, 10, 10, 0.48) 0%,
+    rgba(10, 10, 10, 0.12) 50%,
+    rgba(10, 10, 10, 0.82) 100%
   );
 
   /* Effects */
@@ -415,8 +425,8 @@
   --shadow-reader-page: 0 2px 24px rgba(0, 0, 0, 0.45);
 
   /* Loading */
-  --color-skeleton-base: rgba(168, 85, 247, 0.08);
-  --color-skeleton-shimmer: rgba(168, 85, 247, 0.18);
+  --color-skeleton-base: rgba(255, 255, 255, 0.06);
+  --color-skeleton-shimmer: rgba(255, 255, 255, 0.12);
   --color-skeleton-inverse-base: rgba(255, 255, 255, 0.08);
   --color-skeleton-inverse-shimmer: rgba(255, 255, 255, 0.16);
 }
@@ -854,7 +864,9 @@ textarea {
 :root {
   --settings-gutter: 20px;
   --settings-row-inset: 18px;
-  --settings-row-min: 58px;
+  --settings-row-min: 64px;
+  --settings-switch-row-min: 74px;
+  --settings-row-pad-y: 20px;
   --settings-radius: 16px;
   --settings-label-size: 17px;
   --settings-caption-size: 13.5px;
@@ -869,4 +881,52 @@ textarea {
 
 :root[data-theme="dark"] {
   --settings-back-surface: rgba(118, 118, 128, 0.26);
+}
+
+/* ── Grid / list view switch ───────────────────────────────────────────────
+   One look for every page that offers it (Books, Series, playlists, Hidden,
+   author and group pages): an Apple segmented control. A grey track, and the
+   chosen segment as a raised white (dark: grey) thumb. Declared globally with
+   !important because each page's scoped chip styles would otherwise win. */
+:root {
+  --segmented-track: rgba(118, 118, 128, 0.12);
+  --segmented-thumb: #ffffff;
+  --segmented-thumb-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04);
+}
+:root[data-theme="dark"] {
+  --segmented-track: rgba(118, 118, 128, 0.24);
+  --segmented-thumb: #636366;
+  --segmented-thumb-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+/* A rounded capsule matching the pill-shaped Filter button beside it: the same
+   34px height, with a pill thumb inside. */
+.view-chips {
+  gap: 0 !important;
+  height: 34px;
+  padding: 2px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--segmented-track) !important;
+}
+.view-chips .chip-highlight {
+  display: none !important;
+}
+.view-chips .view-chip-icon {
+  display: inline-grid !important;
+  width: 40px !important;
+  height: 30px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  place-items: center;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--color-text-primary) !important;
+  font-size: 17px !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.view-chips .view-chip-icon.active {
+  background: var(--segmented-thumb) !important;
+  box-shadow: var(--segmented-thumb-shadow) !important;
 }

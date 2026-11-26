@@ -59,6 +59,17 @@
         </button>
       </div>
     </Teleport>
+    <BookActionSheet
+      v-if="sheetMounted"
+      :open="sheetOpen"
+      :book="book"
+      :cover-url="coverUrl"
+      :in-playlist="inPlaylist"
+      :shareable="shareable"
+      @close="sheetOpen = false"
+      @action="runMenuAction"
+      @cover-error="handleCoverError"
+    />
 
     <div class="card-cover">
       <img :src="coverUrl" :alt="book.title" @error="handleCoverError" />
@@ -168,6 +179,7 @@ import { seriesDisplayLabel } from '~/utils/bookSeriesState'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import BookProgressDisplay from './BookProgressDisplay.vue'
 import BookRatingDisplay from './BookRatingDisplay.vue'
+import BookActionSheet from './BookActionSheet.vue'
 import { usePagesSettings } from '~/composables/usePagesSettings'
 import { useDeviceArchitecture } from '~/composables/useDeviceArchitecture'
 import { useRouter } from 'vue-router'
@@ -247,7 +259,18 @@ const menuOpen = ref(false)
 const menuStyle = ref({})
 const showActionMenu = computed(() => effectiveCollapseActions.value && !props.restoreOnly && !props.selectable && !props.unavailable)
 
+// Phones open the same Apple-style action sheet as the book detail page;
+// tablets keep the anchored dropdown below.
+const sheetOpen = ref(false)
+// Mounted on first use only, so a long list doesn't carry a sheet per card.
+const sheetMounted = ref(false)
+
 const toggleMenu = async () => {
+  if (!isTablet.value) {
+    sheetMounted.value = true
+    sheetOpen.value = true
+    return
+  }
   if (menuOpen.value) {
     menuOpen.value = false
     return

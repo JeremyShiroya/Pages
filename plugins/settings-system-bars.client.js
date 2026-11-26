@@ -1,3 +1,5 @@
+import { SYSTEM_BAR_CHANGE_EVENT, hasModalOverlay } from '~/utils/systemBarOverlay'
+
 const parseColor = (value) => {
   const raw = String(value || '').trim()
   const hex = raw.match(/^#([\da-f]{6})$/i)?.[1]
@@ -41,6 +43,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   const sync = () => {
     frame = null
     if (!usesSettingsPalette(window.location.pathname)) return
+    // While a modal is open its backdrop decides the bar colours; the general
+    // system-bars plugin samples it. This one takes over again once it closes.
+    if (hasModalOverlay()) return
     const bridge = globalThis.Capacitor
     if (!bridge?.isNativePlatform?.()) return
     const background = settingsBackground()
@@ -64,6 +69,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   nuxtApp.hook('app:mounted', schedule)
   nuxtApp.hook('page:finish', schedule)
+  window.addEventListener(SYSTEM_BAR_CHANGE_EVENT, schedule)
   themeObserver = new MutationObserver(schedule)
   themeObserver.observe(document.documentElement, {
     attributes: true,
@@ -73,5 +79,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:beforeUnmount', () => {
     if (frame !== null) cancelAnimationFrame(frame)
     themeObserver?.disconnect()
+    window.removeEventListener(SYSTEM_BAR_CHANGE_EVENT, schedule)
   })
 })

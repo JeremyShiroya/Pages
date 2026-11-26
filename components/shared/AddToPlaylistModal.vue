@@ -9,10 +9,12 @@
     >
       <span class="sheet-grabber" aria-hidden="true"></span>
 
-      <header>
-        <h2 id="playlist-sheet-title">Add to playlist</h2>
-        <button type="button" class="close-button" aria-label="Close" @click="emit('close')">
-          <i class="ri-close-line"></i>
+      <!-- Title bar: the title centred, Done on the right, as a system sheet. -->
+      <header class="sheet-bar">
+        <span class="bar-side" aria-hidden="true"></span>
+        <h2 id="playlist-sheet-title">Add to Playlist</h2>
+        <button type="button" class="bar-done" :disabled="saving" @click="finish">
+          {{ creating && newPlaylistName.trim() ? 'Create' : 'Done' }}
         </button>
       </header>
 
@@ -25,62 +27,55 @@
       </div>
 
       <!-- Tap a playlist to toggle the book in or out; the sheet stays open so
-           one book can be filed into several playlists in a row. The book was
-           already chosen to open this sheet — there is never a second step to
-           re-pick it. Done (or the X) closes. -->
+           one book can be filed into several playlists in a row. Done closes. -->
       <div class="playlist-list" role="group" aria-label="Your playlists">
         <!-- No separate Create button: typing a name and pressing Done (or the
              keyboard's enter) creates the playlist with this book in it. -->
-        <div v-if="creating" class="new-playlist-row">
-          <i class="ri-play-list-add-line"></i>
+        <div v-if="creating" class="list-row new-playlist-row">
+          <span class="row-art accent"><i class="ri-add-line"></i></span>
           <input
             ref="newPlaylistInput"
             :value="newPlaylistName"
             type="text"
             maxlength="100"
-            placeholder="Playlist name"
+            placeholder="Playlist Name"
             enterkeyhint="done"
             @input="newPlaylistName = $event.target.value"
             @keydown.enter.prevent="createAndAdd"
             @keydown.esc="cancelCreating"
           />
           <button type="button" class="row-ghost" aria-label="Cancel new playlist" @click="cancelCreating">
-            <i class="ri-close-line"></i>
+            <i class="ri-close-circle-fill"></i>
           </button>
         </div>
 
-        <button v-else type="button" class="new-playlist-toggle" @click="startCreating">
-          <span class="row-icon accent"><i class="ri-add-line"></i></span>
-          <span class="row-copy"><strong>New playlist</strong></span>
+        <button v-else type="button" class="list-row new-playlist-toggle" @click="startCreating">
+          <span class="row-art accent"><i class="ri-add-line"></i></span>
+          <span class="row-copy"><strong>New Playlist…</strong></span>
         </button>
 
         <button
           v-for="playlist in playlists"
           :key="playlist.id"
           type="button"
-          class="playlist-row"
+          class="list-row playlist-row"
           :class="{ added: playlist.alreadyHas }"
           :disabled="saving"
           :aria-pressed="playlist.alreadyHas"
           @click="togglePlaylist(playlist)"
         >
-          <span class="row-icon"><i :class="playlist.alreadyHas ? 'ri-play-list-2-fill' : 'ri-play-list-2-line'"></i></span>
+          <span class="row-art"><i class="ri-play-list-2-fill"></i></span>
           <span class="row-copy">
             <strong>{{ playlist.name }}</strong>
-            <small>{{ playlist.bookIds?.length || 0 }} books</small>
+            <small>{{ playlist.bookIds?.length || 0 }} {{ (playlist.bookIds?.length || 0) === 1 ? 'book' : 'books' }}</small>
           </span>
-          <span v-if="playlist.alreadyHas" class="row-check" aria-hidden="true"><i class="ri-check-line"></i></span>
-          <span v-else class="row-add" aria-hidden="true"><i class="ri-add-line"></i></span>
+          <i v-if="playlist.alreadyHas" class="ri-check-line row-check" aria-hidden="true"></i>
         </button>
-
-        <p v-if="!playlists.length && !creating" class="playlist-empty">
-          You have no playlists yet. Create your first one above.
-        </p>
       </div>
 
-      <button type="button" class="playlist-done" :disabled="saving" @click="finish">
-        {{ creating && newPlaylistName.trim() ? 'Create & done' : 'Done' }}
-      </button>
+      <p v-if="!playlists.length && !creating" class="playlist-empty">
+        You have no playlists yet. Tap New Playlist to create your first one.
+      </p>
     </section>
   </div>
 </template>
@@ -210,262 +205,232 @@ const finish = async () => {
 
 <style scoped>
 .playlist-overlay {
+  --pl-bg: #f2f2f7;
+  --pl-card: #ffffff;
+  --pl-text: #000;
+  --pl-muted: #8a8a8e;
+  --pl-line: rgba(60, 60, 67, 0.16);
+  --pl-press: rgba(60, 60, 67, 0.08);
+  --pl-fill: rgba(118, 118, 128, 0.12);
+  --pl-blue: #007aff;
   position: fixed;
   inset: 0;
-  z-index: 3300;
+  z-index: 3000;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: var(--color-background-overlay-soft);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.32);
+  font-family: var(--mobile-font-family);
+  animation: pl-fade 0.2s ease both;
 }
 
-/* Bottom sheet: reachable with one thumb, and the list scrolls under a pinned
-   header/footer instead of the whole dialog growing off-screen. */
+:global(html[data-theme="dark"] .playlist-overlay) {
+  --pl-bg: #1c1c1e;
+  --pl-card: #2c2c2e;
+  --pl-text: #fff;
+  --pl-muted: #98989f;
+  --pl-line: rgba(84, 84, 88, 0.6);
+  --pl-press: rgba(255, 255, 255, 0.07);
+  --pl-fill: rgba(118, 118, 128, 0.24);
+  --pl-blue: #0a84ff;
+}
+
 .playlist-sheet {
   display: flex;
-  width: min(520px, 100%);
-  max-height: 86vh;
   flex-direction: column;
-  /* Bottom padding clears the gesture bar so the Done footer is never cut off. */
-  padding: 10px 0 calc(0.9rem + env(safe-area-inset-bottom));
-  border-radius: 20px 20px 0 0;
-  background: var(--color-surface-modal, var(--color-surface-primary));
-  box-shadow: 0 -14px 40px rgba(15, 23, 42, 0.24);
+  width: 100%;
+  max-width: 560px;
+  max-height: 86vh;
+  padding: 0 16px calc(20px + env(safe-area-inset-bottom));
+  border-radius: 16px 16px 0 0;
+  background: var(--pl-bg);
+  color: var(--pl-text);
+  animation: pl-rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .sheet-grabber {
+  display: block;
+  flex: none;
   width: 36px;
-  height: 4px;
-  margin: 0 auto 14px;
+  height: 5px;
+  margin: 6px auto 0;
   border-radius: 999px;
-  background: var(--color-border-strong);
-  opacity: 0.5;
+  background: color-mix(in srgb, var(--pl-muted) 55%, transparent);
 }
 
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.1rem 0.6rem;
-}
-
-header h2 {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 1.15rem;
-  font-weight: 600;
-}
-
-.close-button {
+.sheet-bar {
   display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border: 0;
-  border-radius: 9px;
-  background: var(--color-surface-secondary);
-  color: var(--color-text-muted);
-  cursor: pointer;
-  font-size: 1.15rem;
+  flex: none;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
+  align-items: center;
+  min-height: 52px;
 }
+
+.sheet-bar h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 450 !important;
+  text-align: center;
+}
+
+.bar-done {
+  justify-self: end;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--pl-blue);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 450 !important;
+  cursor: pointer;
+}
+
+.bar-done:disabled { opacity: 0.5; }
 
 .book-preview {
   display: flex;
+  flex: none;
   align-items: center;
-  gap: 0.8rem;
-  margin: 0 1.1rem 0.8rem;
-  padding: 0.7rem;
-  border-radius: 12px;
-  background: var(--color-brand-primary-faint);
+  gap: 12px;
+  padding: 4px 4px 16px;
 }
 
 .book-preview img {
   width: 40px;
-  height: 56px;
-  flex: 0 0 auto;
-  border-radius: 6px;
+  height: 60px;
+  border-radius: 5px;
   object-fit: cover;
-  box-shadow: var(--shadow-cover);
 }
 
 .book-preview div {
   display: grid;
   min-width: 0;
-  gap: 0.1rem;
+  gap: 2px;
 }
 
-.book-preview strong {
+.book-preview strong,
+.book-preview span {
   overflow: hidden;
-  color: var(--color-text-primary);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.book-preview span {
-  color: var(--color-text-muted);
-  font-size: 0.78rem;
-}
+.book-preview strong { font-size: 15px; font-weight: 500 !important; }
+.book-preview span { color: var(--pl-muted); font-size: 13px; }
 
+/* One grouped list: rows divided by hairlines inset past the artwork. */
 .playlist-list {
-  display: grid;
-  flex: 1 1 auto;
-  align-content: start;
-  gap: 0.5rem;
-  min-height: 0;
   overflow-y: auto;
-  padding: 0 1.1rem 0.5rem;
+  border-radius: 12px;
+  background: var(--pl-card);
+  overscroll-behavior: contain;
 }
 
-.playlist-row,
-.new-playlist-toggle,
-.new-playlist-row {
+.list-row {
+  position: relative;
   display: flex;
-  width: 100%;
   align-items: center;
-  gap: 0.75rem;
+  gap: 12px;
+  width: 100%;
   min-height: 60px;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 12px;
-  background: var(--color-surface-input);
-  color: inherit;
-  cursor: pointer;
+  padding: 8px 16px 8px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--pl-text);
   font: inherit;
   text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.playlist-row:active {
-  border-color: var(--color-brand-primary);
-  background: var(--color-surface-active);
+.list-row + .list-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 68px;
+  height: 1px;
+  background: var(--pl-line);
 }
 
-/* "Added" is a selected state now, not a disabled one — the row can be tapped
-   again to pull the book back out, so it reads as active rather than dimmed. */
-.playlist-row.added {
-  border-color: var(--color-brand-primary);
-  background: var(--color-surface-active);
-}
+.list-row:active { background: var(--pl-press); }
+.list-row:disabled { cursor: default; }
 
-.row-icon {
+.row-art {
   display: grid;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 auto;
+  flex: none;
+  width: 44px;
+  height: 44px;
   place-items: center;
-  border-radius: 10px;
-  background: var(--color-brand-primary-faint);
-  color: var(--color-brand-primary);
+  border-radius: 8px;
+  background: var(--pl-fill);
+  color: var(--pl-muted);
+  font-size: 22px;
 }
 
-.row-icon.accent {
-  background: var(--color-brand-primary);
-  color: var(--color-text-on-brand);
-}
+.row-art.accent { color: var(--pl-blue); }
 
 .row-copy {
   display: grid;
   flex: 1;
   min-width: 0;
-  gap: 0.1rem;
+  gap: 2px;
 }
 
 .row-copy strong {
   overflow: hidden;
-  color: var(--color-text-primary);
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 400 !important;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.row-copy small {
-  color: var(--color-text-muted);
-  font-size: 0.76rem;
-}
+.new-playlist-toggle .row-copy strong { color: var(--pl-blue); }
+.row-copy small { color: var(--pl-muted); font-size: 13px; }
 
-/* The single-tap "add" affordance on each row. */
-.row-add {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--color-brand-primary-faint);
-  color: var(--color-brand-primary);
-  font-size: 1.1rem;
-}
-
-/* Filled check on a playlist the book is already in. */
 .row-check {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--color-brand-primary);
-  color: var(--color-text-on-brand);
-  font-size: 1.05rem;
-}
-
-/* Fixed footer inside the sheet — never scrolls with the list, and the sheet's
-   safe-area padding below keeps it fully visible above the gesture bar. */
-.playlist-done {
-  flex: 0 0 auto;
-  margin: 0.5rem 1.1rem 0;
-  padding: 0.85rem;
-  border: 0;
-  border-radius: 12px;
-  background: var(--color-brand-primary);
-  color: var(--color-text-on-brand);
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-}
-
-.playlist-done:disabled {
-  opacity: 0.6;
-}
-
-.new-playlist-row {
-  cursor: default;
-}
-
-.new-playlist-row > i {
-  color: var(--color-brand-primary);
-  font-size: 1.2rem;
+  flex: none;
+  color: var(--pl-blue);
+  font-size: 22px;
 }
 
 .new-playlist-row input {
-  width: 100%;
-  min-width: 0;
   flex: 1;
+  min-width: 0;
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--color-text-primary);
+  color: var(--pl-text);
   font: inherit;
+  font-size: 17px;
 }
+
+.new-playlist-row input::placeholder { color: var(--pl-muted); }
 
 .row-ghost {
   display: grid;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
+  flex: none;
   place-items: center;
+  padding: 0;
   border: 0;
-  border-radius: 8px;
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--pl-muted);
+  font-size: 20px;
   cursor: pointer;
 }
 
 .playlist-empty {
-  margin: 0.5rem 0 1rem;
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  text-align: center;
+  margin: 10px 16px 0;
+  color: var(--pl-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@keyframes pl-fade { from { opacity: 0; } }
+@keyframes pl-rise { from { transform: translateY(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .playlist-overlay,
+  .playlist-sheet { animation: none; }
 }
 </style>

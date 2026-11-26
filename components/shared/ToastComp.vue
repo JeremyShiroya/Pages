@@ -1,22 +1,21 @@
 <template>
-  <div class="toast-container">
+  <div class="toast-container" aria-live="polite">
     <TransitionGroup name="toast">
-      <div
+      <!-- Frosted capsule: a small blurred-glass pill at the top centre with a
+           coloured icon, as iOS shows "AirPods Connected". Tap to dismiss. -->
+      <button
         v-for="toast in toasts"
         :key="toast.id"
+        type="button"
         class="toast"
         :class="toast.type"
+        :role="toast.type === 'error' ? 'alert' : 'status'"
+        :aria-label="`${toast.message}. Tap to dismiss.`"
+        @click="removeToast(toast.id)"
       >
-        <div class="toast-icon">
-          <i v-if="toast.type === 'success'" class="ri-checkbox-circle-line"></i>
-          <i v-else-if="toast.type === 'error'" class="ri-alert-line"></i>
-          <i v-else class="ri-information-line"></i>
-        </div>
-        <p class="toast-message">{{ toast.message }}</p>
-        <button class="toast-close" aria-label="Dismiss" @click="removeToast(toast.id)">
-          <i class="ri-close-circle-line"></i>
-        </button>
-      </div>
+        <i class="toast-icon" :class="iconFor(toast.type)" aria-hidden="true"></i>
+        <span class="toast-message">{{ toast.message }}</span>
+      </button>
     </TransitionGroup>
   </div>
 </template>
@@ -25,119 +24,118 @@
 import { useToast } from '~/composables/useToast';
 
 const { toasts, removeToast } = useToast();
+
+const iconFor = (type) => (
+  type === 'success' ? 'ri-checkbox-circle-fill'
+    : type === 'error' ? 'ri-error-warning-fill'
+      : 'ri-information-fill'
+);
 </script>
 
 <style scoped>
 .toast-container {
   position: fixed;
-  top: calc(env(safe-area-inset-top) + 16px);
-  right: 1rem;
+  top: calc(env(safe-area-inset-top) + 12px);
+  right: 16px;
+  left: 16px;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  align-items: center;
+  gap: 8px;
   z-index: 9999;
   pointer-events: none;
 }
 
-/* Soft alert-bar style: pale tinted pill with matching border, text, and icons. */
+/* Glassmorphism: a mostly see-through pane that blurs and saturates whatever
+   is behind it, with a light rim and a soft top highlight like real glass. */
 .toast {
+  --toast-glass: rgba(255, 255, 255, 0.42);
+  --toast-rim: rgba(255, 255, 255, 0.65);
+  --toast-sheen: rgba(255, 255, 255, 0.55);
+  --toast-ink: #111114;
+  --toast-hairline: rgba(60, 60, 67, 0.1);
+  --toast-green: #34c759;
+  --toast-red: #ff3b30;
+  --toast-blue: #007aff;
   pointer-events: auto;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  min-width: 300px;
-  max-width: 450px;
-  padding: 0.8rem 0.9rem;
-  border: 1px solid;
-  border-radius: 10px;
-  font-weight: 500;
+  gap: 8px;
+  max-width: min(100%, 420px);
+  padding: 10px 18px 10px 14px;
+  border: 1px solid var(--toast-rim);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, var(--toast-sheen) 0%, transparent 55%),
+    var(--toast-glass);
+  color: var(--toast-ink);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.14),
+    0 0 0 0.5px var(--toast-hairline),
+    inset 0 1px 0 var(--toast-sheen);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.toast.error {
-  background: #fdecec;
-  border-color: #f3c1c5;
-  color: #c04552;
+:global(html[data-theme="dark"] .toast-container .toast) {
+  --toast-glass: rgba(40, 40, 42, 0.45);
+  --toast-rim: rgba(255, 255, 255, 0.14);
+  --toast-sheen: rgba(255, 255, 255, 0.1);
+  --toast-ink: #f5f5f7;
+  --toast-hairline: rgba(84, 84, 88, 0.55);
+  --toast-green: #30d158;
+  --toast-red: #ff453a;
+  --toast-blue: #0a84ff;
 }
 
-.toast.success {
-  background: #e9f7ee;
-  border-color: #b5e0c4;
-  color: #2f9e5f;
-}
-
-.toast.info {
-  background: #fff8e6;
-  border-color: #f4dfa2;
-  color: #c19a2e;
-}
+.toast.success .toast-icon { color: var(--toast-green); }
+.toast.error .toast-icon { color: var(--toast-red); }
+.toast.info .toast-icon { color: var(--toast-blue); }
 
 .toast-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
+  flex: none;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .toast-message {
-  flex: 1;
-  margin: 0;
-  color: inherit;
-  font-size: 0.9rem;
-  line-height: 1.35;
+  font-size: 14px;
+  font-weight: 450 !important;
+  line-height: 1.3;
 }
 
-.toast-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  padding: 0.15rem;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  font-size: 1.15rem;
-  opacity: 0.75;
-  transition: opacity 0.2s;
+/* Drops in from under the status bar with a slight spring. */
+.toast-enter-active {
+  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.2, 1.25, 0.4, 1);
 }
 
-.toast-close:hover {
-  opacity: 1;
-}
-
-/* Transitions — slide in from the top. */
-.toast-enter-active,
 .toast-leave-active {
-  transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
 }
 
-.toast-enter-from,
+.toast-enter-from {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.96);
+}
+
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(-18px) scale(0.96);
+  filter: blur(2px);
+  transform: translateY(-8px) scale(0.98);
 }
 
-@media (max-width: 768px),
-  (orientation: portrait) and (min-width: 769px) and (max-width: 1024px) {
-  .toast-container {
-    top: calc(env(safe-area-inset-top) + 12px);
-    right: 1rem;
-    left: 1rem;
-    align-items: stretch;
-    gap: 0.55rem;
-  }
+.toast-move {
+  transition: transform 0.3s ease;
+}
 
-  .toast {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-    padding: 0.75rem 0.8rem;
-  }
-
-  .toast-message {
-    font-size: 0.86rem;
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter-active,
+  .toast-leave-active {
+    transition: opacity 0.2s ease;
   }
 }
 </style>

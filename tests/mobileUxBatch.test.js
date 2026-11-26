@@ -272,14 +272,14 @@ describe('mobile UX batch', () => {
     }
   })
 
-  test('toasts render as tinted alert bars pinned to the top', () => {
+  test('toasts render as frosted capsules pinned to the top', () => {
     const toast = read('components/shared/ToastComp.vue')
 
     expect(toast).toMatch(/\.toast-container\s*\{[^}]*top:\s*calc\(env\(safe-area-inset-top\)/)
     expect(toast).not.toMatch(/\.toast-container[^}]*bottom:/)
-    expect(toast).toContain('ri-close-circle-line')
-    expect(toast).toMatch(/\.toast\.success\s*\{[^}]*background:\s*#e9f7ee/)
-    expect(toast).toMatch(/\.toast\.error\s*\{[^}]*background:\s*#fdecec/)
+    // Glass pill with a coloured icon; tapping it dismisses.
+    expect(toast).toMatch(/\.toast\s*\{[^}]*border-radius:\s*999px[^}]*backdrop-filter:\s*blur/s)
+    expect(toast).toContain('@click="removeToast(toast.id)"')
   })
 
   test('storage page has a mobile design with metadata backfill and failure modal', () => {
@@ -395,11 +395,12 @@ describe('mobile UX batch', () => {
     expect(plugin).toContain('public void deleteFile(PluginCall call)')
 
     const modal = read('components/shared/DeleteConfirmModal.vue')
-    expect(modal).toContain("permanently removes {{ isBulk ? 'them' : 'the book' }}")
+    expect(modal).toContain('cannot be restored')
+    // When the book owns a file on the phone, the message says that goes too.
     expect(modal).toContain('removesDeviceFile')
-    expect(modal).toContain('Delete permanently')
-    // Points the user at Hide, the non-destructive neighbour.
-    expect(modal).toContain('Hide')
+    expect(modal).toContain('file on your device')
+    expect(modal).toContain('Yes, Delete')
+    expect(modal).toContain('No, Cancel')
   })
 
   test('reader thickness options map to weights the reader fonts actually ship', () => {
@@ -476,10 +477,13 @@ describe('mobile UX batch', () => {
     expect(series).toContain('var(--gradient-image-card-overlay)')
   })
 
-  test('mobile modals are reachable bottom sheets', () => {
+  test('delete is a centred alert and the playlist picker a bottom sheet', () => {
     const del = read('components/shared/DeleteConfirmModal.vue')
     expect(del).toContain('delete-sheet')
-    expect(del).toMatch(/align-items:\s*flex-end/)
+    // Centred alert with side-by-side "Yes, Delete" / "No, Cancel".
+    expect(del).toMatch(/\.delete-overlay\s*\{[^}]*align-items:\s*center/)
+    expect(del).toContain('Yes, Delete')
+    expect(del).toContain('No, Cancel')
 
     const playlist = read('components/shared/AddToPlaylistModal.vue')
     expect(playlist).toContain('playlist-sheet')
@@ -494,12 +498,11 @@ describe('mobile UX batch', () => {
     expect(playlist).toContain('alreadyHas')
   })
 
-  test('delete modal keeps the device path inside the sheet', () => {
+  test('delete alert is just a title, a message and two buttons', () => {
     const del = read('components/shared/DeleteConfirmModal.vue')
-    // The path column must be allowed to shrink and the path must wrap.
-    expect(del).toMatch(/\.effect-copy\s*\{[^}]*min-width:\s*0/)
-    expect(del).toMatch(/\.delete-effects em\s*\{[^}]*overflow-wrap:\s*anywhere/)
-    expect(del).not.toMatch(/\.delete-effects em\s*\{[^}]*white-space:\s*nowrap/)
+    expect(del).toMatch(/\.delete-actions\s*\{[^}]*grid-template-columns:\s*1fr 1fr/)
+    expect(del).not.toContain('delete-effects')
+    expect(del).not.toContain('delete-cover')
   })
 
   test('series card orders books by installment so home and series pages agree', () => {

@@ -180,7 +180,7 @@
                   aria-label="List view"
                   title="List view"
                 >
-                  <i class="ri-list-unordered"></i>
+                  <i class="ri-list-ordered-2"></i>
                 </button>
               </div>
             </div>
@@ -486,7 +486,7 @@ const runBulkAction = async (key) => {
     // becomes all-favourite rather than flipping each independently.
     const makeFavourite = chosen.some((book) => !book.isFavourite);
     for (const book of chosen) {
-      if (!!book.isFavourite !== makeFavourite) await toggleFavourite(book.id);
+      if (!!book.isFavourite !== makeFavourite) await toggleFavourite(book.id, { announce: false });
     }
     addToast(
       makeFavourite

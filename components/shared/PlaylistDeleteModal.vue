@@ -1,34 +1,26 @@
 <template>
-  <div class="pl-delete-overlay" role="presentation" @click="emit('close')">
+  <!-- Same centred alert as deleting a book: a title, one message, and two
+       equal buttons under a hairline, split by a hairline. -->
+  <div class="delete-overlay" role="presentation" @click="emit('close')">
     <section
-      class="pl-delete-sheet"
+      class="delete-sheet"
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="pl-delete-title"
       aria-describedby="pl-delete-description"
       @click.stop
     >
-      <span class="sheet-grabber" aria-hidden="true"></span>
-
-      <div class="pl-delete-icon" aria-hidden="true">
-        <i class="ri-play-list-2-line"></i>
+      <div class="delete-body">
+        <h2 id="pl-delete-title">{{ isBulk ? `Delete ${count} Playlists` : 'Delete Playlist' }}</h2>
+        <p id="pl-delete-description" class="delete-description">
+          Are you sure you want to delete {{ isBulk ? 'these playlists' : `"${playlist.name}"` }}?
+          The books in {{ isBulk ? 'them' : 'it' }} stay in your library.
+        </p>
       </div>
 
-      <h2 id="pl-delete-title">
-        {{ isBulk ? `Delete these ${count} playlists?` : 'Delete this playlist?' }}
-      </h2>
-      <p id="pl-delete-description" class="pl-delete-description">
-        <strong>{{ isBulk ? `${count} playlists` : playlist.name }}</strong> will be removed. The
-        books in {{ isBulk ? 'them' : 'it' }} stay in your library — only the
-        {{ isBulk ? 'playlists are' : 'playlist is' }} deleted.
-      </p>
-
-      <div class="pl-delete-actions">
-        <button type="button" class="pl-delete-cancel" @click="emit('close')">Cancel</button>
-        <button type="button" class="pl-delete-confirm" @click="emit('confirm')">
-          <i class="ri-delete-bin-line"></i>
-          {{ isBulk ? 'Delete playlists' : 'Delete playlist' }}
-        </button>
+      <div class="delete-actions">
+        <button type="button" class="delete-confirm" @click="emit('confirm')">Yes, Delete</button>
+        <button type="button" class="delete-cancel" @click="emit('close')">No, Cancel</button>
       </div>
     </section>
   </div>
@@ -56,89 +48,100 @@ const isBulk = computed(() => props.count > 1)
 </script>
 
 <style scoped>
-.pl-delete-overlay {
+.delete-overlay {
+  --dc-bg: #ffffff;
+  --dc-text: #000000;
+  --dc-muted: #6b6b6b;
+  --dc-line: #d6d6d6;
+  --dc-press: rgba(0, 0, 0, 0.05);
+  --dc-red: #c62828;
   position: fixed;
   inset: 0;
   z-index: 3400;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding: 0;
-  background: rgba(0, 0, 0, 0.5);
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  font-family: var(--mobile-font-family);
+  animation: dc-fade 0.18s ease both;
 }
 
-.pl-delete-sheet {
+:global(html[data-theme="dark"] .delete-overlay) {
+  --dc-bg: #2c2c2e;
+  --dc-text: #ffffff;
+  --dc-muted: #a1a1a6;
+  --dc-line: #48484a;
+  --dc-press: rgba(255, 255, 255, 0.06);
+  --dc-red: #ff453a;
+}
+
+.delete-sheet {
   width: 100%;
-  max-width: 520px;
-  padding: 0.75rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
-  border-radius: 24px 24px 0 0;
-  background: var(--color-surface-primary);
-  color: var(--color-text-primary);
+  max-width: 420px;
+  overflow: hidden;
+  border-radius: 32px;
+  background: var(--dc-bg);
+  color: var(--dc-text);
+  animation: dc-pop 0.24s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+.delete-body {
+  padding: 36px 24px 30px;
   text-align: center;
 }
 
-.sheet-grabber {
-  display: block;
-  width: 40px;
-  height: 4px;
-  margin: 0 auto 1rem;
-  border-radius: 999px;
-  background: var(--color-border-subtle);
+.delete-body h2 {
+  margin: 0 0 14px;
+  color: var(--dc-text);
+  font-size: 20px;
+  font-weight: 400 !important;
+  line-height: 1.25;
 }
 
-.pl-delete-icon {
-  display: grid;
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 0.75rem;
-  place-items: center;
-  border-radius: 14px;
-  background: var(--color-status-danger-faint, rgba(220, 38, 38, 0.12));
-  color: var(--color-status-danger-bright, #dc2626);
-  font-size: 1.5rem;
-}
-
-.pl-delete-sheet h2 {
-  margin: 0 0 0.4rem;
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.pl-delete-description {
-  margin: 0 0 1.25rem;
-  color: var(--color-text-secondary);
-  font-size: 0.92rem;
+.delete-description {
+  margin: 0;
+  color: var(--dc-muted);
+  font-size: 15px;
   line-height: 1.5;
 }
 
-.pl-delete-actions {
+.delete-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  border-top: 1px solid var(--dc-line);
 }
 
-.pl-delete-cancel,
-.pl-delete-confirm {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.85rem;
+.delete-confirm,
+.delete-cancel {
+  min-height: 56px;
   border: 0;
-  border-radius: 12px;
-  cursor: pointer;
+  background: transparent;
   font: inherit;
-  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.pl-delete-cancel {
-  border: 1px solid var(--color-border-subtle);
-  background: var(--color-surface-input);
-  color: var(--color-text-primary);
+.delete-confirm {
+  border-right: 1px solid var(--dc-line);
+  color: var(--dc-red);
 }
 
-.pl-delete-confirm {
-  background: var(--color-status-danger-bright, #dc2626);
-  color: #fff;
+.delete-cancel {
+  color: var(--dc-text);
+}
+
+.delete-confirm:active,
+.delete-cancel:active {
+  background: var(--dc-press);
+}
+
+@keyframes dc-fade { from { opacity: 0; } }
+@keyframes dc-pop { from { opacity: 0; transform: scale(1.06); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .delete-overlay,
+  .delete-sheet { animation: none; }
 }
 </style>

@@ -212,7 +212,6 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
   font-size: var(--mobile-subtext-size);
   font-weight: 400;
 }
-
 .continue-play {
   position: absolute;
   top: 50%;

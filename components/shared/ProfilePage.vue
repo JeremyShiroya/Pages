@@ -13,8 +13,8 @@
       </div>
       <h1>Profile</h1>
       <div class="nav-actions">
-        <button v-if="showStreak" type="button" class="streak-pill" aria-label="Open streak calendar" @click="router.push('/streak')">
-          <i class="ri-fire-fill"></i>
+        <button v-if="showStreak" type="button" class="streak-pill" :class="{ plain: settings.streakBackground === false }" aria-label="Open streak calendar" @click="router.push('/streak')">
+          <i :class="settings.streakIcon === 'lightning' ? 'ri-flashlight-fill' : 'ri-fire-fill'"></i>
           <span>{{ streakCount }}</span>
         </button>
         <button type="button" class="menu-button" aria-label="Open settings" @click="router.push('/settings')">
@@ -74,6 +74,12 @@
             <i :class="tab.icon"></i>
             <span>{{ tab.label }}</span>
           </button>
+          <!-- One underline that glides between the tabs. -->
+          <span
+            class="tab-indicator"
+            aria-hidden="true"
+            :style="{ width: `${100 / tabs.length}%`, transform: `translateX(${Math.max(0, tabs.findIndex((tab) => tab.id === activeTab)) * 100}%)` }"
+          ></span>
         </div>
 
         <div v-if="activeTab === 'favourites'" class="tab-panel" role="tabpanel">
@@ -282,7 +288,7 @@ const runBulkAction = async (key) => {
     return
   }
   if (key === 'favourite') {
-    for (const book of chosen) await toggleFavourite(book.id)
+    for (const book of chosen) await toggleFavourite(book.id, { announce: false })
     addToast(`${chosen.length} book${chosen.length === 1 ? '' : 's'} removed from favourites.`, 'success')
     clearSelection()
     return
@@ -408,6 +414,7 @@ onMounted(async () => {
 .nav-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
 .streak-pill, .menu-button { display: inline-flex; align-items: center; justify-content: center; border: 0; color: var(--color-text-primary); cursor: pointer; }
 .streak-pill { gap: 4px; min-height: 36px; padding: 0 12px; border-radius: 999px; background: var(--color-brand-primary-muted); color: var(--color-brand-primary); }
+.streak-pill.plain { padding: 0 6px; background: transparent; }
 .menu-button { width: 44px; height: 44px; padding: 0; background: transparent; font-size: 22px; }
 .profile-content { width: min(1040px, 100%); margin: 0 auto; padding: 32px 28px 120px; }
 .profile-summary { width: min(720px, 100%); margin: 0 auto; }
@@ -432,10 +439,14 @@ onMounted(async () => {
 .backup-profile-button:active { background: var(--color-brand-primary-hover); }
 .edit-profile-button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .profile-library { margin-top: 28px; }
-.profile-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid var(--color-border-subtle); }
-.profile-tabs button { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; border: 0; background: transparent; color: var(--color-text-muted); cursor: pointer; font: inherit; font-size: 0.9rem; }
+.profile-tabs { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid var(--color-border-subtle); }
+.profile-tabs button { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; border: 0; background: transparent; color: var(--color-text-muted); cursor: pointer; font: inherit; font-size: 0.9rem; transition: color 0.25s ease; }
 .profile-tabs button.active { color: var(--color-brand-primary); font-weight: 600; }
-.profile-tabs button.active::after { position: absolute; right: 14%; bottom: -1px; left: 14%; height: 2px; border-radius: 99px; background: var(--color-brand-primary); content: ''; }
+/* The underline is one element sliding a full tab width at a time; the bar is
+   drawn inset inside it, as the per-tab underline used to be. */
+.tab-indicator { position: absolute; bottom: -1px; left: 0; height: 2px; pointer-events: none; transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+.tab-indicator::after { position: absolute; inset: 0 14%; border-radius: 99px; background: var(--color-brand-primary); content: ''; }
+@media (prefers-reduced-motion: reduce) { .tab-indicator { transition: none; } }
 .tab-panel { padding-top: 24px; }
 .books-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 14px; }
 .books-list { display: grid; grid-template-columns: 1fr; gap: 16px; }

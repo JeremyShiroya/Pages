@@ -525,7 +525,7 @@ onMounted(() => {
 .storage-group {
   display: grid;
   gap: 14px;
-  padding: 16px var(--settings-row-inset);
+  padding: var(--settings-row-pad-y) var(--settings-row-inset);
   border-radius: var(--settings-radius);
   background: var(--color-settings-group);
 }

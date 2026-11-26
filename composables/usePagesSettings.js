@@ -47,8 +47,12 @@ export const DEFAULT_PAGES_SETTINGS = Object.freeze({
   listenBarScope: 'book',           // 'book' | 'chapter'
   listenSummaryScope: 'book',       // 'book' | 'chapter'
   showStreak: true,                // reading-streak pill in the top nav
+  streakIcon: 'flame',             // 'flame' | 'lightning' — the streak pill's icon
+  streakBackground: true,          // the streak pill's tinted capsule behind icon + count
   formatFilter: 'all',             // 'all' | 'pdf' | 'epub' — legacy, see useLibraryFilters
   hideContent: false,              // preview the app as though the library were empty
+  settingsIcons: true,             // developer preview: Settings list with or without row icons
+  settingsArrows: true,            // developer preview: Settings list with or without row arrows
   // Show the series installments you don't own yet. ON by default: it is the
   // answer to "which book do I read next", it needs no setup, and a reader who
   // never opens Preferences would otherwise never discover it exists. Resolution
@@ -263,9 +267,8 @@ export function normalizePagesSettings(value) {
     favouritesCardLayout: FAVOURITES_CARD_LAYOUT_OPTIONS.includes(source.favouritesCardLayout)
       ? source.favouritesCardLayout
       : DEFAULT_PAGES_SETTINGS.favouritesCardLayout,
-    profileFavouritesLayout: FAVOURITES_CARD_LAYOUT_OPTIONS.includes(source.profileFavouritesLayout)
-      ? source.profileFavouritesLayout
-      : DEFAULT_PAGES_SETTINGS.profileFavouritesLayout,
+    // No longer a choice in Preferences: Profile favourites are always a grid.
+    profileFavouritesLayout: DEFAULT_PAGES_SETTINGS.profileFavouritesLayout,
     playlistCardBackground: 'blur',
     playlistCardLayout: 'fan',
     bookActionDisplay: BOOK_ACTION_DISPLAY_OPTIONS.includes(source.bookActionDisplay)
@@ -296,6 +299,8 @@ export function normalizePagesSettings(value) {
     showStreak: source.showStreak === undefined
       ? DEFAULT_PAGES_SETTINGS.showStreak
       : source.showStreak !== false,
+    streakIcon: ['flame', 'lightning'].includes(source.streakIcon) ? source.streakIcon : DEFAULT_PAGES_SETTINGS.streakIcon,
+    streakBackground: source.streakBackground !== false,
     formatFilter: (
       normalizeEnabledFormats(source.enabledFormats).length <= 1
       || (source.formatFilter !== 'all' && !normalizeEnabledFormats(source.enabledFormats).includes(source.formatFilter))
@@ -303,6 +308,8 @@ export function normalizePagesSettings(value) {
       ? 'all'
       : (FORMAT_FILTER_OPTIONS.includes(source.formatFilter) ? source.formatFilter : DEFAULT_PAGES_SETTINGS.formatFilter),
     hideContent: source.hideContent === true,
+    settingsIcons: source.settingsIcons !== false,
+    settingsArrows: source.settingsArrows !== false,
     // undefined means "never chosen", which must fall through to the default —
     // `=== true` would pin every existing install to off no matter what the
     // default says, so flipping the default alone would change nothing.

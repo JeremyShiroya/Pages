@@ -106,7 +106,7 @@ const restoreAll = () => updateSettings(Object.fromEntries(
 .bottom-nav-settings { min-height: 100vh; background: var(--color-settings-background); color: var(--color-text-primary); font-family: var(--mobile-font-family); }
 .settings-scroll { display: grid; gap: 24px; width: min(760px, 100%); margin: 0 auto; padding: 8px var(--settings-gutter) calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 28px); }
 .intro { margin: 0 var(--settings-row-inset) 2px; color: var(--color-text-secondary); font-size: 14px; line-height: 1.5; }
-.setting-card { display: grid; gap: 16px; padding: 18px var(--settings-row-inset); border: 0; border-radius: var(--settings-radius); background: var(--color-settings-group); }
+.setting-card { display: grid; gap: 16px; padding: var(--settings-row-pad-y) var(--settings-row-inset); border: 0; border-radius: var(--settings-radius); background: var(--color-settings-group); }
 .section-heading h2 { margin: 0; font-size: var(--settings-label-size); }
 .section-heading p { margin: 4px 0 0; color: var(--color-text-muted); font-size: var(--settings-caption-size); line-height: 1.4; }
 .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }

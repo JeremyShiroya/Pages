@@ -68,7 +68,7 @@ const statusOptions = [
 ]
 const viewOptions = [
   { value: 'grid', label: 'Grid', icon: 'ri-apps-2-line' },
-  { value: 'table', label: 'Table', icon: 'ri-list-unordered' },
+  { value: 'table', label: 'Table', icon: 'ri-list-ordered-2' },
 ]
 
 const statusChipsRef = ref(null)

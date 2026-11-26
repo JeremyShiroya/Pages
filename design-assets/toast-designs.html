@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Toast Designs</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" />
+<style>
+  @font-face {
+    font-family: "General Sans";
+    src: url("../public/fonts/GeneralSans-Variable.woff2") format("woff2");
+    font-weight: 200 700;
+  }
+
+  :root {
+    --page: #f2f2f7;
+    --card: #ffffff;
+    --ink: #111114;
+    --muted: #8a8a8e;
+    --line: rgba(60, 60, 67, 0.14);
+    --brand: #8a2be2;
+    --phone-bg: #ffffff;
+    --phone-surface: #f1f1f4;
+    --green: #34c759;
+    --red: #ff3b30;
+    --blue: #007aff;
+    --orange: #ff9500;
+    --glass: rgba(255, 255, 255, 0.72);
+    --glass-ink: #111114;
+    --island: #000000;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --page: #000000;
+    --card: #1c1c1e;
+    --ink: #f5f5f7;
+    --muted: #98989f;
+    --line: rgba(84, 84, 88, 0.55);
+    --phone-bg: #111018;
+    --phone-surface: #1f1d29;
+    --green: #30d158;
+    --red: #ff453a;
+    --blue: #0a84ff;
+    --orange: #ff9f0a;
+    --glass: rgba(44, 44, 48, 0.72);
+    --glass-ink: #f5f5f7;
+    --island: #000000;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: "General Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout: catalogue on the left, a phone to play them in on the right ── */
+  .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; max-width: 1240px; margin: 0 auto; padding: 32px 24px 64px; }
+  @media (max-width: 960px) { .wrap { grid-template-columns: 1fr; } .phone-col { order: -1; } }
+
+  header.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+  header.top h1 { margin: 0; font-size: 34px; font-weight: 650; letter-spacing: -0.02em; }
+  header.top p { margin: 6px 0 0; color: var(--muted); font-size: 15px; max-width: 560px; line-height: 1.45; }
+
+  .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--muted) 18%, transparent); }
+  .seg button { min-height: 30px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .seg button.on { background: var(--card); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .design { display: grid; gap: 14px; padding: 18px; border-radius: 18px; background: var(--card); }
+  .design-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+  .design-head h2 { margin: 0; font-size: 17px; font-weight: 600; }
+  .design-head .num { color: var(--muted); font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .design-head p { margin: 3px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
+  .stage { position: relative; display: grid; gap: 10px; justify-items: center; padding: 18px 12px; border-radius: 14px; background: var(--phone-surface); overflow: hidden; }
+  .play { display: inline-flex; align-items: center; gap: 6px; justify-self: start; min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--blue) 14%, transparent); color: var(--blue); font: inherit; font-size: 13px; font-weight: 550; cursor: pointer; }
+  .play:active { transform: scale(0.97); }
+  .design.picked { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .pick { margin-left: auto; min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; }
+  .design.picked .pick { color: var(--brand); font-weight: 600; }
+  .actions { display: flex; align-items: center; gap: 8px; }
+
+  /* ── Phone ── */
+  .phone-col { position: sticky; top: 24px; align-self: start; }
+  .phone { position: relative; width: 340px; height: 700px; margin: 0 auto; overflow: hidden; border: 10px solid #0b0b0d; border-radius: 52px; background: var(--phone-bg); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.18); }
+  .phone::before { content: ""; position: absolute; top: 10px; left: 50%; z-index: 30; width: 104px; height: 30px; border-radius: 20px; background: #000; transform: translateX(-50%); }
+  .mock { position: absolute; inset: 0; padding: 58px 16px 0; }
+  .mock .bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .mock .logo { display: flex; align-items: center; gap: 8px; color: var(--brand); font-size: 22px; font-weight: 500; }
+  .mock .logo span { width: 26px; height: 26px; border-radius: 8px; background: var(--brand); }
+  .mock .search { height: 40px; margin-bottom: 18px; border-radius: 12px; background: var(--phone-surface); }
+  .mock .title { margin: 0 0 10px; font-size: 18px; }
+  .mock .hero { height: 128px; margin-bottom: 18px; border-radius: 18px; background: linear-gradient(120deg, #4b4757, #6d4560); }
+  .mock .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .mock .row i { aspect-ratio: 2 / 3; border-radius: 10px; background: var(--phone-surface); }
+  .mock .tabs { position: absolute; right: 16px; bottom: 18px; left: 16px; height: 58px; border-radius: 30px; background: var(--phone-surface); }
+  .phone-caption { margin: 12px 0 0; color: var(--muted); font-size: 13px; text-align: center; }
+  .layer { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
+
+  /* Shared bits */
+  .t { font-size: 14px; line-height: 1.3; }
+  .t .msg { font-weight: 500; }
+  .ic-success { color: var(--green); }
+  .ic-error { color: var(--red); }
+  .ic-info { color: var(--blue); }
+
+  /* 1 · Dynamic Island */
+  .d1 { display: flex; align-items: center; gap: 10px; min-width: 220px; max-width: 300px; padding: 10px 16px 10px 10px; border-radius: 26px; background: var(--island); color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); }
+  .d1 .dot { display: grid; flex: none; width: 30px; height: 30px; place-items: center; border-radius: 50%; font-size: 18px; }
+  .d1 .dot.success { background: rgba(48, 209, 88, 0.2); color: #30d158; }
+  .d1 .dot.error { background: rgba(255, 69, 58, 0.2); color: #ff453a; }
+  .d1 .dot.info { background: rgba(10, 132, 255, 0.22); color: #0a84ff; }
+
+  /* 2 · Notification banner */
+  .d2 { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 10px; width: 300px; padding: 12px 14px; border-radius: 22px; background: var(--glass); color: var(--glass-ink); backdrop-filter: blur(24px) saturate(1.6); -webkit-backdrop-filter: blur(24px) saturate(1.6); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16); }
+  .d2 .app { width: 38px; height: 38px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 18px; }
+  .d2 .head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+  .d2 .head span { color: var(--muted); font-weight: 400; }
+  .d2 .msg { margin-top: 1px; font-weight: 400; }
+
+  /* 3 · Frosted capsule */
+  .d3 { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px 10px 14px; border-radius: 999px; background: var(--glass); color: var(--glass-ink); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 0 0 0.5px var(--line); max-width: 300px; }
+  .d3 i { font-size: 18px; }
+
+  /* 4 · HUD square */
+  .d4 { display: grid; justify-items: center; gap: 10px; width: 156px; padding: 22px 14px 18px; border-radius: 22px; background: var(--glass); color: var(--glass-ink); text-align: center; backdrop-filter: blur(26px) saturate(1.5); -webkit-backdrop-filter: blur(26px) saturate(1.5); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16); }
+  .d4 i { font-size: 46px; line-height: 1; }
+  .d4 .msg { font-size: 14px; font-weight: 550; }
+
+  /* 5 · Bottom pill above the tab bar */
+  .d5 { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 88%, transparent); color: var(--phone-bg); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22); max-width: 300px; }
+  .d5 i { font-size: 18px; }
+  .d5 .ic-success { color: #30d158; } .d5 .ic-error { color: #ff6961; } .d5 .ic-info { color: #64b5ff; }
+
+  /* 6 · Text-only capsule */
+  .d6 { padding: 9px 16px; border-radius: 999px; background: rgba(60, 60, 67, 0.82); color: #fff; font-size: 14px; font-weight: 500; max-width: 280px; text-align: center; }
+  :root[data-theme="dark"] .d6 { background: rgba(235, 235, 245, 0.88); color: #000; }
+
+  /* 7 · Tinted status capsule */
+  .d7 { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px 10px 12px; border-radius: 16px; font-weight: 500; max-width: 300px; }
+  .d7 i { font-size: 18px; }
+  .d7.success { background: color-mix(in srgb, var(--green) 16%, var(--phone-bg)); color: color-mix(in srgb, var(--green) 70%, var(--ink)); }
+  .d7.error { background: color-mix(in srgb, var(--red) 14%, var(--phone-bg)); color: color-mix(in srgb, var(--red) 75%, var(--ink)); }
+  .d7.info { background: color-mix(in srgb, var(--blue) 14%, var(--phone-bg)); color: color-mix(in srgb, var(--blue) 75%, var(--ink)); }
+
+  /* 8 · Live Activity card with timer bar */
+  .d8 { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 12px; width: 300px; padding: 14px 16px 16px; overflow: hidden; border-radius: 22px; background: var(--card); color: var(--ink); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14), 0 0 0 0.5px var(--line); }
+  .d8 .dot { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; font-size: 21px; color: #fff; }
+  .d8 .dot.success { background: var(--green); } .d8 .dot.error { background: var(--red); } .d8 .dot.info { background: var(--blue); }
+  .d8 .label { color: var(--muted); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
+  .d8 .timer { position: absolute; right: 16px; bottom: 7px; left: 16px; height: 3px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .d8 .timer span { display: block; height: 100%; width: 100%; border-radius: inherit; background: var(--muted); transform-origin: left; }
+  .layer .d8 .timer span { animation: drain 2.8s linear forwards; }
+  @keyframes drain { to { transform: scaleX(0); } }
+
+  /* 9 · Snackbar with action */
+  .d9 { display: flex; align-items: center; gap: 12px; width: 300px; padding: 10px 10px 10px 16px; border-radius: 16px; background: var(--card); color: var(--ink); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14), 0 0 0 0.5px var(--line); }
+  .d9 .msg { flex: 1; font-weight: 400; }
+  .d9 button { flex: none; min-height: 32px; padding: 0 12px; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--blue) 12%, transparent); color: var(--blue); font: inherit; font-size: 14px; font-weight: 600; }
+
+  /* 10 · Split island: icon bubble + message capsule */
+  .d10 { display: inline-flex; align-items: center; gap: 6px; max-width: 310px; }
+  .d10 .bubble { display: grid; flex: none; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: #fff; font-size: 20px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18); }
+  .d10 .bubble.success { background: var(--green); } .d10 .bubble.error { background: var(--red); } .d10 .bubble.info { background: var(--blue); }
+  .d10 .cap { padding: 10px 16px; border-radius: 999px; background: var(--glass); color: var(--glass-ink); font-weight: 500; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 0 0 0.5px var(--line); }
+
+  /* ── Motion in the phone ── */
+  .live { position: absolute; left: 50%; transform: translateX(-50%); }
+  .live.top { top: 50px; }
+  .live.island { top: 10px; }
+  .live.center { top: 50%; transform: translate(-50%, -50%); }
+  .live.bottom { bottom: 92px; }
+  .live.enter-top { animation: dropIn 0.5s cubic-bezier(0.2, 1.25, 0.4, 1) both; }
+  .live.enter-island { animation: island 0.55s cubic-bezier(0.2, 1.2, 0.35, 1) both; transform-origin: top center; }
+  .live.enter-center { animation: popCenter 0.35s cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+  .live.enter-bottom { animation: riseIn 0.45s cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+  .live.leaving { animation: fadeOut 0.28s ease forwards; }
+  @keyframes dropIn { from { opacity: 0; transform: translate(-50%, -24px) scale(0.96); } to { opacity: 1; transform: translate(-50%, 0); } }
+  @keyframes island { from { opacity: 0.6; transform: translateX(-50%) scale(0.32, 0.5); border-radius: 20px; } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+  @keyframes popCenter { from { opacity: 0; transform: translate(-50%, -50%) scale(0.85); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+  @keyframes riseIn { from { opacity: 0; transform: translate(-50%, 24px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  @keyframes fadeOut { to { opacity: 0; filter: blur(2px); } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <header class="top">
+        <div>
+          <h1>Toast designs</h1>
+          <p>Ten Apple-style takes on Pages' toast. Each shows a success, error and info message. Press Play to see it animate on the phone, and Choose to mark your favourite.</p>
+        </div>
+        <div class="seg" role="group" aria-label="Theme">
+          <button type="button" data-theme-btn="light" class="on">Light</button>
+          <button type="button" data-theme-btn="dark">Dark</button>
+        </div>
+      </header>
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <div class="phone-col">
+      <div class="phone" id="phone">
+        <div class="mock" aria-hidden="true">
+          <div class="bar"><div class="logo"><span></span>Pages</div></div>
+          <div class="search"></div>
+          <p class="title">Currently Reading</p>
+          <div class="hero"></div>
+          <p class="title">Recently Added</p>
+          <div class="row"><i></i><i></i><i></i></div>
+          <div class="tabs"></div>
+        </div>
+        <div class="layer" id="layer"></div>
+      </div>
+      <p class="phone-caption" id="caption">Press Play on any design</p>
+    </div>
+  </div>
+
+<script>
+  const MESSAGES = {
+    success: 'Added to Favourites',
+    error: "Couldn't download Charles. Check your connection.",
+    info: 'Ratings are updating in the background.',
+  }
+  const ICONS = {
+    success: 'ri-checkbox-circle-fill',
+    error: 'ri-error-warning-fill',
+    info: 'ri-information-fill',
+  }
+  const LINE_ICONS = {
+    success: 'ri-check-line',
+    error: 'ri-close-line',
+    info: 'ri-information-2-line',
+  }
+  const HUD_ICONS = {
+    success: 'ri-checkbox-circle-line',
+    error: 'ri-error-warning-line',
+    info: 'ri-information-line',
+  }
+
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
+  const DESIGNS = [
+    {
+      name: 'Dynamic Island', where: 'island',
+      note: 'Grows out of the camera cut-out as a black pill. Feels native on modern phones and never covers content.',
+      html: (type) => `<div class="t d1"><span class="dot ${type}"><i class="${ICONS[type]}"></i></span><span class="msg">${esc(MESSAGES[type])}</span></div>`,
+    },
+    {
+      name: 'Notification Banner', where: 'top',
+      note: 'Frosted card with the app icon, name and "now", like a system notification. Best for longer messages.',
+      html: (type) => `<div class="t d2"><span class="app">P</span><div><div class="head">Pages <span>now</span></div><div class="msg">${esc(MESSAGES[type])}</div></div></div>`,
+    },
+    {
+      name: 'Frosted Capsule', where: 'top',
+      note: 'A small blurred-glass pill at the top with a coloured icon, like "AirPods Connected".',
+      html: (type) => `<div class="t d3"><i class="${ICONS[type]} ic-${type}"></i><span class="msg">${esc(MESSAGES[type])}</span></div>`,
+    },
+    {
+      name: 'HUD Square', where: 'center',
+      note: 'Centered glass square with a large icon, like the "Added to Library" HUD. Strong confirmation for big actions.',
+      html: (type) => `<div class="t d4"><i class="${HUD_ICONS[type]} ic-${type}"></i><span class="msg">${esc(MESSAGES[type])}</span></div>`,
+    },
+    {
+      name: 'Bottom Pill', where: 'bottom',
+      note: 'High-contrast pill that floats just above the tab bar, close to the thumb, like Apple Music.',
+      html: (type) => `<div class="t d5"><i class="${ICONS[type]} ic-${type}"></i><span class="msg">${esc(MESSAGES[type])}</span></div>`,
+    },
+    {
+      name: 'Text Capsule', where: 'top',
+      note: 'Just the words in a quiet grey capsule. The most minimal option; the type is carried by the wording alone.',
+      html: (type) => `<div class="t d6">${esc(MESSAGES[type])}</div>`,
+    },
+    {
+      name: 'Tinted Status', where: 'top',
+      note: 'Soft green, red or blue tint per type. Instantly readable at a glance without being loud.',
+      html: (type) => `<div class="t d7 ${type}"><i class="${ICONS[type]}"></i><span class="msg">${esc(MESSAGES[type])}</span></div>`,
+    },
+    {
+      name: 'Live Activity Card', where: 'top',
+      note: 'Card with a solid coloured icon, a small label and a bar that drains until it closes.',
+      html: (type) => `<div class="t d8"><span class="dot ${type}"><i class="${LINE_ICONS[type]}"></i></span><div><div class="label">${type === 'success' ? 'Done' : type === 'error' ? 'Problem' : 'Heads up'}</div><div class="msg">${esc(MESSAGES[type])}</div></div><div class="timer"><span></span></div></div>`,
+    },
+    {
+      name: 'Snackbar with Action', where: 'bottom',
+      note: 'Bottom card with a button (Undo, Retry, View), like Photos and Mail. Lets the toast do something.',
+      html: (type) => `<div class="t d9"><span class="msg">${esc(MESSAGES[type])}</span><button type="button">${type === 'success' ? 'Undo' : type === 'error' ? 'Retry' : 'View'}</button></div>`,
+    },
+    {
+      name: 'Split Island', where: 'top',
+      note: 'A solid coloured icon bubble beside a glass message capsule. Playful, still clean.',
+      html: (type) => `<div class="t d10"><span class="bubble ${type}"><i class="${LINE_ICONS[type]}"></i></span><span class="cap">${esc(MESSAGES[type])}</span></div>`,
+    },
+  ]
+
+  const grid = document.getElementById('grid')
+  const layer = document.getElementById('layer')
+  const caption = document.getElementById('caption')
+  const PICK_KEY = 'pages-toast-pick'
+  let picked = null
+  try { picked = localStorage.getItem(PICK_KEY) } catch {}
+
+  DESIGNS.forEach((design, index) => {
+    const card = document.createElement('article')
+    card.className = 'design' + (String(index) === picked ? ' picked' : '')
+    card.innerHTML = `
+      <div class="design-head">
+        <div><h2>${design.name}</h2><p>${design.note}</p></div>
+        <span class="num">${String(index + 1).padStart(2, '0')}</span>
+      </div>
+      <div class="stage">${['success', 'error', 'info'].map(design.html).join('')}</div>
+      <div class="actions">
+        <button type="button" class="play"><i class="ri-play-fill"></i>Play</button>
+        <button type="button" class="pick">${String(index) === picked ? 'Chosen' : 'Choose'}</button>
+      </div>`
+    card.querySelector('.play').addEventListener('click', () => play(index))
+    card.querySelector('.pick').addEventListener('click', () => {
+      picked = String(index)
+      try { localStorage.setItem(PICK_KEY, picked) } catch {}
+      document.querySelectorAll('.design').forEach((el, i) => {
+        el.classList.toggle('picked', i === index)
+        el.querySelector('.pick').textContent = i === index ? 'Chosen' : 'Choose'
+      })
+    })
+    grid.appendChild(card)
+  })
+
+  // Plays success, then error, then info in the phone.
+  let timers = []
+  const play = (index) => {
+    timers.forEach(clearTimeout)
+    timers = []
+    layer.innerHTML = ''
+    const design = DESIGNS[index]
+    caption.textContent = `${String(index + 1).padStart(2, '0')} · ${design.name}`
+    ;['success', 'error', 'info'].forEach((type, step) => {
+      timers.push(setTimeout(() => {
+        layer.innerHTML = ''
+        const holder = document.createElement('div')
+        holder.className = `live ${design.where} enter-${design.where}`
+        holder.innerHTML = design.html(type)
+        layer.appendChild(holder)
+        timers.push(setTimeout(() => holder.classList.add('leaving'), 2500))
+      }, step * 3000))
+    })
+    timers.push(setTimeout(() => { layer.innerHTML = '' }, 9000))
+  }
+
+  document.querySelectorAll('[data-theme-btn]').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.documentElement.dataset.theme = button.dataset.themeBtn
+      document.querySelectorAll('[data-theme-btn]').forEach((b) => b.classList.toggle('on', b === button))
+    })
+  })
+</script>
+</body>
+</html>
