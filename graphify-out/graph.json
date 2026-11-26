@@ -498,6 +498,19 @@
       "source_location": "L3"
     },
     {
+      "id": "server_utils_openlibraryapi_olresult",
+      "label": "OLResult",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 219,
+      "community_name": "openLibraryApi.ts",
+      "file_type": "code",
+      "norm_label": "olresult",
+      "source_file": "server/utils/openLibraryApi.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "android_app_src_main_java_com_bookish_app_localspeechstream_item",
       "label": "Item",
       "_callable": true,
@@ -555,25 +568,12 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 261,
+      "community": 264,
       "community_name": "BufferMetadataEdgeTts",
       "file_type": "code",
       "norm_label": "buffermetadataedgetts",
       "source_file": "server/utils/edgeTts.test.ts",
       "source_location": "L41"
-    },
-    {
-      "id": "server_utils_openlibraryapi_olresult",
-      "label": "OLResult",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 266,
-      "community_name": "openLibraryApi.ts",
-      "file_type": "code",
-      "norm_label": "olresult",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L1"
     },
     {
       "id": "android_app_src_main_java_com_bookish_app_localspeechstream_piecesink",
@@ -11434,64 +11434,160 @@
       "source_location": "L58"
     },
     {
-      "id": "composables_usecoverimagecache_coverassetname",
-      "label": "coverAssetName()",
+      "id": "composables_usetts_chunkindexforpdfprogress",
+      "label": "chunkIndexForPdfProgress()",
       "_callable": true,
       "_origin": "ast",
       "community": 185,
-      "community_name": "useCoverImageCache.js",
+      "community_name": "useTTS",
       "file_type": "code",
-      "norm_label": "coverassetname()",
-      "source_file": "composables/useCoverImageCache.js",
-      "source_location": "L24"
+      "norm_label": "chunkindexforpdfprogress()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L362"
     },
     {
-      "id": "composables_usecoverimagecache_coverfilename",
-      "label": "coverFileName()",
+      "id": "composables_usetts_chunkindexforprogress",
+      "label": "chunkIndexForProgress()",
       "_callable": true,
       "_origin": "ast",
       "community": 185,
-      "community_name": "useCoverImageCache.js",
+      "community_name": "useTTS",
       "file_type": "code",
-      "norm_label": "coverfilename()",
-      "source_file": "composables/useCoverImageCache.js",
-      "source_location": "L30"
+      "norm_label": "chunkindexforprogress()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L347"
     },
     {
-      "id": "composables_usecoverimagecache_islocalassetcover",
-      "label": "isLocalAssetCover()",
+      "id": "composables_usetts_clearstoredttssession",
+      "label": "clearStoredTtsSession()",
       "_callable": true,
       "_origin": "ast",
       "community": 185,
-      "community_name": "useCoverImageCache.js",
+      "community_name": "useTTS",
       "file_type": "code",
-      "norm_label": "islocalassetcover()",
-      "source_file": "composables/useCoverImageCache.js",
-      "source_location": "L18"
+      "norm_label": "clearstoredttssession()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L137"
     },
     {
-      "id": "composables_usecoverimagecache_isremotecoverurl",
-      "label": "isRemoteCoverUrl()",
+      "id": "composables_usetts_dismissstoredttssession",
+      "label": "dismissStoredTtsSession()",
       "_callable": true,
       "_origin": "ast",
       "community": 185,
-      "community_name": "useCoverImageCache.js",
+      "community_name": "useTTS",
       "file_type": "code",
-      "norm_label": "isremotecoverurl()",
-      "source_file": "composables/useCoverImageCache.js",
-      "source_location": "L5"
+      "norm_label": "dismissstoredttssession()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L141"
     },
     {
-      "id": "composables_usecoverimagecache_usecoverimagecache",
-      "label": "useCoverImageCache()",
+      "id": "composables_usetts_normalizeavailablevoice",
+      "label": "normalizeAvailableVoice()",
       "_callable": true,
       "_origin": "ast",
       "community": 185,
-      "community_name": "useCoverImageCache.js",
+      "community_name": "useTTS",
       "file_type": "code",
-      "norm_label": "usecoverimagecache()",
-      "source_file": "composables/useCoverImageCache.js",
-      "source_location": "L40"
+      "norm_label": "normalizeavailablevoice()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L76"
+    },
+    {
+      "id": "composables_usetts_readstoredttssession",
+      "label": "readStoredTtsSession()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "readstoredttssession()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L88"
+    },
+    {
+      "id": "composables_usetts_resume_test_memorystorage",
+      "label": "memoryStorage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "memorystorage()",
+      "source_file": "composables/useTTS.resume.test.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "composables_usetts_savedplaybackchunk",
+      "label": "savedPlaybackChunk()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "savedplaybackchunk()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L147"
+    },
+    {
+      "id": "composables_usetts_synthesizespeech",
+      "label": "synthesizeSpeech()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "synthesizespeech()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L575"
+    },
+    {
+      "id": "composables_usetts_takematchingprefetch",
+      "label": "takeMatchingPrefetch()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "takematchingprefetch()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L153"
+    },
+    {
+      "id": "composables_usetts_ttsprewarmkey",
+      "label": "ttsPrewarmKey()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "ttsprewarmkey()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L159"
+    },
+    {
+      "id": "composables_usetts_usetts",
+      "label": "useTTS()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "usetts()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L583"
+    },
+    {
+      "id": "composables_usetts_writestoredttssession",
+      "label": "writeStoredTtsSession()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 185,
+      "community_name": "useTTS",
+      "file_type": "code",
+      "norm_label": "writestoredttssession()",
+      "source_file": "composables/useTTS.js",
+      "source_location": "L113"
     },
     {
       "id": "composables_usedevicearchitecture_classifydevice",
@@ -12382,52 +12478,28 @@
       "source_location": "L923"
     },
     {
-      "id": "plugins_00_app_errors_client_ischunkloaderror",
-      "label": "isChunkLoadError()",
+      "id": "pages_listen_settings_id_changelistenskip",
+      "label": "changeListenSkip()",
       "_callable": true,
       "_origin": "ast",
       "community": 204,
-      "community_name": "00.app-errors.client.js",
+      "community_name": "listen-settings/[id].vue",
       "file_type": "code",
-      "norm_label": "ischunkloaderror()",
-      "source_file": "plugins/00.app-errors.client.js",
-      "source_location": "L30"
+      "norm_label": "changelistenskip()",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L81"
     },
     {
-      "id": "plugins_00_app_errors_client_isrendererror",
-      "label": "isRenderError()",
+      "id": "pages_listen_settings_id_setprogressscope",
+      "label": "setProgressScope()",
       "_callable": true,
       "_origin": "ast",
       "community": 204,
-      "community_name": "00.app-errors.client.js",
+      "community_name": "listen-settings/[id].vue",
       "file_type": "code",
-      "norm_label": "isrendererror()",
-      "source_file": "plugins/00.app-errors.client.js",
-      "source_location": "L20"
-    },
-    {
-      "id": "plugins_00_app_errors_client_reloadonceforchunks",
-      "label": "reloadOnceForChunks()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 204,
-      "community_name": "00.app-errors.client.js",
-      "file_type": "code",
-      "norm_label": "reloadonceforchunks()",
-      "source_file": "plugins/00.app-errors.client.js",
-      "source_location": "L37"
-    },
-    {
-      "id": "plugins_00_app_errors_client_setup",
-      "label": "setup()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 204,
-      "community_name": "00.app-errors.client.js",
-      "file_type": "code",
-      "norm_label": "setup()",
-      "source_file": "plugins/00.app-errors.client.js",
-      "source_location": "L51"
+      "norm_label": "setprogressscope()",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L74"
     },
     {
       "id": "composables_readingpositionstore_flushreadingpositions",
@@ -13498,28 +13570,64 @@
       "source_location": "L132"
     },
     {
-      "id": "tests_mobilenativeappconfig_test_exists",
-      "label": "exists()",
+      "id": "server_utils_openlibraryapi_extractgenres",
+      "label": "extractGenres()",
       "_callable": true,
       "_origin": "ast",
       "community": 219,
-      "community_name": "mobileNativeAppConfig.test.js",
+      "community_name": "openLibraryApi.ts",
       "file_type": "code",
-      "norm_label": "exists()",
-      "source_file": "tests/mobileNativeAppConfig.test.js",
-      "source_location": "L7"
+      "norm_label": "extractgenres()",
+      "source_file": "server/utils/openLibraryApi.ts",
+      "source_location": "L55"
     },
     {
-      "id": "tests_mobilenativeappconfig_test_read",
-      "label": "read()",
+      "id": "server_utils_openlibraryapi_normalizesubjectgenre",
+      "label": "normalizeSubjectGenre()",
       "_callable": true,
       "_origin": "ast",
       "community": 219,
-      "community_name": "mobileNativeAppConfig.test.js",
+      "community_name": "openLibraryApi.ts",
       "file_type": "code",
-      "norm_label": "read()",
-      "source_file": "tests/mobileNativeAppConfig.test.js",
-      "source_location": "L6"
+      "norm_label": "normalizesubjectgenre()",
+      "source_file": "server/utils/openLibraryApi.ts",
+      "source_location": "L36"
+    },
+    {
+      "id": "server_utils_openlibraryapi_pickpublisher",
+      "label": "pickPublisher()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 219,
+      "community_name": "openLibraryApi.ts",
+      "file_type": "code",
+      "norm_label": "pickpublisher()",
+      "source_file": "server/utils/openLibraryApi.ts",
+      "source_location": "L16"
+    },
+    {
+      "id": "server_utils_openlibraryapi_safeopenlibrarykey",
+      "label": "safeOpenLibraryKey()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 219,
+      "community_name": "openLibraryApi.ts",
+      "file_type": "code",
+      "norm_label": "safeopenlibrarykey()",
+      "source_file": "server/utils/openLibraryApi.ts",
+      "source_location": "L32"
+    },
+    {
+      "id": "server_utils_openlibraryapi_searchopenlibrary",
+      "label": "searchOpenLibrary()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 219,
+      "community_name": "openLibraryApi.ts",
+      "file_type": "code",
+      "norm_label": "searchopenlibrary()",
+      "source_file": "server/utils/openLibraryApi.ts",
+      "source_location": "L78"
     },
     {
       "id": "android_app_src_main_java_com_bookish_app_localspeechstream_localspeechstream_setvolume",
@@ -14046,52 +14154,136 @@
       "source_location": "L92"
     },
     {
-      "id": "pages_reader_id_handlepdfloaded",
-      "label": "handlePdfLoaded()",
+      "id": "composables_usecoverimagecache_coverassetname",
+      "label": "coverAssetName()",
       "_callable": true,
       "_origin": "ast",
       "community": 224,
-      "community_name": "updateBookEdge",
+      "community_name": "useCoverImageCache.js",
       "file_type": "code",
-      "norm_label": "handlepdfloaded()",
-      "source_file": "pages/reader/[id].vue",
-      "source_location": "L1829"
+      "norm_label": "coverassetname()",
+      "source_file": "composables/useCoverImageCache.js",
+      "source_location": "L24"
     },
     {
-      "id": "pages_reader_id_updatebookedge",
-      "label": "updateBookEdge()",
+      "id": "composables_usecoverimagecache_coverfilename",
+      "label": "coverFileName()",
       "_callable": true,
       "_origin": "ast",
       "community": 224,
-      "community_name": "updateBookEdge",
+      "community_name": "useCoverImageCache.js",
       "file_type": "code",
-      "norm_label": "updatebookedge()",
-      "source_file": "pages/reader/[id].vue",
-      "source_location": "L1754"
+      "norm_label": "coverfilename()",
+      "source_file": "composables/useCoverImageCache.js",
+      "source_location": "L30"
     },
     {
-      "id": "pages_reader_id_zoomin",
-      "label": "zoomIn()",
+      "id": "composables_usecoverimagecache_islocalassetcover",
+      "label": "isLocalAssetCover()",
       "_callable": true,
       "_origin": "ast",
       "community": 224,
-      "community_name": "updateBookEdge",
+      "community_name": "useCoverImageCache.js",
       "file_type": "code",
-      "norm_label": "zoomin()",
-      "source_file": "pages/reader/[id].vue",
-      "source_location": "L1353"
+      "norm_label": "islocalassetcover()",
+      "source_file": "composables/useCoverImageCache.js",
+      "source_location": "L18"
     },
     {
-      "id": "pages_reader_id_zoomout",
-      "label": "zoomOut()",
+      "id": "composables_usecoverimagecache_isremotecoverurl",
+      "label": "isRemoteCoverUrl()",
       "_callable": true,
       "_origin": "ast",
       "community": 224,
-      "community_name": "updateBookEdge",
+      "community_name": "useCoverImageCache.js",
       "file_type": "code",
-      "norm_label": "zoomout()",
-      "source_file": "pages/reader/[id].vue",
-      "source_location": "L1361"
+      "norm_label": "isremotecoverurl()",
+      "source_file": "composables/useCoverImageCache.js",
+      "source_location": "L5"
+    },
+    {
+      "id": "composables_usecoverimagecache_usecoverimagecache",
+      "label": "useCoverImageCache()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 224,
+      "community_name": "useCoverImageCache.js",
+      "file_type": "code",
+      "norm_label": "usecoverimagecache()",
+      "source_file": "composables/useCoverImageCache.js",
+      "source_location": "L40"
+    },
+    {
+      "id": "components_mobile_readermobile_hidepdfreadhere",
+      "label": "hidePdfReadHere()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 225,
+      "community_name": "onScrollTap",
+      "file_type": "code",
+      "norm_label": "hidepdfreadhere()",
+      "source_file": "components/mobile/ReaderMobile.vue",
+      "source_location": "L1403"
+    },
+    {
+      "id": "components_mobile_readermobile_onpdftouchstart",
+      "label": "onPdfTouchStart()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 225,
+      "community_name": "onScrollTap",
+      "file_type": "code",
+      "norm_label": "onpdftouchstart()",
+      "source_file": "components/mobile/ReaderMobile.vue",
+      "source_location": "L1419"
+    },
+    {
+      "id": "components_mobile_readermobile_onscrolltap",
+      "label": "onScrollTap()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 225,
+      "community_name": "onScrollTap",
+      "file_type": "code",
+      "norm_label": "onscrolltap()",
+      "source_file": "components/mobile/ReaderMobile.vue",
+      "source_location": "L1660"
+    },
+    {
+      "id": "components_mobile_readermobile_openfigureviewer",
+      "label": "openFigureViewer()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 225,
+      "community_name": "onScrollTap",
+      "file_type": "code",
+      "norm_label": "openfigureviewer()",
+      "source_file": "components/mobile/ReaderMobile.vue",
+      "source_location": "L1473"
+    },
+    {
+      "id": "components_mobile_readermobile_pdfpageatpoint",
+      "label": "pdfPageAtPoint()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 225,
+      "community_name": "onScrollTap",
+      "file_type": "code",
+      "norm_label": "pdfpageatpoint()",
+      "source_file": "components/mobile/ReaderMobile.vue",
+      "source_location": "L1413"
+    },
+    {
+      "id": "components_mobile_readermobile_readfrompressedpage",
+      "label": "readFromPressedPage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 225,
+      "community_name": "onScrollTap",
+      "file_type": "code",
+      "norm_label": "readfrompressedpage()",
+      "source_file": "components/mobile/ReaderMobile.vue",
+      "source_location": "L1482"
     },
     {
       "id": "components_mobile_seriesdetailmobile_coverfallback",
@@ -15090,76 +15282,52 @@
       "source_location": "L3"
     },
     {
-      "id": "components_mobile_readermobile_hidepdfreadhere",
-      "label": "hidePdfReadHere()",
+      "id": "plugins_00_app_errors_client_ischunkloaderror",
+      "label": "isChunkLoadError()",
       "_callable": true,
       "_origin": "ast",
       "community": 248,
-      "community_name": "onScrollTap",
+      "community_name": "00.app-errors.client.js",
       "file_type": "code",
-      "norm_label": "hidepdfreadhere()",
-      "source_file": "components/mobile/ReaderMobile.vue",
-      "source_location": "L1403"
+      "norm_label": "ischunkloaderror()",
+      "source_file": "plugins/00.app-errors.client.js",
+      "source_location": "L30"
     },
     {
-      "id": "components_mobile_readermobile_onpdftouchstart",
-      "label": "onPdfTouchStart()",
+      "id": "plugins_00_app_errors_client_isrendererror",
+      "label": "isRenderError()",
       "_callable": true,
       "_origin": "ast",
       "community": 248,
-      "community_name": "onScrollTap",
+      "community_name": "00.app-errors.client.js",
       "file_type": "code",
-      "norm_label": "onpdftouchstart()",
-      "source_file": "components/mobile/ReaderMobile.vue",
-      "source_location": "L1419"
+      "norm_label": "isrendererror()",
+      "source_file": "plugins/00.app-errors.client.js",
+      "source_location": "L20"
     },
     {
-      "id": "components_mobile_readermobile_onscrolltap",
-      "label": "onScrollTap()",
+      "id": "plugins_00_app_errors_client_reloadonceforchunks",
+      "label": "reloadOnceForChunks()",
       "_callable": true,
       "_origin": "ast",
       "community": 248,
-      "community_name": "onScrollTap",
+      "community_name": "00.app-errors.client.js",
       "file_type": "code",
-      "norm_label": "onscrolltap()",
-      "source_file": "components/mobile/ReaderMobile.vue",
-      "source_location": "L1660"
+      "norm_label": "reloadonceforchunks()",
+      "source_file": "plugins/00.app-errors.client.js",
+      "source_location": "L37"
     },
     {
-      "id": "components_mobile_readermobile_openfigureviewer",
-      "label": "openFigureViewer()",
+      "id": "plugins_00_app_errors_client_setup",
+      "label": "setup()",
       "_callable": true,
       "_origin": "ast",
       "community": 248,
-      "community_name": "onScrollTap",
+      "community_name": "00.app-errors.client.js",
       "file_type": "code",
-      "norm_label": "openfigureviewer()",
-      "source_file": "components/mobile/ReaderMobile.vue",
-      "source_location": "L1473"
-    },
-    {
-      "id": "components_mobile_readermobile_pdfpageatpoint",
-      "label": "pdfPageAtPoint()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 248,
-      "community_name": "onScrollTap",
-      "file_type": "code",
-      "norm_label": "pdfpageatpoint()",
-      "source_file": "components/mobile/ReaderMobile.vue",
-      "source_location": "L1413"
-    },
-    {
-      "id": "components_mobile_readermobile_readfrompressedpage",
-      "label": "readFromPressedPage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 248,
-      "community_name": "onScrollTap",
-      "file_type": "code",
-      "norm_label": "readfrompressedpage()",
-      "source_file": "components/mobile/ReaderMobile.vue",
-      "source_location": "L1482"
+      "norm_label": "setup()",
+      "source_file": "plugins/00.app-errors.client.js",
+      "source_location": "L51"
     },
     {
       "id": "components_shared_bookactionsheet_choose",
@@ -15726,160 +15894,28 @@
       "source_location": "L8"
     },
     {
-      "id": "composables_usetts_chunkindexforpdfprogress",
-      "label": "chunkIndexForPdfProgress()",
+      "id": "tests_mobilenativeappconfig_test_exists",
+      "label": "exists()",
       "_callable": true,
       "_origin": "ast",
       "community": 258,
-      "community_name": "useTTS",
+      "community_name": "mobileNativeAppConfig.test.js",
       "file_type": "code",
-      "norm_label": "chunkindexforpdfprogress()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L362"
+      "norm_label": "exists()",
+      "source_file": "tests/mobileNativeAppConfig.test.js",
+      "source_location": "L7"
     },
     {
-      "id": "composables_usetts_chunkindexforprogress",
-      "label": "chunkIndexForProgress()",
+      "id": "tests_mobilenativeappconfig_test_read",
+      "label": "read()",
       "_callable": true,
       "_origin": "ast",
       "community": 258,
-      "community_name": "useTTS",
+      "community_name": "mobileNativeAppConfig.test.js",
       "file_type": "code",
-      "norm_label": "chunkindexforprogress()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L347"
-    },
-    {
-      "id": "composables_usetts_clearstoredttssession",
-      "label": "clearStoredTtsSession()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "clearstoredttssession()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L137"
-    },
-    {
-      "id": "composables_usetts_dismissstoredttssession",
-      "label": "dismissStoredTtsSession()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "dismissstoredttssession()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L141"
-    },
-    {
-      "id": "composables_usetts_normalizeavailablevoice",
-      "label": "normalizeAvailableVoice()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "normalizeavailablevoice()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L76"
-    },
-    {
-      "id": "composables_usetts_readstoredttssession",
-      "label": "readStoredTtsSession()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "readstoredttssession()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L88"
-    },
-    {
-      "id": "composables_usetts_resume_test_memorystorage",
-      "label": "memoryStorage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "memorystorage()",
-      "source_file": "composables/useTTS.resume.test.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "composables_usetts_savedplaybackchunk",
-      "label": "savedPlaybackChunk()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "savedplaybackchunk()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L147"
-    },
-    {
-      "id": "composables_usetts_synthesizespeech",
-      "label": "synthesizeSpeech()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "synthesizespeech()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L575"
-    },
-    {
-      "id": "composables_usetts_takematchingprefetch",
-      "label": "takeMatchingPrefetch()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "takematchingprefetch()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L153"
-    },
-    {
-      "id": "composables_usetts_ttsprewarmkey",
-      "label": "ttsPrewarmKey()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "ttsprewarmkey()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L159"
-    },
-    {
-      "id": "composables_usetts_usetts",
-      "label": "useTTS()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "usetts()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L583"
-    },
-    {
-      "id": "composables_usetts_writestoredttssession",
-      "label": "writeStoredTtsSession()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 258,
-      "community_name": "useTTS",
-      "file_type": "code",
-      "norm_label": "writestoredttssession()",
-      "source_file": "composables/useTTS.js",
-      "source_location": "L113"
+      "norm_label": "read()",
+      "source_file": "tests/mobileNativeAppConfig.test.js",
+      "source_location": "L6"
     },
     {
       "id": "composables_tts_silencetrim_encodewav",
@@ -15963,7 +15999,7 @@
       "file_type": "code",
       "norm_label": "applypagestheme()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L329"
+      "source_location": "L332"
     },
     {
       "id": "composables_usepagessettings_clamp",
@@ -15975,7 +16011,7 @@
       "file_type": "code",
       "norm_label": "clamp()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L169"
+      "source_location": "L172"
     },
     {
       "id": "composables_usepagessettings_enabledacceptattribute",
@@ -15987,7 +16023,7 @@
       "file_type": "code",
       "norm_label": "enabledacceptattribute()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L105"
+      "source_location": "L108"
     },
     {
       "id": "composables_usepagessettings_enabledextensionpattern",
@@ -15999,7 +16035,7 @@
       "file_type": "code",
       "norm_label": "enabledextensionpattern()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L101"
+      "source_location": "L104"
     },
     {
       "id": "composables_usepagessettings_enabledformatsformode",
@@ -16011,7 +16047,7 @@
       "file_type": "code",
       "norm_label": "enabledformatsformode()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L81"
+      "source_location": "L84"
     },
     {
       "id": "composables_usepagessettings_formatmodefor",
@@ -16023,7 +16059,7 @@
       "file_type": "code",
       "norm_label": "formatmodefor()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L75"
+      "source_location": "L78"
     },
     {
       "id": "composables_usepagessettings_isformatenabled",
@@ -16035,7 +16071,7 @@
       "file_type": "code",
       "norm_label": "isformatenabled()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L95"
+      "source_location": "L98"
     },
     {
       "id": "composables_usepagessettings_matchesformatfilter",
@@ -16047,7 +16083,7 @@
       "file_type": "code",
       "norm_label": "matchesformatfilter()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L135"
+      "source_location": "L138"
     },
     {
       "id": "composables_usepagessettings_migratebottomnav",
@@ -16059,7 +16095,7 @@
       "file_type": "code",
       "norm_label": "migratebottomnav()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L381"
+      "source_location": "L384"
     },
     {
       "id": "composables_usepagessettings_normalizeenabledformats",
@@ -16071,7 +16107,7 @@
       "file_type": "code",
       "norm_label": "normalizeenabledformats()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L87"
+      "source_location": "L90"
     },
     {
       "id": "composables_usepagessettings_normalizepagessettings",
@@ -16083,7 +16119,7 @@
       "file_type": "code",
       "norm_label": "normalizepagessettings()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L182"
+      "source_location": "L185"
     },
     {
       "id": "composables_usepagessettings_numberordefault",
@@ -16095,7 +16131,7 @@
       "file_type": "code",
       "norm_label": "numberordefault()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L171"
+      "source_location": "L174"
     },
     {
       "id": "composables_usepagessettings_readpagessettings",
@@ -16107,7 +16143,7 @@
       "file_type": "code",
       "norm_label": "readpagessettings()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L399"
+      "source_location": "L402"
     },
     {
       "id": "composables_usepagessettings_resetpagessettingsfortests",
@@ -16119,7 +16155,7 @@
       "file_type": "code",
       "norm_label": "resetpagessettingsfortests()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L474"
+      "source_location": "L477"
     },
     {
       "id": "composables_usepagessettings_resolvestorage",
@@ -16131,7 +16167,7 @@
       "file_type": "code",
       "norm_label": "resolvestorage()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L366"
+      "source_location": "L369"
     },
     {
       "id": "composables_usepagessettings_syncsystembarappearance",
@@ -16143,7 +16179,7 @@
       "file_type": "code",
       "norm_label": "syncsystembarappearance()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L356"
+      "source_location": "L359"
     },
     {
       "id": "composables_usepagessettings_test_creatememorystorage",
@@ -16167,7 +16203,7 @@
       "file_type": "code",
       "norm_label": "voiceordefault()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L176"
+      "source_location": "L179"
     },
     {
       "id": "composables_usepagessettings_writepagessettings",
@@ -16179,7 +16215,7 @@
       "file_type": "code",
       "norm_label": "writepagessettings()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L456"
+      "source_location": "L459"
     },
     {
       "id": "tests_preferences_test_read",
@@ -16398,11 +16434,59 @@
       "source_location": "L1481"
     },
     {
+      "id": "pages_reader_id_handlepdfloaded",
+      "label": "handlePdfLoaded()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 263,
+      "community_name": "updateBookEdge",
+      "file_type": "code",
+      "norm_label": "handlepdfloaded()",
+      "source_file": "pages/reader/[id].vue",
+      "source_location": "L1829"
+    },
+    {
+      "id": "pages_reader_id_updatebookedge",
+      "label": "updateBookEdge()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 263,
+      "community_name": "updateBookEdge",
+      "file_type": "code",
+      "norm_label": "updatebookedge()",
+      "source_file": "pages/reader/[id].vue",
+      "source_location": "L1754"
+    },
+    {
+      "id": "pages_reader_id_zoomin",
+      "label": "zoomIn()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 263,
+      "community_name": "updateBookEdge",
+      "file_type": "code",
+      "norm_label": "zoomin()",
+      "source_file": "pages/reader/[id].vue",
+      "source_location": "L1353"
+    },
+    {
+      "id": "pages_reader_id_zoomout",
+      "label": "zoomOut()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 263,
+      "community_name": "updateBookEdge",
+      "file_type": "code",
+      "norm_label": "zoomout()",
+      "source_file": "pages/reader/[id].vue",
+      "source_location": "L1361"
+    },
+    {
       "id": "server_utils_edgetts_test_buffermetadataedgetts_close",
       "label": ".close()",
       "_callable": true,
       "_origin": "ast",
-      "community": 261,
+      "community": 264,
       "community_name": "BufferMetadataEdgeTts",
       "file_type": "code",
       "norm_label": ".close()",
@@ -16414,7 +16498,7 @@
       "label": ".rawToStream()",
       "_callable": true,
       "_origin": "ast",
-      "community": 261,
+      "community": 264,
       "community_name": "BufferMetadataEdgeTts",
       "file_type": "code",
       "norm_label": ".rawtostream()",
@@ -16426,72 +16510,12 @@
       "label": ".setMetadata()",
       "_callable": true,
       "_origin": "ast",
-      "community": 261,
+      "community": 264,
       "community_name": "BufferMetadataEdgeTts",
       "file_type": "code",
       "norm_label": ".setmetadata()",
       "source_file": "server/utils/edgeTts.test.ts",
       "source_location": "L44"
-    },
-    {
-      "id": "components_tablet_booksdesktop_coverfallback",
-      "label": "coverFallback()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 263,
-      "community_name": "generateCoverPlaceholder",
-      "file_type": "code",
-      "norm_label": "coverfallback()",
-      "source_file": "components/tablet/BooksDesktop.vue",
-      "source_location": "L733"
-    },
-    {
-      "id": "components_tablet_booksdesktop_generatecoverplaceholder",
-      "label": "generateCoverPlaceholder()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 263,
-      "community_name": "generateCoverPlaceholder",
-      "file_type": "code",
-      "norm_label": "generatecoverplaceholder()",
-      "source_file": "components/tablet/BooksDesktop.vue",
-      "source_location": "L715"
-    },
-    {
-      "id": "components_tablet_booksdesktop_resolvebookcover",
-      "label": "resolveBookCover()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 263,
-      "community_name": "generateCoverPlaceholder",
-      "file_type": "code",
-      "norm_label": "resolvebookcover()",
-      "source_file": "components/tablet/BooksDesktop.vue",
-      "source_location": "L708"
-    },
-    {
-      "id": "pages_listen_settings_id_changelistenskip",
-      "label": "changeListenSkip()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "changelistenskip()",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L81"
-    },
-    {
-      "id": "pages_listen_settings_id_setprogressscope",
-      "label": "setProgressScope()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "setprogressscope()",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L74"
     },
     {
       "id": "plugins_settings_system_bars_client_androidcolor",
@@ -16542,64 +16566,40 @@
       "source_location": "L33"
     },
     {
-      "id": "server_utils_openlibraryapi_extractgenres",
-      "label": "extractGenres()",
+      "id": "components_mobile_addbookmobile_closecovermodal",
+      "label": "closeCoverModal()",
       "_callable": true,
       "_origin": "ast",
       "community": 266,
-      "community_name": "openLibraryApi.ts",
+      "community_name": "closeCoverModal",
       "file_type": "code",
-      "norm_label": "extractgenres()",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L55"
+      "norm_label": "closecovermodal()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L464"
     },
     {
-      "id": "server_utils_openlibraryapi_normalizesubjectgenre",
-      "label": "normalizeSubjectGenre()",
+      "id": "components_mobile_addbookmobile_selectbookcover",
+      "label": "selectBookCover()",
       "_callable": true,
       "_origin": "ast",
       "community": 266,
-      "community_name": "openLibraryApi.ts",
+      "community_name": "closeCoverModal",
       "file_type": "code",
-      "norm_label": "normalizesubjectgenre()",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L36"
+      "norm_label": "selectbookcover()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L515"
     },
     {
-      "id": "server_utils_openlibraryapi_pickpublisher",
-      "label": "pickPublisher()",
+      "id": "components_mobile_addbookmobile_triggercoverinput",
+      "label": "triggerCoverInput()",
       "_callable": true,
       "_origin": "ast",
       "community": 266,
-      "community_name": "openLibraryApi.ts",
+      "community_name": "closeCoverModal",
       "file_type": "code",
-      "norm_label": "pickpublisher()",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L16"
-    },
-    {
-      "id": "server_utils_openlibraryapi_safeopenlibrarykey",
-      "label": "safeOpenLibraryKey()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 266,
-      "community_name": "openLibraryApi.ts",
-      "file_type": "code",
-      "norm_label": "safeopenlibrarykey()",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L32"
-    },
-    {
-      "id": "server_utils_openlibraryapi_searchopenlibrary",
-      "label": "searchOpenLibrary()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 266,
-      "community_name": "openLibraryApi.ts",
-      "file_type": "code",
-      "norm_label": "searchopenlibrary()",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L78"
+      "norm_label": "triggercoverinput()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L469"
     },
     {
       "id": "composables_usedevicepermissionprompt_usedevicepermissionprompt",
@@ -17190,40 +17190,40 @@
       "source_location": "L191"
     },
     {
-      "id": "components_tablet_booksdesktop_handleresize",
-      "label": "handleResize()",
+      "id": "components_mobile_addbookmobile_generatecoverplaceholder",
+      "label": "generateCoverPlaceholder()",
       "_callable": true,
       "_origin": "ast",
       "community": 272,
-      "community_name": "handleResize",
+      "community_name": "saveBook",
       "file_type": "code",
-      "norm_label": "handleresize()",
-      "source_file": "components/tablet/BooksDesktop.vue",
-      "source_location": "L763"
+      "norm_label": "generatecoverplaceholder()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L529"
     },
     {
-      "id": "components_tablet_booksdesktop_updatechiphighlight",
-      "label": "updateChipHighlight()",
+      "id": "components_mobile_addbookmobile_getpdfsourceforstorage",
+      "label": "getPdfSourceForStorage()",
       "_callable": true,
       "_origin": "ast",
       "community": 272,
-      "community_name": "handleResize",
+      "community_name": "saveBook",
       "file_type": "code",
-      "norm_label": "updatechiphighlight()",
-      "source_file": "components/tablet/BooksDesktop.vue",
-      "source_location": "L536"
+      "norm_label": "getpdfsourceforstorage()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L797"
     },
     {
-      "id": "components_tablet_booksdesktop_updateviewhighlight",
-      "label": "updateViewHighlight()",
+      "id": "components_mobile_addbookmobile_savebook",
+      "label": "saveBook()",
       "_callable": true,
       "_origin": "ast",
       "community": 272,
-      "community_name": "handleResize",
+      "community_name": "saveBook",
       "file_type": "code",
-      "norm_label": "updateviewhighlight()",
-      "source_file": "components/tablet/BooksDesktop.vue",
-      "source_location": "L576"
+      "norm_label": "savebook()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L805"
     },
     {
       "id": "utils_authorintelligence_authordetailsversion",
@@ -17826,6 +17826,102 @@
       "source_location": "L5"
     },
     {
+      "id": "components_tablet_booksdesktop_coverfallback",
+      "label": "coverFallback()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 280,
+      "community_name": "generateCoverPlaceholder",
+      "file_type": "code",
+      "norm_label": "coverfallback()",
+      "source_file": "components/tablet/BooksDesktop.vue",
+      "source_location": "L733"
+    },
+    {
+      "id": "components_tablet_booksdesktop_generatecoverplaceholder",
+      "label": "generateCoverPlaceholder()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 280,
+      "community_name": "generateCoverPlaceholder",
+      "file_type": "code",
+      "norm_label": "generatecoverplaceholder()",
+      "source_file": "components/tablet/BooksDesktop.vue",
+      "source_location": "L715"
+    },
+    {
+      "id": "components_tablet_booksdesktop_resolvebookcover",
+      "label": "resolveBookCover()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 280,
+      "community_name": "generateCoverPlaceholder",
+      "file_type": "code",
+      "norm_label": "resolvebookcover()",
+      "source_file": "components/tablet/BooksDesktop.vue",
+      "source_location": "L708"
+    },
+    {
+      "id": "components_tablet_booksdesktop_handleresize",
+      "label": "handleResize()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 283,
+      "community_name": "handleResize",
+      "file_type": "code",
+      "norm_label": "handleresize()",
+      "source_file": "components/tablet/BooksDesktop.vue",
+      "source_location": "L763"
+    },
+    {
+      "id": "components_tablet_booksdesktop_updatechiphighlight",
+      "label": "updateChipHighlight()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 283,
+      "community_name": "handleResize",
+      "file_type": "code",
+      "norm_label": "updatechiphighlight()",
+      "source_file": "components/tablet/BooksDesktop.vue",
+      "source_location": "L536"
+    },
+    {
+      "id": "components_tablet_booksdesktop_updateviewhighlight",
+      "label": "updateViewHighlight()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 283,
+      "community_name": "handleResize",
+      "file_type": "code",
+      "norm_label": "updateviewhighlight()",
+      "source_file": "components/tablet/BooksDesktop.vue",
+      "source_location": "L576"
+    },
+    {
+      "id": "components_mobile_addbookmobile_closeblurbchooser",
+      "label": "closeBlurbChooser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 286,
+      "community_name": "closeBlurbChooser",
+      "file_type": "code",
+      "norm_label": "closeblurbchooser()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L736"
+    },
+    {
+      "id": "components_mobile_addbookmobile_pickblurb",
+      "label": "pickBlurb()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 286,
+      "community_name": "closeBlurbChooser",
+      "file_type": "code",
+      "norm_label": "pickblurb()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L741"
+    },
+    {
       "id": "scripts_inspect_device_library_connectdevice",
       "label": "connectDevice()",
       "_callable": true,
@@ -18196,6 +18292,30 @@
       "norm_label": "speak()",
       "source_file": "composables/tts/desktopTtsDriver.test.js",
       "source_location": "L15"
+    },
+    {
+      "id": "components_mobile_addbookmobile_handlebookkindchange",
+      "label": "handleBookKindChange()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 292,
+      "community_name": "handleBookKindChange",
+      "file_type": "code",
+      "norm_label": "handlebookkindchange()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L788"
+    },
+    {
+      "id": "components_mobile_addbookmobile_setbookkind",
+      "label": "setBookKind()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 292,
+      "community_name": "handleBookKindChange",
+      "file_type": "code",
+      "norm_label": "setbookkind()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L787"
     },
     {
       "id": "composables_usesharebook_safefilename",
@@ -18894,6 +19014,30 @@
       "source_location": "L37"
     },
     {
+      "id": "components_mobile_addbookmobile_openblurbchooser",
+      "label": "openBlurbChooser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 303,
+      "community_name": "openBlurbChooser",
+      "file_type": "code",
+      "norm_label": "openblurbchooser()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L730"
+    },
+    {
+      "id": "components_mobile_addbookmobile_selectmetadata",
+      "label": "selectMetadata()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 303,
+      "community_name": "openBlurbChooser",
+      "file_type": "code",
+      "norm_label": "selectmetadata()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L748"
+    },
+    {
       "id": "composables_tts_desktopttsdriver_hasusableaudio",
       "label": "hasUsableAudio()",
       "_callable": true,
@@ -18916,6 +19060,30 @@
       "norm_label": "synthesizedesktopspeech()",
       "source_file": "composables/tts/desktopTtsDriver.js",
       "source_location": "L28"
+    },
+    {
+      "id": "components_mobile_addbookmobile_sourcelabel",
+      "label": "sourceLabel()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 305,
+      "community_name": "sourceLabel",
+      "file_type": "code",
+      "norm_label": "sourcelabel()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L682"
+    },
+    {
+      "id": "components_mobile_addbookmobile_sourcetooltip",
+      "label": "sourceTooltip()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 305,
+      "community_name": "sourceLabel",
+      "file_type": "code",
+      "norm_label": "sourcetooltip()",
+      "source_file": "components/mobile/AddBookMobile.vue",
+      "source_location": "L706"
     },
     {
       "id": "components_mobile_readerdisplaysheet_movevslide",
@@ -19158,78 +19326,6 @@
       "source_location": "L754"
     },
     {
-      "id": "components_mobile_addbookmobile_closecovermodal",
-      "label": "closeCoverModal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 315,
-      "community_name": "closeCoverModal",
-      "file_type": "code",
-      "norm_label": "closecovermodal()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L464"
-    },
-    {
-      "id": "components_mobile_addbookmobile_selectbookcover",
-      "label": "selectBookCover()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 315,
-      "community_name": "closeCoverModal",
-      "file_type": "code",
-      "norm_label": "selectbookcover()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L515"
-    },
-    {
-      "id": "components_mobile_addbookmobile_triggercoverinput",
-      "label": "triggerCoverInput()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 315,
-      "community_name": "closeCoverModal",
-      "file_type": "code",
-      "norm_label": "triggercoverinput()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L469"
-    },
-    {
-      "id": "components_mobile_addbookmobile_generatecoverplaceholder",
-      "label": "generateCoverPlaceholder()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 316,
-      "community_name": "saveBook",
-      "file_type": "code",
-      "norm_label": "generatecoverplaceholder()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L529"
-    },
-    {
-      "id": "components_mobile_addbookmobile_getpdfsourceforstorage",
-      "label": "getPdfSourceForStorage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 316,
-      "community_name": "saveBook",
-      "file_type": "code",
-      "norm_label": "getpdfsourceforstorage()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L797"
-    },
-    {
-      "id": "components_mobile_addbookmobile_savebook",
-      "label": "saveBook()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 316,
-      "community_name": "saveBook",
-      "file_type": "code",
-      "norm_label": "savebook()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L805"
-    },
-    {
       "id": "components_mobile_editbookmobile_sourcelabel",
       "label": "sourceLabel()",
       "_callable": true,
@@ -19468,102 +19564,6 @@
       "norm_label": "truncatewords()",
       "source_file": "components/shared/BookGroupDetail.vue",
       "source_location": "L381"
-    },
-    {
-      "id": "components_mobile_addbookmobile_closeblurbchooser",
-      "label": "closeBlurbChooser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 320,
-      "community_name": "closeBlurbChooser",
-      "file_type": "code",
-      "norm_label": "closeblurbchooser()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L736"
-    },
-    {
-      "id": "components_mobile_addbookmobile_pickblurb",
-      "label": "pickBlurb()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 320,
-      "community_name": "closeBlurbChooser",
-      "file_type": "code",
-      "norm_label": "pickblurb()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L741"
-    },
-    {
-      "id": "components_mobile_addbookmobile_handlebookkindchange",
-      "label": "handleBookKindChange()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 321,
-      "community_name": "handleBookKindChange",
-      "file_type": "code",
-      "norm_label": "handlebookkindchange()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L788"
-    },
-    {
-      "id": "components_mobile_addbookmobile_setbookkind",
-      "label": "setBookKind()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 321,
-      "community_name": "handleBookKindChange",
-      "file_type": "code",
-      "norm_label": "setbookkind()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L787"
-    },
-    {
-      "id": "components_mobile_addbookmobile_openblurbchooser",
-      "label": "openBlurbChooser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 322,
-      "community_name": "openBlurbChooser",
-      "file_type": "code",
-      "norm_label": "openblurbchooser()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L730"
-    },
-    {
-      "id": "components_mobile_addbookmobile_selectmetadata",
-      "label": "selectMetadata()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 322,
-      "community_name": "openBlurbChooser",
-      "file_type": "code",
-      "norm_label": "selectmetadata()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L748"
-    },
-    {
-      "id": "components_mobile_addbookmobile_sourcelabel",
-      "label": "sourceLabel()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 323,
-      "community_name": "sourceLabel",
-      "file_type": "code",
-      "norm_label": "sourcelabel()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L682"
-    },
-    {
-      "id": "components_mobile_addbookmobile_sourcetooltip",
-      "label": "sourceTooltip()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 323,
-      "community_name": "sourceLabel",
-      "file_type": "code",
-      "norm_label": "sourcetooltip()",
-      "source_file": "components/mobile/AddBookMobile.vue",
-      "source_location": "L706"
     },
     {
       "id": "android_app_src_main_java_com_bookish_app_mediasessionplugin_mediasessionplugin_buildnotification",
@@ -27233,7 +27233,7 @@
       "file_type": "code",
       "norm_label": "usepagessettings()",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L479"
+      "source_location": "L482"
     },
     {
       "id": "components_mobile_addbookmobile_choosedocumenttype",
@@ -27569,7 +27569,7 @@
       "file_type": "code",
       "norm_label": "handlesettingsrow()",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L111"
+      "source_location": "L112"
     },
     {
       "id": "components_mobile_settingsmobile_handleversionclick",
@@ -27581,7 +27581,7 @@
       "file_type": "code",
       "norm_label": "handleversionclick()",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L70"
+      "source_location": "L71"
     },
     {
       "id": "components_mobile_settingsmobile_navigate",
@@ -27593,7 +27593,7 @@
       "file_type": "code",
       "norm_label": "navigate()",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L107"
+      "source_location": "L108"
     },
     {
       "id": "components_mobile_settingsmobile_setreadertheme",
@@ -27605,7 +27605,7 @@
       "file_type": "code",
       "norm_label": "setreadertheme()",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L139"
+      "source_location": "L140"
     },
     {
       "id": "utils_backupassets_assetref",
@@ -40898,26 +40898,27 @@
       "source_location": "L1"
     },
     {
-      "id": "usedeviceassets",
-      "label": "~/composables/useDeviceAssets",
+      "id": "composables_usetts_resume_test",
+      "label": "useTTS.resume.test.js",
       "_origin": "ast",
       "community": 185,
-      "community_name": "useCoverImageCache.js",
-      "confidence": "EXTRACTED",
+      "community_name": "useTTS",
       "file_type": "code",
-      "norm_label": "~/composables/usedeviceassets",
-      "source_file": "~/composables/useDeviceAssets"
+      "norm_label": "usetts.resume.test.js",
+      "source_file": "composables/useTTS.resume.test.js",
+      "source_location": "L1"
     },
     {
-      "id": "composables_usecoverimagecache",
-      "label": "useCoverImageCache.js",
+      "id": "docs_superpowers_plans_2026_06_26_read_aloud_word_highlight_lazy_render_task_5_instant_sentence_highlight_warmer_prefetch",
+      "label": "Task 5: Instant sentence highlight + warmer prefetch",
       "_origin": "ast",
       "community": 185,
-      "community_name": "useCoverImageCache.js",
-      "file_type": "code",
-      "norm_label": "usecoverimagecache.js",
-      "source_file": "composables/useCoverImageCache.js",
-      "source_location": "L1"
+      "community_name": "useTTS",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "task 5: instant sentence highlight + warmer prefetch",
+      "source_file": "docs/superpowers/plans/2026-06-26-read-aloud-word-highlight-lazy-render.md",
+      "source_location": "L607"
     },
     {
       "id": "composables_usedevicearchitecture",
@@ -43026,26 +43027,92 @@
       "source_location": "L24"
     },
     {
-      "id": "plugins_00_app_errors_client",
-      "label": "00.app-errors.client.js",
+      "id": "pages_listen_settings_id",
+      "label": "listen-settings/[id].vue",
       "_origin": "ast",
       "community": 204,
-      "community_name": "00.app-errors.client.js",
+      "community_name": "listen-settings/[id].vue",
       "file_type": "code",
-      "norm_label": "00.app-errors.client.js",
-      "source_file": "plugins/00.app-errors.client.js",
+      "norm_label": "listen-settings/[id].vue",
+      "source_file": "pages/listen-settings/[id].vue",
       "source_location": "L1"
     },
     {
-      "id": "tests_startupresilience_test",
-      "label": "startupResilience.test.js",
+      "id": "pages_listen_settings_id_listenbackseconds",
+      "label": "listenBackSeconds",
       "_origin": "ast",
       "community": 204,
-      "community_name": "00.app-errors.client.js",
+      "community_name": "listen-settings/[id].vue",
       "file_type": "code",
-      "norm_label": "startupresilience.test.js",
-      "source_file": "tests/startupResilience.test.js",
-      "source_location": "L1"
+      "norm_label": "listenbackseconds",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L72"
+    },
+    {
+      "id": "pages_listen_settings_id_listenforwardseconds",
+      "label": "listenForwardSeconds",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "listen-settings/[id].vue",
+      "file_type": "code",
+      "norm_label": "listenforwardseconds",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L73"
+    },
+    {
+      "id": "pages_listen_settings_id_progressscope",
+      "label": "progressScope",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "listen-settings/[id].vue",
+      "file_type": "code",
+      "norm_label": "progressscope",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L75"
+    },
+    {
+      "id": "pages_listen_settings_id_readerpath",
+      "label": "readerPath",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "listen-settings/[id].vue",
+      "file_type": "code",
+      "norm_label": "readerpath",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L70"
+    },
+    {
+      "id": "pages_listen_settings_id_route",
+      "label": "route",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "listen-settings/[id].vue",
+      "file_type": "code",
+      "norm_label": "route",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L69"
+    },
+    {
+      "id": "pages_listen_settings_id_scopeoptions",
+      "label": "scopeOptions",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "listen-settings/[id].vue",
+      "file_type": "code",
+      "norm_label": "scopeoptions",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L76"
+    },
+    {
+      "id": "pages_listen_settings_id_settings_updatesettings",
+      "label": "{ settings, updateSettings }",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "listen-settings/[id].vue",
+      "file_type": "code",
+      "norm_label": "{ settings, updatesettings }",
+      "source_file": "pages/listen-settings/[id].vue",
+      "source_location": "L71"
     },
     {
       "id": "composables_uselibrarybackup",
@@ -44128,37 +44195,37 @@
       "source_location": "L111"
     },
     {
-      "id": "authorimagesweb",
-      "label": "~/server/utils/authorImagesWeb",
+      "id": "server_utils_openlibraryapi",
+      "label": "openLibraryApi.ts",
       "_origin": "ast",
       "community": 219,
-      "community_name": "mobileNativeAppConfig.test.js",
-      "confidence": "EXTRACTED",
+      "community_name": "openLibraryApi.ts",
       "file_type": "code",
-      "norm_label": "~/server/utils/authorimagesweb",
-      "source_file": "~/server/utils/authorImagesWeb"
-    },
-    {
-      "id": "tests_mobilenativeappconfig_test",
-      "label": "mobileNativeAppConfig.test.js",
-      "_origin": "ast",
-      "community": 219,
-      "community_name": "mobileNativeAppConfig.test.js",
-      "file_type": "code",
-      "norm_label": "mobilenativeappconfig.test.js",
-      "source_file": "tests/mobileNativeAppConfig.test.js",
+      "norm_label": "openlibraryapi.ts",
+      "source_file": "server/utils/openLibraryApi.ts",
       "source_location": "L1"
     },
     {
-      "id": "tests_mobilenativeappconfig_test_root",
-      "label": "root",
+      "id": "server_utils_openlibraryapi_openlibraryheaders",
+      "label": "openLibraryHeaders",
       "_origin": "ast",
       "community": 219,
-      "community_name": "mobileNativeAppConfig.test.js",
+      "community_name": "openLibraryApi.ts",
       "file_type": "code",
-      "norm_label": "root",
-      "source_file": "tests/mobileNativeAppConfig.test.js",
-      "source_location": "L5"
+      "norm_label": "openlibraryheaders",
+      "source_file": "server/utils/openLibraryApi.ts",
+      "source_location": "L25"
+    },
+    {
+      "id": "server_utils_openlibraryapi_test",
+      "label": "openLibraryApi.test.ts",
+      "_origin": "ast",
+      "community": 219,
+      "community_name": "openLibraryApi.ts",
+      "file_type": "code",
+      "norm_label": "openlibraryapi.test.ts",
+      "source_file": "server/utils/openLibraryApi.test.ts",
+      "source_location": "L1"
     },
     {
       "id": "composables_usetts_test",
@@ -44422,59 +44489,26 @@
       "source_location": "L98"
     },
     {
-      "id": "pages_settings_about",
-      "label": "about.vue",
+      "id": "usedeviceassets",
+      "label": "~/composables/useDeviceAssets",
       "_origin": "ast",
-      "community": 225,
-      "community_name": "about.vue",
+      "community": 224,
+      "community_name": "useCoverImageCache.js",
+      "confidence": "EXTRACTED",
       "file_type": "code",
-      "norm_label": "about.vue",
-      "source_file": "pages/settings/about.vue",
+      "norm_label": "~/composables/usedeviceassets",
+      "source_file": "~/composables/useDeviceAssets"
+    },
+    {
+      "id": "composables_usecoverimagecache",
+      "label": "useCoverImageCache.js",
+      "_origin": "ast",
+      "community": 224,
+      "community_name": "useCoverImageCache.js",
+      "file_type": "code",
+      "norm_label": "usecoverimagecache.js",
+      "source_file": "composables/useCoverImageCache.js",
       "source_location": "L1"
-    },
-    {
-      "id": "pages_settings_about_appversion",
-      "label": "appVersion",
-      "_origin": "ast",
-      "community": 225,
-      "community_name": "about.vue",
-      "file_type": "code",
-      "norm_label": "appversion",
-      "source_file": "pages/settings/about.vue",
-      "source_location": "L78"
-    },
-    {
-      "id": "pages_settings_about_buildnumber",
-      "label": "buildNumber",
-      "_origin": "ast",
-      "community": 225,
-      "community_name": "about.vue",
-      "file_type": "code",
-      "norm_label": "buildnumber",
-      "source_file": "pages/settings/about.vue",
-      "source_location": "L79"
-    },
-    {
-      "id": "pages_settings_about_runtimeconfig",
-      "label": "runtimeConfig",
-      "_origin": "ast",
-      "community": 225,
-      "community_name": "about.vue",
-      "file_type": "code",
-      "norm_label": "runtimeconfig",
-      "source_file": "pages/settings/about.vue",
-      "source_location": "L77"
-    },
-    {
-      "id": "pages_settings_about_year",
-      "label": "year",
-      "_origin": "ast",
-      "community": 225,
-      "community_name": "about.vue",
-      "file_type": "code",
-      "norm_label": "year",
-      "source_file": "pages/settings/about.vue",
-      "source_location": "L80"
     },
     {
       "id": "docs_superpowers_specs_2026_05_17_empty_state_redesign",
@@ -46388,6 +46422,28 @@
       "source_location": "L1"
     },
     {
+      "id": "plugins_00_app_errors_client",
+      "label": "00.app-errors.client.js",
+      "_origin": "ast",
+      "community": 248,
+      "community_name": "00.app-errors.client.js",
+      "file_type": "code",
+      "norm_label": "00.app-errors.client.js",
+      "source_file": "plugins/00.app-errors.client.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_startupresilience_test",
+      "label": "startupResilience.test.js",
+      "_origin": "ast",
+      "community": 248,
+      "community_name": "00.app-errors.client.js",
+      "file_type": "code",
+      "norm_label": "startupresilience.test.js",
+      "source_file": "tests/startupResilience.test.js",
+      "source_location": "L1"
+    },
+    {
       "id": "components_shared_bookactionsheet",
       "label": "BookActionSheet.vue",
       "_origin": "ast",
@@ -46837,27 +46893,37 @@
       "source_location": "L5"
     },
     {
-      "id": "composables_usetts_resume_test",
-      "label": "useTTS.resume.test.js",
+      "id": "authorimagesweb",
+      "label": "~/server/utils/authorImagesWeb",
       "_origin": "ast",
       "community": 258,
-      "community_name": "useTTS",
+      "community_name": "mobileNativeAppConfig.test.js",
+      "confidence": "EXTRACTED",
       "file_type": "code",
-      "norm_label": "usetts.resume.test.js",
-      "source_file": "composables/useTTS.resume.test.js",
+      "norm_label": "~/server/utils/authorimagesweb",
+      "source_file": "~/server/utils/authorImagesWeb"
+    },
+    {
+      "id": "tests_mobilenativeappconfig_test",
+      "label": "mobileNativeAppConfig.test.js",
+      "_origin": "ast",
+      "community": 258,
+      "community_name": "mobileNativeAppConfig.test.js",
+      "file_type": "code",
+      "norm_label": "mobilenativeappconfig.test.js",
+      "source_file": "tests/mobileNativeAppConfig.test.js",
       "source_location": "L1"
     },
     {
-      "id": "docs_superpowers_plans_2026_06_26_read_aloud_word_highlight_lazy_render_task_5_instant_sentence_highlight_warmer_prefetch",
-      "label": "Task 5: Instant sentence highlight + warmer prefetch",
+      "id": "tests_mobilenativeappconfig_test_root",
+      "label": "root",
       "_origin": "ast",
       "community": 258,
-      "community_name": "useTTS",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "task 5: instant sentence highlight + warmer prefetch",
-      "source_file": "docs/superpowers/plans/2026-06-26-read-aloud-word-highlight-lazy-render.md",
-      "source_location": "L607"
+      "community_name": "mobileNativeAppConfig.test.js",
+      "file_type": "code",
+      "norm_label": "root",
+      "source_file": "tests/mobileNativeAppConfig.test.js",
+      "source_location": "L5"
     },
     {
       "id": "composables_tts_silencetrim",
@@ -46901,7 +46967,7 @@
       "file_type": "code",
       "norm_label": "app_background_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L110"
+      "source_location": "L113"
     },
     {
       "id": "composables_usepagessettings_book_action_display_options",
@@ -46912,7 +46978,7 @@
       "file_type": "code",
       "norm_label": "book_action_display_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L122"
+      "source_location": "L125"
     },
     {
       "id": "composables_usepagessettings_card_background_options",
@@ -46923,7 +46989,7 @@
       "file_type": "code",
       "norm_label": "card_background_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L109"
+      "source_location": "L112"
     },
     {
       "id": "composables_usepagessettings_current_settings_version",
@@ -46934,7 +47000,7 @@
       "file_type": "code",
       "norm_label": "current_settings_version",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L372"
+      "source_location": "L375"
     },
     {
       "id": "composables_usepagessettings_dark_app_background_options",
@@ -46945,7 +47011,7 @@
       "file_type": "code",
       "norm_label": "dark_app_background_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L111"
+      "source_location": "L114"
     },
     {
       "id": "composables_usepagessettings_default_pages_settings",
@@ -46967,7 +47033,7 @@
       "file_type": "code",
       "norm_label": "favourites_card_layout_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L121"
+      "source_location": "L124"
     },
     {
       "id": "composables_usepagessettings_format_filter_choices",
@@ -46978,7 +47044,7 @@
       "file_type": "code",
       "norm_label": "format_filter_choices",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L128"
+      "source_location": "L131"
     },
     {
       "id": "composables_usepagessettings_format_filter_options",
@@ -46989,7 +47055,7 @@
       "file_type": "code",
       "norm_label": "format_filter_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L125"
+      "source_location": "L128"
     },
     {
       "id": "composables_usepagessettings_legacy_nav_defaults",
@@ -47000,7 +47066,7 @@
       "file_type": "code",
       "norm_label": "legacy_nav_defaults",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L374"
+      "source_location": "L377"
     },
     {
       "id": "composables_usepagessettings_legacy_tts_voice_replacements",
@@ -47011,7 +47077,7 @@
       "file_type": "code",
       "norm_label": "legacy_tts_voice_replacements",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L157"
+      "source_location": "L160"
     },
     {
       "id": "composables_usepagessettings_library_grid_items_per_page_options",
@@ -47022,7 +47088,7 @@
       "file_type": "code",
       "norm_label": "library_grid_items_per_page_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L141"
+      "source_location": "L144"
     },
     {
       "id": "composables_usepagessettings_library_table_items_per_page_options",
@@ -47033,7 +47099,7 @@
       "file_type": "code",
       "norm_label": "library_table_items_per_page_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L142"
+      "source_location": "L145"
     },
     {
       "id": "composables_usepagessettings_mobile_nav_active_icon_options",
@@ -47044,7 +47110,7 @@
       "file_type": "code",
       "norm_label": "mobile_nav_active_icon_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L117"
+      "source_location": "L120"
     },
     {
       "id": "composables_usepagessettings_mobile_nav_highlight_options",
@@ -47055,7 +47121,7 @@
       "file_type": "code",
       "norm_label": "mobile_nav_highlight_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L116"
+      "source_location": "L119"
     },
     {
       "id": "composables_usepagessettings_mobile_nav_material_options",
@@ -47066,7 +47132,7 @@
       "file_type": "code",
       "norm_label": "mobile_nav_material_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L115"
+      "source_location": "L118"
     },
     {
       "id": "composables_usepagessettings_mobile_nav_profile_options",
@@ -47077,7 +47143,7 @@
       "file_type": "code",
       "norm_label": "mobile_nav_profile_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L118"
+      "source_location": "L121"
     },
     {
       "id": "composables_usepagessettings_mobile_nav_size_options",
@@ -47088,7 +47154,7 @@
       "file_type": "code",
       "norm_label": "mobile_nav_size_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L114"
+      "source_location": "L117"
     },
     {
       "id": "composables_usepagessettings_mobile_nav_style_options",
@@ -47099,7 +47165,7 @@
       "file_type": "code",
       "norm_label": "mobile_nav_style_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L112"
+      "source_location": "L115"
     },
     {
       "id": "composables_usepagessettings_mobile_top_nav_display_options",
@@ -47110,7 +47176,7 @@
       "file_type": "code",
       "norm_label": "mobile_top_nav_display_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L113"
+      "source_location": "L116"
     },
     {
       "id": "composables_usepagessettings_pages_settings_key",
@@ -47132,7 +47198,7 @@
       "file_type": "code",
       "norm_label": "personal_rating_scale_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L124"
+      "source_location": "L127"
     },
     {
       "id": "composables_usepagessettings_playlist_card_layout_options",
@@ -47143,7 +47209,7 @@
       "file_type": "code",
       "norm_label": "playlist_card_layout_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L120"
+      "source_location": "L123"
     },
     {
       "id": "composables_usepagessettings_rating_source_options",
@@ -47154,7 +47220,7 @@
       "file_type": "code",
       "norm_label": "rating_source_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L123"
+      "source_location": "L126"
     },
     {
       "id": "composables_usepagessettings_series_card_layout_options",
@@ -47165,7 +47231,7 @@
       "file_type": "code",
       "norm_label": "series_card_layout_options",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L119"
+      "source_location": "L122"
     },
     {
       "id": "composables_usepagessettings_settingsstate",
@@ -47176,7 +47242,7 @@
       "file_type": "code",
       "norm_label": "settingsstate",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L166"
+      "source_location": "L169"
     },
     {
       "id": "composables_usepagessettings_supported_formats",
@@ -47187,7 +47253,7 @@
       "file_type": "code",
       "norm_label": "supported_formats",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L72"
+      "source_location": "L75"
     },
     {
       "id": "composables_usepagessettings_test",
@@ -47209,7 +47275,7 @@
       "file_type": "code",
       "norm_label": "tts_voice_ids",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L144"
+      "source_location": "L147"
     },
     {
       "id": "tests_preferences_test",
@@ -47246,6 +47312,61 @@
       "source_location": "L494"
     },
     {
+      "id": "pages_settings_about",
+      "label": "about.vue",
+      "_origin": "ast",
+      "community": 261,
+      "community_name": "about.vue",
+      "file_type": "code",
+      "norm_label": "about.vue",
+      "source_file": "pages/settings/about.vue",
+      "source_location": "L1"
+    },
+    {
+      "id": "pages_settings_about_appversion",
+      "label": "appVersion",
+      "_origin": "ast",
+      "community": 261,
+      "community_name": "about.vue",
+      "file_type": "code",
+      "norm_label": "appversion",
+      "source_file": "pages/settings/about.vue",
+      "source_location": "L78"
+    },
+    {
+      "id": "pages_settings_about_buildnumber",
+      "label": "buildNumber",
+      "_origin": "ast",
+      "community": 261,
+      "community_name": "about.vue",
+      "file_type": "code",
+      "norm_label": "buildnumber",
+      "source_file": "pages/settings/about.vue",
+      "source_location": "L79"
+    },
+    {
+      "id": "pages_settings_about_runtimeconfig",
+      "label": "runtimeConfig",
+      "_origin": "ast",
+      "community": 261,
+      "community_name": "about.vue",
+      "file_type": "code",
+      "norm_label": "runtimeconfig",
+      "source_file": "pages/settings/about.vue",
+      "source_location": "L77"
+    },
+    {
+      "id": "pages_settings_about_year",
+      "label": "year",
+      "_origin": "ast",
+      "community": 261,
+      "community_name": "about.vue",
+      "file_type": "code",
+      "norm_label": "year",
+      "source_file": "pages/settings/about.vue",
+      "source_location": "L80"
+    },
+    {
       "id": "design_qa",
       "label": "design-qa.md",
       "_origin": "ast",
@@ -47258,94 +47379,6 @@
       "source_location": "L1"
     },
     {
-      "id": "pages_listen_settings_id",
-      "label": "listen-settings/[id].vue",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "listen-settings/[id].vue",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L1"
-    },
-    {
-      "id": "pages_listen_settings_id_listenbackseconds",
-      "label": "listenBackSeconds",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "listenbackseconds",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L72"
-    },
-    {
-      "id": "pages_listen_settings_id_listenforwardseconds",
-      "label": "listenForwardSeconds",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "listenforwardseconds",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L73"
-    },
-    {
-      "id": "pages_listen_settings_id_progressscope",
-      "label": "progressScope",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "progressscope",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L75"
-    },
-    {
-      "id": "pages_listen_settings_id_readerpath",
-      "label": "readerPath",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "readerpath",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L70"
-    },
-    {
-      "id": "pages_listen_settings_id_route",
-      "label": "route",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "route",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L69"
-    },
-    {
-      "id": "pages_listen_settings_id_scopeoptions",
-      "label": "scopeOptions",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "scopeoptions",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L76"
-    },
-    {
-      "id": "pages_listen_settings_id_settings_updatesettings",
-      "label": "{ settings, updateSettings }",
-      "_origin": "ast",
-      "community": 264,
-      "community_name": "listen-settings/[id].vue",
-      "file_type": "code",
-      "norm_label": "{ settings, updatesettings }",
-      "source_file": "pages/listen-settings/[id].vue",
-      "source_location": "L71"
-    },
-    {
       "id": "plugins_settings_system_bars_client",
       "label": "settings-system-bars.client.js",
       "_origin": "ast",
@@ -47354,39 +47387,6 @@
       "file_type": "code",
       "norm_label": "settings-system-bars.client.js",
       "source_file": "plugins/settings-system-bars.client.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "server_utils_openlibraryapi",
-      "label": "openLibraryApi.ts",
-      "_origin": "ast",
-      "community": 266,
-      "community_name": "openLibraryApi.ts",
-      "file_type": "code",
-      "norm_label": "openlibraryapi.ts",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "server_utils_openlibraryapi_openlibraryheaders",
-      "label": "openLibraryHeaders",
-      "_origin": "ast",
-      "community": 266,
-      "community_name": "openLibraryApi.ts",
-      "file_type": "code",
-      "norm_label": "openlibraryheaders",
-      "source_file": "server/utils/openLibraryApi.ts",
-      "source_location": "L25"
-    },
-    {
-      "id": "server_utils_openlibraryapi_test",
-      "label": "openLibraryApi.test.ts",
-      "_origin": "ast",
-      "community": 266,
-      "community_name": "openLibraryApi.ts",
-      "file_type": "code",
-      "norm_label": "openlibraryapi.test.ts",
-      "source_file": "server/utils/openLibraryApi.test.ts",
       "source_location": "L1"
     },
     {
@@ -48948,42 +48948,6 @@
       "source_location": "L1"
     },
     {
-      "id": "pages_master_ai_knowledge_base_combined_1_epub_extraction_pipeline_useepubextractor_js",
-      "label": "1. EPUB Extraction Pipeline (`useEpubExtractor.js`)",
-      "_origin": "ast",
-      "community": 280,
-      "community_name": "Phase 5: Book Ingestion & EPUB/PDF Processing",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "1. epub extraction pipeline (`useepubextractor.js`)",
-      "source_file": "Pages_Master_AI_Knowledge_Base_Combined.md",
-      "source_location": "L249"
-    },
-    {
-      "id": "pages_master_ai_knowledge_base_combined_2_pdf_ingestion_filesystem_offloading",
-      "label": "2. PDF Ingestion & Filesystem Offloading",
-      "_origin": "ast",
-      "community": 280,
-      "community_name": "Phase 5: Book Ingestion & EPUB/PDF Processing",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "2. pdf ingestion & filesystem offloading",
-      "source_file": "Pages_Master_AI_Knowledge_Base_Combined.md",
-      "source_location": "L259"
-    },
-    {
-      "id": "pages_master_ai_knowledge_base_combined_phase_5_book_ingestion_epub_pdf_processing",
-      "label": "Phase 5: Book Ingestion & EPUB/PDF Processing",
-      "_origin": "ast",
-      "community": 280,
-      "community_name": "Phase 5: Book Ingestion & EPUB/PDF Processing",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "phase 5: book ingestion & epub/pdf processing",
-      "source_file": "Pages_Master_AI_Knowledge_Base_Combined.md",
-      "source_location": "L247"
-    },
-    {
       "id": "components_shared_seriesmembershippicker",
       "label": "SeriesMembershipPicker.vue",
       "_origin": "ast",
@@ -49092,6 +49056,42 @@
       "norm_label": "tab_root_paths",
       "source_file": "layouts/default.vue",
       "source_location": "L49"
+    },
+    {
+      "id": "pages_master_ai_knowledge_base_combined_1_epub_extraction_pipeline_useepubextractor_js",
+      "label": "1. EPUB Extraction Pipeline (`useEpubExtractor.js`)",
+      "_origin": "ast",
+      "community": 285,
+      "community_name": "Phase 5: Book Ingestion & EPUB/PDF Processing",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "1. epub extraction pipeline (`useepubextractor.js`)",
+      "source_file": "Pages_Master_AI_Knowledge_Base_Combined.md",
+      "source_location": "L249"
+    },
+    {
+      "id": "pages_master_ai_knowledge_base_combined_2_pdf_ingestion_filesystem_offloading",
+      "label": "2. PDF Ingestion & Filesystem Offloading",
+      "_origin": "ast",
+      "community": 285,
+      "community_name": "Phase 5: Book Ingestion & EPUB/PDF Processing",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "2. pdf ingestion & filesystem offloading",
+      "source_file": "Pages_Master_AI_Knowledge_Base_Combined.md",
+      "source_location": "L259"
+    },
+    {
+      "id": "pages_master_ai_knowledge_base_combined_phase_5_book_ingestion_epub_pdf_processing",
+      "label": "Phase 5: Book Ingestion & EPUB/PDF Processing",
+      "_origin": "ast",
+      "community": 285,
+      "community_name": "Phase 5: Book Ingestion & EPUB/PDF Processing",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "phase 5: book ingestion & epub/pdf processing",
+      "source_file": "Pages_Master_AI_Knowledge_Base_Combined.md",
+      "source_location": "L247"
     },
     {
       "id": "docs_releases_1_3_5",
@@ -50662,6 +50662,17 @@
       "source_location": "L282"
     },
     {
+      "id": "capacitor_app_app",
+      "label": "@capacitor/app",
+      "_origin": "ast",
+      "community": 310,
+      "community_name": "@capacitor/app",
+      "confidence": "EXTRACTED",
+      "file_type": "code",
+      "norm_label": "@capacitor/app",
+      "source_file": "@capacitor/app"
+    },
+    {
       "id": "composables_useselectoptions",
       "label": "useSelectOptions.js",
       "_origin": "ast",
@@ -50682,17 +50693,6 @@
       "norm_label": "useselectoptions.test.js",
       "source_file": "composables/useSelectOptions.test.js",
       "source_location": "L1"
-    },
-    {
-      "id": "capacitor_app_app",
-      "label": "@capacitor/app",
-      "_origin": "ast",
-      "community": 314,
-      "community_name": "@capacitor/app",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "@capacitor/app",
-      "source_file": "@capacitor/app"
     },
     {
       "id": "components_shared_bookgroupdetail",
@@ -60865,7 +60865,7 @@
       "file_type": "code",
       "norm_label": "mobilesettingsrows",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L86"
+      "source_location": "L87"
     },
     {
       "id": "components_mobile_settingsmobile_router",
@@ -60909,7 +60909,7 @@
       "file_type": "code",
       "norm_label": "settingsgroups",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L97"
+      "source_location": "L98"
     },
     {
       "id": "components_mobile_settingsmobile_showarrows",
@@ -60920,7 +60920,7 @@
       "file_type": "code",
       "norm_label": "showarrows",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L65"
+      "source_location": "L66"
     },
     {
       "id": "components_mobile_settingsmobile_showicons",
@@ -60931,7 +60931,7 @@
       "file_type": "code",
       "norm_label": "showicons",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L64"
+      "source_location": "L65"
     },
     {
       "id": "components_mobile_settingsmobile_versionclickcount",
@@ -60942,7 +60942,7 @@
       "file_type": "code",
       "norm_label": "versionclickcount",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L67"
+      "source_location": "L68"
     },
     {
       "id": "utils_backupassets",
@@ -69769,7 +69769,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L113",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -69781,7 +69781,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L132",
+      "source_location": "L133",
       "weight": 1.0
     },
     {
@@ -77245,7 +77245,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L347",
+      "source_location": "L350",
       "weight": 1.0
     },
     {
@@ -77257,7 +77257,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L106",
+      "source_location": "L109",
       "weight": 1.0
     },
     {
@@ -77269,7 +77269,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L102",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -77281,7 +77281,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L76",
+      "source_location": "L79",
       "weight": 1.0
     },
     {
@@ -77293,7 +77293,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L96",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -77305,7 +77305,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L197",
+      "source_location": "L200",
       "weight": 1.0
     },
     {
@@ -77317,7 +77317,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L221",
+      "source_location": "L224",
       "weight": 1.0
     },
     {
@@ -77329,7 +77329,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L305",
+      "source_location": "L308",
       "weight": 1.0
     },
     {
@@ -77341,7 +77341,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L173",
+      "source_location": "L176",
       "weight": 1.0
     },
     {
@@ -77353,7 +77353,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L400",
+      "source_location": "L403",
       "weight": 1.0
     },
     {
@@ -77365,7 +77365,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L409",
+      "source_location": "L412",
       "weight": 1.0
     },
     {
@@ -77377,7 +77377,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L418",
+      "source_location": "L421",
       "weight": 1.0
     },
     {
@@ -77389,7 +77389,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L492",
+      "source_location": "L495",
       "weight": 1.0
     },
     {
@@ -77401,7 +77401,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L494",
+      "source_location": "L497",
       "weight": 1.0
     },
     {
@@ -77413,7 +77413,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L508",
+      "source_location": "L511",
       "weight": 1.0
     },
     {
@@ -77425,7 +77425,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L457",
+      "source_location": "L460",
       "weight": 1.0
     },
     {
@@ -77437,7 +77437,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L461",
+      "source_location": "L464",
       "weight": 1.0
     },
     {
@@ -126076,7 +126076,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L107",
+      "source_location": "L108",
       "weight": 1.0
     },
     {
@@ -126087,7 +126087,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L111",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -126098,7 +126098,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L139",
+      "source_location": "L140",
       "weight": 1.0
     },
     {
@@ -126175,7 +126175,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L64",
+      "source_location": "L65",
       "weight": 1.0
     },
     {
@@ -126186,7 +126186,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -126197,7 +126197,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -126208,7 +126208,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L70",
+      "source_location": "L71",
       "weight": 1.0
     },
     {
@@ -126219,7 +126219,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L86",
+      "source_location": "L87",
       "weight": 1.0
     },
     {
@@ -126230,7 +126230,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/mobile/SettingsMobile.vue",
-      "source_location": "L97",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -142994,7 +142994,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L101",
+      "source_location": "L104",
       "weight": 1.0
     },
     {
@@ -143005,7 +143005,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L105",
+      "source_location": "L108",
       "weight": 1.0
     },
     {
@@ -143016,7 +143016,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L109",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -143027,7 +143027,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L110",
+      "source_location": "L113",
       "weight": 1.0
     },
     {
@@ -143038,7 +143038,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L111",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -143049,7 +143049,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L112",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -143060,7 +143060,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L113",
+      "source_location": "L116",
       "weight": 1.0
     },
     {
@@ -143071,7 +143071,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L114",
+      "source_location": "L117",
       "weight": 1.0
     },
     {
@@ -143082,7 +143082,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L115",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -143093,7 +143093,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L116",
+      "source_location": "L119",
       "weight": 1.0
     },
     {
@@ -143104,7 +143104,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L117",
+      "source_location": "L120",
       "weight": 1.0
     },
     {
@@ -143115,7 +143115,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L118",
+      "source_location": "L121",
       "weight": 1.0
     },
     {
@@ -143126,7 +143126,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L119",
+      "source_location": "L122",
       "weight": 1.0
     },
     {
@@ -143137,7 +143137,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L120",
+      "source_location": "L123",
       "weight": 1.0
     },
     {
@@ -143148,7 +143148,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L121",
+      "source_location": "L124",
       "weight": 1.0
     },
     {
@@ -143159,7 +143159,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L122",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -143170,7 +143170,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L123",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -143181,7 +143181,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L124",
+      "source_location": "L127",
       "weight": 1.0
     },
     {
@@ -143192,7 +143192,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L125",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -143203,7 +143203,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L128",
+      "source_location": "L131",
       "weight": 1.0
     },
     {
@@ -143214,7 +143214,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L135",
+      "source_location": "L138",
       "weight": 1.0
     },
     {
@@ -143225,7 +143225,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L141",
+      "source_location": "L144",
       "weight": 1.0
     },
     {
@@ -143236,7 +143236,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L142",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -143247,7 +143247,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L144",
+      "source_location": "L147",
       "weight": 1.0
     },
     {
@@ -143258,7 +143258,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L157",
+      "source_location": "L160",
       "weight": 1.0
     },
     {
@@ -143269,7 +143269,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L166",
+      "source_location": "L169",
       "weight": 1.0
     },
     {
@@ -143280,7 +143280,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L169",
+      "source_location": "L172",
       "weight": 1.0
     },
     {
@@ -143291,7 +143291,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L171",
+      "source_location": "L174",
       "weight": 1.0
     },
     {
@@ -143302,7 +143302,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L176",
+      "source_location": "L179",
       "weight": 1.0
     },
     {
@@ -143313,7 +143313,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L182",
+      "source_location": "L185",
       "weight": 1.0
     },
     {
@@ -143335,7 +143335,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L329",
+      "source_location": "L332",
       "weight": 1.0
     },
     {
@@ -143346,7 +143346,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L356",
+      "source_location": "L359",
       "weight": 1.0
     },
     {
@@ -143357,7 +143357,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L366",
+      "source_location": "L369",
       "weight": 1.0
     },
     {
@@ -143368,7 +143368,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L372",
+      "source_location": "L375",
       "weight": 1.0
     },
     {
@@ -143379,7 +143379,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L374",
+      "source_location": "L377",
       "weight": 1.0
     },
     {
@@ -143390,7 +143390,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L381",
+      "source_location": "L384",
       "weight": 1.0
     },
     {
@@ -143401,7 +143401,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L399",
+      "source_location": "L402",
       "weight": 1.0
     },
     {
@@ -143412,7 +143412,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L456",
+      "source_location": "L459",
       "weight": 1.0
     },
     {
@@ -143423,7 +143423,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L474",
+      "source_location": "L477",
       "weight": 1.0
     },
     {
@@ -143434,7 +143434,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L479",
+      "source_location": "L482",
       "weight": 1.0
     },
     {
@@ -143456,7 +143456,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L72",
+      "source_location": "L75",
       "weight": 1.0
     },
     {
@@ -143467,7 +143467,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L75",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -143478,7 +143478,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L81",
+      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -143489,7 +143489,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L87",
+      "source_location": "L90",
       "weight": 1.0
     },
     {
@@ -143500,7 +143500,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "composables/usePagesSettings.js",
-      "source_location": "L95",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -169929,5 +169929,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "8a8f36f0f8efad120a73a4eeefa450fbcfa738f6"
+  "built_at_commit": "fa767cba65cd18122ebeb130af3762c5e5b94884"
 }

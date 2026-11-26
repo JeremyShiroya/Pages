@@ -24,8 +24,8 @@
     "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1795663817.190468,
-    "seen": 1795663850.4920382,
+    "mtime": 1795665555.8996413,
+    "seen": 1795666564.657357,
     "ast_hash": "a3f5186283b43c363a376a7b27dc2224",
     "semantic_hash": ""
   },
@@ -84,8 +84,8 @@
     "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1795663817.189467,
-    "seen": 1795663850.4974062,
+    "mtime": 1795665555.8996413,
+    "seen": 1795666564.664911,
     "ast_hash": "b4d9264dcc0a0263b7dc995cd6fed430",
     "semantic_hash": ""
   },
@@ -210,9 +210,9 @@
     "semantic_hash": "08d9ed05478623c19186d1cb0c36fff0"
   },
   "components/mobile/PreferencesMobile.vue": {
-    "mtime": 1795661950.3034685,
-    "seen": 1795662564.1932151,
-    "ast_hash": "7de1a7b1d868da66ece4966a93b4e8d3",
+    "mtime": 1795666301.809466,
+    "seen": 1795666564.6794078,
+    "ast_hash": "cfb7aaed47d9dd56d9158f4a23b4e9c0",
     "semantic_hash": ""
   },
   "components/mobile/ProfileMobile.vue": {
@@ -264,9 +264,9 @@
     "semantic_hash": ""
   },
   "components/mobile/SettingsMobile.vue": {
-    "mtime": 1795648747.4104187,
-    "seen": 1795648960.4254973,
-    "ast_hash": "e21c85c120962c851b03ae1a7b8798e7",
+    "mtime": 1795666308.5245416,
+    "seen": 1795666564.6854796,
+    "ast_hash": "024337232f66c4939d4b8e7b370b39b1",
     "semantic_hash": ""
   },
   "components/mobile/SettingsStorageMobile.vue": {
@@ -1062,9 +1062,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1795627541.9379406,
-    "seen": 1795627630.9788213,
-    "ast_hash": "d91100461319fe5e578ce4be49e47fcf",
+    "mtime": 1795665436.7138517,
+    "seen": 1795665493.6056328,
+    "ast_hash": "c811deaff9aec2199f3446d3c239ea8a",
     "semantic_hash": ""
   },
   "pages/add.vue": {
@@ -3031,19 +3031,19 @@
   },
   "server/database/migrations/0000_add-pages-column.sql": {
     "mtime": 1778139591.9198406,
-    "seen": 1795627630.979504,
+    "seen": 1795665493.6063142,
     "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0001_naive_stark_industries.sql": {
     "mtime": 1778224044.757941,
-    "seen": 1795627630.9795136,
+    "seen": 1795665493.6063204,
     "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0002_drop_content_column.sql": {
     "mtime": 1778991194.1574428,
-    "seen": 1795627630.9795227,
+    "seen": 1795665493.6063259,
     "ast_hash": "",
     "semantic_hash": ""
   },
@@ -5803,7 +5803,7 @@
   },
   "supabase/migrations/20261124000000_cloud_backups.sql": {
     "mtime": 1795508661.807664,
-    "seen": 1795627630.9801,
+    "seen": 1795665493.6068213,
     "ast_hash": "",
     "semantic_hash": ""
   },
@@ -5826,15 +5826,15 @@
     "semantic_hash": ""
   },
   "composables/usePagesSettings.js": {
-    "mtime": 1795658768.3930438,
-    "seen": 1795659194.3133993,
-    "ast_hash": "31e50d4e60c8c9f74659fd2715bcd9ee",
+    "mtime": 1795666301.805465,
+    "seen": 1795666564.7679935,
+    "ast_hash": "728496b9fa3dbef1b6cf79623c611026",
     "semantic_hash": ""
   },
   "composables/usePagesSettings.test.js": {
-    "mtime": 1795625439.378102,
-    "seen": 1795625786.3280373,
-    "ast_hash": "48135d648c73598f0dd0e2239dfe8cda",
+    "mtime": 1795666325.7315335,
+    "seen": 1795666564.7679985,
+    "ast_hash": "114d11a11ffe4c70f7857e30157b2dbd",
     "semantic_hash": ""
   },
   "utils/backupAssets.js": {
@@ -5893,13 +5893,13 @@
   },
   "supabase/migrations/20261124010000_keepalive.sql": {
     "mtime": 1795511034.2257404,
-    "seen": 1795627630.980107,
+    "seen": 1795665493.6068285,
     "ast_hash": "",
     "semantic_hash": ""
   },
   "supabase/migrations/20261124020000_backup_asset_refs.sql": {
     "mtime": 1795514704.8371067,
-    "seen": 1795627630.9801133,
+    "seen": 1795665493.606858,
     "ast_hash": "",
     "semantic_hash": ""
   },

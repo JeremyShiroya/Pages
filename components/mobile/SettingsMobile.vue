@@ -60,9 +60,10 @@ const { canShareApp, shareApp } = useShareApp()
 const { addToast } = useToast()
 const router = useRouter()
 const appVersion = computed(() => runtimeConfig.public.appVersion || '0.0.0')
-// Developer-only preview (Preferences → Interface) of the list without icons.
-const showIcons = computed(() => settings.value.settingsIcons !== false)
-const showArrows = computed(() => settings.value.settingsArrows !== false)
+// Plain rows by default; developer mode (Preferences → Developer) can bring
+// back the row icons and arrows to compare.
+const showIcons = computed(() => settings.value.settingsRowIcons === true)
+const showArrows = computed(() => settings.value.settingsRowArrows === true)
 
 const versionClickCount = ref(0)
 let versionClickTimer = null
@@ -198,7 +199,7 @@ const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
   min-height: var(--settings-switch-row-min);
 }
 
-/* Developer preview: the same list without the leading icons. */
+/* Default: the list without the leading icons. */
 .no-icons .setting-info {
   grid-template-columns: minmax(0, 1fr);
 }

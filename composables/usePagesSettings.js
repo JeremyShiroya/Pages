@@ -51,8 +51,11 @@ export const DEFAULT_PAGES_SETTINGS = Object.freeze({
   streakBackground: true,          // the streak pill's tinted capsule behind icon + count
   formatFilter: 'all',             // 'all' | 'pdf' | 'epub' — legacy, see useLibraryFilters
   hideContent: false,              // preview the app as though the library were empty
-  settingsIcons: true,             // developer preview: Settings list with or without row icons
-  settingsArrows: true,            // developer preview: Settings list with or without row arrows
+  // The Settings list shows plain rows by default; developer mode can turn the
+  // row icons and arrows back on to compare. New keys, so installs that saved
+  // the old always-on values also start without them.
+  settingsRowIcons: false,
+  settingsRowArrows: false,
   // Show the series installments you don't own yet. ON by default: it is the
   // answer to "which book do I read next", it needs no setup, and a reader who
   // never opens Preferences would otherwise never discover it exists. Resolution
@@ -308,8 +311,8 @@ export function normalizePagesSettings(value) {
       ? 'all'
       : (FORMAT_FILTER_OPTIONS.includes(source.formatFilter) ? source.formatFilter : DEFAULT_PAGES_SETTINGS.formatFilter),
     hideContent: source.hideContent === true,
-    settingsIcons: source.settingsIcons !== false,
-    settingsArrows: source.settingsArrows !== false,
+    settingsRowIcons: source.settingsRowIcons === true,
+    settingsRowArrows: source.settingsRowArrows === true,
     // undefined means "never chosen", which must fall through to the default —
     // `=== true` would pin every existing install to off no matter what the
     // default says, so flipping the default alone would change nothing.

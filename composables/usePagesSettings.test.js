@@ -102,6 +102,16 @@ describe('usePagesSettings storage helpers', () => {
     }
   })
 
+  it('shows the Settings list without row icons or arrows unless turned on', () => {
+    // Includes installs that saved the old always-on settingsIcons/Arrows.
+    const fresh = normalizePagesSettings({ settingsIcons: true, settingsArrows: true })
+    expect(fresh.settingsRowIcons).toBe(false)
+    expect(fresh.settingsRowArrows).toBe(false)
+    const on = normalizePagesSettings({ settingsRowIcons: true, settingsRowArrows: true })
+    expect(on.settingsRowIcons).toBe(true)
+    expect(on.settingsRowArrows).toBe(true)
+  })
+
   it('validates bottom navigation style, opacity, and blur', () => {
     expect(normalizePagesSettings({})).toMatchObject({ mobileNavStyle: 'floating', mobileNavSize: 'compact', mobileNavOpacity: 95, mobileNavBlur: 18 })
     expect(normalizePagesSettings({ mobileNavStyle: 'standard', mobileNavOpacity: 35, mobileNavBlur: 50 }))

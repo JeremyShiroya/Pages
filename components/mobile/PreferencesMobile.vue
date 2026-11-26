@@ -165,9 +165,9 @@
             class="pref-toggle"
             role="switch"
             aria-label="Settings icons"
-            :aria-checked="settings.settingsIcons !== false"
-            :class="{ on: settings.settingsIcons !== false }"
-            @click="set('settingsIcons', settings.settingsIcons === false)"
+            :aria-checked="settings.settingsRowIcons === true"
+            :class="{ on: settings.settingsRowIcons === true }"
+            @click="set('settingsRowIcons', settings.settingsRowIcons !== true)"
           >
             <span class="knob"></span>
           </button>
@@ -183,9 +183,9 @@
             class="pref-toggle"
             role="switch"
             aria-label="Settings arrows"
-            :aria-checked="settings.settingsArrows !== false"
-            :class="{ on: settings.settingsArrows !== false }"
-            @click="set('settingsArrows', settings.settingsArrows === false)"
+            :aria-checked="settings.settingsRowArrows === true"
+            :class="{ on: settings.settingsRowArrows === true }"
+            @click="set('settingsRowArrows', settings.settingsRowArrows !== true)"
           >
             <span class="knob"></span>
           </button>
