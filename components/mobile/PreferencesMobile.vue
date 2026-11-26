@@ -9,41 +9,20 @@
       <section class="pref-group">
         <h2 class="pref-group-title">Reading</h2>
 
-        <div class="pref-row">
-          <div class="pref-copy">
-            <span class="pref-label">Highlight While Reading</span>
-            <span class="pref-hint">Highlight the sentence being read aloud.</span>
-          </div>
-          <button
-            type="button"
-            class="pref-toggle"
-            role="switch"
-            aria-label="Highlight while reading"
-            :aria-checked="settings.readerHighlight !== false"
-            :class="{ on: settings.readerHighlight !== false }"
-            @click="set('readerHighlight', settings.readerHighlight === false)"
-          >
-            <span class="knob"></span>
-          </button>
-        </div>
+        <!-- Highlight while reading, and its colour (the accent by default). -->
+        <NuxtLink class="pref-link" to="/settings/preferences/highlight">
+          <span class="pref-link-label">Highlight</span>
+          <span class="pref-link-value">{{ highlightSummary }}</span>
+          <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+        </NuxtLink>
 
-        <div class="pref-row">
-          <div class="pref-copy">
-            <span class="pref-label">Blurred Cover in Listen</span>
-            <span class="pref-hint">Show a soft blurred book cover behind the player.</span>
-          </div>
-          <button
-            type="button"
-            class="pref-toggle"
-            role="switch"
-            aria-label="Blurred cover in Listen mode"
-            :aria-checked="settings.listenCoverBlur !== false"
-            :class="{ on: settings.listenCoverBlur !== false }"
-            @click="set('listenCoverBlur', settings.listenCoverBlur === false)"
-          >
-            <span class="knob"></span>
-          </button>
-        </div>
+        <!-- Orb or book cover in the Listen player (the blurred-cover switch
+             lives on that page, since it only applies to the cover). -->
+        <NuxtLink class="pref-link" to="/settings/preferences/listen-screen">
+          <span class="pref-link-label">Listen Screen</span>
+          <span class="pref-link-value">{{ listenVisualSummary }}</span>
+          <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+        </NuxtLink>
 
         <!-- "Formats Pages Reads" REMOVES: those books leave the library and the
              scanner stops detecting them. Hiding one is "Show in Library". -->
@@ -198,6 +177,7 @@
 <script setup>
 import { computed } from 'vue'
 import { usePagesSettings } from '~/composables/usePagesSettings'
+import { accentLabel } from '~/utils/accentPalette'
 import { useBooks } from '~/composables/useBooks'
 import { useRatingSync } from '~/composables/useRatingSync'
 import { formatLabel, useFormatEnablement } from '~/composables/useFormatEnablement'
@@ -243,6 +223,11 @@ const formatModeSummary = computed(() => (
   { both: 'PDF and EPUB', pdf: 'PDF Only', epub: 'EPUB Only' }[formatMode.value] || 'PDF and EPUB'
 ))
 const streakSummary = computed(() => (settings.value.showStreak === false ? 'Off' : 'On'))
+const highlightSummary = computed(() => {
+  if (settings.value.readerHighlight === false) return 'Off'
+  return settings.value.highlightColor && settings.value.highlightColor !== 'accent' ? accentLabel(settings.value.highlightColor) : 'Accent'
+})
+const listenVisualSummary = computed(() => (settings.value.listenVisual === 'cover' ? 'Book Cover' : 'Narrator Orb'))
 </script>
 
 <style scoped>
@@ -419,7 +404,7 @@ const streakSummary = computed(() => (settings.value.showStreak === false ? 'Off
 
 .palette-sidebar i:first-child {
   width: 76%;
-  background: #8a2be2;
+  background: var(--color-brand-primary);
   opacity: 1;
 }
 
@@ -523,7 +508,7 @@ const streakSummary = computed(() => (settings.value.showStreak === false ? 'Off
 }
 
 .pref-toggle.on {
-  background: var(--color-brand-primary);
+  background: var(--color-switch-on);
 }
 
 .pref-toggle .knob {
@@ -539,6 +524,7 @@ const streakSummary = computed(() => (settings.value.showStreak === false ? 'Off
 }
 
 .pref-toggle.on .knob {
+  background: var(--color-switch-knob-on);
   transform: translateX(calc(var(--settings-switch-width) - var(--settings-switch-knob) - 4px));
 }
 

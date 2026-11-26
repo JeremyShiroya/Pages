@@ -204,6 +204,12 @@ const finish = async () => {
 </script>
 
 <style scoped>
+/* Every label in the sheet is regular weight (400), titles included. */
+.playlist-sheet,
+.playlist-sheet :is(h2, strong, button, span, small, p) {
+  font-weight: 400 !important;
+}
+
 .playlist-overlay {
   --pl-bg: #f2f2f7;
   --pl-card: #ffffff;
@@ -212,7 +218,7 @@ const finish = async () => {
   --pl-line: rgba(60, 60, 67, 0.16);
   --pl-press: rgba(60, 60, 67, 0.08);
   --pl-fill: rgba(118, 118, 128, 0.12);
-  --pl-blue: #007aff;
+  --pl-tint: var(--color-brand-primary);
   position: fixed;
   inset: 0;
   z-index: 3000;
@@ -232,7 +238,7 @@ const finish = async () => {
   --pl-line: rgba(84, 84, 88, 0.6);
   --pl-press: rgba(255, 255, 255, 0.07);
   --pl-fill: rgba(118, 118, 128, 0.24);
-  --pl-blue: #0a84ff;
+  --pl-tint: var(--color-brand-primary);
 }
 
 .playlist-sheet {
@@ -269,7 +275,7 @@ const finish = async () => {
 .sheet-bar h2 {
   margin: 0;
   font-size: 17px;
-  font-weight: 450 !important;
+  font-weight: 400 !important;
   text-align: center;
 }
 
@@ -278,10 +284,10 @@ const finish = async () => {
   padding: 6px 0;
   border: 0;
   background: transparent;
-  color: var(--pl-blue);
+  color: var(--pl-tint);
   font: inherit;
   font-size: 17px;
-  font-weight: 450 !important;
+  font-weight: 400 !important;
   cursor: pointer;
 }
 
@@ -315,7 +321,7 @@ const finish = async () => {
   white-space: nowrap;
 }
 
-.book-preview strong { font-size: 15px; font-weight: 500 !important; }
+.book-preview strong { font-size: 15px; font-weight: 400 !important; }
 .book-preview span { color: var(--pl-muted); font-size: 13px; }
 
 /* One grouped list: rows divided by hairlines inset past the artwork. */
@@ -368,7 +374,7 @@ const finish = async () => {
   font-size: 22px;
 }
 
-.row-art.accent { color: var(--pl-blue); }
+.row-art.accent { color: var(--pl-tint); }
 
 .row-copy {
   display: grid;
@@ -385,12 +391,12 @@ const finish = async () => {
   white-space: nowrap;
 }
 
-.new-playlist-toggle .row-copy strong { color: var(--pl-blue); }
+.new-playlist-toggle .row-copy strong { color: var(--pl-tint); }
 .row-copy small { color: var(--pl-muted); font-size: 13px; }
 
 .row-check {
   flex: none;
-  color: var(--pl-blue);
+  color: var(--pl-tint);
   font-size: 22px;
 }
 

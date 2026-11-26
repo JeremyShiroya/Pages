@@ -244,8 +244,9 @@ describe('update prompt on every app open', () => {
   test('the modal offers update or later', () => {
     const modal = read('components/shared/AppUpdateModal.vue')
     expect(modal).toMatch(/>\s*Later\s*</)
-    expect(modal).toMatch(/>\s*Update\s*</)
-    // Skipping a version permanently is a bigger decision, so it is demoted.
-    expect(modal).toContain('update-skip-link')
+    expect(modal).toContain("'Update')")
+    // And a What's New page over the alert, with its own Update.
+    expect(modal).toContain("Check what's new")
+    expect(modal).toContain('ua-page-update')
   })
 })

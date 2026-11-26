@@ -348,7 +348,7 @@ onUnmounted(() => document.removeEventListener('click', closeOnOutsideClick));
   padding: 0;
   border: 0;
   border-radius: var(--mobile-control-radius);
-  background: rgba(138, 43, 226, 0.07);
+  background: color-mix(in srgb, var(--color-brand-primary) 7%, transparent);
   color: var(--color-text-subtle);
   cursor: pointer;
   font-size: 18px;

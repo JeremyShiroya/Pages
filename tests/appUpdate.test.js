@@ -157,11 +157,11 @@ describe('update checker wiring', () => {
   // download must be a real navigation for Android to raise an ACTION_VIEW.
   test('the download is a real link so the WebView hands off to the OS', () => {
     const modal = readCode('components/shared/AppUpdateModal.vue')
-    expect(modal).toContain(':href="available.apkUrl"')
+    expect(modal).toContain('href: available.value?.apkUrl')
     expect(modal).not.toContain('window.open')
   })
 
-  test('a mandatory update hides the skip control', () => {
+  test('a mandatory update hides Later', () => {
     const modal = read('components/shared/AppUpdateModal.vue')
     expect(modal).toContain('v-if="!available.mandatory"')
   })
@@ -234,11 +234,11 @@ describe('in-app APK download and install', () => {
     // Web, and any native build without the plugin, must still be able to update.
     expect(composable).toContain('isPluginAvailable')
     expect(modal).toContain('v-else')
-    expect(modal).toContain(':href="available.apkUrl"')
+    expect(modal).toContain('href: available.value?.apkUrl')
   })
 
   test('the dialog cannot be dismissed out from under a running download', () => {
-    expect(modal).toContain('available.mandatory || busy ? null : dismiss()')
+    expect(modal).toContain('available.mandatory || busy || notesOpen ? null : dismiss()')
     expect(modal).toContain('v-if="!busy"')
   })
 

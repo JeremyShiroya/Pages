@@ -432,11 +432,13 @@ onMounted(async () => {
 .profile-details p { margin: 5px 0 0; color: var(--color-text-muted); font-size: 0.9rem; }
 .profile-buttons { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 16px; }
 .profile-buttons.split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.edit-profile-button { display: flex; width: 100%; min-height: 40px; min-width: 0; align-items: center; justify-content: center; gap: 7px; padding: 0 18px; border: 1px solid var(--color-border-card); border-radius: var(--mobile-control-radius); background: var(--color-settings-group); color: var(--color-text-primary); text-decoration: none; font-size: 0.86rem; font-weight: 600; }
-.edit-profile-button:active { background: var(--color-surface-hover); }
-:root[data-theme="dark"] .edit-profile-button { border-color: transparent; }
+.edit-profile-button { display: flex; width: 100%; min-height: 40px; min-width: 0; align-items: center; justify-content: center; gap: 7px; padding: 0 18px; border: 0; border-radius: var(--mobile-control-radius); background: rgba(118, 118, 128, 0.18); color: var(--color-text-primary); text-decoration: none; font-size: 0.86rem; font-weight: 600; }
+.edit-profile-button:active { background: rgba(118, 118, 128, 0.28); }
+:root[data-theme="dark"] .edit-profile-button { background: rgba(118, 118, 128, 0.32); }
+/* No outline, as with Listen on the book page: Apple's grey secondary fill. */
 .backup-profile-button { border-color: transparent; background: var(--color-brand-primary); color: var(--color-text-on-brand); }
 .backup-profile-button:active { background: var(--color-brand-primary-hover); }
+:root[data-theme="dark"] .backup-profile-button { background: var(--color-brand-primary); }
 .edit-profile-button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .profile-library { margin-top: 28px; }
 .profile-tabs { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid var(--color-border-subtle); }

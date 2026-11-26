@@ -474,11 +474,23 @@ export const useBooks = () => {
     return result;
   };
 
+  // The narrator keeps its own copy of the book it is reading (ttsBook), so an
+  // edit made while it plays left the playing bar and lock screen showing the
+  // old title, author and cover. Carry the edited details over; the narration
+  // itself (content, position) is untouched.
+  const syncNowPlaying = (saved) => {
+    const nowPlaying = useState('tts:book', () => null);
+    if (!saved || !nowPlaying.value || String(nowPlaying.value.id) !== String(saved.id)) return;
+    const { content: _content, ...details } = saved;
+    nowPlaying.value = { ...nowPlaying.value, ...details };
+  };
+
   const updateBook = async (updatedBook, options = {}) => {
     if (options.automaticMetadata || options.automaticSeriesRepair) {
       const result = await useLibraryStore().updateBook(updatedBook, { automaticMetadata: true })
       const latestIndex = books.value.findIndex((book) => book.id === result.id)
       if (latestIndex >= 0 && books.value[latestIndex].updatedAt <= result.updatedAt) books.value[latestIndex] = result
+      syncNowPlaying(result)
       return result
     }
     const index = books.value.findIndex(b => b.id === updatedBook.id);
@@ -507,6 +519,7 @@ export const useBooks = () => {
         automaticMetadata: options.automaticMetadata === true || options.automaticSeriesRepair === true,
       });
       if (index !== -1) books.value[index] = result;
+      syncNowPlaying(result);
       if (options.automaticSeriesRepair) {
         appendSeriesRepairAudit({
           bookId: normalizedUpdatedBook.id,

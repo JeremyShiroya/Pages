@@ -1,5 +1,5 @@
 <template>
-  <div class="paged-reader">
+  <div class="paged-reader" :class="{ dormant }">
     <div
       ref="viewportRef"
       class="paged-viewport"
@@ -54,6 +54,13 @@ const props = defineProps({
   // on the sentence that was on screen rather than at the top of the chapter.
   startChunk: { type: Number, default: -1 },
   startPosition: { type: Object, default: null },
+  // True while the Listen screen covers the page. A long chapter is one
+  // multi-column strip (220+ pages wide); restyling any of it — the sentence
+  // highlight, a page turn, a note mark — re-lays-out and repaints the whole
+  // strip, ~600 ms a time on a phone. Following narration under the Listen
+  // screen therefore starved it (words and orb at 2-3 fps). Dormant, the
+  // surface is not rendered and does not follow; it catches up on waking.
+  dormant: { type: Boolean, default: false },
 });
 
 const emit = defineEmits([
@@ -402,7 +409,7 @@ const applyChunkHighlight = () => {
   highlightedEl = el;
 };
 
-watch(() => props.activeChunkIndex, async (chunkIdx) => {
+const followNarration = async (chunkIdx) => {
   if (chunkIdx < 0) {
     clearChunkHighlight();
     return;
@@ -417,6 +424,16 @@ watch(() => props.activeChunkIndex, async (chunkIdx) => {
   applyChunkHighlight();
   const chunkPage = pageForChunkEl(el);
   if (chunkPage !== null && chunkPage !== page.value) setPage(chunkPage);
+};
+
+watch(() => props.activeChunkIndex, (chunkIdx) => {
+  if (props.dormant) return; // caught up when the surface wakes
+  followNarration(chunkIdx);
+});
+
+// Back to Read: one jump to wherever narration got to meanwhile.
+watch(() => props.dormant, (dormant) => {
+  if (!dormant && props.activeChunkIndex >= 0) followNarration(props.activeChunkIndex);
 });
 
 // ── Gestures: tap zones, swipe, long-press "read from here" ────────────────
@@ -637,6 +654,12 @@ defineExpose({ nextPage, prevPage, goToSection, goToSectionPage, goToChunk, getP
   background: var(--mobile-reader-bg);
 }
 
+/* Not rendered at all while the Listen screen covers it (its fixed inset keeps
+   its size, so nothing around it moves). See the `dormant` prop. */
+.paged-reader.dormant {
+  content-visibility: hidden;
+}
+
 .paged-empty {
   position: absolute;
   inset: 0;
@@ -759,7 +782,7 @@ defineExpose({ nextPage, prevPage, goToSection, goToSectionPage, goToChunk, getP
 .paged-text blockquote {
   margin: 1em 0;
   padding: 0.2em 0 0.2em 1em;
-  border-left: 3px solid var(--color-reader-highlight-border, rgba(138, 43, 226, 0.4));
+  border-left: 3px solid var(--color-reader-highlight-border);
   color: var(--mobile-reader-muted);
   font-style: italic;
   text-indent: 0;

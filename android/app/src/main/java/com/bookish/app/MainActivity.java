@@ -28,6 +28,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(PageSyncPlugin.class);
         registerPlugin(AppResetPlugin.class);
         registerPlugin(LocalSpeechPlugin.class);
+        registerPlugin(AppIconPlugin.class);
         super.onCreate(savedInstanceState);
         // Phones stay in portrait when tilted; tablets keep the responsive
         // portrait/landscape layouts that are designed for their larger screens.

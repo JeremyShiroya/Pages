@@ -1631,8 +1631,8 @@ onUnmounted(() => {
 }
 
 .metric-icon-completed {
-  background: rgba(139, 92, 246, 0.12);
-  color: rgb(124, 58, 237);
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
+  color: var(--color-brand-primary);
 }
 
 .metric-icon-unread {

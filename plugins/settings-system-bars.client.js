@@ -1,4 +1,5 @@
 import { SYSTEM_BAR_CHANGE_EVENT, hasModalOverlay } from '~/utils/systemBarOverlay'
+import { paintSystemBarScrims } from '~/utils/systemBarScrims'
 
 const parseColor = (value) => {
   const raw = String(value || '').trim()
@@ -53,12 +54,15 @@ export default defineNuxtPlugin((nuxtApp) => {
     const luminance = (0.2126 * background.red + 0.7152 * background.green + 0.0722 * background.blue) / 255
     const dark = luminance < 0.56
     const color = androidColor(background)
+    // The colour goes on the in-page strips (utils/systemBarScrims), which
+    // backdrops cover in step; the native strips stay transparent.
+    paintSystemBarScrims({ status: color, navigation: color })
     bridge.Plugins?.SystemBars?.setAppearance?.({
       dark,
       statusBarDark: dark,
       navigationBarDark: dark,
-      statusBarColor: color,
-      navigationBarColor: color,
+      statusBarColor: '#00000000',
+      navigationBarColor: '#00000000',
     })?.catch?.(() => {})
   }
 

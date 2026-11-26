@@ -3,8 +3,12 @@ import { readonly, ref } from 'vue'
 export const PAGES_SETTINGS_KEY = 'bookish:settings'
 
 export const DEFAULT_PAGES_SETTINGS = Object.freeze({
-  settingsVersion: 4,
-  readerTheme: 'light',
+  settingsVersion: 5,
+  readerTheme: 'light',            // the theme in effect (light | dark); with themeMode 'system' it follows the device
+  themeMode: 'light',              // what the user chose: 'system' | 'light' | 'dark'
+  accentColor: 'purple',           // the app's tint: see ACCENT_COLOR_OPTIONS
+  highlightColor: 'accent',        // reading highlights: 'accent' (follow accentColor) or an accent id
+  launcherIcon: 'accent',          // home-screen icon (and in-app logo): 'accent' or an accent id
   readerZoom: 1.0,
   libraryView: 'table',
   groupDetailView: 'table',
@@ -41,7 +45,11 @@ export const DEFAULT_PAGES_SETTINGS = Object.freeze({
   ratingSource: 'goodreads',       // 'goodreads' | 'storygraph' | 'personal' | 'none'
   personalRatingScale: 10,         // 5 | 10; values remain normalized to ten internally
   readerHighlight: true,           // highlight the section being read
-  listenCoverBlur: true,           // blurred cover backdrop in Listen mode
+  listenCoverBlur: true,           // blurred cover backdrop in Listen mode (cover visual only)
+  listenVisual: 'orb',             // 'orb' (the narrator's orb) | 'cover' (book cover) in Listen mode
+  listenOrbBackground: 'soft',     // orb mode backdrop: 'flat' (none) | 'soft' (light wash) | 'blur' (strong blurred bleed)
+  listenOrbRing: false,            // thin ring that pulses out around the orb as the narrator speaks
+  listenOrbHalo: false,            // soft glow + drop shadow around the orb
   listenBackSeconds: 10,           // independent Listen skip intervals, 1–60 seconds
   listenForwardSeconds: 10,
   listenBarScope: 'book',           // 'book' | 'chapter'
@@ -109,6 +117,12 @@ export const enabledAcceptAttribute = (enabledFormats) => (
   normalizeEnabledFormats(enabledFormats).map((format) => `.${format}`).join(',')
 )
 
+export const THEME_MODE_OPTIONS = Object.freeze(['system', 'light', 'dark'])
+// Ids land on <html data-accent> and are matched by the palettes in main.css.
+export const ACCENT_COLOR_OPTIONS = Object.freeze([
+  'purple', 'pastel-purple', 'pastel-blue', 'pastel-pink', 'pastel-yellow',
+  'burgundy', 'sage', 'green', 'pastel-green', 'mono',
+])
 export const CARD_BACKGROUND_OPTIONS = Object.freeze(['blank', 'blur'])
 export const APP_BACKGROUND_OPTIONS = Object.freeze(['white', 'muted'])
 export const DARK_APP_BACKGROUND_OPTIONS = Object.freeze(['dark', 'muted'])
@@ -197,6 +211,19 @@ export function normalizePagesSettings(value) {
     readerTheme: ['light', 'dark'].includes(source.readerTheme)
       ? source.readerTheme
       : DEFAULT_PAGES_SETTINGS.readerTheme,
+    // Settings saved before the Appearance page only had the light/dark switch.
+    themeMode: THEME_MODE_OPTIONS.includes(source.themeMode)
+      ? source.themeMode
+      : (['light', 'dark'].includes(source.readerTheme) ? source.readerTheme : DEFAULT_PAGES_SETTINGS.themeMode),
+    accentColor: ACCENT_COLOR_OPTIONS.includes(source.accentColor)
+      ? source.accentColor
+      : DEFAULT_PAGES_SETTINGS.accentColor,
+    highlightColor: ACCENT_COLOR_OPTIONS.includes(source.highlightColor)
+      ? source.highlightColor
+      : DEFAULT_PAGES_SETTINGS.highlightColor,
+    launcherIcon: ACCENT_COLOR_OPTIONS.includes(source.launcherIcon)
+      ? source.launcherIcon
+      : DEFAULT_PAGES_SETTINGS.launcherIcon,
     readerZoom: numberOrDefault(
       source.readerZoom,
       DEFAULT_PAGES_SETTINGS.readerZoom,
@@ -289,6 +316,14 @@ export function normalizePagesSettings(value) {
     listenCoverBlur: source.listenCoverBlur === undefined
       ? DEFAULT_PAGES_SETTINGS.listenCoverBlur
       : source.listenCoverBlur !== false,
+    listenVisual: ['orb', 'cover'].includes(source.listenVisual)
+      ? source.listenVisual
+      : DEFAULT_PAGES_SETTINGS.listenVisual,
+    listenOrbBackground: ['flat', 'soft', 'blur'].includes(source.listenOrbBackground)
+      ? source.listenOrbBackground
+      : DEFAULT_PAGES_SETTINGS.listenOrbBackground,
+    listenOrbRing: source.listenOrbRing === true,
+    listenOrbHalo: source.listenOrbHalo === true,
     listenBackSeconds: Math.round(numberOrDefault(
       source.listenBackSeconds ?? source.listenSkipSeconds, DEFAULT_PAGES_SETTINGS.listenBackSeconds, 1, 60,
     )),
@@ -333,6 +368,8 @@ export function applyPagesTheme(
   theme,
   appBackground = DEFAULT_PAGES_SETTINGS.appBackground,
   darkAppBackground = DEFAULT_PAGES_SETTINGS.darkAppBackground,
+  accentColor = DEFAULT_PAGES_SETTINGS.accentColor,
+  highlightColor = DEFAULT_PAGES_SETTINGS.highlightColor,
 ) {
   if (typeof document === 'undefined') return
 
@@ -347,6 +384,18 @@ export function applyPagesTheme(
   document.documentElement.dataset.appBackground = normalizedBackground
   document.documentElement.dataset.darkAppBackground = normalizedDarkBackground
   document.documentElement.style.colorScheme = normalizedTheme
+  // Purple is the stylesheet's own palette; any other accent overrides it.
+  if (ACCENT_COLOR_OPTIONS.includes(accentColor) && accentColor !== 'purple') {
+    document.documentElement.dataset.accent = accentColor
+  } else {
+    delete document.documentElement.dataset.accent
+  }
+  // 'accent' leaves highlights on --color-brand-primary.
+  if (ACCENT_COLOR_OPTIONS.includes(highlightColor)) {
+    document.documentElement.dataset.highlight = highlightColor
+  } else {
+    delete document.documentElement.dataset.highlight
+  }
   syncSystemBarAppearance(normalizedTheme === 'dark')
 }
 
@@ -372,7 +421,7 @@ const resolveStorage = (storage) => {
   return localStorage
 }
 
-export const CURRENT_SETTINGS_VERSION = 4
+export const CURRENT_SETTINGS_VERSION = 5
 
 const LEGACY_NAV_DEFAULTS = Object.freeze({
   mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95,
@@ -430,6 +479,10 @@ export function readPagesSettings(storage) {
         seriesSuggestions: DEFAULT_PAGES_SETTINGS.seriesSuggestions,
         readerHighlight: DEFAULT_PAGES_SETTINGS.readerHighlight,
         listenCoverBlur: DEFAULT_PAGES_SETTINGS.listenCoverBlur,
+        listenVisual: DEFAULT_PAGES_SETTINGS.listenVisual,
+        listenOrbBackground: DEFAULT_PAGES_SETTINGS.listenOrbBackground,
+        listenOrbRing: DEFAULT_PAGES_SETTINGS.listenOrbRing,
+        listenOrbHalo: DEFAULT_PAGES_SETTINGS.listenOrbHalo,
         showStreak: DEFAULT_PAGES_SETTINGS.showStreak,
         hideContent: DEFAULT_PAGES_SETTINGS.hideContent,
         formatFilter: 'all',
@@ -441,9 +494,17 @@ export function readPagesSettings(storage) {
     }
 
     if (storedVersion < CURRENT_SETTINGS_VERSION) {
+      // v5: the orb's look moved to new defaults (soft bleed, no ring, no glow).
+      // Settings saved before then only hold the old defaults, so take the new.
+      const orbLook = storedVersion < 5 ? {
+        listenOrbBackground: DEFAULT_PAGES_SETTINGS.listenOrbBackground,
+        listenOrbRing: DEFAULT_PAGES_SETTINGS.listenOrbRing,
+        listenOrbHalo: DEFAULT_PAGES_SETTINGS.listenOrbHalo,
+      } : {}
       const migrated = normalizePagesSettings({
         ...parsed,
         ...navMigration,
+        ...orbLook,
         settingsVersion: CURRENT_SETTINGS_VERSION,
       })
       try { targetStorage.setItem(PAGES_SETTINGS_KEY, JSON.stringify(migrated)) } catch {}
@@ -479,6 +540,37 @@ export function resetPagesSettingsForTests() {
   loadedFromStorage = false
 }
 
+// 'system' follows the device's light/dark setting, live.
+const systemPrefersDark = () => (
+  typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-color-scheme: dark)')?.matches
+)
+const resolveThemeMode = (value) => (value.themeMode === 'system'
+  ? { ...value, readerTheme: systemPrefersDark() ? 'dark' : 'light' }
+  : { ...value, readerTheme: value.themeMode === 'dark' ? 'dark' : 'light' })
+
+const applyCurrentTheme = () => applyPagesTheme(
+  settingsState.value.readerTheme,
+  settingsState.value.appBackground,
+  settingsState.value.darkAppBackground,
+  settingsState.value.accentColor,
+  settingsState.value.highlightColor,
+)
+
+let systemThemeWatched = false
+const watchSystemTheme = () => {
+  if (systemThemeWatched || typeof window === 'undefined' || !window.matchMedia) return
+  systemThemeWatched = true
+  const query = window.matchMedia('(prefers-color-scheme: dark)')
+  const onChange = () => {
+    if (settingsState.value.themeMode !== 'system') return
+    const next = query.matches ? 'dark' : 'light'
+    if (settingsState.value.readerTheme === next) return
+    settingsState.value = writePagesSettings({ ...settingsState.value, readerTheme: next })
+    applyCurrentTheme()
+  }
+  query.addEventListener?.('change', onChange)
+}
+
 export const usePagesSettings = () => {
   const applyMobileNavSpacing = () => {
     if (typeof document === 'undefined') return
@@ -492,13 +584,10 @@ export const usePagesSettings = () => {
   }
 
   const loadSettings = () => {
-    settingsState.value = readPagesSettings()
+    settingsState.value = resolveThemeMode(readPagesSettings())
     applyMobileNavSpacing()
-    applyPagesTheme(
-      settingsState.value.readerTheme,
-      settingsState.value.appBackground,
-      settingsState.value.darkAppBackground,
-    )
+    applyCurrentTheme()
+    watchSystemTheme()
     loadedFromStorage = true
     return settingsState.value
   }
@@ -508,16 +597,13 @@ export const usePagesSettings = () => {
   }
 
   const updateSettings = (patch) => {
-    settingsState.value = writePagesSettings({
-      ...settingsState.value,
-      ...patch,
-    })
+    // A plain light/dark switch (the reader's moon button) is an explicit
+    // choice, so it also leaves 'system'.
+    const next = { ...settingsState.value, ...patch }
+    if ('readerTheme' in patch && !('themeMode' in patch)) next.themeMode = patch.readerTheme === 'dark' ? 'dark' : 'light'
+    settingsState.value = writePagesSettings(resolveThemeMode(next))
     applyMobileNavSpacing()
-    applyPagesTheme(
-      settingsState.value.readerTheme,
-      settingsState.value.appBackground,
-      settingsState.value.darkAppBackground,
-    )
+    applyCurrentTheme()
     loadedFromStorage = true
     return settingsState.value
   }
@@ -531,3 +617,9 @@ export const usePagesSettings = () => {
     setSetting,
   }
 }
+
+// The app icon in effect: its own choice, or the accent's when it follows it.
+export const effectiveLauncherIcon = (value) => (
+  ACCENT_COLOR_OPTIONS.includes(value?.launcherIcon) ? value.launcherIcon
+    : (ACCENT_COLOR_OPTIONS.includes(value?.accentColor) ? value.accentColor : 'purple')
+)

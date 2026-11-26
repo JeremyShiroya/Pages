@@ -126,7 +126,8 @@ const iconClass = computed(() => (settings.value.streakIcon === 'lightning' ? 'r
   transition: background 0.2s ease;
 }
 
-.toggle.on { background: var(--color-brand-primary); }
+.toggle.on { background: var(--color-switch-on); }
+.toggle.on .knob { background: var(--color-switch-knob-on); }
 
 .toggle .knob {
   position: absolute;

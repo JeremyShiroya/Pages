@@ -32,10 +32,17 @@ export const compositeOver = (top, base) => {
   }
 }
 
+// A layer playing its Vue leave transition is already closed as far as the
+// bars are concerned: they switch when it starts to fade, not once it is gone.
+const LEAVING = '[class*="-leave-active"], [class*="-leave-from"], [class*="-leave-to"]'
+export const isLeavingLayer = (element) => Boolean(element?.closest?.(LEAVING))
+export const isLeaveTransitionClass = (name) => /-leave-(active|from|to)/.test(String(name || ''))
+
 // True while a translucent full-screen backdrop sits over the given point.
 export const modalOverlayAt = (x, y) => {
   for (const element of document.elementsFromPoint(x, y)) {
     if (!(element instanceof Element)) continue
+    if (isLeavingLayer(element)) continue
     const color = parseCssColor(getComputedStyle(element).backgroundColor)
     if (!color || color.alpha <= 0.02) continue
     return color.alpha < 0.98 && isFullScreenLayer(element)

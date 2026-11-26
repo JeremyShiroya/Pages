@@ -42,7 +42,7 @@ describe('usePagesSettings storage helpers', () => {
       mobileNavShowTitles: true,
     }))
     expect(readPagesSettings(storage)).toMatchObject({
-      settingsVersion: 4, readerTheme: 'dark', appBackground: 'white',
+      settingsVersion: 5, readerTheme: 'dark', appBackground: 'white',
       mobileNavStyle: 'floating', mobileNavSize: 'compact',
       mobileNavMaterial: 'frosted', mobileNavProfileDisplay: 'avatar',
       mobileNavActiveIconStyle: 'fill', mobileNavShowTitles: true,
@@ -158,6 +158,31 @@ describe('usePagesSettings storage helpers', () => {
 
     applyPagesTheme('light', 'white')
     expect(document.documentElement.dataset.appBackground).toBe('white')
+  })
+
+  it('theme mode carries over the old light/dark switch and accents are validated', () => {
+    expect(normalizePagesSettings({ readerTheme: 'dark' }).themeMode).toBe('dark')
+    expect(normalizePagesSettings({ readerTheme: 'dark', themeMode: 'system' }).themeMode).toBe('system')
+    expect(normalizePagesSettings({ themeMode: 'sepia' }).themeMode).toBe('light')
+    expect(normalizePagesSettings({ accentColor: 'pastel-green' }).accentColor).toBe('pastel-green')
+    expect(normalizePagesSettings({ accentColor: 'teal' }).accentColor).toBe('purple')
+  })
+
+  it('puts a non-purple accent on <html data-accent> and clears it for purple', () => {
+    applyPagesTheme('light', 'white', 'dark', 'sage')
+    expect(document.documentElement.dataset.accent).toBe('sage')
+    applyPagesTheme('light', 'white', 'dark', 'purple')
+    expect(document.documentElement.dataset.accent).toBeUndefined()
+  })
+
+  it('moves settings saved before v5 to the new orb look', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(PAGES_SETTINGS_KEY, JSON.stringify({
+      settingsVersion: 4, listenOrbBackground: 'blur', listenOrbRing: true, listenOrbHalo: true,
+    }))
+    expect(readPagesSettings(storage)).toMatchObject({
+      listenOrbBackground: 'soft', listenOrbRing: false, listenOrbHalo: false,
+    })
   })
 
   it('persists partial updates with defaults for missing values', () => {

@@ -3,9 +3,12 @@ import {
   compositeOver,
   hasModalOverlay,
   isFullScreenLayer,
+  isLeaveTransitionClass,
+  isLeavingLayer,
   isModalLikeNode,
   parseCssColor,
 } from '~/utils/systemBarOverlay'
+import { paintSystemBarScrims } from '~/utils/systemBarScrims'
 
 const TRANSPARENT = '#00000000'
 
@@ -45,6 +48,7 @@ const surfaceAt = (x, y) => {
 
   for (const element of document.elementsFromPoint(x, y)) {
     if (!(element instanceof Element)) continue
+    if (isLeavingLayer(element)) continue
     const style = getComputedStyle(element)
     const raw = parseCssColor(style.backgroundColor)
     const color = raw && dimmed(raw, element, dim)
@@ -52,14 +56,16 @@ const surfaceAt = (x, y) => {
     // A native solid scrim would flatten gradients and cover art. Keeping the
     // bar transparent lets the real page continue through the safe-area strip.
     if (hasImageBackground(style)) {
-      return { color: TRANSPARENT, sample: overlays.length ? layered(overlays, { red: 128, green: 128, blue: 128, alpha: 1 }) : null }
+      return { color: TRANSPARENT, base: TRANSPARENT, sample: overlays.length ? layered(overlays, { red: 128, green: 128, blue: 128, alpha: 1 }) : null }
     }
 
     if (!color || color.alpha <= 0.02) continue
 
     if (color.alpha >= 0.98) {
       const solid = layered(overlays, color)
-      return { color: toAndroidColor(solid), sample: solid }
+      // `base` is the page colour alone: a backdrop above the in-page strip
+      // already dims it there, so the strip must not be dimmed twice.
+      return { color: toAndroidColor(solid), base: toAndroidColor(color), sample: solid }
     }
 
     if (isFullScreenLayer(element)) {
@@ -70,7 +76,7 @@ const surfaceAt = (x, y) => {
     // A translucent bar or card (frosted navigation): layering the same
     // surface in a native scrim would double it, so keep the WebView rendering
     // and use the colour only for icon contrast.
-    return { color: TRANSPARENT, sample: color }
+    return { color: TRANSPARENT, base: TRANSPARENT, sample: color }
   }
 
   const documentColors = [
@@ -79,8 +85,10 @@ const surfaceAt = (x, y) => {
   ]
   const found = documentColors.find((color) => color?.alpha > 0.02) || null
   const rootColor = found && layered(overlays, dimmed(found, null, dim))
+  const rootBase = found && dimmed(found, null, dim)
   return {
     color: rootColor ? toAndroidColor(rootColor) : TRANSPARENT,
+    base: rootBase ? toAndroidColor(rootBase) : TRANSPARENT,
     sample: rootColor,
   }
 }
@@ -127,12 +135,18 @@ export default defineNuxtPlugin((nuxtApp) => {
       : pagePreference === 'dark' ? false : null
     const forceTransparent = !overlayOpen && document.querySelector('[data-system-bar-color="transparent"]') !== null
 
+    // Colour: the in-page strips (see utils/systemBarScrims). The native
+    // strips are kept transparent; Android is only asked for icon contrast.
+    paintSystemBarScrims({
+      status: forceTransparent ? TRANSPARENT : status.base,
+      navigation: forceTransparent ? TRANSPARENT : navigation.base,
+    })
     bridge.Plugins?.SystemBars?.setAppearance?.({
       dark: fallbackDark,
       statusBarDark: forcedDark ?? isDarkSurface(status.sample, fallbackDark),
       navigationBarDark: forcedDark ?? isDarkSurface(navigation.sample, fallbackDark),
-      statusBarColor: forceTransparent ? TRANSPARENT : status.color,
-      navigationBarColor: forceTransparent ? TRANSPARENT : navigation.color,
+      statusBarColor: TRANSPARENT,
+      navigationBarColor: TRANSPARENT,
     })?.catch?.(() => {})
   }
 
@@ -169,11 +183,24 @@ export default defineNuxtPlugin((nuxtApp) => {
   const watchModals = () => {
     modalObserver = new MutationObserver((records) => {
       for (const record of records) {
+        // A teleported sheet/modal starting to close. Sync right now rather
+        // than on removal: whatever the action does next (a favourite re-rendering
+        // the library) can hold the main thread for a second, while the page's
+        // own fade runs on the compositor — the bars used to lag behind it.
+        if (record.type === 'attributes') {
+          const target = record.target
+          if (target.parentNode === document.body && isModalLikeNode(target) && isLeaveTransitionClass(target.className)) {
+            if (frame !== null) cancelAnimationFrame(frame)
+            sync()
+            return onModalChange()
+          }
+          continue
+        }
         for (const node of record.addedNodes) if (isModalLikeNode(node)) return onModalChange()
         for (const node of record.removedNodes) if (isModalLikeNode(node)) return onModalChange()
       }
     })
-    modalObserver.observe(document.body, { childList: true, subtree: true })
+    modalObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] })
   }
 
   nuxtApp.hook('app:mounted', () => {

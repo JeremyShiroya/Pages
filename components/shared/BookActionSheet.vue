@@ -28,6 +28,22 @@
             </div>
           </header>
 
+          <!-- Highlights and notes, only when the book has some: tiles with the
+               icon over the label and a count, under the header. -->
+          <div v-if="annotationTiles.length" class="bas-tiles" role="group" aria-label="Highlights and notes">
+            <button
+              v-for="tile in annotationTiles"
+              :key="tile.id"
+              type="button"
+              class="bas-tile"
+              @click="openAnnotations(tile.path)"
+            >
+              <i :class="tile.icon" aria-hidden="true"></i>
+              <span class="bas-tile-label">{{ tile.label }}</span>
+              <span class="bas-tile-count">{{ tile.count }}</span>
+            </button>
+          </div>
+
           <!-- Groups, top to bottom, by what an action does to the book:
                1. Collect: keep it somewhere (favourites, a playlist).
                2. Details: look at or change the book itself.
@@ -58,6 +74,8 @@
 // iOS / Apple TV action sheet: grabber, a header naming the item, and
 // full-width groups of icon + label rows divided by hairlines.
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { countAnnotations } from '~/composables/useAnnotations'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -116,6 +134,29 @@ const groups = computed(() => [
   },
 ])
 
+// Counted when the sheet opens (a quick indexed read, not the shared list).
+const router = useRouter()
+const annotationCounts = ref({ highlights: 0, notes: 0 })
+watch(() => [props.open, props.book?.id], async ([open, id]) => {
+  if (!open || !id) return
+  const counts = await countAnnotations(id)
+  if (props.open && props.book?.id === id) annotationCounts.value = counts
+}, { immediate: true })
+
+const annotationTiles = computed(() => {
+  const id = encodeURIComponent(String(props.book?.id ?? ''))
+  const { highlights, notes } = annotationCounts.value
+  return [
+    highlights && { id: 'highlights', icon: 'ri-mark-pen-line', label: 'Highlights', count: highlights, path: `/highlights/${id}` },
+    notes && { id: 'notes', icon: 'ri-sticky-note-line', label: 'Notes', count: notes, path: `/notes/${id}` },
+  ].filter(Boolean)
+})
+
+const openAnnotations = (path) => {
+  emit('close')
+  router.push(path)
+}
+
 const close = () => emit('close')
 const choose = (action) => {
   emit('close')
@@ -150,13 +191,20 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 </script>
 
 <style scoped>
+/* Every label in the sheet is regular weight (400), titles included. */
+.bas-layer,
+.bas-layer :is(h2, h3, strong, button, span, small, p) {
+  font-weight: 400 !important;
+}
+
 .bas-layer {
   --bas-bg: #f2f2f7;
   --bas-text: #000;
   --bas-muted: #8a8a8e;
   --bas-line: rgba(60, 60, 67, 0.16);
   --bas-press: rgba(60, 60, 67, 0.1);
-  --bas-tint: #007aff;
+  --bas-tint: var(--color-brand-primary);
+  --bas-tile-bg: #ffffff;
   --bas-destructive: #ff3b30;
   position: fixed;
   inset: 0;
@@ -172,7 +220,8 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   --bas-muted: #98989f;
   --bas-line: rgba(84, 84, 88, 0.55);
   --bas-press: rgba(255, 255, 255, 0.08);
-  --bas-tint: #0a84ff;
+  --bas-tint: var(--color-brand-primary);
+  --bas-tile-bg: rgba(255, 255, 255, 0.07);
   --bas-destructive: #ff453a;
 }
 
@@ -232,7 +281,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   overflow: hidden;
   margin: 0;
   font-size: 17px;
-  font-weight: 450 !important;
+  font-weight: 400 !important;
   line-height: 1.25;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -243,12 +292,57 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   margin: 3px 0 0;
   color: var(--bas-muted);
   font-size: 14px;
-  font-weight: 450 !important;
+  font-weight: 400 !important;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* Full-width hairlines between groups, none between rows inside one. */
+/* Highlights / notes tiles: rounded squares with the icon over the label and
+   the count under it, sitting between the header and the first group. */
+.bas-tiles {
+  display: grid;
+  /* Always two equal columns: a lone Highlights (or Notes) tile keeps its
+     half width instead of stretching across the sheet. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 19px 16px;
+}
+
+.bas-tile {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  min-height: 82px;
+  padding: 12px 8px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--bas-tile-bg);
+  color: var(--bas-text);
+  cursor: pointer;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bas-tile:active {
+  background: var(--bas-press);
+}
+
+.bas-tile i {
+  color: var(--bas-tint);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.bas-tile-label {
+  font-size: 15px;
+}
+
+.bas-tile-count {
+  color: var(--bas-muted);
+  font-size: 13px;
+}
+
 .bas-group {
   display: grid;
   padding: 7px 0;
@@ -272,7 +366,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 }
 
 .bas-item span {
-  font-weight: 450 !important;
+  font-weight: 400 !important;
 }
 
 .bas-item:active {

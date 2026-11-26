@@ -298,7 +298,7 @@ const onTouchEnd = () => {
 .bar-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: var(--color-brand-primary, #8a2be2);
+  background: var(--color-brand-primary);
   transition: width 0.4s linear;
 }
 

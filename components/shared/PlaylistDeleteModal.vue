@@ -1,6 +1,6 @@
 <template>
-  <!-- Same centred alert as deleting a book: a title, one message, and two
-       equal buttons under a hairline, split by a hairline. -->
+  <!-- Same alert as deleting a book: left-aligned title and message, text
+       buttons at the bottom right (Cancel normal, Delete red). -->
   <div class="delete-overlay" role="presentation" @click="emit('close')">
     <section
       class="delete-sheet"
@@ -19,8 +19,8 @@
       </div>
 
       <div class="delete-actions">
-        <button type="button" class="delete-confirm" @click="emit('confirm')">Yes, Delete</button>
-        <button type="button" class="delete-cancel" @click="emit('close')">No, Cancel</button>
+        <button type="button" class="delete-cancel" @click="emit('close')">Cancel</button>
+        <button type="button" class="delete-confirm" @click="emit('confirm')">Delete</button>
       </div>
     </section>
   </div>
@@ -49,20 +49,18 @@ const isBulk = computed(() => props.count > 1)
 
 <style scoped>
 .delete-overlay {
-  --dc-bg: #ffffff;
+  --dc-bg: #f2f2f7;
   --dc-text: #000000;
-  --dc-muted: #6b6b6b;
-  --dc-line: #d6d6d6;
-  --dc-press: rgba(0, 0, 0, 0.05);
-  --dc-red: #c62828;
+  --dc-press: rgba(0, 0, 0, 0.06);
+  --dc-red: #ff3b30;
   position: fixed;
   inset: 0;
-  z-index: 3400;
+  z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.45);
   font-family: var(--mobile-font-family);
   animation: dc-fade 0.18s ease both;
 }
@@ -70,25 +68,24 @@ const isBulk = computed(() => props.count > 1)
 :global(html[data-theme="dark"] .delete-overlay) {
   --dc-bg: #2c2c2e;
   --dc-text: #ffffff;
-  --dc-muted: #a1a1a6;
-  --dc-line: #48484a;
-  --dc-press: rgba(255, 255, 255, 0.06);
+  --dc-press: rgba(255, 255, 255, 0.08);
   --dc-red: #ff453a;
 }
 
 .delete-sheet {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   overflow: hidden;
-  border-radius: 32px;
+  padding: 26px 24px 14px;
+  border-radius: 28px;
   background: var(--dc-bg);
   color: var(--dc-text);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
   animation: dc-pop 0.24s cubic-bezier(0.2, 1.2, 0.4, 1) both;
 }
 
 .delete-body {
-  padding: 36px 24px 30px;
-  text-align: center;
+  text-align: left;
 }
 
 .delete-body h2 {
@@ -101,35 +98,38 @@ const isBulk = computed(() => props.count > 1)
 
 .delete-description {
   margin: 0;
-  color: var(--dc-muted);
-  font-size: 15px;
-  line-height: 1.5;
+  color: var(--dc-text);
+  font-size: 16px;
+  line-height: 1.45;
 }
 
 .delete-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-top: 1px solid var(--dc-line);
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 26px;
 }
 
 .delete-confirm,
 .delete-cancel {
-  min-height: 56px;
+  min-height: 44px;
+  padding: 0 16px;
   border: 0;
+  border-radius: 12px;
   background: transparent;
   font: inherit;
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 400 !important;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.delete-confirm {
-  border-right: 1px solid var(--dc-line);
-  color: var(--dc-red);
-}
-
 .delete-cancel {
   color: var(--dc-text);
+}
+
+.delete-confirm {
+  color: var(--dc-red);
 }
 
 .delete-confirm:active,

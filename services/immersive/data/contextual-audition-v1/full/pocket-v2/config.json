@@ -1,0 +1,9 @@
+{
+  "model": "kyutai/pocket-tts-without-voice-cloning",
+  "cast": {
+    "Mara": "azelma",
+    "Leo": "charles",
+    "Nia": "jane"
+  },
+  "package": "pocket-tts==3.3.0"
+}

@@ -621,7 +621,7 @@ onMounted(() => {
   border: 0;
   background: var(--color-brand-primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(138, 43, 226, 0.24);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-brand-primary) 24%, transparent);
 }
 
 .primary-btn.compact {

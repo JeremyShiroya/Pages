@@ -1,0 +1,31 @@
+{
+  "scenes": [
+    "original-door",
+    "same-words-three-meanings",
+    "three-way-station",
+    "interrupted-turn",
+    "whispers-and-reset",
+    "dry-humor",
+    "shout-then-ordinary",
+    "returning-cast"
+  ],
+  "issues": [],
+  "characterAudioSeconds": {
+    "A": 33.04,
+    "B": 37.36,
+    "C": 34.24
+  },
+  "renderSeconds": {
+    "A": 128.227,
+    "B": 91.532,
+    "C": 83.9
+  },
+  "livePlanner": {
+    "candidates": 28,
+    "spokenRoleErrors": 0,
+    "explicitSpeakerErrors": 0,
+    "inferredSpeakerErrors": 3,
+    "deliveryErrors": 0,
+    "shadeDisagreements": 19
+  }
+}

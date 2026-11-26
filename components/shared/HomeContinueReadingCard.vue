@@ -223,9 +223,12 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
   width: var(--mobile-touch-target);
   height: var(--mobile-touch-target);
   padding: 0;
-  border: 1px solid var(--color-border-on-image-strong);
+  /* No ring: a visible frosted disc carries the button on the cover wash. */
+  border: 0;
   border-radius: 50%;
-  background: var(--color-surface-on-image-soft);
+  background: rgba(255, 255, 255, 0.24);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: var(--color-text-on-brand);
   font-size: 20px;
   transform: translateY(-50%);
@@ -233,14 +236,12 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
 }
 
 .continue-card:hover .continue-play {
-  background: var(--color-surface-on-image-hover);
-  border-color: var(--color-text-on-image-secondary);
+  background: rgba(255, 255, 255, 0.32);
   transform: translateY(-50%) scale(1.05);
 }
 
 .continue-play.playing {
   background: var(--color-brand-primary);
-  border-color: var(--color-brand-primary);
   color: #fff;
 }
 

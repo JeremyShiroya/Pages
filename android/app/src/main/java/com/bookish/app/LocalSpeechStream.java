@@ -76,6 +76,23 @@ final class LocalSpeechStream {
     private final HandlerThread monitorThread = new HandlerThread("speech-stream-monitor");
     private final Handler monitor;
 
+    // Loudness envelope of the audio written to the track: one RMS value per
+    // LEVEL_WINDOW frames, keyed by the frame it starts at. The monitor reads
+    // the entry at the hardware playback head, so the reported level is what
+    // is coming out of the speaker NOW — silent during pauses and while the
+    // engine is still synthesizing, loud while the narrator speaks. The Listen
+    // view's orb moves with it.
+    private static final int LEVEL_WINDOW = 480;            // ~20 ms at 24 kHz
+    private static final int LEVEL_CAPACITY = 4096;          // ~80 s of envelope
+    private final long[] levelFrames = new long[LEVEL_CAPACITY];
+    private final float[] levelValues = new float[LEVEL_CAPACITY];
+    private int levelHead;                                   // next slot to fill
+    private int levelCount;
+    private float lastLevelSent = -1f;
+    private long pendingLevelFrame = -1;
+    private double pendingLevelSum;
+    private int pendingLevelSamples;
+
     LocalSpeechStream(Synthesizer synth, java.util.concurrent.Executor synthExecutor, Events events) {
         this.synth = synth;
         this.synthExecutor = synthExecutor;
@@ -116,6 +133,7 @@ final class LocalSpeechStream {
         itemsPending.set(0);
         synchronized (batchItems) { batchItems.clear(); batchFrames.clear(); batchFrameCount = 0; }
         synchronized (boundaries) { boundaries.clear(); }
+        resetLevels();
         playQueue = new LinkedBlockingQueue<>();
         final AudioTrack current = track;
         final LinkedBlockingQueue<Object> queue = playQueue;
@@ -336,6 +354,7 @@ final class LocalSpeechStream {
                             Thread.sleep(25);
                             continue;
                         }
+                        recordLevels(data, offset, written, framesWritten);
                         offset += written;
                         framesWritten += written;
                         samplesQueued.addAndGet(-written);
@@ -366,8 +385,67 @@ final class LocalSpeechStream {
             int underruns = 0;
             try { underruns = current.getUnderrunCount(); } catch (Exception ignored) {}
             for (Boundary b : due) events.emit(b.start ? "started" : "ended", b.index, b.start ? null : ("underruns=" + underruns));
+
+            // Loudness at the playback head. Nothing is playing while paused, or
+            // when the head has caught up with everything written (a stall).
+            float level = 0f;
+            boolean playing = !paused && current.getPlayState() == AudioTrack.PLAYSTATE_PLAYING;
+            if (playing && head >= 0 && head < framesWritten) level = levelAt(head);
+            // Only meaningful changes cross the bridge (plus the drop to silence).
+            if (Math.abs(level - lastLevelSent) >= 0.03f || (level == 0f && lastLevelSent != 0f)) {
+                lastLevelSent = level;
+                events.emit("level", -1, String.format(java.util.Locale.US, "%.3f", level));
+            }
         }
         monitor.postDelayed(() -> poll(gen), 30);
+    }
+
+    private void resetLevels() {
+        synchronized (levelFrames) {
+            levelHead = 0;
+            levelCount = 0;
+            pendingLevelFrame = -1;
+            pendingLevelSum = 0;
+            pendingLevelSamples = 0;
+        }
+        lastLevelSent = -1f;
+    }
+
+    // Writer thread: fold the samples just written into ~20 ms RMS windows.
+    private void recordLevels(short[] data, int offset, int count, long startFrame) {
+        synchronized (levelFrames) {
+            for (int i = 0; i < count; i++) {
+                if (pendingLevelFrame < 0) pendingLevelFrame = startFrame + i;
+                double v = data[offset + i] / 32768.0;
+                pendingLevelSum += v * v;
+                if (++pendingLevelSamples >= LEVEL_WINDOW) {
+                    levelFrames[levelHead] = pendingLevelFrame;
+                    levelValues[levelHead] = (float) Math.sqrt(pendingLevelSum / pendingLevelSamples);
+                    levelHead = (levelHead + 1) % LEVEL_CAPACITY;
+                    if (levelCount < LEVEL_CAPACITY) levelCount++;
+                    pendingLevelFrame = -1;
+                    pendingLevelSum = 0;
+                    pendingLevelSamples = 0;
+                }
+            }
+        }
+    }
+
+    // Monitor thread: RMS of the window containing `frame`, scaled to 0–1
+    // (speech RMS sits around 0.05–0.25), with a square-root soft knee.
+    private float levelAt(long frame) {
+        synchronized (levelFrames) {
+            for (int n = 0; n < levelCount; n++) {
+                int slot = ((levelHead - 1 - n) % LEVEL_CAPACITY + LEVEL_CAPACITY) % LEVEL_CAPACITY;
+                if (levelFrames[slot] <= frame) {
+                    if (frame - levelFrames[slot] > LEVEL_WINDOW * 2L) return 0f;
+                    // Gate out the noise floor so pauses read as true silence.
+                    double voiced = Math.max(0.0, levelValues[slot] - 0.008) * 6.0;
+                    return (float) Math.min(1.0, Math.sqrt(voiced));
+                }
+            }
+        }
+        return 0f;
     }
 
     private static short[] toPcm(float[] samples) {

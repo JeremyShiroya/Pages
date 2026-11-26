@@ -131,7 +131,7 @@ watch(initialized, (ready) => {
 
 .author-card:hover .author-avatar {
   transform: scale(1.06);
-  box-shadow: 0 8px 28px rgba(138, 43, 226, 0.25);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--color-brand-primary) 25%, transparent);
 }
 
 .author-avatar img {

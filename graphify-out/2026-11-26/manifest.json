@@ -24,8 +24,8 @@
     "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1795663817.190468,
-    "seen": 1795663850.4920382,
+    "mtime": 1795700116.304665,
+    "seen": 1795700302.4682477,
     "ast_hash": "a3f5186283b43c363a376a7b27dc2224",
     "semantic_hash": ""
   },
@@ -84,8 +84,8 @@
     "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1795663817.189467,
-    "seen": 1795663850.4974062,
+    "mtime": 1795700116.3036757,
+    "seen": 1795700302.4822047,
     "ast_hash": "b4d9264dcc0a0263b7dc995cd6fed430",
     "semantic_hash": ""
   },
@@ -210,9 +210,9 @@
     "semantic_hash": "08d9ed05478623c19186d1cb0c36fff0"
   },
   "components/mobile/PreferencesMobile.vue": {
-    "mtime": 1795661950.3034685,
-    "seen": 1795662564.1932151,
-    "ast_hash": "7de1a7b1d868da66ece4966a93b4e8d3",
+    "mtime": 1795699306.2610369,
+    "seen": 1795700302.4999526,
+    "ast_hash": "64805e23bd84ac03c12879d0eb68c540",
     "semantic_hash": ""
   },
   "components/mobile/ProfileMobile.vue": {
@@ -228,9 +228,9 @@
     "semantic_hash": "b1ea933a896e0ec17f08f7b3b3c54e10"
   },
   "components/mobile/ReaderMobile.vue": {
-    "mtime": 1795662236.5414305,
-    "seen": 1795662564.1952355,
-    "ast_hash": "319b56306f8c3d00e253b5b77dfc0755",
+    "mtime": 1795700035.9128497,
+    "seen": 1795700302.5033078,
+    "ast_hash": "d5841b0231543e74c19e14d18a332f7c",
     "semantic_hash": ""
   },
   "components/mobile/ReaderNoteEditor.vue": {
@@ -264,9 +264,9 @@
     "semantic_hash": ""
   },
   "components/mobile/SettingsMobile.vue": {
-    "mtime": 1795648747.4104187,
-    "seen": 1795648960.4254973,
-    "ast_hash": "e21c85c120962c851b03ae1a7b8798e7",
+    "mtime": 1795666308.5245416,
+    "seen": 1795666564.6854796,
+    "ast_hash": "024337232f66c4939d4b8e7b370b39b1",
     "semantic_hash": ""
   },
   "components/mobile/SettingsStorageMobile.vue": {
@@ -288,9 +288,9 @@
     "semantic_hash": ""
   },
   "components/shared/AddToPlaylistModal.vue": {
-    "mtime": 1795665084.30836,
-    "seen": 1795665435.183621,
-    "ast_hash": "c39279987aac16ea99cbb60ca467f41e",
+    "mtime": 1795699306.267073,
+    "seen": 1795700302.5131404,
+    "ast_hash": "e63555231763aba1819a7cd09605c7e3",
     "semantic_hash": ""
   },
   "components/shared/AppUpdateModal.vue": {
@@ -516,9 +516,9 @@
     "semantic_hash": "74755998966cb595c4e5f4ae4130f485"
   },
   "components/shared/ToastComp.vue": {
-    "mtime": 1795663601.4789894,
-    "seen": 1795663850.529198,
-    "ast_hash": "6cc8833f016d1e3cab5ea920e07cbcd7",
+    "mtime": 1795699306.2710998,
+    "seen": 1795700302.551384,
+    "ast_hash": "3797204a7f0fbbbdd0372d33f91056f2",
     "semantic_hash": ""
   },
   "components/shared/previews/BookActionsPreview.vue": {
@@ -1002,9 +1002,9 @@
     "semantic_hash": ""
   },
   "composables/useTTS.js": {
-    "mtime": 1795519137.3806343,
-    "seen": 1795519501.7992625,
-    "ast_hash": "912bc0ab379e03db379c3582d1594315",
+    "mtime": 1795699306.27714,
+    "seen": 1795700302.678304,
+    "ast_hash": "506e90e49a14a17fb21e1154bc6445e8",
     "semantic_hash": ""
   },
   "composables/useTTS.test.js": {
@@ -1062,9 +1062,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1795665436.7138517,
-    "seen": 1795665493.6056328,
-    "ast_hash": "c811deaff9aec2199f3446d3c239ea8a",
+    "mtime": 1795666566.3439424,
+    "seen": 1795666596.2987018,
+    "ast_hash": "5bdf0cb8f6aba2ec044c41583212bb7c",
     "semantic_hash": ""
   },
   "pages/add.vue": {
@@ -1764,9 +1764,9 @@
     "semantic_hash": "1692a7f864acae7dca63882adf4d3410"
   },
   "tests/mobileUxBatch.test.js": {
-    "mtime": 1795663636.5966327,
-    "seen": 1795663850.6443388,
-    "ast_hash": "0ba42e504ab00061ba293f1fdb4a198b",
+    "mtime": 1795699346.8065474,
+    "seen": 1795700302.9578085,
+    "ast_hash": "47b04013d1f675c00942c1b3b1dc9f40",
     "semantic_hash": ""
   },
   "tests/nativeApiEndpoint.test.js": {
@@ -1788,15 +1788,15 @@
     "semantic_hash": ""
   },
   "tests/preferences.test.js": {
-    "mtime": 1795662401.1484177,
-    "seen": 1795662564.377592,
-    "ast_hash": "a0f73c22eab7e6a63f577f8fb65c70cd",
+    "mtime": 1795699334.4728146,
+    "seen": 1795700302.9625797,
+    "ast_hash": "773169cb3670af40d31a4ef7c165d66e",
     "semantic_hash": ""
   },
   "tests/readerChromeAndListen.test.js": {
-    "mtime": 1789633776.6935906,
-    "seen": 1789634651.9224536,
-    "ast_hash": "aa286e90ab2cc922730372d5bf7cae3b",
+    "mtime": 1795699347.5168648,
+    "seen": 1795700302.9643056,
+    "ast_hash": "b71c96c0249aa3941ca99373ba881cdd",
     "semantic_hash": ""
   },
   "tests/readerPositionLifecycle.test.js": {
@@ -3031,20 +3031,20 @@
   },
   "server/database/migrations/0000_add-pages-column.sql": {
     "mtime": 1778139591.9198406,
-    "seen": 1795665493.6063142,
-    "ast_hash": "fae8f00f3932a1e5e3f11be8ea24f3ea",
+    "seen": 1795666596.2989795,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0001_naive_stark_industries.sql": {
     "mtime": 1778224044.757941,
-    "seen": 1795665493.6063204,
-    "ast_hash": "bcb6d05640ed56e698637c15d100f6e7",
+    "seen": 1795666596.2989845,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0002_drop_content_column.sql": {
     "mtime": 1778991194.1574428,
-    "seen": 1795665493.6063259,
-    "ast_hash": "812224c49041ad46b8e8d1e772855b69",
+    "seen": 1795666596.2989888,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "components/shared/BookProgressDisplay.vue": {
@@ -5803,8 +5803,8 @@
   },
   "supabase/migrations/20261124000000_cloud_backups.sql": {
     "mtime": 1795508661.807664,
-    "seen": 1795665493.6068213,
-    "ast_hash": "64e3d55245b328262131ef027e35fc55",
+    "seen": 1795666596.2993507,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   ".github/workflows/supabase-keepalive.yml": {
@@ -5826,15 +5826,15 @@
     "semantic_hash": ""
   },
   "composables/usePagesSettings.js": {
-    "mtime": 1795658768.3930438,
-    "seen": 1795659194.3133993,
-    "ast_hash": "31e50d4e60c8c9f74659fd2715bcd9ee",
+    "mtime": 1795700026.4033072,
+    "seen": 1795700302.6523235,
+    "ast_hash": "1912e4c5ccde6adfa4f428da8f269d52",
     "semantic_hash": ""
   },
   "composables/usePagesSettings.test.js": {
-    "mtime": 1795625439.378102,
-    "seen": 1795625786.3280373,
-    "ast_hash": "48135d648c73598f0dd0e2239dfe8cda",
+    "mtime": 1795666325.7315335,
+    "seen": 1795666564.7679985,
+    "ast_hash": "114d11a11ffe4c70f7857e30157b2dbd",
     "semantic_hash": ""
   },
   "utils/backupAssets.js": {
@@ -5893,14 +5893,14 @@
   },
   "supabase/migrations/20261124010000_keepalive.sql": {
     "mtime": 1795511034.2257404,
-    "seen": 1795665493.6068285,
-    "ast_hash": "2e3d4e51915a0e44588770eff351e720",
+    "seen": 1795666596.2993555,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "supabase/migrations/20261124020000_backup_asset_refs.sql": {
     "mtime": 1795514704.8371067,
-    "seen": 1795665493.606858,
-    "ast_hash": "2a5819f6cb2121230bfbb9ed8431feff",
+    "seen": 1795666596.2993581,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "utils/backupLocalData.js": {
@@ -6108,9 +6108,9 @@
     "semantic_hash": ""
   },
   "components/shared/BookActionSheet.vue": {
-    "mtime": 1795661885.6382527,
-    "seen": 1795662564.2047799,
-    "ast_hash": "01bb99c613b22d75c2529e747351143a",
+    "mtime": 1795699306.2690854,
+    "seen": 1795700302.5189433,
+    "ast_hash": "33b0eee3365d29c1a4fd9860425e3798",
     "semantic_hash": ""
   },
   "pages/settings/preferences/book-format.vue": {
@@ -6153,6 +6153,132 @@
     "mtime": 1795665145.6479428,
     "seen": 1795665435.3613884,
     "ast_hash": "7bb6c16602b4dde8a28e00c8f6000ac2",
+    "semantic_hash": ""
+  },
+  "components/mobile/ListenScreenPreferencesMobile.vue": {
+    "mtime": 1795700045.7677782,
+    "seen": 1795700302.49529,
+    "ast_hash": "ed1c82c83077ff3f7b6ec18e93d7193a",
+    "semantic_hash": ""
+  },
+  "composables/useNarratorActivity.js": {
+    "mtime": 1795699306.47305,
+    "seen": 1795700302.646826,
+    "ast_hash": "0ebaee7b7fae2505ee5c8baeb51fd055",
+    "semantic_hash": ""
+  },
+  "composables/useNarratorActivity.test.js": {
+    "mtime": 1795699357.843976,
+    "seen": 1795700302.646834,
+    "ast_hash": "da58b5aa637a384bf8fc42feee2261fb",
+    "semantic_hash": ""
+  },
+  "pages/settings/preferences/listen-screen.vue": {
+    "mtime": 1795699306.47305,
+    "seen": 1795700302.7664135,
+    "ast_hash": "f6896add1da796470160fc60925494b1",
+    "semantic_hash": ""
+  },
+  "utils/narratorOrbs.js": {
+    "mtime": 1795699306.5047188,
+    "seen": 1795700302.9952552,
+    "ast_hash": "a7ec8f63e0555c45bb19a4c3dfe86b91",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/andrew.webp": {
+    "mtime": 1795699306.47305,
+    "seen": 1795700303.1040738,
+    "ast_hash": "8752bc1db955b78451cfd66ef741d73f",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/ava.webp": {
+    "mtime": 1795699306.4887633,
+    "seen": 1795700303.1040792,
+    "ast_hash": "875234e18130ce4abc7ccfaef331372f",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/brian.webp": {
+    "mtime": 1795699306.4920094,
+    "seen": 1795700303.1040835,
+    "ast_hash": "f9731780c902b888e1fec33a025760dc",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/charles.webp": {
+    "mtime": 1795699306.4920094,
+    "seen": 1795700303.1040878,
+    "ast_hash": "831bcc326bba0f332db6c8155e2778cd",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/emma.webp": {
+    "mtime": 1795699306.4920094,
+    "seen": 1795700303.1040924,
+    "ast_hash": "e24fb3f8425f7482bd1d8af002b4f2f7",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/nicole.webp": {
+    "mtime": 1795699306.5047188,
+    "seen": 1795700303.1040974,
+    "ast_hash": "c5eaba84be192dd2a23fbe993826cde0",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/ryan.webp": {
+    "mtime": 1795699306.5047188,
+    "seen": 1795700303.1041007,
+    "ast_hash": "26cdeab8995da4dcb770f371440d7450",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/sonia.webp": {
+    "mtime": 1795699306.5047188,
+    "seen": 1795700303.104106,
+    "ast_hash": "2ab4a5ef493d9dfe2455e23a72eeae8c",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/andrew.webm": {
+    "mtime": 1795699306.47305,
+    "seen": 1795700303.1200984,
+    "ast_hash": "3d817986e0e53593ad9cc8ba632e8211",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/ava.webm": {
+    "mtime": 1795699306.47305,
+    "seen": 1795700303.1201053,
+    "ast_hash": "1a442fe2c4ae9c46e22212a287f0df5b",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/brian.webm": {
+    "mtime": 1795699306.4920094,
+    "seen": 1795700303.1201098,
+    "ast_hash": "080d0e6600c9bac94f9c8358eba99c70",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/charles.webm": {
+    "mtime": 1795699306.4920094,
+    "seen": 1795700303.1201148,
+    "ast_hash": "6c0c447e5dfb8c17eb074c3bd098e856",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/emma.webm": {
+    "mtime": 1795699306.4920094,
+    "seen": 1795700303.1201189,
+    "ast_hash": "9d76faf49b1dca8673e0aa2808eb7c3d",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/nicole.webm": {
+    "mtime": 1795699306.5047188,
+    "seen": 1795700303.1201227,
+    "ast_hash": "e54439ea72712179c3479432986d0f70",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/ryan.webm": {
+    "mtime": 1795699306.5047188,
+    "seen": 1795700303.1201265,
+    "ast_hash": "840126f064605a70d2b4cee0e9776010",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/sonia.webm": {
+    "mtime": 1795699306.5047188,
+    "seen": 1795700303.1201305,
+    "ast_hash": "e786a19e8f935dfc157f4732583b1408",
     "semantic_hash": ""
   }
 }

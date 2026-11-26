@@ -179,7 +179,10 @@ describe('listen view tracks narration on open', () => {
   const reader = read('components/mobile/ReaderMobile.vue')
 
   test('opening Listen samples the live reading position', () => {
-    expect(reader).toMatch(/watch\(readerMode, \(mode\) => \{\s*if \(mode === "listen"\) sampleScrollChunk/)
+    expect(reader).toMatch(/watch\(readerMode, \(mode, previous\) => \{\s*if \(mode === "listen" && previous\) sampleScrollChunk/)
+    // The page pauses its hidden reading-surface work while Listen covers it.
+    expect(reader).toContain('emit("mode-change", mode)')
+    expect(read('pages/reader/[id].vue')).toContain('if (listenScreenOpen.value && !forceScroll) return')
   })
 
   test('the spoken sentence is selected directly instead of translated in a page-sized strip', () => {

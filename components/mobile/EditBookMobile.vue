@@ -157,16 +157,6 @@
               <span class="info-value">#{{ suggestionInstallment }}</span>
             </div>
           </div>
-          <div v-else class="info-card">
-            <div class="info-item">
-              <span class="info-label">Format</span>
-              <span class="info-value">{{ editBook.format ? editBook.format.toUpperCase() : 'Unknown' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Current Progress</span>
-              <span class="info-value">{{ editBook.progress }}%</span>
-            </div>
-          </div>
         </div>
 
         <!-- Details Section -->
@@ -1511,7 +1501,11 @@ const handleUpdateBook = async () => {
   min-width: 0;
 }
 
+/* A fixed width, not shrink-to-fit: with only `margin: auto` the column took
+   the cover image's own size, so low-resolution covers (often PDFs) showed
+   small and others large. Every cover now gets the same large frame. */
 .media-column {
+  width: 100%;
   max-width: 300px;
   margin: 0 auto;
 }
@@ -1578,5 +1572,97 @@ const handleUpdateBook = async () => {
 
 .form-input:disabled {
   opacity: 0.6;
+}
+
+/* "Update with web metadata" as an inset grouped card (iOS style): the
+   description in a row with a tinted icon tile, and the action as a full-width
+   tappable row under a hairline, in the brand tint. */
+.fetch-metadata-card {
+  display: grid;
+  flex-direction: unset;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-settings-group, var(--color-surface-secondary));
+}
+
+.fetch-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.fetch-info i {
+  display: grid;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--color-brand-primary-faint);
+  color: var(--color-brand-primary);
+  font-size: 20px;
+}
+
+.fetch-info strong {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: 16px;
+  font-weight: 400 !important;
+}
+
+.fetch-info p {
+  margin: 2px 0 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.btn-fetch {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-brand-primary);
+  box-shadow: none;
+  font-size: 16px;
+  font-weight: 400 !important;
+}
+
+.btn-fetch:hover:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-fetch:active:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+.btn-fetch:disabled {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+/* A floating hairline over the action, inset from both edges, instead of a
+   full-width rule; the action itself has no shape of its own. */
+.btn-fetch::before {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  left: 16px;
+  height: 1px;
+  background: var(--color-border-subtle);
+  content: "";
 }
 </style>

@@ -272,14 +272,16 @@ describe('mobile UX batch', () => {
     }
   })
 
-  test('toasts render as frosted capsules pinned to the top', () => {
+  test('toasts render as flat capsules pinned to the top that swipe away', () => {
     const toast = read('components/shared/ToastComp.vue')
 
     expect(toast).toMatch(/\.toast-container\s*\{[^}]*top:\s*calc\(env\(safe-area-inset-top\)/)
     expect(toast).not.toMatch(/\.toast-container[^}]*bottom:/)
-    // Glass pill with a coloured icon; tapping it dismisses.
-    expect(toast).toMatch(/\.toast\s*\{[^}]*border-radius:\s*999px[^}]*backdrop-filter:\s*blur/s)
-    expect(toast).toContain('@click="removeToast(toast.id)"')
+    // Flat, theme-token pill (no glass); tap or swipe in any direction dismisses.
+    expect(toast).toMatch(/\.toast\s*\{[^}]*border-radius:\s*999px[^}]*background:\s*var\(--toast-surface\)/s)
+    expect(toast).not.toContain('backdrop-filter')
+    expect(toast).toContain('@pointermove="onPointerMove"')
+    expect(toast).toContain('removeToast(id)')
   })
 
   test('storage page has a mobile design with metadata backfill and failure modal', () => {
@@ -399,8 +401,8 @@ describe('mobile UX batch', () => {
     // When the book owns a file on the phone, the message says that goes too.
     expect(modal).toContain('removesDeviceFile')
     expect(modal).toContain('file on your device')
-    expect(modal).toContain('Yes, Delete')
-    expect(modal).toContain('No, Cancel')
+    expect(modal).toContain('>Delete<')
+    expect(modal).toContain('>Cancel<')
   })
 
   test('reader thickness options map to weights the reader fonts actually ship', () => {
@@ -480,10 +482,10 @@ describe('mobile UX batch', () => {
   test('delete is a centred alert and the playlist picker a bottom sheet', () => {
     const del = read('components/shared/DeleteConfirmModal.vue')
     expect(del).toContain('delete-sheet')
-    // Centred alert with side-by-side "Yes, Delete" / "No, Cancel".
+    // Alert with left-aligned text and plain Cancel / Delete buttons at the bottom right.
     expect(del).toMatch(/\.delete-overlay\s*\{[^}]*align-items:\s*center/)
-    expect(del).toContain('Yes, Delete')
-    expect(del).toContain('No, Cancel')
+    expect(del).toContain('>Delete<')
+    expect(del).toContain('>Cancel<')
 
     const playlist = read('components/shared/AddToPlaylistModal.vue')
     expect(playlist).toContain('playlist-sheet')
@@ -500,7 +502,7 @@ describe('mobile UX batch', () => {
 
   test('delete alert is just a title, a message and two buttons', () => {
     const del = read('components/shared/DeleteConfirmModal.vue')
-    expect(del).toMatch(/\.delete-actions\s*\{[^}]*grid-template-columns:\s*1fr 1fr/)
+    expect(del).toMatch(/\.delete-actions\s*\{[^}]*justify-content:\s*flex-end/)
     expect(del).not.toContain('delete-effects')
     expect(del).not.toContain('delete-cover')
   })

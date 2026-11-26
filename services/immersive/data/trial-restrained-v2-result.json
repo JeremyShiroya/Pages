@@ -1,0 +1,8 @@
+{
+  "jobId": "50053082587b4b2a9608d25e6b7aa7e8",
+  "status": "error",
+  "passages": [],
+  "assets": [],
+  "characters": [],
+  "error": "No GPU became available within three minutes. Retry later or use normal narration."
+}

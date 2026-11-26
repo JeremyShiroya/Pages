@@ -788,7 +788,7 @@ onUnmounted(() => {
   color: #fff;
   cursor: pointer;
   font-size: 28px;
-  box-shadow: 0 8px 22px rgba(138, 43, 226, 0.38);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-brand-primary) 38%, transparent);
   transition: bottom 0.28s ease;
 }
 
@@ -1919,7 +1919,7 @@ onUnmounted(() => {
     min-height: 34px;
     padding: 0 12px;
     border-radius: var(--mobile-control-radius);
-    background: rgba(138, 43, 226, 0.1);
+    background: color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
     color: var(--color-text-muted);
     font-size: var(--mobile-caption-size);
     line-height: 1;
@@ -1936,7 +1936,7 @@ onUnmounted(() => {
     min-height: 34px;
     padding: 0;
     border-radius: var(--mobile-control-radius);
-    background: rgba(138, 43, 226, 0.07);
+    background: color-mix(in srgb, var(--color-brand-primary) 7%, transparent);
     color: var(--color-text-subtle);
     font-size: 18px;
   }

@@ -3,7 +3,7 @@
   <main class="about-page">
     <!-- App identity, as a system About screen opens. -->
     <header class="about-hero">
-      <img class="app-icon" src="/images/P Logo.png" alt="" />
+      <img class="app-icon" :src="appLogo" alt="" />
       <h1>Pages</h1>
       <p class="hero-sub">Built by a reader, for readers.</p>
     </header>
@@ -71,6 +71,8 @@
 </template>
 
 <script setup>
+import { useAppLogo } from '~/composables/useAppLogo'
+const appLogo = useAppLogo()
 import { computed } from 'vue'
 import MobileSettingsNav from '~/components/mobile/MobileSettingsNav.vue'
 

@@ -9,7 +9,7 @@
           v-for="row in group.rows"
           :key="row.label"
           class="setting-item"
-          :class="{ 'has-switch': row.type === 'theme' || row.type === 'developerMode' }"
+          :class="{ 'has-switch': row.type === 'developerMode' }"
           @click="handleSettingsRow(row)"
         >
           <div class="setting-info">
@@ -18,16 +18,7 @@
           </div>
 
           <span
-            v-if="row.type === 'theme'"
-            class="theme-toggle"
-            role="switch"
-            aria-label="Toggle dark mode"
-            :aria-checked="settings.readerTheme === 'dark'"
-          >
-            <span></span>
-          </span>
-          <span
-            v-else-if="row.type === 'developerMode'"
+            v-if="row.type === 'developerMode'"
             class="theme-toggle"
             role="switch"
             aria-label="Toggle developer mode"
@@ -35,7 +26,8 @@
           >
             <span></span>
           </span>
-          <i v-else-if="showArrows" class="ri-arrow-right-s-line right-icon"></i>
+          <span v-else-if="row.detail" class="setting-detail">{{ row.detail }}</span>
+          <i v-if="showArrows && row.type !== 'developerMode'" class="ri-arrow-right-s-line right-icon"></i>
         </div>
 
       </section>
@@ -65,6 +57,9 @@ const appVersion = computed(() => runtimeConfig.public.appVersion || '0.0.0')
 const showIcons = computed(() => settings.value.settingsRowIcons === true)
 const showArrows = computed(() => settings.value.settingsRowArrows === true)
 
+const THEME_LABELS = { system: 'System', light: 'Light', dark: 'Dark' }
+const themeSummary = computed(() => THEME_LABELS[settings.value.themeMode] || 'Light')
+
 const versionClickCount = ref(0)
 let versionClickTimer = null
 
@@ -85,7 +80,8 @@ const handleVersionClick = () => {
 }
 
 const mobileSettingsRows = computed(() => [
-  { label: 'Theme', icon: 'ri-moon-line', type: 'theme' },
+  // System / Light / Dark and the accent colour live on their own page.
+  { label: 'Theme', icon: 'ri-palette-line', to: '/settings/theme', detail: themeSummary.value },
   { label: 'Preferences', icon: 'ri-edit-box-line', to: '/settings/preferences' },
   { label: 'Storage', icon: 'ri-database-2-line', to: '/settings/storage' },
   ...(settings.value.developerMode ? [{ label: 'Connection test', icon: 'ri-base-station-line', to: '/settings/connection' }] : []),
@@ -110,11 +106,6 @@ const navigate = (path) => {
 }
 
 const handleSettingsRow = async (row) => {
-  if (row.type === 'theme') {
-    setReaderTheme(settings.value.readerTheme === 'dark' ? 'light' : 'dark')
-    return
-  }
-
   if (row.type === 'developerMode') {
     updateSettings({ developerMode: !settings.value.developerMode })
     return
@@ -137,7 +128,7 @@ const handleSettingsRow = async (row) => {
   addToast(`${row.label} page is coming later.`, 'info')
 }
 
-const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
+
 
 </script>
 
@@ -251,6 +242,17 @@ const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
   text-align: center;
 }
 
+/* Current value on the right of a link row (Theme → "System"). */
+.setting-item:has(.setting-detail) {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  column-gap: 6px;
+}
+
+.setting-detail {
+  color: var(--color-text-muted);
+  font-size: var(--settings-label-size);
+}
+
 .right-icon {
   color: var(--color-text-muted);
   font-size: 20px;
@@ -279,10 +281,11 @@ const setReaderTheme = (readerTheme) => updateSettings({ readerTheme })
 }
 
 .theme-toggle[aria-checked='true'] {
-  background: var(--color-brand-primary);
+  background: var(--color-switch-on);
 }
 
 .theme-toggle[aria-checked='true'] span {
+  background: var(--color-switch-knob-on);
   transform: translateX(calc(var(--settings-switch-width) - var(--settings-switch-knob) - 4px));
 }
 

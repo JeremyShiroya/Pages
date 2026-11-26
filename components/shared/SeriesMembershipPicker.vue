@@ -1,11 +1,21 @@
 <template>
+  <!-- One grouped card of radio rows, styled like the choices in Settings. -->
   <div class="series-membership-picker" role="radiogroup" aria-label="Series membership">
-    <label v-for="option in options" :key="option.value" class="membership-option" :class="{ selected: modelValue === option.value }">
-      <input type="radio" name="series-membership" :value="option.value" :checked="modelValue === option.value" @change="$emit('update:modelValue', option.value)" />
-      <span class="membership-icon"><i :class="option.icon" aria-hidden="true"></i></span>
-      <span class="membership-copy"><strong>{{ option.label }}</strong><small>{{ option.description }}</small></span>
-      <i class="membership-check" :class="modelValue === option.value ? 'ri-check-line' : 'ri-arrow-right-s-line'" aria-hidden="true"></i>
-    </label>
+    <button
+      v-for="option in options"
+      :key="option.value"
+      type="button"
+      role="radio"
+      class="membership-row"
+      :aria-checked="modelValue === option.value"
+      @click="$emit('update:modelValue', option.value)"
+    >
+      <span class="membership-copy">
+        <span class="membership-label">{{ option.label }}</span>
+        <span class="membership-hint">{{ option.description }}</span>
+      </span>
+      <span class="membership-radio" :class="{ on: modelValue === option.value }" aria-hidden="true"></span>
+    </button>
   </div>
 </template>
 
@@ -14,24 +24,82 @@ defineProps({ modelValue: { type: String, default: 'unknown' } })
 defineEmits(['update:modelValue'])
 
 const options = [
-  { value: 'unknown', label: 'Not sure yet', description: 'Keep the series open for later.', icon: 'ri-question-mark' },
-  { value: 'standalone', label: 'Standalone', description: 'This book is complete on its own.', icon: 'ri-book-open-line' },
-  { value: 'series', label: 'Part of a series', description: 'Add its series name and position.', icon: 'ri-book-shelf-line' },
+  { value: 'unknown', label: 'Not sure yet', description: 'Keep the series open for later.' },
+  { value: 'standalone', label: 'Standalone', description: 'This book is complete on its own.' },
+  { value: 'series', label: 'Part of a series', description: 'Add its series name and position.' },
 ]
 </script>
 
 <style scoped>
-.series-membership-picker { display: grid; gap: .55rem; }
-.membership-option { position: relative; display: grid; grid-template-columns: 38px minmax(0,1fr) 20px; align-items: center; gap: .8rem; min-height: 62px; padding: .65rem .85rem; border: 1px solid var(--color-border-card); border-radius: 13px; background: var(--color-surface-card); color: var(--color-text-secondary); cursor: pointer; transition: border-color .18s, background .18s, box-shadow .18s; }
-.membership-option:hover { border-color: var(--color-border-focus); }
-.membership-option.selected { border-color: var(--color-brand-primary); background: var(--color-brand-primary-faint); box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--color-brand-primary) 14%,transparent); }
-.membership-option:focus-within { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
-.membership-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.membership-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 11px; background: var(--color-surface-secondary); color: var(--color-text-secondary); font-size: 1.1rem; }
-.selected .membership-icon { background: var(--color-brand-primary-muted); color: var(--color-brand-primary); }
-.membership-copy { display: grid; min-width: 0; gap: 2px; }
-.membership-copy strong { color: var(--color-text-primary); font-size: .88rem; font-weight: 600; }
-.membership-copy small { color: var(--color-text-muted); font-size: .75rem; line-height: 1.3; }
-.membership-check { color: var(--color-text-muted); font-size: 1rem; }
-.selected .membership-check { color: var(--color-brand-primary); }
+.series-membership-picker {
+  display: grid;
+  padding: 6px 0;
+  border-radius: var(--settings-radius, 14px);
+  background: var(--color-settings-group, var(--color-surface-secondary));
+}
+
+.membership-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 54px;
+  padding: 8px var(--settings-row-inset, 16px);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.membership-row:active {
+  background: var(--color-surface-hover);
+}
+
+.membership-row:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: -2px;
+}
+
+.membership-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.membership-label {
+  font-size: var(--settings-label-size, 16px);
+  font-weight: 400;
+}
+
+.membership-hint {
+  color: var(--color-text-muted);
+  font-size: var(--settings-caption-size, 13px);
+  line-height: 1.35;
+}
+
+/* Same radio as SettingsOptionGroupMobile: ring, filled dot when chosen. */
+.membership-radio {
+  position: relative;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid color-mix(in srgb, var(--color-text-muted) 45%, transparent);
+  border-radius: 50%;
+  transition: border-color 0.15s ease;
+}
+
+.membership-radio.on {
+  border-color: var(--color-brand-primary);
+}
+
+.membership-radio.on::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--color-brand-primary);
+}
 </style>

@@ -73,7 +73,7 @@ const { visible, answer } = useDevicePermissionPrompt()
   margin: 0 auto 14px;
   place-items: center;
   border-radius: 16px;
-  background: var(--color-brand-primary-faint, rgba(138, 43, 226, 0.12));
+  background: var(--color-brand-primary-faint);
   color: var(--color-brand-primary);
   font-size: 28px;
 }
@@ -119,7 +119,7 @@ const { visible, answer } = useDevicePermissionPrompt()
 .perm-btn.primary {
   background: var(--color-brand-primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(138, 43, 226, 0.28);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
 .perm-btn.secondary {

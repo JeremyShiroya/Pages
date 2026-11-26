@@ -617,7 +617,7 @@ onMounted(async () => {
   --ob-muted: #6c6676;
   --ob-line: rgba(21, 17, 29, 0.1);
   --ob-soft: #f4f2f8;
-  --ob-brand: #7c3aed;
+  --ob-brand: var(--color-brand-primary);
   --ob-brand-ink: #ffffff;
   --ob-moment-bg: #120c1e;
   --ob-moment-ink: #ffffff;
@@ -638,7 +638,7 @@ onMounted(async () => {
   --ob-muted: rgba(245, 242, 250, 0.62);
   --ob-line: rgba(245, 242, 250, 0.12);
   --ob-soft: rgba(245, 242, 250, 0.07);
-  --ob-brand: #a77bff;
+  --ob-brand: var(--color-brand-primary);
   --ob-brand-ink: #120c1e;
   --ob-moment-bg: #0b0713;
 }

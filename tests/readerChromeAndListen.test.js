@@ -69,6 +69,8 @@ describe('listen view follows the reading position', () => {
       reader.indexOf('<main', reader.indexOf('class="reader-listen-view"')),
     )
 
+    // Orb by default, the cover when chosen in Preferences → Listen Screen.
+    expect(listenView.indexOf('class="listen-orb"')).toBeLessThan(listenView.indexOf('class="listen-cover"'))
     expect(listenView.indexOf('class="listen-cover"')).toBeLessThan(listenView.indexOf('class="listen-text"'))
     expect(listenView.indexOf('class="listen-text"')).toBeLessThan(listenView.indexOf('class="listen-progress"'))
     expect(reader).toContain('listenSentenceWords')
@@ -78,15 +80,25 @@ describe('listen view follows the reading position', () => {
     expect(reader).toContain('<Transition name="listen-sentence">')
     expect(reader).not.toContain('<Transition name="listen-sentence" mode="out-in">')
     expect(reader).toMatch(/\.listen-text-inner\s*\{[^}]*grid-area:\s*1 \/ 1/s)
-    expect(reader).toMatch(/\.listen-sentence-enter-active,[\s\S]*transition:\s*opacity 0\.52s/s)
+    // A short plain crossfade: a blur filter lingered over changed text on phones.
+    expect(reader).toMatch(/\.listen-sentence-enter-active,[\s\S]*transition:\s*opacity 0\.18s/s)
+    expect(reader).not.toMatch(/\.listen-sentence-enter-from[^{]*\{[^}]*filter:\s*blur/s)
+    // Real spaces between words, so a line never breaks inside one.
+    expect(reader).toContain('</span>{{ " " }}')
     expect(reader).toMatch(/\.listen-text\s*\{[^}]*width:\s*calc\(100% - 12px\)[^}]*padding-inline:\s*6px/s)
     expect(reader).not.toMatch(/\.listen-text\s*\{[^}]*background:/s)
     expect(reader).toMatch(/\.listen-text-inner\s*\{[^}]*font-size:\s*16px[^}]*font-weight:\s*800/s)
     expect(reader).toMatch(/\.listen-text-inner\s*\{[^}]*text-shadow:\s*none/s)
-    expect(reader).toMatch(/\.listen-generated-word\s*\{[^}]*background:\s*none[^}]*color:\s*rgba\(255, 255, 255, 0\.58\)/s)
+    // Ink follows the page (white over imagery / dark themes); unread words are dull.
+    expect(reader).toMatch(/\.listen-generated-word\s*\{[^}]*background:\s*none[^}]*color:\s*var\(--listen-word-ink\)/s)
+    expect(reader).toMatch(/\.listen-generated-word\.unread\s*\{[^}]*opacity:\s*0\.32/s)
+    expect(reader).toMatch(/\.listen-generated-word\.current\s*\{[^}]*opacity:\s*1/s)
+    // The shown words are the text being spoken, not the reader's chunk.
+    expect(reader).toMatch(/activeListenChunk\.value >= 0 && ttsPlayingChunkText\.value/)
     expect(reader).not.toMatch(/\.listen-generated-word\s*\{[^}]*linear-gradient/s)
     expect(reader).toMatch(/\.listen-generated-word\s*\{[^}]*font-weight:\s*800 !important/s)
-    expect(reader).toMatch(/\.listen-generated-word\s*\{[^}]*margin-inline-end:\s*0\.26em/s)
+    // Word gaps are real spaces, not margins (margins left no break points).
+    expect(reader).not.toMatch(/\.listen-generated-word\s*\{[^}]*margin-inline-end/s)
     expect(reader).toContain('LISTEN_WORD_WINDOW_SIZE = 8')
   })
 

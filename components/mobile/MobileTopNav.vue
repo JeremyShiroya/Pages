@@ -1,9 +1,9 @@
 <template>
   <header class="mobile-top-nav" :class="{ 'preview-nav': preview }" :inert="preview" :aria-label="preview ? 'Top navigation appearance preview' : 'Primary top navigation'">
     <h1 v-if="topNavDisplay === 'title'" class="pages-brand">Pages</h1>
-    <img v-else-if="topNavDisplay === 'logo'" class="pages-logo" src="/images/P Logo.png" alt="Pages" />
+    <img v-else-if="topNavDisplay === 'logo'" class="pages-logo" :src="appLogo" alt="Pages" />
     <div v-else-if="topNavDisplay === 'logo-title'" class="pages-logo-title">
-      <img class="pages-logo" src="/images/P Logo.png" alt="" />
+      <img class="pages-logo" :src="appLogo" alt="" />
       <h1 class="pages-brand">Pages</h1>
     </div>
     <button
@@ -41,6 +41,8 @@
 </template>
 
 <script setup>
+import { useAppLogo } from '~/composables/useAppLogo'
+const appLogo = useAppLogo()
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { PAGES_SETTINGS_KEY, usePagesSettings } from "~/composables/usePagesSettings";
 import { useStreak } from "~/composables/useStreak";
@@ -123,13 +125,19 @@ onBeforeUnmount(() => {
   background: var(--color-background-app);
 }
 
+/* The wordmark stays Pages purple whatever accent is chosen (it will follow the
+   launcher icon once that can change too). */
 .pages-brand {
   margin: 0;
-  color: var(--color-brand-primary);
+  color: #8a2be2;
   font-size: clamp(1.55rem, 6vw, 1.9rem);
   font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 1;
+}
+
+:global(:root[data-theme="dark"] .pages-brand) {
+  color: #a855f7;
 }
 
 .pages-logo {

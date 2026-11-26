@@ -145,30 +145,8 @@
         </button>
       </div>
 
-      <!-- Only offered once there is something to show: an empty screen is a
-           worse answer than no entry point. -->
-      <div v-if="!isSuggestion && (highlightCount || noteCount)" class="annotation-links">
-        <button
-          v-if="highlightCount"
-          type="button"
-          class="annotation-link"
-          @click="router.push(`/highlights/${book.id}`)"
-        >
-          <i class="ri-mark-pen-line"></i>
-          <span>View highlights</span>
-          <strong>{{ highlightCount }}</strong>
-        </button>
-        <button
-          v-if="noteCount"
-          type="button"
-          class="annotation-link"
-          @click="router.push(`/notes/${book.id}`)"
-        >
-          <i class="ri-sticky-note-line"></i>
-          <span>View notes</span>
-          <strong>{{ noteCount }}</strong>
-        </button>
-      </div>
+      <!-- Highlights and notes open from the book's More sheet
+           (BookActionSheet), which shows them only when the book has some. -->
 
       <section class="synopsis-section">
         <h2>Synopsis</h2>
@@ -665,7 +643,7 @@ watch(
   border: none;
   background: var(--color-brand-primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(138, 43, 226, 0.28);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
 /* No outline: a neutral grey fill (Apple's secondary button) that is clearly

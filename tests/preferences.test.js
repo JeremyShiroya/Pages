@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
@@ -29,6 +30,7 @@ describe('appearance preferences', () => {
     expect(DEFAULT_PAGES_SETTINGS.personalRatingScale).toBe(10)
     expect(DEFAULT_PAGES_SETTINGS.readerHighlight).toBe(true)
     expect(DEFAULT_PAGES_SETTINGS.listenCoverBlur).toBe(true)
+    expect(DEFAULT_PAGES_SETTINGS.listenVisual).toBe('orb')
     expect(DEFAULT_PAGES_SETTINGS.showStreak).toBe(true)
     expect(DEFAULT_PAGES_SETTINGS.formatFilter).toBe('all')
   })
@@ -99,7 +101,7 @@ describe('appearance preferences', () => {
     expect(settings).not.toMatch(/Preferences[^}]*comingSoon/)
 
     const prefs = read('components/mobile/PreferencesMobile.vue')
-    for (const key of ['bookActionDisplay', 'readerHighlight', 'listenCoverBlur', 'seriesSuggestions']) {
+    for (const key of ['bookActionDisplay', 'readerHighlight', 'seriesSuggestions']) {
       expect(prefs, key).toContain(key)
     }
 
@@ -153,8 +155,14 @@ describe('appearance preferences', () => {
     // Ratings open their own page; the two Reading options are plain switches.
     expect(prefs).toContain('to="/settings/preferences/ratings"')
     expect(existsSync(resolve(root, 'pages/settings/preferences/ratings.vue'))).toBe(true)
-    expect(prefs).toContain("set('readerHighlight'")
-    expect(prefs).toContain("set('listenCoverBlur'")
+    // Highlight is a row that opens its own page (switch + colour).
+    expect(prefs).toContain('to="/settings/preferences/highlight"')
+    expect(fs.readFileSync('components/mobile/HighlightPreferencesMobile.vue', 'utf8')).toContain('readerHighlight: !enabled')
+    // Orb vs cover (and the cover's blur switch) live on their own page.
+    expect(prefs).toContain('to="/settings/preferences/listen-screen"')
+    const listenScreen = read('components/mobile/ListenScreenPreferencesMobile.vue')
+    expect(listenScreen).toContain('listenVisual')
+    expect(listenScreen).toContain('listenCoverBlur')
     expect(existsSync(resolve(root, 'components/shared/previews/BookActionsPreview.vue'))).toBe(true)
   })
 

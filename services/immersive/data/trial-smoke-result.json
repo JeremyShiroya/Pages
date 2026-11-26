@@ -1,0 +1,152 @@
+{
+  "jobId": "1127b193c3d049d79ebc9c250e0e0ae8",
+  "status": "ready",
+  "passages": [
+    {
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-0",
+      "sourceHash": "df5c601955e11d1e247a895e1201a71b4441d090e0648ad3bd7aec538709a440",
+      "chapterId": "chapter-0",
+      "start": 0,
+      "end": 22,
+      "kind": "narration",
+      "speakerId": "narrator",
+      "attributionStatus": "explicit",
+      "evidence": [],
+      "emotion": "neutral",
+      "intensity": "low",
+      "delivery": "normal",
+      "scriptRevision": 1
+    },
+    {
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-1",
+      "sourceHash": "df5c601955e11d1e247a895e1201a71b4441d090e0648ad3bd7aec538709a440",
+      "chapterId": "chapter-0",
+      "start": 22,
+      "end": 38,
+      "kind": "dialogue",
+      "speakerId": "char-c8b6c061e8591dfe",
+      "attributionStatus": "explicit",
+      "evidence": [],
+      "emotion": "joyful",
+      "intensity": "medium",
+      "delivery": "normal",
+      "scriptRevision": 1
+    },
+    {
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-2",
+      "sourceHash": "df5c601955e11d1e247a895e1201a71b4441d090e0648ad3bd7aec538709a440",
+      "chapterId": "chapter-0",
+      "start": 38,
+      "end": 59,
+      "kind": "narration",
+      "speakerId": "narrator",
+      "attributionStatus": "explicit",
+      "evidence": [],
+      "emotion": "neutral",
+      "intensity": "low",
+      "delivery": "normal",
+      "scriptRevision": 1
+    },
+    {
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-3",
+      "sourceHash": "df5c601955e11d1e247a895e1201a71b4441d090e0648ad3bd7aec538709a440",
+      "chapterId": "chapter-0",
+      "start": 59,
+      "end": 82,
+      "kind": "dialogue",
+      "speakerId": "char-8535e86c8118bbbb",
+      "attributionStatus": "explicit",
+      "evidence": [],
+      "emotion": "neutral",
+      "intensity": "low",
+      "delivery": "whispered",
+      "scriptRevision": 1
+    },
+    {
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-4",
+      "sourceHash": "df5c601955e11d1e247a895e1201a71b4441d090e0648ad3bd7aec538709a440",
+      "chapterId": "chapter-0",
+      "start": 82,
+      "end": 123,
+      "kind": "narration",
+      "speakerId": "narrator",
+      "attributionStatus": "explicit",
+      "evidence": [],
+      "emotion": "neutral",
+      "intensity": "low",
+      "delivery": "normal",
+      "scriptRevision": 1
+    }
+  ],
+  "assets": [
+    {
+      "assetId": "186c2f9dd4654fb6ac8f57f0daa0009b",
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-0",
+      "voiceId": "Ryan",
+      "checksum": "aecbe6434d7759b656bae598bbc4d5aa4f747d9516ed719b5c328524648cc504",
+      "byteLength": 180524,
+      "mime": "audio/wav",
+      "durationMs": 3760.0
+    },
+    {
+      "assetId": "cdfede165f2a4b0a8b3a49b40fd99002",
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-1",
+      "voiceId": "Uncle_Fu",
+      "checksum": "f28923d853f41d1724c98ef353049a97a80d0812ebacf08bede5152381f535c1",
+      "byteLength": 80684,
+      "mime": "audio/wav",
+      "durationMs": 1680.0
+    },
+    {
+      "assetId": "ed4c95e3b6ef48318ffb29726ee60fa2",
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-2",
+      "voiceId": "Ryan",
+      "checksum": "ff4360c7ba248f52efd67fee1caec193f3ffb287852f34425a7765dd1632b5af",
+      "byteLength": 161324,
+      "mime": "audio/wav",
+      "durationMs": 3360.0
+    },
+    {
+      "assetId": "2c61a628ee2f4413b66be127d21d7a5a",
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-3",
+      "voiceId": "Serena",
+      "checksum": "838546e365ea42a611ec5388a6b19166bd197a52c0b3e30a31d48c61f035cca6",
+      "byteLength": 76844,
+      "mime": "audio/wav",
+      "durationMs": 1600.0
+    },
+    {
+      "assetId": "5698af9c8d064c50b22b31bd2371bab5",
+      "passageId": "1127b193c3d049d79ebc9c250e0e0ae8-4",
+      "voiceId": "Ryan",
+      "checksum": "4a24a34b3b2a75ededc5fcd7a6ec1840750416434151d204c4ef8c4c8ed03bbe",
+      "byteLength": 149804,
+      "mime": "audio/wav",
+      "durationMs": 3120.0
+    }
+  ],
+  "characters": [
+    {
+      "characterId": "char-c8b6c061e8591dfe",
+      "displayName": "Mara",
+      "aliases": [],
+      "evidence": [],
+      "voiceId": "Uncle_Fu",
+      "castRevision": 1
+    },
+    {
+      "characterId": "char-8535e86c8118bbbb",
+      "displayName": "Leo",
+      "aliases": [],
+      "evidence": [],
+      "voiceId": "Serena",
+      "castRevision": 1
+    }
+  ],
+  "error": null,
+  "elapsedSeconds": 109.17,
+  "progress": {
+    "passages": 5,
+    "readyAssets": 5
+  }
+}

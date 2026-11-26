@@ -102,7 +102,7 @@ export default defineNuxtPlugin(() => {
   }
 
   watch(
-    [() => ttsBook.value?.id, ttsStatus, ttsSpeed],
+    [() => ttsBook.value?.id, () => ttsBook.value?.title, () => ttsBook.value?.author, () => ttsBook.value?.cover, ttsStatus, ttsSpeed],
     () => {
       lastSentElapsed = -100
       pushState(true)

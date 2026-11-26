@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-26T03:58:15.508681+00:00",
+  "generated_at": "2026-11-26T04:16:37.303445+00:00",
   "nodes": {
     "capacitor_config": {
       "code_fingerprint": "0c658b029deb5e8d47a8f58de8d83ec2ad7a80c3ca3d23fabe2d3319266f34bc",
@@ -12,13 +12,13 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 0.178114423,
+      "score": 0.178061951,
       "source_file": "capacitor.config.ts",
       "status": "tentative",
       "uses": 1
     },
     "components_mobile_preferencesmobile": {
-      "code_fingerprint": "cdfff45796e0a9e8756c833d8ec87fd66eb35872938985c470db9be0cc195d91",
+      "code_fingerprint": "dea85aca45946fe5ca26ecf56c3755ae6ce1beb4022ea80a4eae4d29ef08df95",
       "label": "PreferencesMobile.vue",
       "last": "2026-09-15T10:56:20.844599+00:00",
       "provenance": [
@@ -33,7 +33,7 @@
           "q": "Add visual progress choices, selectable Goodreads StoryGraph or personal ratings with persistent background sync, settings system-bar backgrounds, and Minimal actions by default"
         }
       ],
-      "score": 0.381394573,
+      "score": 0.381282216,
       "source_file": "components/mobile/PreferencesMobile.vue",
       "status": "preferred",
       "uses": 2
@@ -54,7 +54,7 @@
           "q": "Add visual progress choices, selectable Goodreads StoryGraph or personal ratings with persistent background sync, settings system-bar backgrounds, and Minimal actions by default"
         }
       ],
-      "score": 0.381394573,
+      "score": 0.381282216,
       "source_file": "components/shared/BookProgressDisplay.vue",
       "status": "preferred",
       "uses": 2
@@ -75,7 +75,7 @@
           "q": "Add visual progress choices, selectable Goodreads StoryGraph or personal ratings with persistent background sync, settings system-bar backgrounds, and Minimal actions by default"
         }
       ],
-      "score": 0.381394573,
+      "score": 0.381282216,
       "source_file": "components/shared/BookRatingDisplay.vue",
       "status": "preferred",
       "uses": 2
@@ -91,7 +91,7 @@
           "q": "Fix the progress ring fidelity, restore provider icon plus stars plus plain rating on book cards, and improve the Preferences ratings UI"
         }
       ],
-      "score": 0.190739822,
+      "score": 0.190683631,
       "source_file": "components/shared/LibraryBookCard.vue",
       "status": "tentative",
       "uses": 1
@@ -112,7 +112,7 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 0.356245085,
+      "score": 0.356140136,
       "source_file": "composables/tts/desktopTtsDriver.test.js",
       "status": "preferred",
       "uses": 2
@@ -128,7 +128,7 @@
           "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
         }
       ],
-      "score": 0.174263897,
+      "score": 0.174212559,
       "source_file": "composables/tts/mobileTtsDriver.js",
       "status": "tentative",
       "uses": 1
@@ -144,7 +144,7 @@
           "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
         }
       ],
-      "score": 0.174263897,
+      "score": 0.174212559,
       "source_file": "composables/tts/mobileTtsDriver.js",
       "status": "tentative",
       "uses": 1
@@ -165,7 +165,7 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 0.356245085,
+      "score": 0.356140136,
       "source_file": "composables/tts/nativeSpeech.js",
       "status": "preferred",
       "uses": 2
@@ -181,7 +181,7 @@
           "q": "will it function/behave like an actual desktop app and not just a mock?"
         }
       ],
-      "score": 0.178130661,
+      "score": 0.178078185,
       "source_file": "composables/useDeviceAssets.js",
       "status": "tentative",
       "uses": 1
@@ -197,7 +197,7 @@
           "q": "will it function/behave like an actual desktop app and not just a mock?"
         }
       ],
-      "score": 0.178130661,
+      "score": 0.178078185,
       "source_file": "composables/useDeviceLibrarySync.js",
       "status": "tentative",
       "uses": 1
@@ -213,7 +213,7 @@
           "q": "Add visual progress choices, selectable Goodreads StoryGraph or personal ratings with persistent background sync, settings system-bar backgrounds, and Minimal actions by default"
         }
       ],
-      "score": 0.190654751,
+      "score": 0.190598585,
       "source_file": "composables/useRatingSync.js",
       "status": "tentative",
       "uses": 1
@@ -229,13 +229,13 @@
           "q": "every time i try to play a book in horizintal for tablet, it says tts failed check your connection, find the problem and fix"
         }
       ],
-      "score": 0.174263897,
+      "score": 0.174212559,
       "source_file": "composables/useTTS.js",
       "status": "tentative",
       "uses": 1
     },
     "package": {
-      "code_fingerprint": "2ba4cebed0210fc1ec9d3e98454b0de3848055df087eb44f510835851697f3ae",
+      "code_fingerprint": "bc6a8fe347ce9223279596195c45b25c2a578d3bfb58115dc7f7210e09095623",
       "label": "package.json",
       "last": "2026-09-12T11:53:47.654862+00:00",
       "provenance": [
@@ -250,7 +250,7 @@
           "q": "is electron the best for this project? for performance and speed without eating resources?"
         }
       ],
-      "score": 0.356245085,
+      "score": 0.356140136,
       "source_file": "package.json",
       "status": "preferred",
       "uses": 2
@@ -266,7 +266,7 @@
           "q": "will it function/behave like an actual desktop app and not just a mock?"
         }
       ],
-      "score": 0.178130661,
+      "score": 0.178078185,
       "source_file": "plugins/media-session.client.js",
       "status": "tentative",
       "uses": 1

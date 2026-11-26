@@ -197,9 +197,11 @@ describe('annotation wiring', () => {
     expect(read('pages/highlights/[id].vue')).toContain('AnnotationListMobile')
     expect(read('pages/notes/[id].vue')).toContain('AnnotationListMobile')
 
-    const detail = read('components/mobile/BookDetailMobile.vue')
-    expect(detail).toContain('/highlights/${book.id}')
-    expect(detail).toContain('/notes/${book.id}')
+    // They open from the book's More sheet, shown only when the book has some.
+    const sheet = read('components/shared/BookActionSheet.vue')
+    expect(sheet).toContain('/highlights/${id}')
+    expect(sheet).toContain('/notes/${id}')
+    expect(sheet).toContain('countAnnotations')
   })
 
   test('painting targets the live reader, never the offscreen page measurer', () => {

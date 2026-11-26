@@ -8,6 +8,7 @@ vi.stubGlobal('$fetch', (...args) => $fetch(...args))
 
 vi.mock('~/composables/useEdgeSpeechClient', () => ({
   synthesizeEdgeSpeechInBrowser: (...args) => synthesizeEdgeSpeechInBrowser(...args),
+  resetEdgeSpeechClient: () => {},
 }))
 
 vi.mock('~/composables/tts/nativeSpeech', () => ({
@@ -59,18 +60,38 @@ describe('mobileTtsDriver Edge resilience', () => {
     expect(mobileTtsEdgeDisabled()).toBe(false)
   })
 
-  it('quickly uses a phone voice after a failed Edge handshake', async () => {
+  // Three separate failed sentences before the phone voice takes over: one
+  // slow reply (a busy phone, a long sentence) must never change the narrator.
+  const failUntilFallback = async () => {
+    await expect(speak()).rejects.toThrow()
+    await expect(speak()).rejects.toThrow()
+    return speak()
+  }
+
+  it('keeps the Edge narrator through one or two failed sentences', async () => {
     synthesizeEdgeSpeechInBrowser.mockRejectedValueOnce(new Error('socket timeout'))
-    await expect(speak()).resolves.toMatchObject({ native: true })
+    await expect(speak()).rejects.toThrow('socket timeout')
+    expect(mobileTtsEdgeDisabled()).toBe(false)
+    synthesizeEdgeSpeechInBrowser.mockResolvedValueOnce(EDGE_AUDIO)
+    await expect(speak()).resolves.toEqual(EDGE_AUDIO)
+  })
+
+  it('uses the phone voice after three failed sentences in a row', async () => {
+    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('handshake 403'))
+    await expect(failUntilFallback()).resolves.toMatchObject({ native: true })
     expect(mobileTtsEdgeDisabled()).toBe(true)
   })
 
-  it('does not retry a rejected Edge handshake for each PDF sentence', async () => {
-    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('handshake 403'))
-    await expect(speak()).resolves.toMatchObject({ native: true })
-    await expect(speak()).resolves.toMatchObject({ native: true })
-    expect(synthesizeEdgeSpeechInBrowser).toHaveBeenCalledTimes(1)
-    expect(mobileTtsEdgeDisabled()).toBe(true)
+  it('uses the phone voice straight away when the phone is offline', async () => {
+    const online = Object.getOwnPropertyDescriptor(Navigator.prototype, 'onLine')
+    Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false })
+    try {
+      synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('offline'))
+      await expect(speak()).resolves.toMatchObject({ native: true })
+    } finally {
+      delete navigator.onLine
+      if (online) Object.defineProperty(Navigator.prototype, 'onLine', online)
+    }
   })
 
   it('does not mistake a configured server HTML response for synthesized audio', async () => {
@@ -81,7 +102,7 @@ describe('mobileTtsDriver Edge resilience', () => {
       apiUrl: (path) => `https://pages.example${path}`,
     }
 
-    await expect(speak(options)).resolves.toMatchObject({ native: true })
+    await expect(speak(options)).rejects.toThrow()
     expect($fetch).toHaveBeenCalledWith(
       'https://pages.example/api/tts',
       expect.objectContaining({ method: 'POST' }),
@@ -99,8 +120,8 @@ describe('mobileTtsDriver Edge resilience', () => {
   })
 
   it('can probe Edge again after an explicit reset', async () => {
-    synthesizeEdgeSpeechInBrowser.mockRejectedValueOnce(new Error('blip'))
-    await expect(speak()).resolves.toMatchObject({ native: true })
+    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('blip'))
+    await expect(failUntilFallback()).resolves.toMatchObject({ native: true })
     resetMobileTtsDriver()
     synthesizeEdgeSpeechInBrowser.mockResolvedValueOnce(EDGE_AUDIO)
     await expect(speak()).resolves.toEqual(EDGE_AUDIO)
@@ -118,33 +139,31 @@ describe('mobileTtsDriver Edge resilience', () => {
     expect(mobileTtsEdgeDisabled()).toBe(false)
   })
 
-  it('gives the backgrounded socket longer to answer', async () => {
+  it('gives the backgrounded socket longer to answer, and retries on a fresh connection', async () => {
     setHidden(true)
     synthesizeEdgeSpeechInBrowser.mockResolvedValue(EDGE_AUDIO)
     await speak()
     expect(synthesizeEdgeSpeechInBrowser).toHaveBeenCalledWith(
-      expect.objectContaining({ timeoutMs: 30000, attempts: 1 }),
+      expect.objectContaining({ timeoutMs: 30000, attempts: 2 }),
     )
 
-    // Foreground gets two short attempts, so one stalled handshake retries in
-    // 6s instead of holding the sentence for a full 12s.
     setHidden(false)
     await speak()
     expect(synthesizeEdgeSpeechInBrowser).toHaveBeenLastCalledWith(
-      expect.objectContaining({ timeoutMs: 15000, attempts: 1 }),
+      expect.objectContaining({ timeoutMs: 15000, attempts: 2 }),
     )
   })
 
   // Regression: the fallback used to latch for the whole session, so the
   // narrator stayed on the phone's voice long after the connection returned.
   it('re-probes Edge once the cooldown expires', async () => {
+    synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('dead'))
+    await failUntilFallback()
+    expect(mobileTtsEdgeDisabled()).toBe(true)
+
     vi.useFakeTimers()
     try {
-      synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('dead'))
-      await speak()
-      expect(mobileTtsEdgeDisabled()).toBe(true)
-
-      vi.advanceTimersByTime(301_000)
+      vi.advanceTimersByTime(91_000)
       expect(mobileTtsEdgeDisabled()).toBe(false)
 
       synthesizeEdgeSpeechInBrowser.mockResolvedValue(EDGE_AUDIO)
@@ -156,7 +175,7 @@ describe('mobileTtsDriver Edge resilience', () => {
 
   it('once disabled, keeps using the device voice without calling Edge again', async () => {
     synthesizeEdgeSpeechInBrowser.mockRejectedValue(new Error('dead'))
-    await speak()
+    await failUntilFallback()
     expect(mobileTtsEdgeDisabled()).toBe(true)
 
     synthesizeEdgeSpeechInBrowser.mockClear()

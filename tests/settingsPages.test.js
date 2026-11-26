@@ -23,13 +23,14 @@ describe('settings pages wiring', () => {
     expect(settings).toContain('navigate(row.to)')
   })
 
-  test('theme row uses a light and dark toggle without a trailing arrow', () => {
+  test('theme row opens the Theme page (System / Light / Dark and accent colour)', () => {
     const settings = read('components/mobile/SettingsMobile.vue')
+    expect(settings).toContain("to: '/settings/theme'")
+    expect(settings).not.toContain('aria-label="Toggle dark mode"')
 
-    expect(settings).toContain('theme-toggle')
-    expect(settings).toContain("aria-label=\"Toggle dark mode\"")
-    expect(settings).toContain("setReaderTheme(settings.value.readerTheme === 'dark' ? 'light' : 'dark')")
-    expect(settings).not.toMatch(/label: 'Theme'[\s\S]*?ri-arrow-right-s-line/)
+    const page = read('components/mobile/ThemeSettingsMobile.vue')
+    for (const label of ['System', 'Light', 'Dark', 'Accent Colour']) expect(page).toContain(label)
+    expect(read('pages/settings/theme.vue')).toContain('ThemeSettingsMobile')
   })
 
   test('mobile settings mirrors Najibudget list structure with settings nav and no row buttons', () => {

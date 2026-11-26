@@ -71,6 +71,21 @@ export async function loadAnnotations(bookId) {
   return list
 }
 
+// How many highlights and notes a book has, WITHOUT replacing the shared list
+// (loadAnnotations makes that book the "current" one, which would pull the
+// rug from under an open reader). Used by the book options sheet.
+export async function countAnnotations(bookId) {
+  if (!bookId || typeof indexedDB === 'undefined') return { highlights: 0, notes: 0 }
+  try {
+    const rows = await withStore('readonly', (store) => store.index('bookId').getAll(String(bookId)))
+    const list = Array.isArray(rows) ? rows : []
+    const notes = list.filter((a) => a.note).length
+    return { highlights: list.length - notes, notes }
+  } catch {
+    return { highlights: 0, notes: 0 }
+  }
+}
+
 export async function saveAnnotation(annotation) {
   const record = {
     ...annotation,

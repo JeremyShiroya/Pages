@@ -131,7 +131,23 @@ const stream = {
 
 export const localStreamingSupported = () => onAndroid()
 
+// Loudness (0–1) at the native stream's playback head, reported ~30 times a
+// second while it changes. Read by the Listen view's orb.
+let streamLevel = 0
+let streamLevelAt = 0
+export const localStreamLevel = () => {
+  if (!stream.active || stream.nativePaused) return 0
+  // A stale value (no event for a while) means nothing new is playing.
+  return performance.now() - streamLevelAt > 400 && streamLevel > 0 ? 0 : streamLevel
+}
+
 function onStreamEvent(event) {
+  if (event?.type === 'level') {
+    const value = Number(event.message)
+    streamLevel = Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0
+    streamLevelAt = performance.now()
+    return
+  }
   const index = Number(event?.index)
   if (!Number.isFinite(index)) return
   if (event.type === 'started') {

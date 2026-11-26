@@ -60,11 +60,11 @@
   --color-brand-primary-hover: #6a0dad;
   --color-brand-primary-pressed: #590a96;
   --color-brand-primary-soft: #f3e8ff;
-  --color-brand-primary-faint: rgba(138, 43, 226, 0.1);
-  --color-brand-primary-muted: #9370db3f;
+  --color-brand-primary-faint: color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
+  --color-brand-primary-muted: color-mix(in srgb, var(--color-brand-primary) 25%, transparent);
   --color-brand-secondary: #2563eb;
-  --color-brand-tertiary: #b19cd9;
-  --color-brand-lavender: #e6e6fa;
+  --color-brand-tertiary: color-mix(in srgb, var(--color-brand-primary) 55%, #fff);
+  --color-brand-lavender: color-mix(in srgb, var(--color-brand-primary) 12%, #fff);
   --color-book-cover-placeholder-one: #8a2be2;
   --color-book-cover-placeholder-two: #6a0dad;
   --color-book-cover-placeholder-three: #9370db;
@@ -92,7 +92,7 @@
   --color-surface-muted: #f1f5f9;
   --color-surface-hover: #f3f0ff;
   --color-table-row-hover: #f1f5f9;
-  --color-surface-active: #ede9fe;
+  --color-surface-active: color-mix(in srgb, var(--color-brand-primary) 12%, #fff);
   --color-surface-modal: #ffffff;
   --color-surface-input: #f8fafc;
   --color-surface-input-focus: #ffffff;
@@ -112,6 +112,13 @@
   --color-text-placeholder: #94a3b8;
   --color-text-inverse: #ffffff;
   --color-text-on-brand: #ffffff;
+  /* Switches: the track when on and its knob. Most accents tint the track;
+     Black & White needs its own pair (a white track wants a dark knob). */
+  /* Reading highlights: the accent unless Preferences → Highlight picks a
+     colour of its own (<html data-highlight>). */
+  --color-highlight-base: var(--color-brand-primary);
+  --color-switch-on: var(--color-brand-primary);
+  --color-switch-knob-on: #ffffff;
   --color-text-on-image-primary: #ffffff;
   --color-text-on-image-secondary: rgba(255, 255, 255, 0.85);
   --color-text-on-image-muted: rgba(255, 255, 255, 0.7);
@@ -123,8 +130,8 @@
   --color-border-subtle: #e2e8f0;
   --color-border-strong: #cbd5e1;
   --color-border-card: #e2e8f0;
-  --color-border-focus: #8a2be2;
-  --color-border-focus-ring: rgba(138, 43, 226, 0.18);
+  --color-border-focus: var(--color-brand-primary);
+  --color-border-focus-ring: color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
   --color-border-on-image: rgba(255, 255, 255, 0.16);
   --color-border-on-image-strong: rgba(255, 255, 255, 0.34);
   --color-raised-surface-border: var(--color-border-card);
@@ -149,9 +156,9 @@
   --color-reader-page: var(--color-surface-primary);
   --color-reader-toolbar: var(--color-surface-primary);
   --color-reader-border: var(--color-border-card);
-  --color-reader-highlight: #9370db3f;
-  --color-reader-highlight-border: #8a2be2;
-  --color-reader-word-highlight: #9370db7f;
+  --color-reader-highlight: color-mix(in srgb, var(--color-highlight-base) 25%, transparent);
+  --color-reader-highlight-border: var(--color-highlight-base);
+  --color-reader-word-highlight: color-mix(in srgb, var(--color-highlight-base) 50%, transparent);
   --color-reader-light-background: var(--color-background-app);
   --color-reader-light-page: var(--color-surface-primary);
   --color-reader-light-toolbar: var(--color-surface-primary);
@@ -167,7 +174,7 @@
   --color-reader-dark-text: #e4e4e7;
   --color-reader-dark-muted: #a1a1aa;
   --color-reader-dark-button-hover: #2e2d36;
-  --color-reader-dark-toc-active: #2d1f42;
+  --color-reader-dark-toc-active: color-mix(in srgb, var(--color-brand-primary) 22%, #18171c);
 
   /* Gradients */
   --gradient-brand-primary: linear-gradient(
@@ -185,7 +192,7 @@
     var(--color-brand-primary-soft),
     var(--color-surface-primary)
   );
-  --gradient-library-progress: #ad60f5;
+  --gradient-library-progress: var(--color-brand-primary);
   --gradient-image-card-overlay: linear-gradient(
     135deg,
     rgba(15, 23, 42, 0.8) 0%,
@@ -217,14 +224,14 @@
   --shadow-cover: 0 8px 15px -3px rgba(15, 23, 42, 0.22);
   --shadow-cover-hover: 0 12px 20px -5px rgba(15, 23, 42, 0.26);
   --shadow-text-on-image: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-brand-glow: 0 4px 12px rgba(138, 43, 226, 0.28);
-  --shadow-brand-button: 0 4px 6px -1px rgba(138, 43, 226, 0.3);
-  --shadow-brand-button-hover: 0 8px 12px -1px rgba(138, 43, 226, 0.3);
+  --shadow-brand-glow: 0 4px 12px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+  --shadow-brand-button: 0 4px 6px -1px color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
+  --shadow-brand-button-hover: 0 8px 12px -1px color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
   --shadow-reader-page: 0 2px 24px rgba(0, 0, 0, 0.13);
 
   /* Loading */
-  --color-skeleton-base: rgba(138, 43, 226, 0.05);
-  --color-skeleton-shimmer: rgba(138, 43, 226, 0.12);
+  --color-skeleton-base: color-mix(in srgb, var(--color-brand-primary) 5%, transparent);
+  --color-skeleton-shimmer: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
   --color-skeleton-inverse-base: rgba(255, 255, 255, 0.08);
   --color-skeleton-inverse-shimmer: rgba(255, 255, 255, 0.16);
 
@@ -246,7 +253,7 @@
   --primary-color: var(--color-brand-primary);
   --primary-dark: var(--color-brand-primary-hover);
   --primary-light: var(--color-brand-primary-soft);
-  --primary-shadow: rgba(138, 43, 226, 0.3);
+  --primary-shadow: color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
 }
 
 /* The original muted light palette remains available as a user preference. */
@@ -256,12 +263,12 @@
   --color-background-page: #f8fafc;
   --color-background-sidebar: #dfe0eb;
   --color-settings-group: #f8fafc;
-  --color-surface-secondary: rgba(138, 43, 226, 0.05);
-  --color-surface-tertiary: rgba(138, 43, 226, 0.08);
-  --color-surface-muted: rgba(138, 43, 226, 0.06);
-  --color-surface-hover: rgba(147, 112, 219, 0.18);
+  --color-surface-secondary: color-mix(in srgb, var(--color-brand-primary) 5%, transparent);
+  --color-surface-tertiary: color-mix(in srgb, var(--color-brand-primary) 8%, transparent);
+  --color-surface-muted: color-mix(in srgb, var(--color-brand-primary) 6%, transparent);
+  --color-surface-hover: color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
   --color-table-row-hover: #d3d5e3;
-  --color-surface-active: rgba(147, 112, 219, 0.24);
+  --color-surface-active: color-mix(in srgb, var(--color-brand-primary) 24%, transparent);
   --color-surface-input: rgba(255, 255, 255, 0.45);
   --color-surface-input-focus: rgba(255, 255, 255, 0.8);
   --color-surface-card: transparent;
@@ -279,12 +286,12 @@
   --color-brand-primary: #a855f7;
   --color-brand-primary-hover: #c084fc;
   --color-brand-primary-pressed: #7e22ce;
-  --color-brand-primary-soft: #2d1f42;
-  --color-brand-primary-faint: rgba(168, 85, 247, 0.14);
-  --color-brand-primary-muted: rgba(168, 85, 247, 0.24);
+  --color-brand-primary-soft: color-mix(in srgb, var(--color-brand-primary) 22%, #141317);
+  --color-brand-primary-faint: color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
+  --color-brand-primary-muted: color-mix(in srgb, var(--color-brand-primary) 24%, transparent);
   --color-brand-secondary: #60a5fa;
-  --color-brand-tertiary: #c4b5fd;
-  --color-brand-lavender: #3b3353;
+  --color-brand-tertiary: color-mix(in srgb, var(--color-brand-primary) 60%, #fff);
+  --color-brand-lavender: color-mix(in srgb, var(--color-brand-primary) 22%, #26252b);
   --color-book-cover-placeholder-one: #a855f7;
   --color-book-cover-placeholder-two: #7e22ce;
   --color-book-cover-placeholder-three: #8b5cf6;
@@ -342,8 +349,8 @@
   --color-border-subtle: #38383a;
   --color-border-strong: #48484a;
   --color-border-card: #38383a;
-  --color-border-focus: #a855f7;
-  --color-border-focus-ring: rgba(168, 85, 247, 0.2);
+  --color-border-focus: var(--color-brand-primary);
+  --color-border-focus-ring: color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
   --color-border-on-image: rgba(255, 255, 255, 0.16);
   --color-border-on-image-strong: rgba(255, 255, 255, 0.36);
   --color-raised-surface-border: transparent;
@@ -368,9 +375,9 @@
   --color-reader-page: var(--color-surface-primary);
   --color-reader-toolbar: var(--color-surface-primary);
   --color-reader-border: var(--color-border-card);
-  --color-reader-highlight: #9370db3f;
-  --color-reader-highlight-border: #8a2be2;
-  --color-reader-word-highlight: #9370db7f;
+  --color-reader-highlight: color-mix(in srgb, var(--color-highlight-base) 25%, transparent);
+  --color-reader-highlight-border: var(--color-highlight-base);
+  --color-reader-word-highlight: color-mix(in srgb, var(--color-highlight-base) 50%, transparent);
   --color-reader-light-background: #eceae4;
   --color-reader-light-page: #ffffff;
   --color-reader-light-toolbar: #ffffff;
@@ -419,9 +426,9 @@
   --shadow-cover: 0 8px 15px -3px rgba(0, 0, 0, 0.45);
   --shadow-cover-hover: 0 12px 20px -5px rgba(0, 0, 0, 0.5);
   --shadow-text-on-image: 0 1px 2px rgba(0, 0, 0, 0.34);
-  --shadow-brand-glow: 0 4px 14px rgba(168, 85, 247, 0.28);
-  --shadow-brand-button: 0 4px 6px -1px rgba(168, 85, 247, 0.28);
-  --shadow-brand-button-hover: 0 8px 12px -1px rgba(168, 85, 247, 0.34);
+  --shadow-brand-glow: 0 4px 14px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+  --shadow-brand-button: 0 4px 6px -1px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+  --shadow-brand-button-hover: 0 8px 12px -1px color-mix(in srgb, var(--color-brand-primary) 34%, transparent);
   --shadow-reader-page: 0 2px 24px rgba(0, 0, 0, 0.45);
 
   /* Loading */
@@ -620,7 +627,7 @@ textarea {
   height: 130px;
   overflow: hidden;
   border-radius: var(--mobile-card-radius);
-  background: linear-gradient(135deg, #6c3fb5 0%, #8a2be2 40%, #a855f7 100%);
+  background: linear-gradient(135deg, var(--color-brand-primary-pressed) 0%, var(--color-brand-primary) 45%, color-mix(in srgb, var(--color-brand-primary) 70%, #fff) 100%);
   color: #fff;
 }
 
@@ -930,3 +937,189 @@ textarea {
   background: var(--segmented-thumb) !important;
   box-shadow: var(--segmented-thumb-shadow) !important;
 }
+
+/* ── Accent colours ─────────────────────────────────────────────────────
+   Settings → Theme picks one; it lands on <html data-accent>. Purple is the
+   default and needs no block. Every other brand token (soft fills, focus
+   rings, shadows, highlights) is mixed from these, so this is all an accent
+   has to supply. "mono" is Black & White: ink-coloured (black on light, white
+   on dark), with its own switch pair. */
+:root[data-accent="pastel-purple"] {
+  --color-brand-primary: #a685e2;
+  --color-brand-primary-hover: #9370d6;
+  --color-brand-primary-pressed: #7f5cc4;
+  --color-brand-primary-soft: #f3edfc;
+  --color-book-cover-placeholder-one: #a685e2;
+  --color-book-cover-placeholder-two: #7f5cc4;
+}
+:root[data-theme="dark"][data-accent="pastel-purple"] {
+  --color-brand-primary: #c9b3f5;
+  --color-brand-primary-hover: #d9c9f8;
+  --color-brand-primary-pressed: #b49ae8;
+  --color-brand-primary-soft: #2a2236;
+  --color-book-cover-placeholder-one: #c9b3f5;
+  --color-book-cover-placeholder-two: #b49ae8;
+  --color-text-on-brand: #1d1430;
+}
+:root[data-accent="pastel-blue"] {
+  --color-brand-primary: #5f9fd8;
+  --color-brand-primary-hover: #4c8bc4;
+  --color-brand-primary-pressed: #3d78ae;
+  --color-brand-primary-soft: #eaf3fb;
+  --color-book-cover-placeholder-one: #5f9fd8;
+  --color-book-cover-placeholder-two: #3d78ae;
+}
+:root[data-theme="dark"][data-accent="pastel-blue"] {
+  --color-brand-primary: #a9cdf0;
+  --color-brand-primary-hover: #c1dbf4;
+  --color-brand-primary-pressed: #8fbbe6;
+  --color-brand-primary-soft: #1d2a36;
+  --color-book-cover-placeholder-one: #a9cdf0;
+  --color-book-cover-placeholder-two: #8fbbe6;
+  --color-text-on-brand: #10202e;
+}
+:root[data-accent="pastel-pink"] {
+  --color-brand-primary: #e2789f;
+  --color-brand-primary-hover: #cc5f88;
+  --color-brand-primary-pressed: #b54d75;
+  --color-brand-primary-soft: #fdeef4;
+  --color-book-cover-placeholder-one: #e2789f;
+  --color-book-cover-placeholder-two: #b54d75;
+}
+:root[data-theme="dark"][data-accent="pastel-pink"] {
+  --color-brand-primary: #f4a7c4;
+  --color-brand-primary-hover: #f8c2d6;
+  --color-brand-primary-pressed: #e38bae;
+  --color-brand-primary-soft: #3a2430;
+  --color-book-cover-placeholder-one: #f4a7c4;
+  --color-book-cover-placeholder-two: #e38bae;
+  --color-text-on-brand: #2a1420;
+}
+:root[data-accent="pastel-yellow"] {
+  --color-brand-primary: #d4b13e;
+  --color-brand-primary-hover: #bf9d31;
+  --color-brand-primary-pressed: #a68826;
+  --color-brand-primary-soft: #fbf5dd;
+  --color-book-cover-placeholder-one: #d4b13e;
+  --color-book-cover-placeholder-two: #a68826;
+  --color-text-on-brand: #2a2410;
+}
+:root[data-theme="dark"][data-accent="pastel-yellow"] {
+  --color-brand-primary: #f3df8f;
+  --color-brand-primary-hover: #f7e8ad;
+  --color-brand-primary-pressed: #e6cd70;
+  --color-brand-primary-soft: #343020;
+  --color-book-cover-placeholder-one: #f3df8f;
+  --color-book-cover-placeholder-two: #e6cd70;
+  --color-text-on-brand: #2a2410;
+}
+:root[data-accent="burgundy"] {
+  --color-brand-primary: #8c1c3a;
+  --color-brand-primary-hover: #741630;
+  --color-brand-primary-pressed: #5e1127;
+  --color-brand-primary-soft: #f7e6eb;
+  --color-book-cover-placeholder-one: #8c1c3a;
+  --color-book-cover-placeholder-two: #5e1127;
+}
+:root[data-theme="dark"][data-accent="burgundy"] {
+  --color-brand-primary: #c94b64;
+  --color-brand-primary-hover: #d66d82;
+  --color-brand-primary-pressed: #ad3b52;
+  --color-brand-primary-soft: #351820;
+  --color-book-cover-placeholder-one: #c94b64;
+  --color-book-cover-placeholder-two: #ad3b52;
+}
+:root[data-accent="sage"] {
+  --color-brand-primary: #6f8f6a;
+  --color-brand-primary-hover: #5d7b58;
+  --color-brand-primary-pressed: #4c6748;
+  --color-brand-primary-soft: #eef3ec;
+  --color-book-cover-placeholder-one: #6f8f6a;
+  --color-book-cover-placeholder-two: #4c6748;
+}
+:root[data-theme="dark"][data-accent="sage"] {
+  --color-brand-primary: #9cb897;
+  --color-brand-primary-hover: #b5ccb1;
+  --color-brand-primary-pressed: #839f7e;
+  --color-brand-primary-soft: #222b21;
+  --color-book-cover-placeholder-one: #9cb897;
+  --color-book-cover-placeholder-two: #839f7e;
+  --color-text-on-brand: #17211a;
+}
+:root[data-accent="green"] {
+  --color-brand-primary: #2ea44f;
+  --color-brand-primary-hover: #258a42;
+  --color-brand-primary-pressed: #1d7036;
+  --color-brand-primary-soft: #e6f6ea;
+  --color-book-cover-placeholder-one: #2ea44f;
+  --color-book-cover-placeholder-two: #1d7036;
+}
+:root[data-theme="dark"][data-accent="green"] {
+  --color-brand-primary: #30d158;
+  --color-brand-primary-hover: #5fdd7e;
+  --color-brand-primary-pressed: #24b548;
+  --color-brand-primary-soft: #11301a;
+  --color-book-cover-placeholder-one: #30d158;
+  --color-book-cover-placeholder-two: #24b548;
+}
+:root[data-accent="pastel-green"] {
+  --color-brand-primary: #5fb87e;
+  --color-brand-primary-hover: #4ea06b;
+  --color-brand-primary-pressed: #3f8a5a;
+  --color-brand-primary-soft: #eaf7ee;
+  --color-book-cover-placeholder-one: #5fb87e;
+  --color-book-cover-placeholder-two: #3f8a5a;
+}
+:root[data-theme="dark"][data-accent="pastel-green"] {
+  --color-brand-primary: #98e0ad;
+  --color-brand-primary-hover: #b3e9c3;
+  --color-brand-primary-pressed: #7dcf95;
+  --color-brand-primary-soft: #1c3324;
+  --color-book-cover-placeholder-one: #98e0ad;
+  --color-book-cover-placeholder-two: #7dcf95;
+  --color-text-on-brand: #132a1b;
+}
+:root[data-accent="mono"] {
+  --color-brand-primary: #1c1c1e;
+  --color-brand-primary-hover: #000000;
+  --color-brand-primary-pressed: #000000;
+  --color-brand-primary-soft: #ececf0;
+  --color-book-cover-placeholder-one: #1c1c1e;
+  --color-book-cover-placeholder-two: #000000;
+  --color-text-on-brand: #ffffff;
+  --color-switch-on: #3a3a3c;
+  --color-switch-knob-on: #ffffff;
+}
+:root[data-theme="dark"][data-accent="mono"] {
+  --color-brand-primary: #f2f2f7;
+  --color-brand-primary-hover: #ffffff;
+  --color-brand-primary-pressed: #d1d1d6;
+  --color-brand-primary-soft: #2c2c2e;
+  --color-book-cover-placeholder-one: #f2f2f7;
+  --color-book-cover-placeholder-two: #d1d1d6;
+  --color-text-on-brand: #000000;
+  --color-switch-on: #f2f2f7;
+  --color-switch-knob-on: #1c1c1e;
+}
+
+/* ── Highlight colours (Preferences → Highlight) ──────────────────────── */
+:root[data-highlight="purple"] { --color-highlight-base: #8a2be2; }
+:root[data-theme="dark"][data-highlight="purple"] { --color-highlight-base: #a855f7; }
+:root[data-highlight="pastel-purple"] { --color-highlight-base: #a685e2; }
+:root[data-theme="dark"][data-highlight="pastel-purple"] { --color-highlight-base: #c9b3f5; }
+:root[data-highlight="pastel-blue"] { --color-highlight-base: #5f9fd8; }
+:root[data-theme="dark"][data-highlight="pastel-blue"] { --color-highlight-base: #a9cdf0; }
+:root[data-highlight="pastel-pink"] { --color-highlight-base: #e2789f; }
+:root[data-theme="dark"][data-highlight="pastel-pink"] { --color-highlight-base: #f4a7c4; }
+:root[data-highlight="pastel-yellow"] { --color-highlight-base: #d4b13e; }
+:root[data-theme="dark"][data-highlight="pastel-yellow"] { --color-highlight-base: #f3df8f; }
+:root[data-highlight="burgundy"] { --color-highlight-base: #8c1c3a; }
+:root[data-theme="dark"][data-highlight="burgundy"] { --color-highlight-base: #c94b64; }
+:root[data-highlight="sage"] { --color-highlight-base: #6f8f6a; }
+:root[data-theme="dark"][data-highlight="sage"] { --color-highlight-base: #9cb897; }
+:root[data-highlight="green"] { --color-highlight-base: #2ea44f; }
+:root[data-theme="dark"][data-highlight="green"] { --color-highlight-base: #30d158; }
+:root[data-highlight="pastel-green"] { --color-highlight-base: #5fb87e; }
+:root[data-theme="dark"][data-highlight="pastel-green"] { --color-highlight-base: #98e0ad; }
+:root[data-highlight="mono"] { --color-highlight-base: #1c1c1e; }
+:root[data-theme="dark"][data-highlight="mono"] { --color-highlight-base: #f2f2f7; }

@@ -7,10 +7,11 @@
       paper: prefs.background === 'paper',
       night: prefs.background === 'night',
       'listen-blur': readerMode === 'listen' && listenBlurEnabled,
+      'listen-orb-mode': readerMode === 'listen' && listenOrbMode,
     }]"
     :style="readerStyleVars"
     :data-system-bar-icons="pageSyncOpen ? 'light' : (pageSyncWorking || pageSyncError ? 'dark' : readerMode === 'listen' && listenBlurEnabled ? 'light' : (pageTheme === 'dark' ? 'light' : 'dark'))"
-    :data-system-bar-color="pageSyncOpen || (readerMode === 'listen' && listenBlurEnabled) ? 'transparent' : undefined"
+    :data-system-bar-color="pageSyncOpen || (readerMode === 'listen' && (listenBlurEnabled || listenOrbBackdrop)) ? 'transparent' : undefined"
     :data-system-bar-dim="dimOpacity ? String(dimOpacity) : undefined"
   >
     <header v-show="!chromeHidden" class="reader-mobile-topbar">
@@ -52,7 +53,7 @@
           :aria-expanded="displayOpen"
           @click="displayOpen = true"
         >
-          <i class="ri-font-size-2"></i>
+          <i class="ri-font-size"></i>
         </button>
       </div>
       <div v-else class="reader-top-actions">
@@ -65,14 +66,59 @@
     <div
       v-if="readerMode === 'listen'"
       class="reader-listen-view"
-      :class="{ 'bg-blur': listenBlurEnabled, 'text-hidden': !listenTextVisible }"
+      :class="{ 'bg-blur': listenBlurEnabled, 'orb-mode': listenOrbMode, 'text-hidden': !listenTextVisible }"
     >
       <template v-if="book">
-        <div v-if="listenBlurEnabled" class="listen-bg" aria-hidden="true">
+        <!-- Orb mode: a very light, unblurred wash of the narrator's orb in
+             place of the book's cover backdrop. -->
+        <div
+          v-if="listenOrbMode && listenOrbBackground !== 'flat'"
+          class="listen-orb-bg"
+          :class="`is-${listenOrbBackground}`"
+          aria-hidden="true"
+        >
+          <video
+            :key="`bg-${listenOrb.name}`"
+            :src="listenOrb.video"
+            :poster="listenOrb.poster"
+            autoplay
+            loop
+            muted
+            playsinline
+            disablepictureinpicture
+          ></video>
+        </div>
+        <div v-else-if="listenBlurEnabled" class="listen-bg" aria-hidden="true">
           <img :src="book.cover" alt="" @error="onCoverError($event, book.title)" />
           <div class="listen-bg-overlay"></div>
         </div>
-        <div class="listen-cover">
+        <!-- The narrator's orb; --voice (0–1, set per frame) follows their
+             words and pauses. -->
+        <div
+          v-if="listenOrbMode"
+          ref="listenOrbEl"
+          class="listen-orb"
+          :class="{ speaking: isPlaying, 'no-halo': !listenOrbHalo }"
+          :style="{ '--orb-poster': `url('${listenOrb.poster}')` }"
+          role="img"
+          :aria-label="activeNarratorName ? `${activeNarratorName}, narrator` : 'Narrator'"
+        >
+          <span v-if="listenOrbHalo" class="listen-orb-halo" aria-hidden="true"></span>
+          <span v-if="listenOrbRing" class="listen-orb-ring" aria-hidden="true"></span>
+          <span class="listen-orb-core">
+            <video
+              :key="listenOrb.name"
+              :src="listenOrb.video"
+              :poster="listenOrb.poster"
+              autoplay
+              loop
+              muted
+              playsinline
+              disablepictureinpicture
+            ></video>
+          </span>
+        </div>
+        <div v-else class="listen-cover">
           <img
             :src="book.cover"
             :alt="`${book.title} cover`"
@@ -96,13 +142,15 @@
               class="listen-text-inner listen-chunk active"
               aria-live="polite"
             >
-              <span
-                v-for="word in listenSentenceWords"
-                :key="`${listenDisplayChunkIndex}-${word.index}`"
-                class="listen-generated-word"
-                :class="{ spoken: word.spoken, upcoming: word.upcoming }"
-                :aria-current="word.upcoming ? 'true' : undefined"
-              >{{ word.text }} </span>
+              <!-- A real space between words (not a margin): without one the
+                   line could only break inside a word ("hea / d"). -->
+              <template v-for="word in listenSentenceWords" :key="`${listenDisplayChunkIndex}-${word.index}`">
+                <span
+                  class="listen-generated-word"
+                  :class="word.state"
+                  :aria-current="word.state === 'current' ? 'true' : undefined"
+                >{{ word.text }}</span>{{ " " }}
+              </template>
             </p>
           </Transition>
           <p v-if="!listenSentenceWords.length" class="listen-text-empty">
@@ -126,7 +174,7 @@
             :aria-label="`${listenBarScopeLabel} audio progress`"
             @input="seekListenBar(Number($event.target.value))"
           />
-          <span>{{ listenBarTotal }}</span>
+          <span>{{ listenOrbMode ? `−${listenBarRemaining}` : listenBarTotal }}</span>
         </div>
 
         <div class="listen-controls">
@@ -139,7 +187,12 @@
             {{ speedLabel }}
           </button>
           <button type="button" class="listen-skip" :aria-label="`Back ${listenBackSeconds} seconds`" @click="skipSeconds(-listenBackSeconds)">
-            <i class="ri-arrow-go-back-line"></i><span>{{ listenBackSeconds }}</span>
+            <!-- A circular arrow with the interval inside it (both players). -->
+            <svg class="listen-skip-icon" viewBox="0 0 32 32" aria-hidden="true">
+              <path d="M16 5 A12 12 0 1 1 5.6 11" />
+              <path d="M19.4 1.9 L16 5 L19.4 8.1" />
+              <text x="16" y="20.6">{{ listenBackSeconds }}</text>
+            </svg>
           </button>
           <button
             type="button"
@@ -150,7 +203,12 @@
             <i :class="isPlaying ? 'ri-pause-fill' : 'ri-play-fill'"></i>
           </button>
           <button type="button" class="listen-skip" :aria-label="`Forward ${listenForwardSeconds} seconds`" @click="skipSeconds(listenForwardSeconds)">
-            <i class="ri-arrow-go-forward-line"></i><span>{{ listenForwardSeconds }}</span>
+            <svg class="listen-skip-icon" viewBox="0 0 32 32" aria-hidden="true">
+              <path d="M16 5 A12 12 0 1 0 26.4 11" />
+              <path d="M12.6 1.9 L16 5 L12.6 8.1" />
+              <text x="16" y="20.6">{{ listenForwardSeconds }}</text>
+            </svg>
+
           </button>
           <button
             type="button"
@@ -304,6 +362,7 @@
           :readable-chunks="readableChunks"
           :section-counts="sectionCounts"
           :active-chunk-index="activeTtsChunkIndex"
+          :dormant="readerMode === 'listen'"
           :highlight-enabled="true"
           :geometry="pageGeometry"
           :layout-hash="layoutHash"
@@ -660,6 +719,8 @@ import {
 } from '~/composables/tts/localTtsDriver';
 import { findPageSyncMatch } from "~/composables/usePageSyncMatch";
 import { onCoverError } from "~/composables/useCoverFallback";
+import { useNarratorActivity } from "~/composables/useNarratorActivity";
+import { narratorOrb } from "~/utils/narratorOrbs";
 import { offeredDeviceVoices } from "~/composables/tts/nativeSpeech";
 import { shouldAskWhereToResume } from "~/composables/useResumePrompt";
 import { firstChunkForPage, pageForChunk } from "~/composables/usePdfManifest";
@@ -769,6 +830,7 @@ const emit = defineEmits([
   "go-to-section",
   "jump-to-toc",
   "page-sync",
+  "mode-change",
 ]);
 
 const route = useRoute();
@@ -789,6 +851,7 @@ const {
   ttsPlayingChunkText,
   ttsWordIdx,
   ttsBoundaries,
+  ttsPlaybackClock,
   elapsedTime,
   totalTime,
   togglePlay,
@@ -1593,6 +1656,9 @@ const annotationRoot = () => (
 );
 
 const repaintAnnotations = async () => {
+  // Under the Listen screen nobody sees the marks, and re-marking a long
+  // chapter re-lays-out all of it; they are painted on the way back to Read.
+  if (readerMode.value === "listen") return;
   if (!bookAnnotations.value.length && !_paintedAnything) return;
   await nextTick();
   const root = annotationRoot();
@@ -1600,7 +1666,20 @@ const repaintAnnotations = async () => {
   paintAnnotations(root, bookAnnotations.value);
   _paintedAnything = bookAnnotations.value.length > 0;
 };
-const listenBlurEnabled = computed(() => appSettings.value.listenCoverBlur !== false);
+// Preferences → Listen Screen: the narrator's orb (default) or the book cover.
+// The blurred-cover backdrop belongs to the cover visual only.
+const listenOrbMode = computed(() => appSettings.value.listenVisual !== "cover");
+const listenBlurEnabled = computed(() => !listenOrbMode.value && appSettings.value.listenCoverBlur !== false);
+const listenOrb = computed(() => narratorOrb(ttsVoiceId.value));
+// Orb backdrop strength: 'flat' (none), 'soft' (light wash), 'blur' (strong bleed).
+const listenOrbBackground = computed(() => appSettings.value.listenOrbBackground || "soft");
+// Soft/full bleed run edge to edge, so the status and navigation bars go
+// transparent and the wash shows through them (like the blurred cover).
+const listenOrbBackdrop = computed(() => listenOrbMode.value && listenOrbBackground.value !== "flat");
+// Ring and glow around the orb, each switchable in Preferences → Listen Screen.
+const listenOrbRing = computed(() => appSettings.value.listenOrbRing === true);
+const listenOrbHalo = computed(() => appSettings.value.listenOrbHalo === true);
+const listenOrbEl = ref(null);
 
 const readerMode = ref("listen");
 
@@ -1889,18 +1968,48 @@ const listenDisplayChunkIndex = computed(() => (
 ));
 
 const LISTEN_WORD_WINDOW_SIZE = 8;
-const listenSourceText = computed(() => props.tabletMode && activeListenChunk.value >= 0
-  ? (ttsPlayingChunkText.value || (props.readableChunks || [])[listenDisplayChunkIndex.value] || '')
-  : ((props.readableChunks || [])[listenDisplayChunkIndex.value] || ''));
-const listenSpokenWordIndex = computed(() => {
-  const boundaryIndex = activeListenChunk.value >= 0 ? Number(ttsWordIdx.value) : -1;
-  if (boundaryIndex < 0) return boundaryIndex;
-  const charIndex = Number(ttsBoundaries.value?.[boundaryIndex]?.charIndex);
-  if (!Number.isFinite(charIndex) || charIndex < 0) return boundaryIndex;
-  const starts = [...String(listenSourceText.value).matchAll(/\S+/g)].map(match => match.index || 0);
+// While narrating, show the text the engine is ACTUALLY speaking. The word
+// boundaries' charIndex is measured against that exact string, and the
+// reader's own chunk at the same index is not guaranteed to be identical
+// (sections are chunked separately) — reading it instead is what made the
+// words on screen drift from the voice.
+const listenSourceText = computed(() => (activeListenChunk.value >= 0 && ttsPlayingChunkText.value
+  ? ttsPlayingChunkText.value
+  : ((props.readableChunks || [])[listenDisplayChunkIndex.value] || '')));
+
+// Orb motion + an estimated word position for narrators with no word timings.
+const { estimatedWordIndex: listenEstimatedWord } = useNarratorActivity({
+  clock: () => ttsPlaybackClock?.() ?? null,
+  playing: computed(() => readerMode.value === "listen" && isPlaying.value),
+  text: computed(() => (activeListenChunk.value >= 0 ? ttsPlayingChunkText.value : "")),
+  boundaries: ttsBoundaries,
+  speed: ttsSpeed,
+  target: listenOrbEl,
+});
+
+const listenWordStarts = computed(() => [...String(listenSourceText.value).matchAll(/\S+/g)].map((match) => match.index || 0));
+const wordIndexForChar = (charIndex) => {
+  const starts = listenWordStarts.value;
   let wordIndex = 0;
   while (wordIndex + 1 < starts.length && starts[wordIndex + 1] <= charIndex) wordIndex += 1;
   return wordIndex;
+};
+const listenSpokenWordIndex = computed(() => {
+  if (activeListenChunk.value < 0) return -1;
+  const boundaries = ttsBoundaries.value || [];
+  const boundaryIndex = Number(ttsWordIdx.value);
+  if (boundaryIndex >= 0 && boundaries.length) {
+    // A boundary whose word could not be located in the text has charIndex -1;
+    // the last located one before it is the best anchor (never the raw
+    // boundary number, which counts differently from the words on screen).
+    for (let i = Math.min(boundaryIndex, boundaries.length - 1); i >= 0; i -= 1) {
+      const charIndex = Number(boundaries[i]?.charIndex);
+      if (Number.isFinite(charIndex) && charIndex >= 0) return wordIndexForChar(charIndex);
+    }
+    return Math.min(boundaryIndex, Math.max(0, listenWordStarts.value.length - 1));
+  }
+  // On-device narrators report no word timings: follow the clock estimate.
+  return listenEstimatedWord.value;
 });
 
 const listenCurrentChunk = computed(() => isThisBookNarrating.value
@@ -1954,6 +2063,8 @@ const listenSummaryStats = computed(() => {
 const listenBarProgress = computed(() => listenBarStats.value.percent);
 const listenBarElapsed = computed(() => formatDuration(listenBarStats.value.elapsed));
 const listenBarTotal = computed(() => formatDuration(listenBarStats.value.total));
+// The orb player counts down on the right, as audiobook players do.
+const listenBarRemaining = computed(() => formatDuration(Math.max(0, listenBarStats.value.total - listenBarStats.value.elapsed)));
 const listenBarScopeLabel = computed(() => appSettings.value.listenBarScope === "chapter" && listenChapterRange.value ? "Chapter" : "Book");
 const formatListenTime = (seconds) => {
   const minutes = Math.max(0, Math.round(seconds / 60));
@@ -1983,12 +2094,13 @@ const listenWordWindowStart = computed(() => {
 });
 const listenSentenceKey = computed(() => `${listenDisplayChunkIndex.value}:${listenWordWindowStart.value}`);
 
-// The player shows only the current sentence. Spoken words resolve from blur
-// to solid white as the audio boundary reaches them; the moving window keeps
-// long sentences readable without ever filling more than two lines.
+// The player shows only the current sentence. The word being spoken is bright
+// (white over imagery and in dark themes), words already read stay readable,
+// and words not read yet are dull; the moving window keeps long sentences
+// readable without ever filling more than two lines.
 const listenSentenceWords = computed(() => {
   const text = listenSourceText.value;
-  const words = String(text).trim().split(/\s+/).filter(Boolean);
+  const words = String(text).match(/\S+/g) || [];
   if (!words.length) return [];
 
   const spokenIndex = listenSpokenWordIndex.value;
@@ -1998,8 +2110,7 @@ const listenSentenceWords = computed(() => {
     return {
       text: word,
       index,
-      spoken: spokenIndex >= 0 && index <= spokenIndex,
-      upcoming: index === spokenIndex + 1,
+      state: spokenIndex < 0 || index > spokenIndex ? "unread" : index === spokenIndex ? "current" : "read",
     };
   });
 });
@@ -2214,9 +2325,13 @@ const chooseNarrator = (voiceId) => {
   narratorOpen.value = false;
 };
 
-watch(readerMode, (mode) => {
-  if (mode === "listen") sampleScrollChunk();
-});
+watch(readerMode, (mode, previous) => {
+  if (mode === "listen" && previous) sampleScrollChunk();
+  // The page pauses its hidden reading-surface work (narration scrolling and
+  // per-word highlighting) while the Listen screen covers it.
+  emit("mode-change", mode);
+  if (mode === "read" && previous === "listen") repaintAnnotations();
+}, { immediate: true });
 
 // Ask the engine to go back to the cloud narrators. It reports whether it
 // actually managed it, so a still-dead connection says so instead of silently
@@ -2848,6 +2963,164 @@ onUnmounted(() => {
   box-shadow: var(--shadow-cover);
 }
 
+/* ── Narrator orb ─────────────────────────────────────────────────────────
+   The orb video is cropped to a circle (slightly oversized so its square
+   edges never show). --voice is 0 at rest and rises toward 1 on each spoken
+   word, falling back in pauses: the core swells, a ring pushes out and a
+   soft glow of the orb's own colours breathes around it. */
+.listen-orb {
+  --voice: 0;
+  --orb-size: min(56vw, 214px, 32vh);
+  position: relative;
+  display: grid;
+  width: var(--orb-size);
+  height: var(--orb-size);
+  flex: 0 0 auto;
+  place-items: center;
+  margin-top: 4px;
+}
+
+.listen-orb > span {
+  grid-area: 1 / 1;
+  border-radius: 50%;
+}
+
+.listen-orb-core {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transform: scale(calc(0.96 + var(--voice) * 0.07));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  will-change: transform;
+}
+
+.listen-orb-core video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+/* Glow: the orb's poster frame, faded at the edge by a radial mask. */
+.listen-orb-halo {
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--orb-poster) center / cover no-repeat;
+  -webkit-mask-image: radial-gradient(circle, #000 38%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 38%, transparent 70%);
+  opacity: calc(0.18 + var(--voice) * 0.5);
+  transform: scale(calc(1.18 + var(--voice) * 0.32));
+  will-change: transform, opacity;
+}
+
+.listen-orb-ring {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: 1px solid color-mix(in srgb, var(--listen-word-ink, #fff) 45%, transparent);
+  opacity: calc(var(--voice) * 0.55);
+  transform: scale(calc(1 + var(--voice) * 0.1));
+  will-change: transform, opacity;
+}
+
+/* The orb is shorter than a cover, so on its own the player would ride up the
+   screen. Auto margins centre the orb in the free space and keep the title,
+   text and controls sitting at the bottom, where they are with a cover. */
+.reader-listen-view.orb-mode .listen-orb {
+  margin-block: auto;
+}
+
+/* Halo off: no glow and no drop shadow — just the orb. */
+.listen-orb.no-halo .listen-orb-core {
+  box-shadow: none;
+}
+
+/* Paused / not narrating: the orb rests, still alive from its own video. */
+.listen-orb:not(.speaking) {
+  --voice: 0 !important;
+}
+
+/* Orb-mode backdrop: the orb's colours as a very light wash (no blur), fading
+   into the page like the cover behind the series detail hero. */
+.listen-orb-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.listen-orb-bg video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.2;
+  transform: scale(1.25);
+}
+
+.reader-mobile-page.dark .listen-orb-bg video,
+.reader-mobile-page.night .listen-orb-bg video {
+  opacity: 0.26;
+}
+
+.listen-orb-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--mobile-reader-bg) 10%, transparent) 0%,
+    color-mix(in srgb, var(--mobile-reader-bg) 55%, transparent) 58%,
+    var(--mobile-reader-bg) 100%
+  );
+}
+
+/* Strong bleed: the orb's colours fill much more of the screen, blurred. */
+.listen-orb-bg.is-blur video {
+  opacity: 0.6;
+  filter: blur(36px) saturate(1.35);
+  transform: scale(1.5);
+}
+
+.reader-mobile-page.dark .listen-orb-bg.is-blur video,
+.reader-mobile-page.night .listen-orb-bg.is-blur video {
+  opacity: 0.55;
+}
+
+.listen-orb-bg.is-blur::after {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--mobile-reader-bg) 25%, transparent) 60%,
+    color-mix(in srgb, var(--mobile-reader-bg) 70%, transparent) 100%
+  );
+}
+
+.reader-listen-view > .listen-orb-bg {
+  position: absolute;
+  z-index: 0;
+}
+
+/* Let the wash run up behind the top bar. */
+.reader-mobile-page.listen-orb-mode .reader-mobile-topbar {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listen-orb-core,
+  .listen-orb-halo,
+  .listen-orb-ring {
+    transform: none;
+  }
+}
+
 .listen-title {
   margin: 16px 0 2px;
   font-size: 17px;
@@ -2954,12 +3227,9 @@ onUnmounted(() => {
 }
 
 .listen-controls .listen-skip {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  font-size: 21px;
+  display: grid;
+  place-items: center;
 }
-.listen-controls .listen-skip span { font-size: 10px; font-weight: 700; line-height: 1; }
 
 .listen-controls .listen-play {
   font-size: 38px;
@@ -3093,6 +3363,183 @@ onUnmounted(() => {
 .reader-listen-view.bg-blur .listen-summary { color: rgba(255, 255, 255, .84); text-shadow: 0 1px 4px rgba(0, 0, 0, .5); }
 .reader-listen-view.bg-blur .listen-summary-toggle { color: #fff; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 
+/* ── Orb player ──────────────────────────────────────────────────────────
+   Orb mode only; the cover player keeps its own look. One ink — the page's
+   text colour (near-black on light paper, white in dark/night) — with quiet
+   tints of it for secondary text and fills, so everything reads on whatever
+   colour the orb washes the page with. */
+.reader-mobile-page.listen-orb-mode {
+  --orb-ink: var(--mobile-reader-text);
+  --orb-muted: color-mix(in srgb, var(--orb-ink) 54%, transparent);
+  --orb-fill: color-mix(in srgb, var(--orb-ink) 8%, transparent);
+  --orb-track: color-mix(in srgb, var(--orb-ink) 16%, transparent);
+  --orb-on-ink: var(--mobile-reader-bg);
+}
+.reader-mobile-page.listen-orb-mode.dark,
+.reader-mobile-page.listen-orb-mode.night {
+  --orb-ink: #fff;
+  --orb-fill: rgba(255, 255, 255, 0.14);
+  --orb-track: rgba(255, 255, 255, 0.22);
+  --orb-on-ink: #111;
+}
+
+/* Listen / Read: an iOS segmented control in the same ink. */
+.reader-mobile-page.listen-orb-mode .reader-mode-toggle {
+  background: var(--orb-fill);
+}
+.reader-mobile-page.listen-orb-mode .reader-mode-toggle button {
+  color: var(--orb-muted);
+  font-weight: 500;
+}
+.reader-mobile-page.listen-orb-mode .reader-mode-toggle button.active {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.reader-mobile-page.listen-orb-mode.dark .reader-mode-toggle button.active,
+.reader-mobile-page.listen-orb-mode.night .reader-mode-toggle button.active {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+  box-shadow: none;
+}
+.reader-mobile-page.listen-orb-mode .reader-nav-btn {
+  color: var(--orb-ink);
+}
+
+.reader-listen-view.orb-mode {
+  color: var(--orb-ink);
+}
+.reader-listen-view.orb-mode .listen-title {
+  margin-top: 18px;
+  color: var(--orb-ink);
+  font-size: 21px;
+  font-weight: 400;
+}
+.reader-listen-view.orb-mode .listen-byline {
+  margin-bottom: 10px;
+  color: var(--orb-muted);
+  font-size: 14px;
+}
+.reader-listen-view.orb-mode .listen-summary {
+  gap: 6px;
+  margin-bottom: 18px;
+  color: var(--orb-muted);
+  font-size: 13.5px;
+  font-weight: 400;
+}
+/* Just the arrow, in line with the text: no disc behind it. */
+.reader-listen-view.orb-mode .listen-summary-toggle {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: none;
+  color: var(--orb-muted);
+  font-size: 19px;
+}
+
+.reader-listen-view.orb-mode .listen-page-sync {
+  gap: 8px;
+  min-height: 40px;
+  margin: 2px 0 16px 6px;
+  padding: 0 18px 0 15px;
+  border: 0;
+  background: var(--orb-fill);
+  color: var(--orb-ink);
+  font-size: 14px;
+  font-weight: 400;
+  box-shadow: none;
+}
+.reader-listen-view.orb-mode .listen-page-sync i { font-size: 18px; }
+
+/* Scrubber: ink fill with a solid ink dot, on a faint track. */
+.reader-listen-view.orb-mode .listen-progress {
+  grid-template-columns: 54px minmax(0, 1fr) 62px;
+  gap: 8px;
+  color: var(--orb-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.reader-listen-view.orb-mode .listen-progress input {
+  height: 4px;
+  background: linear-gradient(to right, var(--orb-ink) var(--fill, 0%), var(--orb-track) var(--fill, 0%));
+}
+.reader-listen-view.orb-mode .listen-progress input::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--orb-ink);
+}
+
+.reader-listen-view.orb-mode .listen-controls {
+  margin: 16px 0 10px;
+}
+.reader-listen-view.orb-mode .listen-controls button {
+  color: var(--orb-ink);
+}
+/* Speed, skips and narrator: one design in both players, in the page's ink
+   (the orb and cover players differ only in scrubber, play button and page
+   steps). */
+.reader-listen-view .listen-controls .listen-aux {
+  width: 44px;
+  height: 44px;
+  color: var(--listen-control-ink, var(--mobile-reader-text));
+  font-size: 23px;
+}
+.reader-listen-view .listen-controls .listen-aux:first-child {
+  font-size: 19px;
+  font-weight: 400;
+}
+.reader-listen-view .listen-controls .listen-skip {
+  width: 48px;
+  height: 48px;
+  color: var(--listen-control-ink, var(--mobile-reader-text));
+}
+.reader-listen-view.bg-blur {
+  --listen-control-ink: #fff;
+}
+.reader-listen-view.orb-mode {
+  --listen-control-ink: var(--orb-ink);
+}
+.listen-skip-icon {
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+}
+.listen-skip-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.listen-skip-icon text {
+  fill: currentColor;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+/* The big round play/pause: solid ink with the page colour inside it. */
+.reader-listen-view.orb-mode .listen-controls .listen-play {
+  width: 64px;
+  height: 64px;
+  background: var(--orb-ink);
+  color: var(--orb-on-ink);
+  font-size: 32px;
+}
+
+.reader-listen-view.orb-mode .listen-page-nav {
+  color: var(--orb-muted);
+}
+.reader-listen-view.orb-mode .listen-page-step {
+  color: var(--orb-muted);
+  font-size: 14px;
+}
+.reader-listen-view.orb-mode .listen-page-current {
+  color: var(--orb-ink);
+  font-size: 14px;
+  font-weight: 600 !important;
+}
+
 .page-sync-overlay {
   position: fixed;
   inset: 0;
@@ -3104,12 +3551,12 @@ onUnmounted(() => {
 }
 .page-sync-video { width: 100%; height: 100%; object-fit: cover; }
 .page-sync-shade { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5, 3, 13, .32); pointer-events: none; }
-.page-sync-frame { width: min(84vw, 470px); height: min(62vh, 660px); border: 3px solid #b26bff; border-radius: 14px; box-shadow: 0 0 0 999px rgba(5, 3, 13, .38), 0 0 24px #a35aff88; }
+.page-sync-frame { width: min(84vw, 470px); height: min(62vh, 660px); border: 3px solid var(--color-brand-primary); border-radius: 14px; box-shadow: 0 0 0 999px rgba(5, 3, 13, .38), 0 0 24px color-mix(in srgb, var(--color-brand-primary) 55%, transparent); }
 .page-sync-top { position: absolute; top: calc(16px + env(safe-area-inset-top)); left: 18px; right: 18px; display: flex; align-items: center; gap: 16px; font-size: 17px; }
 .page-sync-top button { border: 0; background: #22172f; color: white; width: 42px; height: 42px; border-radius: 50%; font-size: 24px; }
 .page-sync-bottom { position: absolute; bottom: calc(22px + env(safe-area-inset-bottom)); left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .page-sync-bottom p { margin: 0; font-size: 14px; text-align: center; text-shadow: 0 1px 5px black; }
-.page-sync-shutter { width: 74px; height: 74px; border: 6px solid white; border-radius: 50%; background: #a65cf0; box-shadow: inset 0 0 0 4px #a65cf0; }
+.page-sync-shutter { width: 74px; height: 74px; border: 6px solid white; border-radius: 50%; background: var(--color-brand-primary); box-shadow: inset 0 0 0 4px var(--color-brand-primary); }
 .page-sync-shutter:disabled { opacity: .45; }
 .page-sync-upload { border: 0; background: none; color: white; text-decoration: underline; font: inherit; font-size: 13px; }
 .page-sync-file { display: none; }
@@ -3127,20 +3574,36 @@ onUnmounted(() => {
 .page-sync-status button { min-height: 42px; margin: 7px; padding: 0 18px; border: 0; border-radius: 999px; background: #302b35; color: white; font: inherit; }
 .page-sync-status button.page-sync-dismiss { background: transparent; color: #514a59; }
 
+/* Sentence ink follows the page: the reader's own text colour on light paper
+   (white was invisible there once the blurred cover was off), pure white over
+   the blurred cover and in the dark themes. */
+.reader-listen-view {
+  --listen-word-ink: var(--mobile-reader-text);
+}
+.reader-listen-view.bg-blur,
+.reader-mobile-page.dark .reader-listen-view,
+.reader-mobile-page.night .reader-listen-view {
+  --listen-word-ink: #fff;
+}
+.reader-mobile-page.sepia .reader-listen-view:not(.bg-blur),
+.reader-mobile-page.paper .reader-listen-view:not(.bg-blur) {
+  --listen-word-ink: var(--mobile-reader-text);
+}
+
 .listen-text-inner {
   grid-area: 1 / 1;
   display: block;
   width: 100%;
   max-width: 100%;
   margin: 0;
-  color: rgba(255, 255, 255, 0.68);
+  color: var(--listen-word-ink);
   font-size: 16px;
   font-weight: 800;
   line-height: 1.42;
   text-align: left;
   text-shadow: none;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: normal;
   -webkit-user-select: none;
   user-select: none;
@@ -3148,46 +3611,41 @@ onUnmounted(() => {
 
 .listen-generated-word {
   display: inline;
-  margin-inline-end: 0.26em;
   background: none;
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--listen-word-ink);
   -webkit-text-fill-color: currentColor;
   font-weight: 800 !important;
-  opacity: 1;
   filter: none;
-  transition: color 0.34s ease, opacity 0.34s ease;
+  transition: opacity 0.22s ease;
 }
 
-.listen-generated-word.spoken {
-  background: none;
-  color: rgba(255, 255, 255, 0.92);
+/* Not read yet: dull. */
+.listen-generated-word.unread {
+  opacity: 0.32;
+}
+
+/* Already read: settled, still easy to re-read. */
+.listen-generated-word.read {
+  opacity: 0.68;
+}
+
+/* Being spoken now: full strength. */
+.listen-generated-word.current {
   opacity: 1;
+  transition-duration: 0.08s;
 }
 
-.listen-generated-word.upcoming {
-  color: rgba(255, 255, 255, 0.74);
-  opacity: 1;
-}
-
+/* A short crossfade between word windows. No blur filter: a filtered layer is
+   re-rasterised every frame, and on a busy phone it lingered (or arrived late)
+   over text that had already changed. */
 .listen-sentence-enter-active,
 .listen-sentence-leave-active {
-  will-change: opacity, filter, transform;
-  transition:
-    opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.18s ease-out;
 }
 
-.listen-sentence-enter-from {
-  opacity: 0;
-  filter: blur(2px);
-  transform: translateY(2px);
-}
-
+.listen-sentence-enter-from,
 .listen-sentence-leave-to {
   opacity: 0;
-  filter: blur(2px);
-  transform: translateY(-2px);
 }
 
 .listen-text-empty {
@@ -3225,7 +3683,7 @@ onUnmounted(() => {
   background: var(--gradient-image-card-overlay);
 }
 
-.reader-listen-view > :not(.listen-bg) {
+.reader-listen-view > :not(.listen-bg):not(.listen-orb-bg) {
   position: relative;
   z-index: 1;
 }
@@ -3520,7 +3978,7 @@ onUnmounted(() => {
 .reader-mobile-text :deep(blockquote) {
   margin: 1em 0;
   padding: 0.2em 0 0.2em 1em;
-  border-left: 3px solid var(--color-reader-highlight-border, rgba(138, 43, 226, 0.4));
+  border-left: 3px solid var(--color-reader-highlight-border);
   color: var(--mobile-reader-muted);
   font-style: italic;
   text-indent: 0;
@@ -3812,7 +4270,7 @@ onUnmounted(() => {
   height: 6px;
   margin-right: 3px;
   border-radius: 50%;
-  background: var(--color-brand-primary, #8a2be2);
+  background: var(--color-brand-primary);
   vertical-align: super;
 }
 

@@ -1,0 +1,42 @@
+{
+  "original-door": {
+    "X": "A",
+    "Y": "C",
+    "Z": "B"
+  },
+  "same-words-three-meanings": {
+    "X": "A",
+    "Y": "C",
+    "Z": "B"
+  },
+  "three-way-station": {
+    "X": "B",
+    "Y": "C",
+    "Z": "A"
+  },
+  "interrupted-turn": {
+    "X": "B",
+    "Y": "A",
+    "Z": "C"
+  },
+  "whispers-and-reset": {
+    "X": "C",
+    "Y": "A",
+    "Z": "B"
+  },
+  "dry-humor": {
+    "X": "B",
+    "Y": "A",
+    "Z": "C"
+  },
+  "shout-then-ordinary": {
+    "X": "B",
+    "Y": "A",
+    "Z": "C"
+  },
+  "returning-cast": {
+    "X": "A",
+    "Y": "C",
+    "Z": "B"
+  }
+}

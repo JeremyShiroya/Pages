@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pages audiobook audition — blind comparison</title>
+<style>body{max-width:760px;margin:2rem auto;padding:0 1rem;font:18px/1.5 system-ui;background:#15191e;color:#f2f2f2}
+button{padding:.8rem 1.2rem;margin:.4rem;border:1px solid #999;border-radius:.5rem;background:#293849;color:white;font-size:1rem}
+button:focus{outline:3px solid #90caff} .source{padding:1rem;background:#20272e;border-radius:.5rem}
+small{color:#bcc6ce} audio{width:100%}</style>
+<h1>Pages audiobook audition</h1>
+<p>Listen to each full sequence, then note which version feels most natural and restrained. X, Y and Z use the same Edge narrator and the same character voices; only character direction changes.</p>
+<div class="source">Mara opened the door. “You came back!” Mara said joyfully. “Keep your voice down,” Leo whispered. The corridor fell silent.</div>
+<p><button onclick="play('X')">Play X</button><button onclick="play('Y')">Play Y</button><button onclick="play('Z')">Play Z</button><button onclick="stop()">Stop</button></p>
+<p id="status" aria-live="polite">Ready</p><audio id="player" controls></audio>
+<p><small>This short scene is a cost and workflow sample. It is not a quality acceptance test for the full eight-scene set. Please rate naturalness, restraint, voice consistency, turn flow, and fit with Edge from 1–5, and identify any wrong or added words.</small></p>
+<script>
+const playlists = {"X": ["edge-0.mp3", "A-0.wav", "edge-2.mp3", "A-1.wav", "edge-4.mp3"], "Y": ["edge-0.mp3", "B-0.wav", "edge-2.mp3", "B-1.wav", "edge-4.mp3"], "Z": ["edge-0.mp3", "C-0.wav", "edge-2.mp3", "C-1.wav", "edge-4.mp3"]};
+const player = document.getElementById('player'); const status = document.getElementById('status');
+let active = null, index = 0;
+function next() { if (!active) return; if (index >= playlists[active].length) { status.textContent = `${active} complete`; active=null; return; }
+  player.src = playlists[active][index++]; status.textContent = `Playing ${active}, passage ${index} of 5`;
+  player.play().catch(error => { status.textContent = String(error); active=null; }); }
+function play(label) { player.pause(); active=label; index=0; next(); }
+function stop() { active=null; player.pause(); status.textContent='Stopped'; }
+player.addEventListener('ended', next);
+</script></html>

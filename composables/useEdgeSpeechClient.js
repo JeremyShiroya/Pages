@@ -14,6 +14,8 @@ const HEADER_BODY_DELIMITER = '\r\n\r\n'
 const DEFAULT_TIMEOUT_MS = 20000
 const DEFAULT_ATTEMPTS = 2
 const RETRY_DELAY_MS = 350
+// A turn fails only after this long with no frame at all from the server.
+const EDGE_QUIET_MS = 12000
 let speechSocket = null
 let socketIdleTimer = null
 let synthesisQueue = Promise.resolve()
@@ -145,6 +147,7 @@ async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
 
     const cleanup = (keepConnection = false) => {
       clearTimeout(timer)
+      clearTimeout(quietTimer)
       clearTimeout(handshakeTimer)
       ws.onopen = null
       ws.onmessage = null
@@ -183,11 +186,22 @@ async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
       }
     }
 
-    const timer = setTimeout(() => fail(new Error('Edge TTS timed out')), timeoutMs)
-    const handshakeTimer = setTimeout(() => fail(new Error('Edge TTS connection timed out')), 6000)
+    // Two clocks. `timeoutMs` caps the whole turn; the quiet timer fails a turn
+    // only when Microsoft has sent NOTHING for a while. A busy phone handles
+    // each frame late but keeps receiving them, and a long sentence streams for
+    // a long time — neither is a dead connection, and both used to be timed
+    // out as one (which then swapped the narrator for the device voice).
+    let timer = setTimeout(() => fail(new Error('Edge TTS timed out')), Math.max(timeoutMs, 45000))
+    let quietTimer = null
+    const armQuiet = () => {
+      clearTimeout(quietTimer)
+      quietTimer = setTimeout(() => fail(new Error('Edge TTS went quiet')), EDGE_QUIET_MS)
+    }
+    const handshakeTimer = setTimeout(() => fail(new Error('Edge TTS connection timed out')), 8000)
 
     const sendRequest = () => {
       clearTimeout(handshakeTimer)
+      armQuiet()
       ws.send(`X-Timestamp:${new Date().toISOString()}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config${HEADER_BODY_DELIMITER}{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`)
       ws.send(`X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml${HEADER_BODY_DELIMITER}${buildEdgeSsml({ text, voice, rate })}`)
     }
@@ -195,6 +209,7 @@ async function synthesizeOnce({ text, voice, rate, timeoutMs }) {
     if (ws.readyState === WebSocket.OPEN) queueMicrotask(sendRequest)
 
     ws.onmessage = (event) => {
+      armQuiet()
       if (event.data instanceof ArrayBuffer) {
         const payload = extractEdgeAudioPayload(new Uint8Array(event.data))
         if (payload?.length) audioParts.push(payload)
@@ -254,6 +269,17 @@ async function synthesizeQueuedSpeech({
   }
 
   throw lastError
+}
+
+// Drop the shared socket and anything queued behind a stuck turn, so the next
+// request (a "try online voices again") starts on a fresh connection right away
+// instead of waiting out — or reusing — the one that just failed.
+export function resetEdgeSpeechClient() {
+  clearTimeout(socketIdleTimer)
+  const socket = speechSocket
+  speechSocket = null
+  if (socket) { try { socket.close() } catch { /* already closed */ } }
+  synthesisQueue = Promise.resolve()
 }
 
 // A socket handles one turn at a time. Sharing it avoids three simultaneous

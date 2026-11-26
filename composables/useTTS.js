@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { Capacitor } from '@capacitor/core'
 import { trimClipSilence } from '~/composables/tts/silenceTrim'
-import { LOCAL_TTS_VOICES, isLocalTtsVoice, synthesizeLocalSpeech, prepareLocalSpeech, cancelLocalSpeech, localVoicesInstalled, localStreamingSupported, createLocalStreamAudio, stopLocalStream, prepareLocalStream } from '~/composables/tts/localTtsDriver'
+import { LOCAL_TTS_VOICES, isLocalTtsVoice, synthesizeLocalSpeech, prepareLocalSpeech, cancelLocalSpeech, localVoicesInstalled, localStreamingSupported, createLocalStreamAudio, stopLocalStream, prepareLocalStream, localStreamLevel } from '~/composables/tts/localTtsDriver'
 import { useState } from '#app'
 import { useApiEndpoint } from '~/composables/useApiEndpoint'
 import { synthesizeDesktopSpeech } from '~/composables/tts/desktopTtsDriver'
@@ -795,15 +795,30 @@ export const useTTS = () => {
     _keepAlive = null
   }
 
+  // A finished or discarded sentence player gives its media pipeline back at
+  // once. Left to garbage collection, every sentence's <audio> kept a decoder
+  // and its buffers alive, and a phone narrating for minutes piled them up.
+  const _releaseElement = (element) => {
+    if (!element || typeof HTMLMediaElement === 'undefined' || !(element instanceof HTMLMediaElement)) return
+    element.onended = null
+    element.onerror = null
+    try {
+      element.pause()
+      element.removeAttribute('src')
+      element.load()
+    } catch { /* already torn down */ }
+  }
+
   const _cancelAudio = ({ keepLocalStream = false } = {}) => {
     if (_currentAudio) {
       _currentAudio.onended = null
       _currentAudio.onerror = null
       // Device-voice player: fully cancel the utterance, not just pause it.
       if (_currentAudio.stop) _currentAudio.stop()
-      else _currentAudio.pause()
+      else _releaseElement(_currentAudio)
       _currentAudio = null
     }
+    _releaseElement(_prefetchChunk?.element)
     // Also when cancelled between two sentences of the native stream — but a
     // fresh play() keeps a pre-buffered stream it may be about to resume.
     if (!keepLocalStream) void stopLocalStream()
@@ -1011,6 +1026,7 @@ export const useTTS = () => {
       prefetched.element = null
       _prefetchChunk = null
     } else {
+      _releaseElement(_prefetchChunk?.element)
       _prefetchChunk = null
       // Queue this sentence first, then the ones after it, so the engine works
       // through them in reading order while this one is being prepared.
@@ -1113,6 +1129,7 @@ export const useTTS = () => {
       _fetchChunkAudio(nextIdx).then(result => {
         if (_prefetchGeneration === gen && result) {
           // A copy, so the cached entry never hands the same element out twice.
+          _releaseElement(_prefetchChunk?.element)
           _prefetchChunk = _prepareElement({ ...result, element: null })
         }
       })
@@ -1124,6 +1141,7 @@ export const useTTS = () => {
     audio.onended = () => {
       if (_currentAudio !== audio) return
       _currentAudio = null
+      _releaseElement(audio)
       if (ttsStatus.value === 'playing') {
         _chunkIdx++
         _updateProgress()
@@ -1594,6 +1612,24 @@ export const useTTS = () => {
     ttsChapterBoundaries.value = Array.isArray(boundaries) ? boundaries : []
   }
 
+  // The playing sentence's clock, read per frame by the Listen view (narrator
+  // orb + word highlight). Not reactive on purpose: polling it costs nothing,
+  // tracking it would re-render every frame. `kind` says what the time means:
+  // 'timed' – Edge audio, word boundaries carry offset + duration
+  // 'native' – the phone's voice: real seconds, one boundary event per word
+  // 'stream' – on-device narrators: seconds of 1x audio, no word timings
+  const ttsPlaybackClock = () => {
+    const audio = _currentAudio
+    if (!audio) return null
+    const kind = _currentBoundaries.length && Number(_currentBoundaries[0]?.duration) > 0
+      ? 'timed'
+      : audio._native && typeof audio.onboundary !== 'undefined' ? 'native'
+        : audio._native ? 'stream' : 'timed'
+    // On-device stream: the real loudness at the speaker, from the native side.
+    const level = kind === 'stream' ? localStreamLevel() : null
+    return { time: Number(audio.currentTime) || 0, kind, paused: !!audio.paused, level }
+  }
+
   return {
     ttsBook, ttsStatus, ttsProgress, ttsChunkIdx, ttsTotalChunks,
     ttsElapsedSeconds, ttsTotalSeconds,
@@ -1605,6 +1641,6 @@ export const useTTS = () => {
     play, pause, resume, togglePlay, stop, restart, restoreLastSession,
     setSpeed, setVolume, setVoice, seekToProgress, skipChunks, skipSeconds, seekToChunk,
     loadDeviceVoices, setNativeVoice, retryOnlineVoices,
-    setChapterBoundaries, prewarmText, prebufferNarration,
+    setChapterBoundaries, prewarmText, prebufferNarration, ttsPlaybackClock,
   }
 }

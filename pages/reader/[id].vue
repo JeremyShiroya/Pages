@@ -46,6 +46,7 @@
         @mount-section="mountSection"
         @position-change="handleMobilePosition"
         @page-sync="handlePageSync"
+        @mode-change="onReaderModeChange"
         @go-to-section="goToSectionFromMobile"
         @jump-to-toc="goToTocItem"
       />
@@ -97,6 +98,7 @@
         @mount-section="mountSection"
         @position-change="handleMobilePosition"
         @page-sync="handlePageSync"
+        @mode-change="onReaderModeChange"
         @go-to-section="goToSectionFromMobile"
         @jump-to-toc="goToTocItem"
       />
@@ -148,6 +150,7 @@
         @mount-section="mountSection"
         @position-change="handleMobilePosition"
         @page-sync="handlePageSync"
+        @mode-change="onReaderModeChange"
         @go-to-section="goToSectionFromMobile"
         @jump-to-toc="goToTocItem"
       />
@@ -1550,7 +1553,26 @@ function _isNearViewport(el) {
   return rect.bottom > -margin && rect.top < window.innerHeight + margin
 }
 
-function _highlightChunk(index, { forceScroll = false } = {}) {
+// Listen covers the reading surface. Following narration there — a smooth
+// scroll of the whole laid-out book every sentence, a word highlight repainted
+// every word — was main-thread work nobody could see, and it is what stalled
+// the Listen screen's text and orb. It is caught up on the way back to Read.
+const listenScreenOpen = ref(false)
+function onReaderModeChange(mode) {
+  const listening = mode === 'listen'
+  if (listenScreenOpen.value === listening) return
+  listenScreenOpen.value = listening
+  if (listening || !readsAsEpub.value) return
+  nextTick(() => {
+    const index = activeTtsChunkIndex.value
+    if (index >= 0 && !usePagedReader.value) _highlightChunk(index, { forceScroll: true, instant: true })
+    _updateEpubWordHighlight()
+  })
+}
+
+function _highlightChunk(index, { forceScroll = false, instant = false } = {}) {
+  // Under Listen even the class change restyles the whole laid-out book.
+  if (listenScreenOpen.value && !forceScroll) return
   const state = _readerDom()
   const previousEl = state.activeEl
   clearHtmlHighlight()
@@ -1578,7 +1600,7 @@ function _highlightChunk(index, { forceScroll = false } = {}) {
   const shouldFollow = forceScroll || !previousEl || _isNearViewport(previousEl) || _isNearViewport(el)
   if (shouldFollow) {
     _releaseScrollTarget()
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    el.scrollIntoView({ behavior: instant ? 'instant' : 'smooth', block: 'center' })
   }
 }
 
@@ -1595,7 +1617,7 @@ function _updateEpubWordHighlight() {
   const highlight = _ensureWordHighlight()
   if (!highlight) return
   highlight.clear()
-  if (!readsAsEpub.value) return
+  if (!readsAsEpub.value || listenScreenOpen.value) return
 
   const chunkIdx = activeTtsChunkIndex.value
   const range = activeWordRange.value
@@ -1784,9 +1806,12 @@ let _scrollRaf = null
 // Set while restoring a saved scroll position so that scroll events fired during
 // the restore don't overwrite the saved chunk with a stale top-of-chapter value.
 let _scrollRestoringPosition = false
+// Bumped per page/scroll switch so a stale switch never releases a newer hold.
+let _modeSwitchToken = 0
 
 function updateCurrentChapterFromScroll() {
-  if (_scrollRestoringPosition || !positionTrackingReady.value) return
+  // Page mode reports its own position; the window scroll there is layout noise.
+  if (_scrollRestoringPosition || !positionTrackingReady.value || usePagedReader.value) return
   if (!readsAsEpub.value || !chapterList.value.length || !import.meta.client) return
 
   // O(1) hit-test at the reading anchor line instead of measuring every
@@ -2226,23 +2251,39 @@ watch(usePdfReflowView, async (reflowing) => {
 // was, so the position is handed over explicitly. The paged reader takes it as
 // its `start-chunk` prop; scroll mode has to be told to go there once its
 // sections exist.
+//
+// The target is read synchronously, before the old surface is torn down: the
+// swap resets the window scroll, and those scroll events used to resolve the
+// top of the book as the new position (and save it) before the hand-over ran.
+// Position tracking is held off until the new surface has landed.
 watch(usePagedReader, async (paged) => {
   if (!readsAsEpub.value) return
-  await flushPendingSave()
   const target = currentReadingChunk.value
   if (!Number.isFinite(target) || target < 0) return
+  const token = ++_modeSwitchToken
+  _scrollRestoringPosition = true
+  currentChapterIdx.value = sectionForChunk(target)
 
-  if (paged) {
-    // The paged reader remounts with start-chunk already pointing here.
-    currentChapterIdx.value = sectionForChunk(target)
-    await nextTick()
-    await mobileReaderRefs.pagedRef?.value?.goToChunk?.(target)
-    return
+  try {
+    if (paged) {
+      // The paged reader remounts with start-chunk already pointing here.
+      await nextTick()
+      await mobileReaderRefs.pagedRef?.value?.goToChunk?.(target)
+    } else {
+      await nextTick()
+      await nextTick()
+      await scrollToChunk(target)
+      _scrollRestoringPosition = true
+    }
+  } finally {
+    // Two frames for the scroll the jump caused to be delivered and ignored.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (token !== _modeSwitchToken || readerDisposed) return
+      _scrollRestoringPosition = false
+      currentReadingChunk.value = target
+      void flushPendingSave()
+    }))
   }
-
-  await nextTick()
-  await nextTick()
-  scrollToChunk(target)
 })
 
 watch(tocOpen, async (open) => {

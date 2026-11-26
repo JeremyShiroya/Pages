@@ -122,11 +122,19 @@ describe('reading settings sheet', () => {
   test('the separate page is gone and the reader opens a draggable sheet', () => {
     expect(existsSync(resolve(process.cwd(), 'pages/read-settings/[id].vue'))).toBe(false)
     const reader = read('components/mobile/ReaderMobile.vue')
-    expect(reader).toContain('<i class="ri-font-size-2"></i>')
+    expect(reader).toContain('<i class="ri-font-size"></i>')
     expect(reader).toContain('<ReaderDisplaySheet')
     const sheet = read('components/mobile/ReaderDisplaySheet.vue')
     expect(sheet).toContain('onHandleMove')
-    expect(sheet).toContain("snap.value = 'full'")
+    // Sliders are the custom ReaderSlider, and text sliders commit on release
+    // (re-laying-out the book on every drag step was the jitter).
+    expect(sheet).toContain('<ReaderSlider')
+    expect(sheet).toContain('@change="commit(\'fontSize\', $event)"')
+    // Highlight colours are reachable from the reader too.
+    expect(sheet).toContain("updateSettings({ highlightColor: 'accent' })")
+    const slider = read('components/mobile/ReaderSlider.vue')
+    expect(slider).toContain('setPointerCapture')
+    expect(slider).toContain('requestAnimationFrame(report)')
   })
 
   test('new layout prefs are clamped and only change the layout hash when used', () => {

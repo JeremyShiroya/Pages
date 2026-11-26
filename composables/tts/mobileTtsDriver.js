@@ -10,7 +10,7 @@
 // Isolated from composables/tts/desktopTtsDriver.js on purpose: changes here
 // must never affect desktop synthesis, and vice-versa.
 
-import { synthesizeEdgeSpeechInBrowser } from '~/composables/useEdgeSpeechClient'
+import { resetEdgeSpeechClient, synthesizeEdgeSpeechInBrowser } from '~/composables/useEdgeSpeechClient'
 import { nativeSpeechSupported } from '~/composables/tts/nativeSpeech'
 
 // A configured native backend can still be a static Pages host that answers
@@ -24,13 +24,15 @@ const hasUsableAudio = (result) => (
 // used to switch the narrator's voice mid-book for the rest of the session —
 // most often because the app was backgrounded and Android throttled the socket,
 // not because Edge was actually unreachable.
-const EDGE_FAILURE_LIMIT = 1
+// Three separate failures (a burst of in-flight requests failing together
+// counts once), and only while the phone could plausibly reach Edge at all.
+const EDGE_FAILURE_LIMIT = 3
 
 // Falling back to the device voice is a temporary degradation, not a verdict.
 // It used to latch for the whole session, so one hiccup on a train left the
 // narrator on the phone's voice until the app was restarted — even after the
 // connection came back. Edge is re-probed once the cooldown expires.
-const EDGE_COOLDOWN_MS = 5 * 60_000
+const EDGE_COOLDOWN_MS = 90_000
 
 let _edgeDisabledUntil = 0
 let _consecutiveEdgeFailures = 0
@@ -51,6 +53,7 @@ export function mobileTtsEdgeDisabled() {
 
 // Re-enable the cloud path (e.g. the user reconnects / restarts narration).
 export function resetMobileTtsDriver() {
+  resetEdgeSpeechClient()
   _edgeDisabledUntil = 0
   _consecutiveEdgeFailures = 0
   _requestSeq = 0
@@ -90,7 +93,8 @@ export async function synthesizeMobileSpeech({ text, voice, speed, apiUrl, apiBa
         // Foreground: two short attempts rather than one long one. A single
         // stalled handshake used to hold the sentence for a full 12s before
         // anything retried — the "long load" mid-book.
-        attempts: 1,
+        // A failed turn is retried once on a brand-new connection.
+        attempts: 2,
         timeoutMs: edgeTimeoutForText(text, hidden),
       })
       _consecutiveEdgeFailures = 0
@@ -124,7 +128,8 @@ export async function synthesizeMobileSpeech({ text, voice, speed, apiUrl, apiBa
       }
 
       noteEdgeFailure(requestSeq)
-      if (_consecutiveEdgeFailures >= EDGE_FAILURE_LIMIT) {
+      const offline = typeof navigator !== 'undefined' && navigator.onLine === false
+      if (offline || _consecutiveEdgeFailures >= EDGE_FAILURE_LIMIT) {
         console.warn(`[TTS] Edge failed ${_consecutiveEdgeFailures}× in a row; using the device voice for ${EDGE_COOLDOWN_MS / 1000}s.`)
         _edgeDisabledUntil = Date.now() + EDGE_COOLDOWN_MS
         _consecutiveEdgeFailures = 0

@@ -288,13 +288,13 @@ onMounted(async () => {
 
 <style scoped>
 .analytics-page {
-  --series-read: #7b3fd6;
+  --series-read: var(--color-brand-primary);
   --series-listen: #b07a1c;
   min-height: 100dvh;
   background: var(--color-background-app, #fff);
   color: var(--color-text-primary, #24232a);
 }
-:global(:root[data-theme="dark"] .analytics-page) { --series-read: #9a6ae6; --series-listen: #c47d22; }
+:global(:root[data-theme="dark"] .analytics-page) { --series-listen: #c47d22; }
 .analytics-shell { width: min(100%, 780px); margin: 0 auto; padding: 14px 20px calc(var(--mobile-bottom-nav-height, 72px) + 38px); }
 .desktop-back { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 24px; color: var(--color-text-secondary, #334155); font-size: .85rem; text-decoration: none; }
 
