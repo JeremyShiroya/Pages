@@ -5,8 +5,8 @@
     <div v-if="illustration" class="empty-illustration" aria-hidden="true">
       <img v-if="illustration === 'library' || illustration === 'books'" class="empty-illustration-img" src="/images/Empty State 2.png" alt="" />
       <img v-else-if="illustration === 'series'" class="empty-illustration-img" src="/images/Empty State 3.png" alt="" />
-      <img v-else-if="illustration === 'favourites'" class="empty-illustration-img" src="/images/Favourites empty-state.png" alt="" />
-      <img v-else-if="illustration === 'playlists'" class="empty-illustration-img" src="/images/Playlist empty-state.png" alt="" />
+      <img v-else-if="illustration === 'favourites'" class="empty-illustration-img" :src="favouritesArt" alt="" />
+      <img v-else-if="illustration === 'playlists'" class="empty-illustration-img" :src="playlistsArt" alt="" />
 
       <!-- Filtered view with no matches: a magnifier over the shelf -->
       <svg v-else-if="illustration === 'filter'" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
@@ -36,6 +36,10 @@
 </template>
 
 <script setup>
+import { useAccentArt } from '~/composables/useAppLogo'
+// Favourites and Playlists artwork comes in the app's accent colour.
+const favouritesArt = useAccentArt('favourites')
+const playlistsArt = useAccentArt('playlists')
 defineProps({
   title: {
     type: String,

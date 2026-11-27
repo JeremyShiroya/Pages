@@ -788,7 +788,7 @@ onUnmounted(() => {
   color: var(--color-text-on-brand);
   cursor: pointer;
   font-size: 28px;
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-brand-primary) 38%, transparent);
+  box-shadow: none;
   transition: bottom 0.28s ease;
 }
 

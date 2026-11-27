@@ -3,7 +3,7 @@ import { readonly, ref } from 'vue'
 export const PAGES_SETTINGS_KEY = 'bookish:settings'
 
 export const DEFAULT_PAGES_SETTINGS = Object.freeze({
-  settingsVersion: 5,
+  settingsVersion: 6,
   readerTheme: 'light',            // the theme in effect (light | dark); with themeMode 'system' it follows the device
   themeMode: 'light',              // what the user chose: 'system' | 'light' | 'dark'
   accentColor: 'purple',           // the app's tint: see ACCENT_COLOR_OPTIONS
@@ -30,7 +30,7 @@ export const DEFAULT_PAGES_SETTINGS = Object.freeze({
   mobileNavSize: 'compact',         // 'standard' | 'compact'
   mobileNavOpacity: 95,            // percent, 50–100
   mobileNavBlur: 18,               // backdrop blur in px, 0–30
-  mobileNavMaterial: 'frosted',     // 'current' | 'frosted'
+  mobileNavMaterial: 'current',     // 'current' (Flat) | 'frosted'
   mobileNavHighlight: 'soft',       // 'soft' | 'none'
   mobileNavActiveIconStyle: 'fill', // 'fill' | 'line'
   mobileNavProfileDisplay: 'avatar',// 'icon' | 'avatar'
@@ -432,7 +432,7 @@ const resolveStorage = (storage) => {
   return localStorage
 }
 
-export const CURRENT_SETTINGS_VERSION = 5
+export const CURRENT_SETTINGS_VERSION = 6
 
 const LEGACY_NAV_DEFAULTS = Object.freeze({
   mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95,
@@ -516,6 +516,9 @@ export function readPagesSettings(storage) {
         ...parsed,
         ...navMigration,
         ...orbLook,
+        // v6: the bottom nav's bar material is Flat for everyone (once); the
+        // selected-tab choice is left as each user set it.
+        ...(storedVersion < 6 ? { mobileNavMaterial: 'current' } : {}),
         settingsVersion: CURRENT_SETTINGS_VERSION,
       })
       try { targetStorage.setItem(PAGES_SETTINGS_KEY, JSON.stringify(migrated)) } catch {}

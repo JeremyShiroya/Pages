@@ -42,9 +42,10 @@ describe('usePagesSettings storage helpers', () => {
       mobileNavShowTitles: true,
     }))
     expect(readPagesSettings(storage)).toMatchObject({
-      settingsVersion: 5, readerTheme: 'dark', appBackground: 'white',
+      settingsVersion: 6, readerTheme: 'dark', appBackground: 'white',
       mobileNavStyle: 'floating', mobileNavSize: 'compact',
-      mobileNavMaterial: 'frosted', mobileNavProfileDisplay: 'avatar',
+      // v6 makes the bar material Flat for everyone.
+      mobileNavMaterial: 'current', mobileNavProfileDisplay: 'avatar',
       mobileNavActiveIconStyle: 'fill', mobileNavShowTitles: true,
     })
     expect(readPagesSettings(storage).mobileNavStyle).toBe('floating')
@@ -124,7 +125,7 @@ describe('usePagesSettings storage helpers', () => {
 
   it('retains frosted navigation and migrates removed liquid and bead choices', () => {
     expect(normalizePagesSettings({})).toMatchObject({
-      mobileNavMaterial: 'frosted', mobileNavHighlight: 'soft',
+      mobileNavMaterial: 'current', mobileNavHighlight: 'soft',
     })
     expect(normalizePagesSettings({
       mobileNavMaterial: 'frosted', mobileNavHighlight: 'none',
@@ -132,7 +133,8 @@ describe('usePagesSettings storage helpers', () => {
       mobileNavMaterial: 'frosted', mobileNavHighlight: 'none',
     })
     const migrated = normalizePagesSettings({ mobileNavMaterial: 'liquid', mobileNavHighlight: 'bead', mobileNavBeadSize: 'large' })
-    expect(migrated).toMatchObject({ mobileNavMaterial: 'frosted', mobileNavHighlight: 'soft' })
+    // A removed material falls back to the default, Flat.
+    expect(migrated).toMatchObject({ mobileNavMaterial: 'current', mobileNavHighlight: 'soft' })
     expect(migrated).not.toHaveProperty('mobileNavBeadSize')
   })
 
@@ -173,6 +175,15 @@ describe('usePagesSettings storage helpers', () => {
     expect(document.documentElement.dataset.accent).toBe('sage')
     applyPagesTheme('light', 'white', 'dark', 'purple')
     expect(document.documentElement.dataset.accent).toBeUndefined()
+  })
+
+  it('moves settings saved before v6 to a Flat bar, keeping the selected-tab choice', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(PAGES_SETTINGS_KEY, JSON.stringify({ settingsVersion: 5, mobileNavMaterial: 'frosted', mobileNavHighlight: 'none' }))
+    expect(readPagesSettings(storage)).toMatchObject({ mobileNavMaterial: 'current', mobileNavHighlight: 'none' })
+    // Chosen again afterwards, it stays.
+    storage.setItem(PAGES_SETTINGS_KEY, JSON.stringify({ settingsVersion: 6, mobileNavMaterial: 'frosted', mobileNavHighlight: 'none' }))
+    expect(readPagesSettings(storage)).toMatchObject({ mobileNavMaterial: 'frosted', mobileNavHighlight: 'none' })
   })
 
   it('moves settings saved before v5 to the new orb look', () => {

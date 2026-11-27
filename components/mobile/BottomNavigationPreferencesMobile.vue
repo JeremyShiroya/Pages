@@ -95,9 +95,22 @@
 
       <section class="setting-card" aria-labelledby="clarity-title">
         <div class="section-heading"><h2 id="clarity-title">Transparency &amp; blur</h2><p>Control how much of the page shows through the glass.</p></div>
-        <label class="range-row"><span>Opacity <strong>{{ settings.mobileNavOpacity }}%</strong></span><input type="range" min="50" max="100" step="1" :value="settings.mobileNavOpacity" @input="set('mobileNavOpacity', Number($event.target.value))" /></label>
-        <label class="range-row"><span>Background blur <strong>{{ settings.mobileNavBlur }} px</strong></span><input type="range" min="0" max="30" step="1" :value="settings.mobileNavBlur" @input="set('mobileNavBlur', Number($event.target.value))" /></label>
-        <button type="button" class="reset-clarity" @click="restoreClarity">Restore opacity &amp; blur defaults</button>
+        <!-- The reader's sliders: knob follows the finger, live on the bar. -->
+        <div class="clarity-row">
+          <div class="clarity-head"><span>Opacity</span><output>{{ settings.mobileNavOpacity }}%</output></div>
+          <ReaderSlider :model-value="settings.mobileNavOpacity" :min="50" :max="100" label="Bar opacity" @input="set('mobileNavOpacity', $event)">
+            <template #start><i class="ri-contrast-drop-line clarity-glyph-small"></i></template>
+            <template #end><i class="ri-contrast-drop-fill clarity-glyph-large"></i></template>
+          </ReaderSlider>
+        </div>
+        <div class="clarity-row">
+          <div class="clarity-head"><span>Background Blur</span><output>{{ settings.mobileNavBlur }} px</output></div>
+          <ReaderSlider :model-value="settings.mobileNavBlur" :min="0" :max="30" label="Background blur" @input="set('mobileNavBlur', $event)">
+            <template #start><i class="ri-blur-off-line clarity-glyph-small"></i></template>
+            <template #end><i class="ri-drop-line clarity-glyph-large"></i></template>
+          </ReaderSlider>
+        </div>
+        <button type="button" class="reset-clarity" @click="restoreClarity">Restore Defaults</button>
       </section>
 
       <button type="button" class="reset-all" @click="restoreAll">Restore all navigation defaults</button>
@@ -111,6 +124,7 @@
 import { DEFAULT_PAGES_SETTINGS, usePagesSettings } from '~/composables/usePagesSettings'
 import MobileBottomNav from './MobileBottomNav.vue'
 import MobileSettingsNav from './MobileSettingsNav.vue'
+import ReaderSlider from './ReaderSlider.vue'
 import { ACCENT_SWATCHES, accentLabel } from '~/utils/accentPalette'
 import { useUserProfile } from '~/composables/useUserProfile'
 
@@ -170,6 +184,15 @@ const restoreAll = () => updateSettings(Object.fromEntries(
 .title-choice-art { display: flex; height: 58px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 11px; background: var(--color-background-app); color: var(--color-brand-primary); font-size: 24px; }
 .title-choice-art small { color: var(--color-text-secondary); font-size: 10px; }
 .range-row { display: grid; gap: 7px; font-size: 13px; }.range-row span { display: flex; justify-content: space-between; }.range-row strong { color: var(--color-brand-primary); }.range-row input { width: 100%; accent-color: var(--color-brand-primary); }
-.reset-clarity, .reset-all { min-height: 42px; padding: 0 16px; border: 1px solid var(--color-border-card); border-radius: 20px; background: var(--color-surface-card); color: var(--color-brand-primary); font: inherit; cursor: pointer; }.reset-clarity { justify-self: start; }.reset-all { justify-self: stretch; }
+.clarity-row { display: grid; gap: 2px; --rs-track: rgba(118, 118, 128, 0.2); --rs-end-color: var(--color-text-muted); }
+.clarity-head { display: flex; align-items: baseline; justify-content: space-between; font-size: var(--settings-label-size); }
+.clarity-head output { color: var(--color-text-muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+.clarity-glyph-small { font-size: 15px; }
+.clarity-glyph-large { font-size: 21px; }
+/* Apple-style buttons: borderless, a grey fill, the accent for the label. */
+.reset-clarity, .reset-all { min-height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: rgba(118, 118, 128, 0.12); color: var(--color-brand-primary); font: inherit; font-size: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.reset-clarity:active, .reset-all:active { background: rgba(118, 118, 128, 0.22); }
+.reset-clarity { justify-self: stretch; }
+.reset-all { justify-self: stretch; }
 @media (max-width: 390px) { .choice-grid { gap: 7px; }.choice-label { font-size: 10px; } }
 </style>

@@ -339,6 +339,8 @@ const stepPdfZoom = (direction) => updatePrefs({ pdfZoom: (prefs.value.pdfZoom |
 const resetDefaults = () => {
   const { readingMode, pdfViewMode, pdfPageMode, pdfZoom } = prefs.value
   updatePrefs({ ...DEFAULT_MOBILE_READER_PREFS, readingMode, pdfViewMode, pdfPageMode, pdfZoom })
+  // The highlight colour goes back to following the app's accent.
+  if (settings.value.highlightColor !== 'accent') updateSettings({ highlightColor: 'accent' })
 }
 
 const previewStyle = computed(() => ({

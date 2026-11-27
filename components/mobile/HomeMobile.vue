@@ -104,7 +104,7 @@
             </NuxtLink>
           </div>
           <div class="empty-reading-arc"></div>
-          <img src="/images/Empty State 1.png" alt="" class="empty-reading-illustration" />
+          <img :src="readingArt" alt="" class="empty-reading-illustration" />
         </div>
       </section>
 
@@ -160,6 +160,9 @@
 </template>
 
 <script setup>
+import { useAccentArt } from '~/composables/useAppLogo'
+// Currently Reading's empty-state artwork, in the accent colour.
+const readingArt = useAccentArt('reading')
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBooks } from '~/composables/useBooks'
