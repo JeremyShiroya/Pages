@@ -42,7 +42,7 @@ describe('usePagesSettings storage helpers', () => {
       mobileNavShowTitles: true,
     }))
     expect(readPagesSettings(storage)).toMatchObject({
-      settingsVersion: 6, readerTheme: 'dark', appBackground: 'white',
+      settingsVersion: 7, readerTheme: 'dark', appBackground: 'white',
       mobileNavStyle: 'floating', mobileNavSize: 'compact',
       // v6 makes the bar material Flat for everyone.
       mobileNavMaterial: 'current', mobileNavProfileDisplay: 'avatar',
@@ -192,7 +192,7 @@ describe('usePagesSettings storage helpers', () => {
       settingsVersion: 4, listenOrbBackground: 'blur', listenOrbRing: true, listenOrbHalo: true,
     }))
     expect(readPagesSettings(storage)).toMatchObject({
-      listenOrbBackground: 'soft', listenOrbRing: false, listenOrbHalo: false,
+      listenOrbBackground: 'blur', listenOrbRing: false, listenOrbHalo: false,
     })
   })
 

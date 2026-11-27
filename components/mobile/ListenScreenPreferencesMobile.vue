@@ -8,7 +8,7 @@
           <video
             v-if="settings.listenOrbBackground !== 'flat'"
             class="listen-preview-wash"
-            :class="`is-${settings.listenOrbBackground || 'soft'}`"
+            :class="`is-${settings.listenOrbBackground || 'blur'}`"
             :src="orb.video"
             :poster="orb.poster"
             autoplay
@@ -52,7 +52,7 @@
       <SettingsOptionGroupMobile
         v-if="settings.listenVisual === 'orb'"
         title="Background"
-        :model-value="settings.listenOrbBackground || 'soft'"
+        :model-value="settings.listenOrbBackground || 'blur'"
         :options="orbBackgroundOptions"
         footnote="How much of the orb's colour bleeds into the screen behind the player."
         @update:model-value="updateSettings({ listenOrbBackground: $event })"

@@ -3,8 +3,8 @@
 // that is shown cropped to a circle; the matching .webp is its first frame, used
 // as the poster so the orb never flashes empty while the video loads.
 //
-// Liam, Natasha and the phone's built-in voices have no orb of their own, so
-// they borrow the closest one rather than showing nothing.
+// The phone's built-in voices have no orb of their own, so they show Ava's
+// (the default) rather than nothing.
 const ORB_FOR_VOICE = Object.freeze({
   'en-US-AvaNeural': 'ava',
   'en-US-AndrewNeural': 'andrew',
@@ -14,13 +14,13 @@ const ORB_FOR_VOICE = Object.freeze({
   'en-GB-RyanNeural': 'ryan',
   'pocket:charles': 'charles',
   'kokoro:af_nicole': 'nicole',
-  'en-CA-LiamNeural': 'andrew',
-  'en-AU-NatashaNeural': 'emma',
+  'en-CA-LiamNeural': 'liam',
+  'en-AU-NatashaNeural': 'natasha',
 })
 
 const DEFAULT_ORB = 'ava'
 
-export const NARRATOR_ORB_NAMES = Object.freeze(['andrew', 'ava', 'brian', 'charles', 'emma', 'nicole', 'ryan', 'sonia'])
+export const NARRATOR_ORB_NAMES = Object.freeze(['andrew', 'ava', 'brian', 'charles', 'emma', 'liam', 'natasha', 'nicole', 'ryan', 'sonia'])
 
 export function narratorOrb(voiceId) {
   const name = ORB_FOR_VOICE[String(voiceId || '')] || DEFAULT_ORB

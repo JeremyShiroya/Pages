@@ -82,6 +82,8 @@ final class LocalSpeechStream {
     // is coming out of the speaker NOW — silent during pauses and while the
     // engine is still synthesizing, loud while the narrator speaks. The Listen
     // view's orb moves with it.
+    // Frames handed to the AudioTrack per write (~40 ms at 24 kHz).
+    private static final int WRITE_SLICE = 960;
     private static final int LEVEL_WINDOW = 480;            // ~20 ms at 24 kHz
     private static final int LEVEL_CAPACITY = 4096;          // ~80 s of envelope
     private final long[] levelFrames = new long[LEVEL_CAPACITY];
@@ -345,7 +347,11 @@ final class LocalSpeechStream {
                     short[] data = ((Pcm) next).data;
                     int offset = 0;
                     while (offset < data.length && generation.get() == gen) {
-                        int written = target.write(data, offset, data.length - offset);
+                        // Small slices: a blocking write of a whole batch (seconds of
+                        // audio) returned only once most of it had PLAYED, so
+                        // framesWritten and the loudness envelope trailed the playback
+                        // head — the orb read silence and sentence ends fired late.
+                        int written = target.write(data, offset, Math.min(WRITE_SLICE, data.length - offset));
                         if (written < 0) return; // ERROR_DEAD_OBJECT and friends: track is gone
                         if (written == 0) {
                             // A paused track accepts nothing once its buffer is full

@@ -24,8 +24,8 @@
     "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1795740546.288763,
-    "seen": 1795740636.4657083,
+    "mtime": 1795744384.7482681,
+    "seen": 1795744706.6768022,
     "ast_hash": "a3f5186283b43c363a376a7b27dc2224",
     "semantic_hash": ""
   },
@@ -84,8 +84,8 @@
     "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1795740546.2877634,
-    "seen": 1795740636.474416,
+    "mtime": 1795744384.7472718,
+    "seen": 1795744706.6870518,
     "ast_hash": "b4d9264dcc0a0263b7dc995cd6fed430",
     "semantic_hash": ""
   },
@@ -228,9 +228,9 @@
     "semantic_hash": "b1ea933a896e0ec17f08f7b3b3c54e10"
   },
   "components/mobile/ReaderMobile.vue": {
-    "mtime": 1795738759.7319303,
-    "seen": 1795739309.5848267,
-    "ast_hash": "2582fc103bc252dc59f6033d738d28c5",
+    "mtime": 1795743670.439912,
+    "seen": 1795744706.7041674,
+    "ast_hash": "627e8bc8f15c629242ef845be9572a95",
     "semantic_hash": ""
   },
   "components/mobile/ReaderNoteEditor.vue": {
@@ -1062,9 +1062,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1795740590.4058068,
-    "seen": 1795740636.5885444,
-    "ast_hash": "1e7454736791ebade85659f13b77a5df",
+    "mtime": 1795744654.126655,
+    "seen": 1795744706.811929,
+    "ast_hash": "259f902b877dab2c2c95b466b263ee2c",
     "semantic_hash": ""
   },
   "pages/add.vue": {
@@ -3031,19 +3031,19 @@
   },
   "server/database/migrations/0000_add-pages-column.sql": {
     "mtime": 1778139591.9198406,
-    "seen": 1795739351.1683369,
+    "seen": 1795740669.4258764,
     "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0001_naive_stark_industries.sql": {
     "mtime": 1778224044.757941,
-    "seen": 1795739351.1683414,
+    "seen": 1795740669.4258814,
     "ast_hash": "",
     "semantic_hash": ""
   },
   "server/database/migrations/0002_drop_content_column.sql": {
     "mtime": 1778991194.1574428,
-    "seen": 1795739351.168345,
+    "seen": 1795740669.425885,
     "ast_hash": "",
     "semantic_hash": ""
   },
@@ -5676,9 +5676,9 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/bookish/app/LocalSpeechStream.java": {
-    "mtime": 1795702438.9855504,
-    "seen": 1795715149.8339503,
-    "ast_hash": "c337187f2e5fc89e5fbf825fe8fe07a1",
+    "mtime": 1795744209.403605,
+    "seen": 1795744706.6814797,
+    "ast_hash": "13b20aba1fe241e212c544d316743d36",
     "semantic_hash": ""
   },
   "composables/useChunkSpans.test.js": {
@@ -5803,7 +5803,7 @@
   },
   "supabase/migrations/20261124000000_cloud_backups.sql": {
     "mtime": 1795508661.807664,
-    "seen": 1795739351.1686962,
+    "seen": 1795740669.4261706,
     "ast_hash": "",
     "semantic_hash": ""
   },
@@ -5826,15 +5826,15 @@
     "semantic_hash": ""
   },
   "composables/usePagesSettings.js": {
-    "mtime": 1795740122.943593,
-    "seen": 1795740636.570274,
-    "ast_hash": "c03c77c6e4ca925a0f310e89f0439fa8",
+    "mtime": 1795742737.905507,
+    "seen": 1795744706.7952964,
+    "ast_hash": "e5f004140ec11d25015f48326aa12463",
     "semantic_hash": ""
   },
   "composables/usePagesSettings.test.js": {
-    "mtime": 1795740160.5155218,
-    "seen": 1795740636.5702794,
-    "ast_hash": "dd1cf010264d59b1d2947c6ff51e25d0",
+    "mtime": 1795742744.0325725,
+    "seen": 1795744706.7953026,
+    "ast_hash": "d773bdfd796a29aec1e34603ea2efa1b",
     "semantic_hash": ""
   },
   "utils/backupAssets.js": {
@@ -5893,13 +5893,13 @@
   },
   "supabase/migrations/20261124010000_keepalive.sql": {
     "mtime": 1795511034.2257404,
-    "seen": 1795739351.168701,
+    "seen": 1795740669.4261742,
     "ast_hash": "",
     "semantic_hash": ""
   },
   "supabase/migrations/20261124020000_backup_asset_refs.sql": {
     "mtime": 1795514704.8371067,
-    "seen": 1795739351.168705,
+    "seen": 1795740669.426177,
     "ast_hash": "",
     "semantic_hash": ""
   },
@@ -6156,15 +6156,15 @@
     "semantic_hash": ""
   },
   "components/mobile/ListenScreenPreferencesMobile.vue": {
-    "mtime": 1795732026.3501258,
-    "seen": 1795733328.8963876,
-    "ast_hash": "93392f684660c3357f94fd0aea030a3c",
+    "mtime": 1795742887.2740467,
+    "seen": 1795744706.6976762,
+    "ast_hash": "7e8ef1e3bac18204b4f73935799215df",
     "semantic_hash": ""
   },
   "composables/useNarratorActivity.js": {
-    "mtime": 1795702467.8744278,
-    "seen": 1795715149.9090073,
-    "ast_hash": "2ced41872e9b942b08f18ba206bd0ad6",
+    "mtime": 1795744294.520162,
+    "seen": 1795744706.7927117,
+    "ast_hash": "a542da5a418650e47b4931badce77bd4",
     "semantic_hash": ""
   },
   "composables/useNarratorActivity.test.js": {
@@ -6180,9 +6180,9 @@
     "semantic_hash": ""
   },
   "utils/narratorOrbs.js": {
-    "mtime": 1795699306.5047188,
-    "seen": 1795700302.9952552,
-    "ast_hash": "a7ec8f63e0555c45bb19a4c3dfe86b91",
+    "mtime": 1795742682.553978,
+    "seen": 1795744706.9153013,
+    "ast_hash": "e14b5c1f327cb18e7ebd691af0318e54",
     "semantic_hash": ""
   },
   "public/images/Orbs/andrew.webp": {
@@ -7563,6 +7563,36 @@
     "mtime": 1795739663.327,
     "seen": 1795740636.8626392,
     "ast_hash": "595af3075752d4a0e1310ac9b0e35cd6",
+    "semantic_hash": ""
+  },
+  "components/mobile/ListenOrbIntroModal.vue": {
+    "mtime": 1795742864.6259768,
+    "seen": 1795744706.6976697,
+    "ast_hash": "d9b986b2047f11263541a324067d17dd",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/liam.webp": {
+    "mtime": 1795742665.6770177,
+    "seen": 1795744707.0595922,
+    "ast_hash": "2f81f60cbadf142a199e415d5cb5563e",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/natasha.webp": {
+    "mtime": 1795742671.3735003,
+    "seen": 1795744707.0595965,
+    "ast_hash": "325f5ebdc90967e34fcdb097a9871b40",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/liam.webm": {
+    "mtime": 1795742665.455374,
+    "seen": 1795744707.0894637,
+    "ast_hash": "23d0148d8a2a0675fc0d41e2b5916ce2",
+    "semantic_hash": ""
+  },
+  "public/images/Orbs/natasha.webm": {
+    "mtime": 1795742671.0961623,
+    "seen": 1795744707.0894685,
+    "ast_hash": "09a87aa7f8db29b01518f02ea97f0131",
     "semantic_hash": ""
   }
 }

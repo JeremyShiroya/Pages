@@ -24,8 +24,8 @@
     "semantic_hash": ""
   },
   "android/app/capacitor.build.gradle": {
-    "mtime": 1795739171.5233665,
-    "seen": 1795739309.5623438,
+    "mtime": 1795740546.288763,
+    "seen": 1795740636.4657083,
     "ast_hash": "a3f5186283b43c363a376a7b27dc2224",
     "semantic_hash": ""
   },
@@ -84,8 +84,8 @@
     "semantic_hash": ""
   },
   "android/capacitor.settings.gradle": {
-    "mtime": 1795739171.5213652,
-    "seen": 1795739309.5710921,
+    "mtime": 1795740546.2877634,
+    "seen": 1795740636.474416,
     "ast_hash": "b4d9264dcc0a0263b7dc995cd6fed430",
     "semantic_hash": ""
   },
@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "components/mobile/BooksMobile.vue": {
-    "mtime": 1795738814.4450948,
-    "seen": 1795739309.5786195,
-    "ast_hash": "5511d7c0764cdce3ee4606f0213e562c",
+    "mtime": 1795740452.6879847,
+    "seen": 1795740636.4795153,
+    "ast_hash": "09d0e14fc84ba0023969ae047cc04866",
     "semantic_hash": ""
   },
   "components/mobile/EditBookMobile.vue": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "components/mobile/HomeMobile.vue": {
-    "mtime": 1795650501.6457524,
-    "seen": 1795650611.5316658,
-    "ast_hash": "b6c8dcfd2ab74d8b96a27aa1b58afc11",
+    "mtime": 1795739673.0248468,
+    "seen": 1795740636.4810734,
+    "ast_hash": "ff4cc55888de4b6c2af933febbd4e97c",
     "semantic_hash": ""
   },
   "components/mobile/MobileBottomNav.vue": {
@@ -366,9 +366,9 @@
     "semantic_hash": ""
   },
   "components/shared/EmptyState.vue": {
-    "mtime": 1789978624.470832,
-    "seen": 1789978997.005467,
-    "ast_hash": "ee6a9d661709b1f21f4102f6c08c75d0",
+    "mtime": 1795739673.020305,
+    "seen": 1795740636.5038025,
+    "ast_hash": "40367b987c17c7852e339fa0ea302938",
     "semantic_hash": ""
   },
   "components/shared/FavouritesComp.vue": {
@@ -1062,9 +1062,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1795739261.2027183,
-    "seen": 1795739309.699649,
-    "ast_hash": "b3af235fc967f92ba8000ac33deb055c",
+    "mtime": 1795740590.4058068,
+    "seen": 1795740636.5885444,
+    "ast_hash": "1e7454736791ebade85659f13b77a5df",
     "semantic_hash": ""
   },
   "pages/add.vue": {
@@ -3031,19 +3031,19 @@
   },
   "server/database/migrations/0000_add-pages-column.sql": {
     "mtime": 1778139591.9198406,
-    "seen": 1795739351.1683369,
+    "seen": 1795740669.4258764,
     "ast_hash": "fae8f00f3932a1e5e3f11be8ea24f3ea",
     "semantic_hash": ""
   },
   "server/database/migrations/0001_naive_stark_industries.sql": {
     "mtime": 1778224044.757941,
-    "seen": 1795739351.1683414,
+    "seen": 1795740669.4258814,
     "ast_hash": "bcb6d05640ed56e698637c15d100f6e7",
     "semantic_hash": ""
   },
   "server/database/migrations/0002_drop_content_column.sql": {
     "mtime": 1778991194.1574428,
-    "seen": 1795739351.168345,
+    "seen": 1795740669.425885,
     "ast_hash": "812224c49041ad46b8e8d1e772855b69",
     "semantic_hash": ""
   },
@@ -3204,9 +3204,9 @@
     "semantic_hash": ""
   },
   "components/mobile/BottomNavigationPreferencesMobile.vue": {
-    "mtime": 1795738653.827182,
-    "seen": 1795739309.5786266,
-    "ast_hash": "ddb4d533fa1637e2540ee69d23bc2642",
+    "mtime": 1795740082.0871313,
+    "seen": 1795740636.4795208,
+    "ast_hash": "6a33adc633c63a41e67950aa1be22748",
     "semantic_hash": ""
   },
   "components/shared/AvatarSourcePicker.vue": {
@@ -5712,9 +5712,9 @@
     "semantic_hash": ""
   },
   "components/mobile/ReaderDisplaySheet.vue": {
-    "mtime": 1795738748.4050453,
-    "seen": 1795739309.5843527,
-    "ast_hash": "f1264f88a5790b5d2eadd5a4bb230101",
+    "mtime": 1795740194.551273,
+    "seen": 1795740636.4868958,
+    "ast_hash": "5208465e19a64bc0837caf98b296fa8e",
     "semantic_hash": ""
   },
   "pages/suggestion/[series]/[installment]/edit.vue": {
@@ -5803,7 +5803,7 @@
   },
   "supabase/migrations/20261124000000_cloud_backups.sql": {
     "mtime": 1795508661.807664,
-    "seen": 1795739351.1686962,
+    "seen": 1795740669.4261706,
     "ast_hash": "64e3d55245b328262131ef027e35fc55",
     "semantic_hash": ""
   },
@@ -5826,15 +5826,15 @@
     "semantic_hash": ""
   },
   "composables/usePagesSettings.js": {
-    "mtime": 1795738653.8130512,
-    "seen": 1795739309.680894,
-    "ast_hash": "2eb9e729d7f25fba1bb81c2fa05e2f5e",
+    "mtime": 1795740122.943593,
+    "seen": 1795740636.570274,
+    "ast_hash": "c03c77c6e4ca925a0f310e89f0439fa8",
     "semantic_hash": ""
   },
   "composables/usePagesSettings.test.js": {
-    "mtime": 1795714325.2155845,
-    "seen": 1795715149.9112847,
-    "ast_hash": "db7b0f1c4a0ebf4fbe41a44caa390520",
+    "mtime": 1795740160.5155218,
+    "seen": 1795740636.5702794,
+    "ast_hash": "dd1cf010264d59b1d2947c6ff51e25d0",
     "semantic_hash": ""
   },
   "utils/backupAssets.js": {
@@ -5893,13 +5893,13 @@
   },
   "supabase/migrations/20261124010000_keepalive.sql": {
     "mtime": 1795511034.2257404,
-    "seen": 1795739351.168701,
+    "seen": 1795740669.4261742,
     "ast_hash": "2e3d4e51915a0e44588770eff351e720",
     "semantic_hash": ""
   },
   "supabase/migrations/20261124020000_backup_asset_refs.sql": {
     "mtime": 1795514704.8371067,
-    "seen": 1795739351.168705,
+    "seen": 1795740669.426177,
     "ast_hash": "2a5819f6cb2121230bfbb9ed8431feff",
     "semantic_hash": ""
   },
@@ -6312,9 +6312,9 @@
     "semantic_hash": ""
   },
   "composables/useAppLogo.js": {
-    "mtime": 1795738547.7179573,
-    "seen": 1795739309.6458843,
-    "ast_hash": "e860c4f11db6b5b18288c899c1c3076d",
+    "mtime": 1795739664.7792332,
+    "seen": 1795740636.5385463,
+    "ast_hash": "06c2803b4f6cea464fb3ecb6d8b3ffb8",
     "semantic_hash": ""
   },
   "pages/settings/preferences/highlight.vue": {
@@ -7377,6 +7377,192 @@
     "mtime": 1795732275.106,
     "seen": 1795733329.3254032,
     "ast_hash": "773019c18ef1731d0293ebdf06fb49d5",
+    "semantic_hash": ""
+  },
+  "scripts/generate-accent-empty-states.mjs": {
+    "mtime": 1795739641.8239958,
+    "seen": 1795740636.614361,
+    "ast_hash": "35eedc0f1e1493743659499831dbdb2b",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-burgundy.webp": {
+    "mtime": 1795739659.938,
+    "seen": 1795740636.862532,
+    "ast_hash": "010991ec588c87064214b5b25a4f460a",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-green.webp": {
+    "mtime": 1795739660.201,
+    "seen": 1795740636.8625374,
+    "ast_hash": "4e44e3816e63d9f4c1617a16423fbdbc",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-mono.webp": {
+    "mtime": 1795739660.488,
+    "seen": 1795740636.8625412,
+    "ast_hash": "57ebcdfb7d51908cbec0cfe81094385e",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-pastel-blue.webp": {
+    "mtime": 1795739659.553,
+    "seen": 1795740636.8625455,
+    "ast_hash": "8964d1dda3e3369e89d5b438a2b0ea87",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-pastel-green.webp": {
+    "mtime": 1795739660.351,
+    "seen": 1795740636.862551,
+    "ast_hash": "24c638f6a2b0eaa7aa561006f457aa79",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-pastel-pink.webp": {
+    "mtime": 1795739659.674,
+    "seen": 1795740636.8625546,
+    "ast_hash": "7f2779277438cfe8d54215de875c8bc3",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-pastel-purple.webp": {
+    "mtime": 1795739659.419,
+    "seen": 1795740636.8625584,
+    "ast_hash": "db25fc96f20350019cfc9ef745bb4d33",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-pastel-yellow.webp": {
+    "mtime": 1795739659.804,
+    "seen": 1795740636.8625624,
+    "ast_hash": "9ca16085f688e25f0afcc6ceb1c2b239",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-purple.webp": {
+    "mtime": 1795739659.238,
+    "seen": 1795740636.862566,
+    "ast_hash": "8d13a64abcfd207d14d5e2af9aebeba1",
+    "semantic_hash": ""
+  },
+  "public/images/empty/favourites-sage.webp": {
+    "mtime": 1795739660.067,
+    "seen": 1795740636.8625689,
+    "ast_hash": "bf93e5239a1492eaab0e8ee1293e63f2",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-burgundy.webp": {
+    "mtime": 1795739661.434,
+    "seen": 1795740636.862572,
+    "ast_hash": "1452dcdbbdff405b07abe29d7d1ebc29",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-green.webp": {
+    "mtime": 1795739661.718,
+    "seen": 1795740636.862575,
+    "ast_hash": "6014e54e474e9dacdbc73cd5bf3ec1ff",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-mono.webp": {
+    "mtime": 1795739662.021,
+    "seen": 1795740636.8625774,
+    "ast_hash": "2f8dd13c34a26e1e7b551f08e1d3cae8",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-pastel-blue.webp": {
+    "mtime": 1795739660.913,
+    "seen": 1795740636.8625793,
+    "ast_hash": "2a8acfb2b4f770d2fa464702a75de68b",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-pastel-green.webp": {
+    "mtime": 1795739661.881,
+    "seen": 1795740636.862583,
+    "ast_hash": "574c714ddb4a6756be6641fa47e06bdf",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-pastel-pink.webp": {
+    "mtime": 1795739661.113,
+    "seen": 1795740636.862586,
+    "ast_hash": "51afb7b83f0ccbc63db12cfcd3a27bd3",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-pastel-purple.webp": {
+    "mtime": 1795739660.764,
+    "seen": 1795740636.8625894,
+    "ast_hash": "14036a51c62cedf72f1acddf00843bf7",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-pastel-yellow.webp": {
+    "mtime": 1795739661.281,
+    "seen": 1795740636.862592,
+    "ast_hash": "f69cc396bae2e90a225dcd120eca19a3",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-purple.webp": {
+    "mtime": 1795739660.607,
+    "seen": 1795740636.8625963,
+    "ast_hash": "3a749f11feecf18c93a029609e959a9b",
+    "semantic_hash": ""
+  },
+  "public/images/empty/playlists-sage.webp": {
+    "mtime": 1795739661.576,
+    "seen": 1795740636.8626,
+    "ast_hash": "679e88b5caa30246820dc6a1dd193ee4",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-burgundy.webp": {
+    "mtime": 1795739663.139,
+    "seen": 1795740636.8626046,
+    "ast_hash": "63fc075cbdeccba1daa4f33e6e25eed9",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-green.webp": {
+    "mtime": 1795739663.524,
+    "seen": 1795740636.862608,
+    "ast_hash": "a751808d82b64996825b7c8d44cd305a",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-mono.webp": {
+    "mtime": 1795739663.981,
+    "seen": 1795740636.8626115,
+    "ast_hash": "6806231bb83326fcbeb081b50fe84527",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-pastel-blue.webp": {
+    "mtime": 1795739662.561,
+    "seen": 1795740636.8626158,
+    "ast_hash": "6947aab5e8687f4556e3134a2076d05a",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-pastel-green.webp": {
+    "mtime": 1795739663.732,
+    "seen": 1795740636.8626194,
+    "ast_hash": "f90c1b2e6168a2d572c933d0d15f7caf",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-pastel-pink.webp": {
+    "mtime": 1795739662.756,
+    "seen": 1795740636.8626235,
+    "ast_hash": "97cb148616492297d6f573802053c1b5",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-pastel-purple.webp": {
+    "mtime": 1795739662.371,
+    "seen": 1795740636.8626273,
+    "ast_hash": "00444f34b8fba0561f3d8bf613cbae45",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-pastel-yellow.webp": {
+    "mtime": 1795739662.941,
+    "seen": 1795740636.8626318,
+    "ast_hash": "f2ee87c720fa2309b6cfa3fd54f2546d",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-purple.webp": {
+    "mtime": 1795739662.171,
+    "seen": 1795740636.862635,
+    "ast_hash": "9326829ba585a00c8d8e89c774440eb4",
+    "semantic_hash": ""
+  },
+  "public/images/empty/reading-sage.webp": {
+    "mtime": 1795739663.327,
+    "seen": 1795740636.8626392,
+    "ast_hash": "595af3075752d4a0e1310ac9b0e35cd6",
     "semantic_hash": ""
   }
 }

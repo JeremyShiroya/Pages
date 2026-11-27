@@ -73,8 +73,10 @@
              place of the book's cover backdrop. -->
         <div
           v-if="listenOrbMode && listenOrbBackground !== 'flat'"
+          ref="listenOrbBgEl"
           class="listen-orb-bg"
-          :class="`is-${listenOrbBackground}`"
+          :class="[`is-${listenOrbBackground}`, `orb-${listenOrb.name}`, { paused: listenPaused }]"
+          :style="{ '--bleed-scale': orbBleedScale }"
           aria-hidden="true"
         >
           <video
@@ -98,7 +100,7 @@
           v-if="listenOrbMode"
           ref="listenOrbEl"
           class="listen-orb"
-          :class="{ speaking: isPlaying, 'no-halo': !listenOrbHalo }"
+          :class="[`orb-${listenOrb.name}`, { speaking: isPlaying, paused: listenPaused, 'no-halo': !listenOrbHalo }]"
           :style="{ '--orb-poster': `url('${listenOrb.poster}')` }"
           role="img"
           :aria-label="activeNarratorName ? `${activeNarratorName}, narrator` : 'Narrator'"
@@ -244,6 +246,13 @@
         </div>
       </template>
     </div>
+
+    <!-- One-time introduction to the Narrator Orb, the first time Listen opens. -->
+    <ListenOrbIntroModal
+      :open="readerMode === 'listen' && !!book && !appSettings.listenOrbIntroSeen"
+      :orb-poster="listenOrb.poster"
+      :cover-url="book?.cover || ''"
+    />
 
     <Teleport to="body">
       <div v-if="pageSyncOpen" class="page-sync-overlay" role="dialog" aria-modal="true" aria-label="Page Sync camera">
@@ -720,6 +729,7 @@ import {
 import { findPageSyncMatch } from "~/composables/usePageSyncMatch";
 import { onCoverError } from "~/composables/useCoverFallback";
 import { useNarratorActivity } from "~/composables/useNarratorActivity";
+import ListenOrbIntroModal from "~/components/mobile/ListenOrbIntroModal.vue";
 import { narratorOrb } from "~/utils/narratorOrbs";
 import { offeredDeviceVoices } from "~/composables/tts/nativeSpeech";
 import { shouldAskWhereToResume } from "~/composables/useResumePrompt";
@@ -1671,8 +1681,34 @@ const repaintAnnotations = async () => {
 const listenOrbMode = computed(() => appSettings.value.listenVisual !== "cover");
 const listenBlurEnabled = computed(() => !listenOrbMode.value && appSettings.value.listenCoverBlur !== false);
 const listenOrb = computed(() => narratorOrb(ttsVoiceId.value));
+// Paused (not idle): the orb video stops and loses its colour until resumed.
+const listenPaused = computed(() => isThisBookNarrating.value && ttsStatus.value === "paused");
+const listenOrbBgEl = ref(null);
+const syncOrbVideos = () => {
+  const videos = [listenOrbEl.value, listenOrbBgEl.value]
+    .flatMap((el) => (el ? [...el.querySelectorAll("video")] : []));
+  for (const video of videos) {
+    if (listenPaused.value) video.pause();
+    else if (video.paused) video.play().catch(() => {});
+  }
+};
+// Sources declared above this point only: listenPaused reads isThisBookNarrating,
+// which is defined further down, and a watch evaluates its sources at setup.
+watch(() => [ttsStatus.value, ttsBook.value?.id, listenOrb.value.name], () => nextTick(syncOrbVideos));
+// Full Bleed blurs a SMALL copy of the video and lets the compositor enlarge
+// it to fill the screen. Blurring the full-screen video (36 px, every video
+// frame) was heavy GPU work — fine beside an online voice, but Charles and
+// Nicole synthesize on the same GPU, and the two starved each other.
+const BLEED_SOURCE_PX = 64;
+const orbBleedScale = ref(20);
+const measureBleed = () => {
+  if (typeof window === "undefined") return;
+  orbBleedScale.value = Math.ceil((Math.max(window.innerWidth, window.innerHeight) * 1.5) / BLEED_SOURCE_PX);
+};
+onMounted(() => { measureBleed(); window.addEventListener("resize", measureBleed); });
+onUnmounted(() => window.removeEventListener("resize", measureBleed));
 // Orb backdrop strength: 'flat' (none), 'soft' (light wash), 'blur' (strong bleed).
-const listenOrbBackground = computed(() => appSettings.value.listenOrbBackground || "soft");
+const listenOrbBackground = computed(() => appSettings.value.listenOrbBackground || "blur");
 // Soft/full bleed run edge to edge, so the status and navigation bars go
 // transparent and the wash shows through them (like the blurred cover).
 const listenOrbBackdrop = computed(() => listenOrbMode.value && listenOrbBackground.value !== "flat");
@@ -3046,6 +3082,31 @@ onUnmounted(() => {
   --voice: 0 !important;
 }
 
+/* Paused: the orb (and its wash) stop and lose their colour, coming back on
+   resume. Andrew's orb is already black and white, so his dims instead. */
+.listen-orb-core video,
+.listen-orb-bg video {
+  transition: filter 0.6s ease, opacity 0.6s ease;
+}
+.listen-orb.paused .listen-orb-core video {
+  filter: grayscale(1) brightness(1.04);
+}
+.listen-orb-bg.paused video {
+  filter: grayscale(1);
+}
+.listen-orb-bg.is-blur.paused video {
+  filter: blur(2.5px) grayscale(1);
+}
+.listen-orb.orb-andrew.paused .listen-orb-core video {
+  filter: brightness(0.55) contrast(0.85);
+}
+.listen-orb-bg.orb-andrew.paused video {
+  filter: brightness(0.6);
+}
+.listen-orb-bg.is-blur.orb-andrew.paused video {
+  filter: blur(2.5px) brightness(0.6);
+}
+
 /* Orb-mode backdrop: the orb's colours as a very light wash (no blur), fading
    into the page like the cover behind the series detail hero. */
 .listen-orb-bg {
@@ -3082,11 +3143,18 @@ onUnmounted(() => {
   );
 }
 
-/* Strong bleed: the orb's colours fill much more of the screen, blurred. */
+/* Strong bleed: the orb's colours fill much more of the screen, blurred. A
+   64 px copy is blurred and scaled up by the compositor (see orbBleedScale):
+   the same soft wash for a tiny fraction of the per-frame GPU work. */
 .listen-orb-bg.is-blur video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
   opacity: 0.6;
-  filter: blur(36px) saturate(1.35);
-  transform: scale(1.5);
+  filter: blur(2.5px) saturate(1.35);
+  transform: translate(-50%, -50%) scale(var(--bleed-scale, 20));
 }
 
 .reader-mobile-page.dark .listen-orb-bg.is-blur video,

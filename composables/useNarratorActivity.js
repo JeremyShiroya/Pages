@@ -17,7 +17,9 @@ const BASE_WORD_SEC = 0.08      // per word, at 1x
 const PER_LETTER_SEC = 0.055    // ~170 words a minute for average English words
 const COMMA_PAUSE_SEC = 0.22
 const STOP_PAUSE_SEC = 0.42
-const VOICED_LEVEL = 0.12       // stream loudness above which the narrator counts as speaking
+// Stream loudness above which the narrator counts as speaking. Measured on a
+// phone: at 0.12 quieter syllables did not count and the words fell behind.
+const VOICED_LEVEL = 0.05
 
 const wordLength = word => word.replace(/[^\p{L}\p{N}]/gu, '').length || 1
 

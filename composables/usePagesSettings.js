@@ -3,7 +3,7 @@ import { readonly, ref } from 'vue'
 export const PAGES_SETTINGS_KEY = 'bookish:settings'
 
 export const DEFAULT_PAGES_SETTINGS = Object.freeze({
-  settingsVersion: 6,
+  settingsVersion: 7,
   readerTheme: 'light',            // the theme in effect (light | dark); with themeMode 'system' it follows the device
   themeMode: 'light',              // what the user chose: 'system' | 'light' | 'dark'
   accentColor: 'purple',           // the app's tint: see ACCENT_COLOR_OPTIONS
@@ -48,7 +48,8 @@ export const DEFAULT_PAGES_SETTINGS = Object.freeze({
   readerHighlight: true,           // highlight the section being read
   listenCoverBlur: true,           // blurred cover backdrop in Listen mode (cover visual only)
   listenVisual: 'orb',             // 'orb' (the narrator's orb) | 'cover' (book cover) in Listen mode
-  listenOrbBackground: 'soft',     // orb mode backdrop: 'flat' (none) | 'soft' (light wash) | 'blur' (strong blurred bleed)
+  listenOrbBackground: 'blur',     // orb mode backdrop: 'flat' (none) | 'soft' (light wash) | 'blur' (Full Bleed)
+  listenOrbIntroSeen: false,       // the one-time 'Narrator Orb' introduction in Listen
   listenOrbRing: false,            // thin ring that pulses out around the orb as the narrator speaks
   listenOrbHalo: false,            // soft glow + drop shadow around the orb
   listenBackSeconds: 10,           // independent Listen skip intervals, 1–60 seconds
@@ -328,6 +329,7 @@ export function normalizePagesSettings(value) {
       : DEFAULT_PAGES_SETTINGS.listenOrbBackground,
     listenOrbRing: source.listenOrbRing === true,
     listenOrbHalo: source.listenOrbHalo === true,
+    listenOrbIntroSeen: source.listenOrbIntroSeen === true,
     listenBackSeconds: Math.round(numberOrDefault(
       source.listenBackSeconds ?? source.listenSkipSeconds, DEFAULT_PAGES_SETTINGS.listenBackSeconds, 1, 60,
     )),
@@ -432,7 +434,7 @@ const resolveStorage = (storage) => {
   return localStorage
 }
 
-export const CURRENT_SETTINGS_VERSION = 6
+export const CURRENT_SETTINGS_VERSION = 7
 
 const LEGACY_NAV_DEFAULTS = Object.freeze({
   mobileNavStyle: 'standard', mobileNavSize: 'standard', mobileNavOpacity: 95,
@@ -519,6 +521,8 @@ export function readPagesSettings(storage) {
         // v6: the bottom nav's bar material is Flat for everyone (once); the
         // selected-tab choice is left as each user set it.
         ...(storedVersion < 6 ? { mobileNavMaterial: 'current' } : {}),
+        // v7: the orb's background is Full Bleed for everyone (once).
+        ...(storedVersion < 7 ? { listenOrbBackground: 'blur' } : {}),
         settingsVersion: CURRENT_SETTINGS_VERSION,
       })
       try { targetStorage.setItem(PAGES_SETTINGS_KEY, JSON.stringify(migrated)) } catch {}

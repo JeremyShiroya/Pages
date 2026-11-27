@@ -1134,23 +1134,23 @@ textarea {
 /* ── Black & White, selectively ──────────────────────────────────────────
    Not everything simply turns black (or white): book progress and the
    Continue Reading play button are white, and the selected bottom-nav tab is
-   white on a dark pill. */
+   ink (black / white) on a grey pill. */
 :root[data-accent="mono"] {
   --color-streak: #1c1c1e;
   --color-streak-ink: #ffffff;
   --color-book-progress: #ffffff;
   --color-play-fill: #ffffff;
   --color-play-ink: #000000;
-  --color-nav-accent: #ffffff;
+  --color-nav-accent: #1c1c1e;
   --color-nav-accent-plain: #1c1c1e;
-  --color-nav-indicator: #1c1c1e;
+  --color-nav-indicator: rgba(118, 118, 128, 0.2);
 }
 :root[data-theme="dark"][data-accent="mono"] {
   --color-streak: #f2f2f7;
   --color-streak-ink: #000000;
   --color-nav-accent: #ffffff;
   --color-nav-accent-plain: #ffffff;
-  --color-nav-indicator: rgba(255, 255, 255, 0.18);
+  --color-nav-indicator: rgba(118, 118, 128, 0.36);
 }
 
 /* ── Bottom navigation colour (when it does not follow the accent) ──────── */
@@ -1172,5 +1172,5 @@ textarea {
 :root[data-theme="dark"][data-nav-accent="green"] { --color-nav-accent: #30d158; --color-nav-accent-plain: #30d158; --color-nav-indicator: color-mix(in srgb, #30d158 22%, transparent); }
 :root[data-nav-accent="pastel-green"]:not([data-theme="dark"]) { --color-nav-accent: #5fb87e; --color-nav-accent-plain: #5fb87e; --color-nav-indicator: color-mix(in srgb, #5fb87e 22%, transparent); }
 :root[data-theme="dark"][data-nav-accent="pastel-green"] { --color-nav-accent: #98e0ad; --color-nav-accent-plain: #98e0ad; --color-nav-indicator: color-mix(in srgb, #98e0ad 22%, transparent); }
-:root[data-nav-accent="mono"]:not([data-theme="dark"]) { --color-nav-accent: #ffffff; --color-nav-accent-plain: #1c1c1e; --color-nav-indicator: #1c1c1e; }
-:root[data-theme="dark"][data-nav-accent="mono"] { --color-nav-accent: #ffffff; --color-nav-accent-plain: #ffffff; --color-nav-indicator: rgba(255, 255, 255, 0.18); }
+:root[data-nav-accent="mono"]:not([data-theme="dark"]) { --color-nav-accent: #1c1c1e; --color-nav-accent-plain: #1c1c1e; --color-nav-indicator: rgba(118, 118, 128, 0.2); }
+:root[data-theme="dark"][data-nav-accent="mono"] { --color-nav-accent: #ffffff; --color-nav-accent-plain: #ffffff; --color-nav-indicator: rgba(118, 118, 128, 0.36); }
