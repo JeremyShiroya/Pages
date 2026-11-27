@@ -308,7 +308,7 @@ watch(hoverIndex, updateHighlight);
 }
 
 .menu-item.active {
-  color: #fff;
+  color: var(--color-text-on-brand);
   background: var(--color-brand-primary);
 }
 .menu-item:not(.active):hover { color: var(--color-brand-primary); }

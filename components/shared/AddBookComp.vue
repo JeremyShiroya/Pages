@@ -1005,7 +1005,7 @@ const saveBook = async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-on-brand);
+  color: #fff;
   opacity: 0;
   transition: opacity 0.2s;
   gap: 0.5rem;

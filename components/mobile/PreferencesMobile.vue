@@ -491,7 +491,7 @@ const listenVisualSummary = computed(() => (settings.value.listenVisual === 'cov
 
 .segment.active {
   background: var(--color-brand-primary);
-  color: #fff;
+  color: var(--color-text-on-brand);
 }
 
 .pref-toggle {

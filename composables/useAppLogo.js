@@ -1,10 +1,10 @@
 import { computed } from 'vue'
-import { effectiveLauncherIcon, usePagesSettings } from '~/composables/usePagesSettings'
+import { usePagesSettings } from '~/composables/usePagesSettings'
 
-// The Pages logo in the colour of the chosen app icon (Settings → Theme →
-// App Icon, which follows the accent by default), so the logo inside the app
-// always matches the one on the home screen.
+// The Pages logo in the app's accent colour (Settings → Theme → Accent
+// Colour), for the logo inside the app: top bar, About, What's New. The App
+// Icon choice only changes the home-screen launcher, never this.
 export const useAppLogo = () => {
   const { settings } = usePagesSettings()
-  return computed(() => `/images/logos/${effectiveLauncherIcon(settings.value)}.png`)
+  return computed(() => `/images/logos/${settings.value.accentColor || 'purple'}.png`)
 }

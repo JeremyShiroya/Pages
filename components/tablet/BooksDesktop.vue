@@ -783,7 +783,7 @@ onUnmounted(() => {
 
 <style scoped>
 .document-review-banner{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px 16px;border:1px solid var(--color-brand-primary-muted);border-radius:13px;background:var(--color-brand-primary-faint);color:var(--color-text-primary)}
-.document-review-banner i{color:var(--color-brand-primary);font-size:23px}.document-review-banner span{flex:1}.document-review-banner button{border:0;border-radius:9px;padding:10px 15px;background:var(--color-brand-primary);color:white;font-weight:700}
+.document-review-banner i{color:var(--color-brand-primary);font-size:23px}.document-review-banner span{flex:1}.document-review-banner button{border:0;border-radius:9px;padding:10px 15px;background:var(--color-brand-primary);color:var(--color-text-on-brand);font-weight:700}
 .books-container {
   padding: 0rem;
   margin: 0 auto;

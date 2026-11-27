@@ -14,7 +14,7 @@
         <div class="list-row"><span>Build</span><span class="row-value">{{ buildNumber }}</span></div>
         <div class="list-row"><span>Developer</span><span class="row-value">Jeremy Shiroya</span></div>
         <div class="list-row"><span>Made in</span><span class="row-value">Kenya</span></div>
-        <div class="list-row"><span>Price</span><span class="row-value">Free, always</span></div>
+        <div class="list-row"><span>Price</span><span class="row-value">Free</span></div>
       </div>
     </section>
 

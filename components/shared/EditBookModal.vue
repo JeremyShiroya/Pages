@@ -336,7 +336,7 @@ const getRatingLabel = (rating) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-on-brand);
+  color: #fff;
   opacity: 0;
   transition: opacity 0.3s ease;
 }

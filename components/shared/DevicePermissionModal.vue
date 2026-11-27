@@ -118,7 +118,7 @@ const { visible, answer } = useDevicePermissionPrompt()
 
 .perm-btn.primary {
   background: var(--color-brand-primary);
-  color: #fff;
+  color: var(--color-text-on-brand);
   box-shadow: 0 6px 16px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 

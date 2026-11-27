@@ -1004,7 +1004,7 @@ const saveBook = async () => {
   justify-content: center;
   gap: 0.55rem;
   background: var(--color-background-overlay-strong);
-  color: var(--color-text-on-brand, #fff);
+  color: #fff;
   opacity: 0;
   transition: opacity 0.2s, background-color 0.2s;
   /* The container owns the tap; the overlay is signage. */

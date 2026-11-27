@@ -329,7 +329,7 @@ defineEmits(['close', 'upload', 'search', 'select'])
   display: grid;
   place-items: center;
   background: var(--color-background-overlay-soft);
-  color: var(--color-text-on-brand);
+  color: #fff;
   opacity: 0;
   transition: opacity 0.2s;
   font-size: 1.5rem;
@@ -349,7 +349,7 @@ defineEmits(['close', 'upload', 'search', 'select'])
   gap: 0.3rem;
   padding: 0.35rem 0.55rem;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.45) 70%, transparent);
-  color: var(--color-text-on-brand);
+  color: #fff;
   font-size: 0.7rem;
   font-weight: 500;
   line-height: 1.2;

@@ -785,7 +785,7 @@ onUnmounted(() => {
   border: 0;
   border-radius: 50%;
   background: var(--color-brand-primary);
-  color: #fff;
+  color: var(--color-text-on-brand);
   cursor: pointer;
   font-size: 28px;
   box-shadow: 0 8px 22px color-mix(in srgb, var(--color-brand-primary) 38%, transparent);
@@ -874,7 +874,7 @@ onUnmounted(() => {
   box-shadow: var(--shadow-card-subtle);
   position: relative;
   overflow: hidden;
-  color: var(--color-text-on-brand);
+  color: #fff;
   z-index: 1;
   min-height: 276px;
   height: 100%;
@@ -971,7 +971,7 @@ onUnmounted(() => {
 }
 
 .play-btn i {
-  color: var(--color-text-on-brand);
+  color: #fff;
   font-size: 20px;
   margin-left: 2px; /* Optical centering */
 }
@@ -1484,7 +1484,7 @@ onUnmounted(() => {
 .document-review-banner{display:flex;align-items:center;gap:12px;margin:0 var(--mobile-page-padding-inline) 16px;padding:13px;border:1px solid var(--color-brand-primary-muted);border-radius:13px;background:var(--color-brand-primary-faint);color:var(--color-text-primary)}
 .document-review-banner>i{font-size:24px;color:var(--color-brand-primary)}
 .document-review-banner>div{flex:1;min-width:0}.document-review-banner strong,.document-review-banner span{display:block}.document-review-banner strong{font-size:.86rem}.document-review-banner span{font-size:.72rem;color:var(--color-text-secondary);margin-top:2px}
-.document-review-banner button{border:0;border-radius:9px;background:var(--color-brand-primary);color:white;padding:9px 11px;font-weight:700;font-size:.78rem}
+.document-review-banner button{border:0;border-radius:9px;background:var(--color-brand-primary);color:var(--color-text-on-brand);padding:9px 11px;font-weight:700;font-size:.78rem}
 
 :root[data-theme="dark"][data-dark-app-background="dark"] .view-container.is-card {
   background: transparent;

@@ -74,7 +74,7 @@ button {
   font-size: 15px;
   font-weight: 600;
 }
-button.primary { background: var(--color-brand-primary); color: #fff; }
+button.primary { background: var(--color-brand-primary); color: var(--color-text-on-brand); }
 .app-recovery-detail { margin-top: 18px; max-width: 320px; color: var(--color-text-secondary, #6b6680); font-size: 12px; }
 .app-recovery-detail pre { white-space: pre-wrap; word-break: break-word; text-align: left; }
 </style>

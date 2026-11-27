@@ -122,7 +122,7 @@ describe('reading settings sheet', () => {
   test('the separate page is gone and the reader opens a draggable sheet', () => {
     expect(existsSync(resolve(process.cwd(), 'pages/read-settings/[id].vue'))).toBe(false)
     const reader = read('components/mobile/ReaderMobile.vue')
-    expect(reader).toContain('<i class="ri-font-size"></i>')
+    expect(reader).toContain('aria-label="Reading settings"')
     expect(reader).toContain('<ReaderDisplaySheet')
     const sheet = read('components/mobile/ReaderDisplaySheet.vue')
     expect(sheet).toContain('onHandleMove')

@@ -81,7 +81,8 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
   border: 0;
   border-radius: var(--mobile-card-radius);
   background: transparent;
-  color: var(--color-text-on-brand);
+  /* Text sits on the cover image: always white, whatever the accent. */
+  color: #fff;
   text-align: left;
   cursor: pointer;
   box-shadow: none;
@@ -181,7 +182,7 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
   display: -webkit-box;
   margin: 0 0 0.25rem;
   overflow: hidden;
-  color: var(--color-text-on-brand);
+  color: #fff;
   font-size: var(--mobile-body-size);
   line-height: 1.3;
   text-shadow: var(--shadow-text-on-image);
@@ -229,7 +230,7 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
   background: rgba(255, 255, 255, 0.24);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  color: var(--color-text-on-brand);
+  color: #fff;
   font-size: 20px;
   transform: translateY(-50%);
   transition: all 0.3s ease;
@@ -241,8 +242,8 @@ const bookInitial = computed(() => props.book.title?.trim()?.charAt(0)?.toUpperC
 }
 
 .continue-play.playing {
-  background: var(--color-brand-primary);
-  color: #fff;
+  background: var(--color-play-fill);
+  color: var(--color-play-ink);
 }
 
 .continue-play:active {

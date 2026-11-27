@@ -117,6 +117,20 @@
   /* Reading highlights: the accent unless Preferences → Highlight picks a
      colour of its own (<html data-highlight>). */
   --color-highlight-base: var(--color-brand-primary);
+  /* Bottom navigation: the selected tab's colour and the pill behind it
+     (Preferences → Bottom Navigation → Colour; the accent unless set). The
+     "plain" colour is for bars without a pill. */
+  --color-nav-accent: var(--color-brand-primary);
+  --color-nav-accent-plain: var(--color-nav-accent);
+  --color-nav-indicator: color-mix(in srgb, var(--color-nav-accent) 22%, transparent);
+  /* Book progress bars (cards, Continue Reading, book page). */
+  --color-book-progress: var(--color-brand-primary);
+  /* The round play button on Continue Reading while playing. */
+  --color-play-fill: var(--color-brand-primary);
+  --color-play-ink: var(--color-text-on-brand);
+  /* The streak page (Black & White keeps it black, with white symbols). */
+  --color-streak: var(--color-brand-primary);
+  --color-streak-ink: var(--color-text-on-brand);
   --color-switch-on: var(--color-brand-primary);
   --color-switch-knob-on: #ffffff;
   --color-text-on-image-primary: #ffffff;
@@ -192,7 +206,7 @@
     var(--color-brand-primary-soft),
     var(--color-surface-primary)
   );
-  --gradient-library-progress: var(--color-brand-primary);
+  --gradient-library-progress: var(--color-book-progress);
   --gradient-image-card-overlay: linear-gradient(
     135deg,
     rgba(15, 23, 42, 0.8) 0%,
@@ -959,7 +973,6 @@ textarea {
   --color-brand-primary-soft: #2a2236;
   --color-book-cover-placeholder-one: #c9b3f5;
   --color-book-cover-placeholder-two: #b49ae8;
-  --color-text-on-brand: #1d1430;
 }
 :root[data-accent="pastel-blue"] {
   --color-brand-primary: #5f9fd8;
@@ -976,7 +989,6 @@ textarea {
   --color-brand-primary-soft: #1d2a36;
   --color-book-cover-placeholder-one: #a9cdf0;
   --color-book-cover-placeholder-two: #8fbbe6;
-  --color-text-on-brand: #10202e;
 }
 :root[data-accent="pastel-pink"] {
   --color-brand-primary: #e2789f;
@@ -993,7 +1005,6 @@ textarea {
   --color-brand-primary-soft: #3a2430;
   --color-book-cover-placeholder-one: #f4a7c4;
   --color-book-cover-placeholder-two: #e38bae;
-  --color-text-on-brand: #2a1420;
 }
 :root[data-accent="pastel-yellow"] {
   --color-brand-primary: #d4b13e;
@@ -1002,7 +1013,6 @@ textarea {
   --color-brand-primary-soft: #fbf5dd;
   --color-book-cover-placeholder-one: #d4b13e;
   --color-book-cover-placeholder-two: #a68826;
-  --color-text-on-brand: #2a2410;
 }
 :root[data-theme="dark"][data-accent="pastel-yellow"] {
   --color-brand-primary: #f3df8f;
@@ -1011,7 +1021,6 @@ textarea {
   --color-brand-primary-soft: #343020;
   --color-book-cover-placeholder-one: #f3df8f;
   --color-book-cover-placeholder-two: #e6cd70;
-  --color-text-on-brand: #2a2410;
 }
 :root[data-accent="burgundy"] {
   --color-brand-primary: #8c1c3a;
@@ -1044,7 +1053,6 @@ textarea {
   --color-brand-primary-soft: #222b21;
   --color-book-cover-placeholder-one: #9cb897;
   --color-book-cover-placeholder-two: #839f7e;
-  --color-text-on-brand: #17211a;
 }
 :root[data-accent="green"] {
   --color-brand-primary: #2ea44f;
@@ -1077,7 +1085,6 @@ textarea {
   --color-brand-primary-soft: #1c3324;
   --color-book-cover-placeholder-one: #98e0ad;
   --color-book-cover-placeholder-two: #7dcf95;
-  --color-text-on-brand: #132a1b;
 }
 :root[data-accent="mono"] {
   --color-brand-primary: #1c1c1e;
@@ -1123,3 +1130,47 @@ textarea {
 :root[data-theme="dark"][data-highlight="pastel-green"] { --color-highlight-base: #98e0ad; }
 :root[data-highlight="mono"] { --color-highlight-base: #1c1c1e; }
 :root[data-theme="dark"][data-highlight="mono"] { --color-highlight-base: #f2f2f7; }
+
+/* ── Black & White, selectively ──────────────────────────────────────────
+   Not everything simply turns black (or white): book progress and the
+   Continue Reading play button are white, and the selected bottom-nav tab is
+   white on a dark pill. */
+:root[data-accent="mono"] {
+  --color-streak: #1c1c1e;
+  --color-streak-ink: #ffffff;
+  --color-book-progress: #ffffff;
+  --color-play-fill: #ffffff;
+  --color-play-ink: #000000;
+  --color-nav-accent: #ffffff;
+  --color-nav-accent-plain: #1c1c1e;
+  --color-nav-indicator: #1c1c1e;
+}
+:root[data-theme="dark"][data-accent="mono"] {
+  --color-streak: #f2f2f7;
+  --color-streak-ink: #000000;
+  --color-nav-accent: #ffffff;
+  --color-nav-accent-plain: #ffffff;
+  --color-nav-indicator: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Bottom navigation colour (when it does not follow the accent) ──────── */
+:root[data-nav-accent="purple"]:not([data-theme="dark"]) { --color-nav-accent: #8a2be2; --color-nav-accent-plain: #8a2be2; --color-nav-indicator: color-mix(in srgb, #8a2be2 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="purple"] { --color-nav-accent: #a855f7; --color-nav-accent-plain: #a855f7; --color-nav-indicator: color-mix(in srgb, #a855f7 22%, transparent); }
+:root[data-nav-accent="pastel-purple"]:not([data-theme="dark"]) { --color-nav-accent: #a685e2; --color-nav-accent-plain: #a685e2; --color-nav-indicator: color-mix(in srgb, #a685e2 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="pastel-purple"] { --color-nav-accent: #c9b3f5; --color-nav-accent-plain: #c9b3f5; --color-nav-indicator: color-mix(in srgb, #c9b3f5 22%, transparent); }
+:root[data-nav-accent="pastel-blue"]:not([data-theme="dark"]) { --color-nav-accent: #5f9fd8; --color-nav-accent-plain: #5f9fd8; --color-nav-indicator: color-mix(in srgb, #5f9fd8 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="pastel-blue"] { --color-nav-accent: #a9cdf0; --color-nav-accent-plain: #a9cdf0; --color-nav-indicator: color-mix(in srgb, #a9cdf0 22%, transparent); }
+:root[data-nav-accent="pastel-pink"]:not([data-theme="dark"]) { --color-nav-accent: #e2789f; --color-nav-accent-plain: #e2789f; --color-nav-indicator: color-mix(in srgb, #e2789f 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="pastel-pink"] { --color-nav-accent: #f4a7c4; --color-nav-accent-plain: #f4a7c4; --color-nav-indicator: color-mix(in srgb, #f4a7c4 22%, transparent); }
+:root[data-nav-accent="pastel-yellow"]:not([data-theme="dark"]) { --color-nav-accent: #d4b13e; --color-nav-accent-plain: #d4b13e; --color-nav-indicator: color-mix(in srgb, #d4b13e 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="pastel-yellow"] { --color-nav-accent: #f3df8f; --color-nav-accent-plain: #f3df8f; --color-nav-indicator: color-mix(in srgb, #f3df8f 22%, transparent); }
+:root[data-nav-accent="burgundy"]:not([data-theme="dark"]) { --color-nav-accent: #8c1c3a; --color-nav-accent-plain: #8c1c3a; --color-nav-indicator: color-mix(in srgb, #8c1c3a 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="burgundy"] { --color-nav-accent: #c94b64; --color-nav-accent-plain: #c94b64; --color-nav-indicator: color-mix(in srgb, #c94b64 22%, transparent); }
+:root[data-nav-accent="sage"]:not([data-theme="dark"]) { --color-nav-accent: #6f8f6a; --color-nav-accent-plain: #6f8f6a; --color-nav-indicator: color-mix(in srgb, #6f8f6a 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="sage"] { --color-nav-accent: #9cb897; --color-nav-accent-plain: #9cb897; --color-nav-indicator: color-mix(in srgb, #9cb897 22%, transparent); }
+:root[data-nav-accent="green"]:not([data-theme="dark"]) { --color-nav-accent: #2ea44f; --color-nav-accent-plain: #2ea44f; --color-nav-indicator: color-mix(in srgb, #2ea44f 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="green"] { --color-nav-accent: #30d158; --color-nav-accent-plain: #30d158; --color-nav-indicator: color-mix(in srgb, #30d158 22%, transparent); }
+:root[data-nav-accent="pastel-green"]:not([data-theme="dark"]) { --color-nav-accent: #5fb87e; --color-nav-accent-plain: #5fb87e; --color-nav-indicator: color-mix(in srgb, #5fb87e 22%, transparent); }
+:root[data-theme="dark"][data-nav-accent="pastel-green"] { --color-nav-accent: #98e0ad; --color-nav-accent-plain: #98e0ad; --color-nav-indicator: color-mix(in srgb, #98e0ad 22%, transparent); }
+:root[data-nav-accent="mono"]:not([data-theme="dark"]) { --color-nav-accent: #ffffff; --color-nav-accent-plain: #1c1c1e; --color-nav-indicator: #1c1c1e; }
+:root[data-theme="dark"][data-nav-accent="mono"] { --color-nav-accent: #ffffff; --color-nav-accent-plain: #ffffff; --color-nav-indicator: rgba(255, 255, 255, 0.18); }

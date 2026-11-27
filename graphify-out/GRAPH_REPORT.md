@@ -1,17 +1,17 @@
 # Graph Report - Pages  (2026-11-27)
 
 ## Corpus Check
-- 584 files · ~1,800,103 words
+- 584 files · ~1,800,712 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 83 file(s) not represented in the graph (top: .xml 31, .sqlite3 27, (none) 8)
 
 ## Summary
-- 5545 nodes · 9338 edges · 330 communities (273 shown, 57 thin omitted)
+- 5547 nodes · 9340 edges · 332 communities (276 shown, 56 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 313 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7cda3c24`
+- Built from commit: `642f9543`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,7 +20,7 @@
 - metadataAggregator.ts
 - reader/[id].vue
 - composables/usePdfExtractor.js
-- authorEnrichment.ts
+- aiMetadataVerifier.ts
 - goodreadsScraper.ts
 - BooksDesktop.vue
 - BooksMobile.vue
@@ -38,9 +38,9 @@
 - AuthorDetailComp.vue
 - SettingsDesktop.vue
 - SettingsStorageMobile.vue
-- useMobileReaderPrefs.js
+- useStreak.js
 - SettingsStorageResetMobile.vue
-- importDeviceFile
+- useMobileReaderPrefs.js
 - PdfViewer.vue
 - usePagesSettings.js
 - EditBookComp.vue
@@ -57,7 +57,7 @@
 - metadata.get.ts
 - useLibraryFilters.js
 - LibraryBookCard.vue
-- useFormatEnablement.js
+- uxBatchFive.test.js
 - backupLocalData.js
 - useAuthorImageSearch.js
 - HomeMobile.vue
@@ -66,7 +66,7 @@
 - PagesSelect.vue
 - BackupSettingsPanel.vue
 - AnnotationListMobile.vue
-- MobilePlayingBar.vue
+- vue-router
 - AddToPlaylistModal.vue
 - Series Collection Progress Design
 - useTTS.js
@@ -74,12 +74,12 @@
 - package.json
 - engine-core.js
 - DeviceBooksPlugin.java
-- aiMetadataVerifier.ts
+- authorImagesWeb.ts
 - useDocumentReview.js
 - ProfilePage.vue
 - hideSelectionMenu
 - PlaylistsDesktop.vue
-- uxBatchFive.test.js
+- usePdfReflow.js
 - dependencies
 - ApkInstallerPlugin
 - vue
@@ -92,11 +92,11 @@
 - emit
 - LibraryControlsRow.vue
 - ratingPreferences.test.js
-- koboScraper.ts
+- coverSearch.ts
 - Composable: `composables/useTTS.js` (rewrite playback engine)
 - Pages UX batch — voices, position sync, filters, format removal, PDF reflow
 - Author Enrichment — Design Spec
-- productionSnapshotEngine.ts
+- computeContentHash
 - Getting Started
 - useAccount.js
 - SettingsMobile.vue
@@ -106,7 +106,7 @@
 - composables/useEpubExtractor.js
 - dry-humor/manifest.json
 - internetArchiveApi.ts
-- aiAuthorVerifier.ts
+- Document intelligence redesign
 - review-documents.vue
 - ProfileMobile.vue
 - useSeriesSuggestions.js
@@ -116,7 +116,7 @@
 - MultiStepLoader.vue
 - ReaderDisplaySheet.vue
 - useCloudBackup.js
-- aiSeriesEnumerator.ts
+- SystemBarsPlugin.java
 - ReaderSlider.vue
 - seriesMutationGuard.js
 - useEpubPageMap.js
@@ -142,25 +142,25 @@
 - vercel-analytics.client.js
 - go
 - useDeviceLibrarySync.js
-- Local-First Library Migration Design
+- Local-First Library Migration Implementation Plan
 - useChunkSpans.js
 - same-words-three-meanings/manifest.json
 - mobileTtsDriver.test.js
 - Pages_Master_AI_Knowledge_Base_Combined.md
-- vue-router
+- default.vue
 - kokoroTts.worker.js
 - IndexedDB Book Content Storage
 - mobileTtsDriver.js
 - MobileTopNav.vue
 - shout-then-ordinary/manifest.json
-- SystemBarsPlugin.java
+- LocalSpeechPlugin.java
 - three-way-station/manifest.json
 - whispers-and-reset/manifest.json
 - useReaderPrewarm.js
 - modal-cost-sample/manifest.json
 - useCoverFallback.js
 - EPUB & PDF Reader Support — Design Spec
-- authorImagesWeb.ts
+- useTTS.test.js
 - sign-release-apk.sh
 - analytics/[id].vue
 - uxBatchSix.test.js
@@ -169,11 +169,11 @@
 - fetchMetadata
 - useDailyCompliment.js
 - Reader, Metadata, and Author Repairs Design
-- useHtmlSanitizer.js
+- Local-First Library Migration Design
 - Library and Playlist UI Improvements Implementation Plan
 - closeChapterMenu
 - FavouriteCardPreview.vue
-- pdfReaderNavigation.test.js
+- .synthesizeItem
 - useMetadataBackfill.js
 - _placeScrollTarget
 - saveReadingProgress
@@ -182,16 +182,16 @@
 - PersonalRatingInput.vue
 - com.getcapacitor.PluginCall
 - applyVoiceChoice
-- usePdfManifest.js
+- usePdfGeometry.test.js
 - sectionStartChunkLocal
-- Document intelligence redesign
+- usePdfManifest.js
 - useGoodreadsRating.js
 - useThemeCssVars.js
 - seriesAccuracy.test.js
-- LocalSpeechPlugin.java
-- vitest
+- useBooks.js
+- Pipeline
 - tsconfig.json
-- SeriesMobile.vue
+- bookCoverMatch.ts
 - system-bars.client.js
 - CoverImageModal.vue
 - firstChunkAtOrAfterPage
@@ -227,14 +227,14 @@
 - sonicaudioprocessor
 - updateAuthorImage
 - DocumentTypePicker.vue
-- edgeSpeechConnection.test.js
+- DeleteConfirmModal.vue
 - googleBooksApi.ts
-- MobileSettingsNav.vue
+- ListenScreenPreferencesMobile.vue
 - Metadata and PDF repair report
 - AppUpdateModal.vue
 - profileDraft.test.js
 - BottomNavigationPreferencesMobile.vue
-- ref_app
+- @capacitor/core
 - FavouritesDesktop.vue
 - BackupPrompt.vue
 - Empty State Redesign
@@ -256,7 +256,7 @@
 - AGENTS.md
 - mobile/deviceArchitecture.js
 - tablet/deviceArchitecture.js
-- 00.app-errors.client.js
+- Sidebar.vue
 - BookActionSheet.vue
 - formatListenTime
 - onScrollTap
@@ -265,15 +265,15 @@
 - edgeTts.ts
 - edge-tts Implementation Plan
 - ToastComp.vue
-- useApiEndpoint.js
+- pdfReaderNavigation.test.js
 - LocalSpeechStream.java
 - fillMissingInstallmentDetails
-- appVersioning.test.js
+- importDeviceFile
 - resolveGapsWithAi
 - settings-system-bars.client.js
 - serie/[id].vue
-- useBooks
-- openLibraryApi.ts
+- Library and Playlist UI Improvements Design
+- What Changes
 - SeriesCardPreview.vue
 - StreakCalendarMobile.vue
 - Q: Add visual progress choices, selectable Goodreads StoryGraph or personal ratings with persistent background sync, settings system-bar backgrounds, and Minimal actions by default
@@ -285,32 +285,32 @@
 - silenceTrim.test.js
 - useLibraryStore.js
 - useBookStorage.js
-- @capacitor/app
-- coverSearch.ts
-- uri
-- HighlightPreferencesMobile.vue
-- Read-Aloud Word Highlight, Instant Highlight & Lazy PDF Render — Implementation Plan
+- RatingsPreferencesMobile.vue
+- openLibraryApi.ts
+- ReadFormatsPreferencesMobile.vue
+- PlaylistDeleteModal.vue
+- Frontend Changes
 - useNarratorActivity.js
-- clearPhoto
+- updateBookEdge
 - 1.3.5.md
 - ref_node_fs
 - notifications.vue
 - settings.vue
 - desktopTtsDriver.test.js
-- Pipeline
-- scrape-image.get.ts
-- @capacitor/core
-- FakeEdgeTts
+- relativeTime
+- handleResize
+- useCoverImageCache.js
+- formatBytes
 - usePageSyncMatch.test.js
 - systemBarScrims.js
-- useShareBook.js
+- refreshHiddenCount
 - voiceParts
-- overrides
+- confirmDeleteAuthorBook
 - jsarray
 - closeCoverModal
-- BufferMetadataEdgeTts
-- updateBookEdge
-- EmptyAudioEdgeTts
+- Read-Aloud Word Highlight, Instant Highlight & Lazy PDF Render
+- playlist/[id].vue
+- SelectionActionsBar.vue
 - accentPalette.js
 - saveName
 - useAuthorDetails.test.js
@@ -319,21 +319,23 @@
 - useSelectOptions.test.js
 - narratorOrbs.js
 - saveSuggestion
-- generateCoverPlaceholder
+- MobileSettingsNav.vue
 - sourceLabel
 - listenSpokenWordIndex
-- confirmDeleteAuthorBook
+- vitest
+- SettingsOptionGroupMobile.vue
 - SeriesMembershipPicker.vue
-- deleteBook
-- generateCoverPlaceholder
-- handleResize
-- desktopTtsDriver.js
-- Phase 1: Architecture & Lifecycle
-- closeBlurbChooser
-- handleBookKindChange
-- openBlurbChooser
-- SelectionActionsBar.vue
+- ReaderNoteEditor.vue
+- responsiveComponentSplit.test.js
+- hardcoverApi.ts
+- useBooks
+- useTTS
+- uri
+- .poll
+- mobileDesktopPurity.test.js
 - packagemanager
+- GoodreadsRatingDisplay.vue
+- Phase 5: Book Ingestion & EPUB/PDF Processing
 
 ## God Nodes (most connected - your core abstractions)
 1. `vue` - 127 edges
@@ -350,8 +352,8 @@
 ## Surprising Connections (you probably didn't know these)
 - `Development builds install alongside, not over` --references--> `ApkInstallerPlugin`  [INFERRED]
   README.md → android/app/src/main/java/com/bookish/app/ApkInstallerPlugin.java
-- `Task 2: Update `useBooks.js`` --references--> `useBooks()`  [INFERRED]
-  docs/superpowers/plans/2026-05-16-indexeddb-book-storage.md → composables/useBooks.js
+- `Spec coverage check` --references--> `updateAuthorImage()`  [INFERRED]
+  docs/superpowers/plans/2026-05-30-local-first-migration.md → components/shared/AuthorDetailComp.vue
 - `What Stays the Same` --references--> `useBooks()`  [INFERRED]
   docs/superpowers/specs/2026-05-30-local-first-migration-design.md → composables/useBooks.js
 - `Design` --references--> `useBooks()`  [INFERRED]
@@ -362,35 +364,35 @@
 ## Import Cycles
 - None detected.
 
-## Communities (330 total, 57 thin omitted)
+## Communities (332 total, 56 thin omitted)
 
 ### Community 0 - "ReaderMobile.vue"
 Cohesion: 0.01
 Nodes (112): activeListenChunk, activeTocChapter, activeVoiceId, { addToast }, allFigureSources, { annotations }, bookAnnotations, chapterLabel (+104 more)
 
 ### Community 1 - "metadataAggregator.ts"
-Cohesion: 0.16
-Nodes (23): 2. Candidate Scoring Formula (`scoreSource`), authorsCompatible(), buildMetadataResults(), collectBlurbOptions(), collectPublisherSource(), collectSourceTags(), completenessScore(), firstValue() (+15 more)
+Cohesion: 0.12
+Nodes (29): Data Flow, 1. Multi-Provider Aggregation & Priority Rankings, 2. Candidate Scoring Formula (`scoreSource`), 3. LLM Metadata Verifier Integration, Phase 3: Metadata Intelligence Engine, authorsCompatible(), buildMetadataResults(), calculateConfidenceScore() (+21 more)
 
 ### Community 2 - "reader/[id].vue"
 Cohesion: 0.02
 Nodes (86): activeTocEntryIdx, activeTtsChunkIndex, activeTtsChunkPage, activeWordRange, allReadableChunks, book, bookFormat, { books, initialized, fetchAllData, fetchBookById } (+78 more)
 
 ### Community 3 - "composables/usePdfExtractor.js"
-Cohesion: 0.20
-Nodes (23): bucketTextLines(), buildPdfPagesHtml(), collectPdfPageLines(), collectPdfPageParagraphs(), collectPdfPageRecords(), escapeHtml(), extractPdf(), extractPdfContentFromSource() (+15 more)
-
-### Community 4 - "authorEnrichment.ts"
 Cohesion: 0.19
-Nodes (20): AuthorDetails, fetchOpenLibraryBio(), fetchWikidataDetails(), fetchWikipediaBio(), JSON_HEADERS, candidateNames(), collectItalicTitles(), countDistinctAuthorSeries() (+12 more)
+Nodes (24): selectPdfEvidencePages(), bucketTextLines(), buildPdfPagesHtml(), collectPdfPageLines(), collectPdfPageParagraphs(), collectPdfPageRecords(), escapeHtml(), extractPdf() (+16 more)
+
+### Community 4 - "aiMetadataVerifier.ts"
+Cohesion: 0.05
+Nodes (74): AuthorDetails, fetchOpenLibraryBio(), fetchWikidataDetails(), fetchWikipediaBio(), JSON_HEADERS, AiAuthorOptions, AiProviderConfig, applyPatch() (+66 more)
 
 ### Community 5 - "goodreadsScraper.ts"
-Cohesion: 0.12
-Nodes (47): Task 3: Add `getGoodreadsReview` to existing scraper, Task 1: Goodreads Series Count, absoluteGoodreadsUrl(), cleanCount(), cleanSearchTitle(), compact(), decodeHtmlEntities(), fetchGoodreadsProxyResult() (+39 more)
+Cohesion: 0.14
+Nodes (41): absoluteGoodreadsUrl(), cleanCount(), cleanSearchTitle(), compact(), decodeHtmlEntities(), fetchGoodreadsProxyResult(), fetchGoodreadsSearchFallback(), fetchGoodreadsSeriesBooks() (+33 more)
 
 ### Community 6 - "BooksDesktop.vue"
-Cohesion: 0.04
-Nodes (41): actionsMenuStyle, activeActionsMenu, activeChipIndex, activeDropdown, activeViewIndex, { addToast }, bookMetrics, {
+Cohesion: 0.03
+Nodes (47): actionsMenuStyle, activeActionsMenu, activeChipIndex, activeDropdown, activeViewIndex, { addToast }, bookMetrics, {
   books,
   loading,
   error,
@@ -398,11 +400,11 @@ Nodes (41): actionsMenuStyle, activeActionsMenu, activeChipIndex, activeDropdown
   deleteBook: removeBookFromStore,
   toggleFavourite,
   fetchAllData,
-} (+33 more)
+} (+39 more)
 
 ### Community 7 - "BooksMobile.vue"
 Cohesion: 0.03
-Nodes (44): activeViewIndex, { addToast }, bookMetrics, {
+Nodes (42): activeViewIndex, { addToast }, bookMetrics, {
   books,
   loading,
   error,
@@ -411,7 +413,7 @@ Nodes (44): activeViewIndex, { addToast }, bookMetrics, {
   toggleFavourite,
   hideBook,
   fetchAllData,
-}, bulkActions, bulkDeleteBooks, bulkPlaylistBooks, collapseBookActions (+36 more)
+}, bulkActions, bulkDeleteBooks, bulkPlaylistBooks, collapseBookActions (+34 more)
 
 ### Community 8 - "AddBookMobile.vue"
 Cohesion: 0.03
@@ -419,7 +421,7 @@ Nodes (54): { addBook, books, updateBook }, { addToast }, { apiUrl }, blurbOptio
 
 ### Community 9 - "EditBookMobile.vue"
 Cohesion: 0.05
-Nodes (31): { addToast }, { apiUrl }, blurbOptions, bookKind, { cacheCoverImage }, coverInput, coverModalMode, coverOptions (+23 more)
+Nodes (37): { addToast }, { apiUrl }, blurbOptions, bookKind, { cacheCoverImage }, closeBlurbChooser(), coverInput, coverModalMode (+29 more)
 
 ### Community 10 - "AddBookComp.vue"
 Cohesion: 0.03
@@ -427,11 +429,11 @@ Nodes (58): { addBook, books, updateBook }, { addToast }, { apiUrl }, blurbOptio
 
 ### Community 11 - "useAutoMetadata.js"
 Cohesion: 0.14
-Nodes (23): addedAt(), autoState, countPendingTargets(), fillOne(), foreground(), GOODREADS_ONLY_FIELDS, loop(), needsGoodreads() (+15 more)
+Nodes (22): addedAt(), autoState, countPendingTargets(), fillOne(), foreground(), GOODREADS_ONLY_FIELDS, loop(), needsGoodreads() (+14 more)
 
 ### Community 12 - "imageSearch.ts"
-Cohesion: 0.20
-Nodes (26): addGoogleImageResult(), addUniqueImage(), cleanExtractedUrl(), cleanForDedupe(), decodeHtmlEntities(), decodeJsEscapes(), dedupeGoogleResults(), googleImageHeaders (+18 more)
+Cohesion: 0.19
+Nodes (27): addGoogleImageResult(), addUniqueImage(), cleanExtractedUrl(), cleanForDedupe(), decodeHtmlEntities(), decodeJsEscapes(), dedupeGoogleResults(), googleImageHeaders (+19 more)
 
 ### Community 13 - "publisherMetadata.ts"
 Cohesion: 0.12
@@ -446,12 +448,12 @@ Cohesion: 0.09
 Nodes (49): animate, applyChunkHighlight(), cancelJump(), cancelLongPress(), chunkAtPoint(), chunkEls, clearChunkHighlight(), contentRef (+41 more)
 
 ### Community 16 - "HomeDesktop.vue"
-Cohesion: 0.09
-Nodes (16): filteredBooks, displayedFavourites, { isTablet }, percent, props, bookInitial, props, { books, recentlyAddedBooks, recentlyReadBooks, seriesList, loading, initialized, error, fetchAllData } (+8 more)
+Cohesion: 0.12
+Nodes (11): filteredBooks, displayedFavourites, { books, recentlyAddedBooks, recentlyReadBooks, seriesList, loading, initialized, error, fetchAllData }, currentBook, matches(), normalizedQuery, { play, togglePlay, ttsBook, ttsStatus }, query (+3 more)
 
 ### Community 17 - "PlayingBar.vue"
-Cohesion: 0.06
-Nodes (26): { books, toggleFavourite }, chapterMenuOpen, chapterMenuRef, chapterMenuX, chapterSegments, currentBookIndex, hasNextBook, hasPreviousBook (+18 more)
+Cohesion: 0.05
+Nodes (29): { books, toggleFavourite }, chapterMenuOpen, chapterMenuRef, chapterMenuX, chapterSegments, coverFallback(), currentBookIndex, generateCoverPlaceholder() (+21 more)
 
 ### Community 18 - "useBookMetadataSearch.js"
 Cohesion: 0.10
@@ -466,28 +468,28 @@ Cohesion: 0.05
 Nodes (25): { addToast }, authorFetchLoading, authorFetchProgress, backgroundOptions, { books, authors, collections, genres, recentlyAddedBooks, fetchAndStoreAuthorDetails }, booksWithCovers, booksWithWebReviews, { canShareApp, shareApp } (+17 more)
 
 ### Community 21 - "SettingsStorageMobile.vue"
-Cohesion: 0.06
-Nodes (28): { addToast }, autoStatusLabel, backfillPercent, { books, updateBook, restoreHiddenBooks, countHiddenBooks }, folderSuggestions, formatBytes(), formattedStorageSize, { getStorageSummary } (+20 more)
+Cohesion: 0.07
+Nodes (21): { addToast }, autoStatusLabel, backfillPercent, { books, updateBook, restoreHiddenBooks, countHiddenBooks }, folderSuggestions, { getStorageSummary }, hiddenCount, newFolderInput (+13 more)
 
-### Community 22 - "useMobileReaderPrefs.js"
-Cohesion: 0.05
-Nodes (54): bookStreak(), calendarDaysBetween(), keyFor(), localDay(), longestBookStreak(), readBookAnalytics(), recordBookActivity(), values (+46 more)
+### Community 22 - "useStreak.js"
+Cohesion: 0.12
+Nodes (30): bookStreak(), calendarDaysBetween(), keyFor(), localDay(), longestBookStreak(), readBookAnalytics(), recordBookActivity(), values (+22 more)
 
 ### Community 23 - "SettingsStorageResetMobile.vue"
 Cohesion: 0.06
 Nodes (24): { addToast }, backfillPercent, { books, updateBook, restoreHiddenBooks, countHiddenBooks }, formattedStorageSize, { getStorageSummary }, hiddenCount, newFolderInput, refreshHiddenCount() (+16 more)
 
-### Community 24 - "importDeviceFile"
-Cohesion: 0.60
-Nodes (5): base64ToFile(), importDeviceFile(), readDeviceFileBase64(), repairDeviceEpubContent(), repairDevicePdfSource()
+### Community 24 - "useMobileReaderPrefs.js"
+Cohesion: 0.08
+Nodes (24): clamp(), MOBILE_READER_PREFS_KEY, normalizeMobileReaderPrefs(), PDF_PAGE_MODE_OPTIONS, PDF_VIEW_MODE_OPTIONS, PDF_ZOOM_MIN, PDF_ZOOM_STEP, prefsState (+16 more)
 
 ### Community 25 - "PdfViewer.vue"
-Cohesion: 0.07
-Nodes (46): buildPages(), dataUrlToBytes(), emit, getPosition(), getVisiblePage(), highlightsByPage, isStreamableUrl(), measuredSpanRects() (+38 more)
+Cohesion: 0.08
+Nodes (44): buildPages(), dataUrlToBytes(), emit, getPosition(), getVisiblePage(), highlightsByPage, isStreamableUrl(), measuredSpanRects() (+36 more)
 
 ### Community 26 - "usePagesSettings.js"
-Cohesion: 0.05
-Nodes (52): ACCENT_COLOR_OPTIONS, APP_BACKGROUND_OPTIONS, applyCurrentTheme(), applyPagesTheme(), BOOK_ACTION_DISPLAY_OPTIONS, CARD_BACKGROUND_OPTIONS, clamp(), CURRENT_SETTINGS_VERSION (+44 more)
+Cohesion: 0.06
+Nodes (47): ACCENT_COLOR_OPTIONS, APP_BACKGROUND_OPTIONS, applyCurrentTheme(), applyPagesTheme(), BOOK_ACTION_DISPLAY_OPTIONS, CARD_BACKGROUND_OPTIONS, clamp(), CURRENT_SETTINGS_VERSION (+39 more)
 
 ### Community 27 - "EditBookComp.vue"
 Cohesion: 0.04
@@ -495,7 +497,7 @@ Nodes (46): { addToast }, { apiUrl }, blurbOptions, bookKind, { cacheCoverImage 
 
 ### Community 28 - "seriesDomainTypes.ts"
 Cohesion: 0.11
-Nodes (29): calculateWeightedConfidence(), DEFAULT_PROVIDER_RELIABILITY_MATRIX, BookAuditRecord, DryRunAuditReport, CanonicalSeries, CanonicalWork, EntryType, EvidenceClaimType (+21 more)
+Nodes (32): calculateWeightedConfidence(), DEFAULT_PROVIDER_RELIABILITY_MATRIX, LiveShadowAuditSummary, runLiveShadowAudit(), BookAuditRecord, DryRunAuditReport, CanonicalSeries, CanonicalWork (+24 more)
 
 ### Community 29 - "PlaylistDetailMobile.vue"
 Cohesion: 0.05
@@ -534,8 +536,8 @@ Cohesion: 0.05
 Nodes (40): account, addBookAfter, { applyFormatMode }, avatarPreview, backup, backupChoices, backupDraft, { books } (+32 more)
 
 ### Community 38 - "metadata.get.ts"
-Cohesion: 0.09
-Nodes (34): File Structure, Series Collection Progress Implementation Plan, Task 2: Metadata Propagation, Task 3: Series Progress Labels, Task 4: End-to-End Verification, firstValue(), fromGoodreads(), fromGoogleBooks() (+26 more)
+Cohesion: 0.12
+Nodes (28): firstValue(), fromGoodreads(), fromGoogleBooks(), fromInternetArchive(), fromKobo(), fromOpenLibrary(), fromPublisher(), getGoodreadsSources() (+20 more)
 
 ### Community 39 - "useLibraryFilters.js"
 Cohesion: 0.23
@@ -545,17 +547,17 @@ Nodes (14): clearUnavailableLibraryFormatFilters(), DEFAULT_LIBRARY_FILTERS, DOC
 Cohesion: 0.09
 Nodes (27): buildCoverPlaceholder(), cardElement, closeMenu(), closeMenuOutside(), coverUrl, effectiveCollapseActions, emit, generateCoverPlaceholder() (+19 more)
 
-### Community 41 - "useFormatEnablement.js"
-Cohesion: 0.24
-Nodes (12): booksOfFormat(), formatLabel(), formatRefreshTail, formatsAddedBy(), formatsRemovedBy(), useFormatEnablement(), chunkForProgress(), progressForChunk() (+4 more)
+### Community 41 - "uxBatchFive.test.js"
+Cohesion: 0.15
+Nodes (19): booksOfFormat(), formatLabel(), formatRefreshTail, formatsAddedBy(), formatsRemovedBy(), useFormatEnablement(), enabledAcceptAttribute(), enabledExtensionPattern() (+11 more)
 
 ### Community 42 - "backupLocalData.js"
 Cohesion: 0.23
 Nodes (13): activeDatesOf(), cleanDates(), collectLocalData(), EXACT_KEYS, isBackedUpLocalKey(), mergeStreakStates(), parse(), PREFIX_KEYS (+5 more)
 
 ### Community 43 - "useAuthorImageSearch.js"
-Cohesion: 0.20
-Nodes (10): addImage(), fetchAuthorImageResults(), findOpenLibraryAuthorImages(), findWikidataImages(), findWikipediaSummaryImages(), imageInfoForFiles(), isUsefulAuthorImage(), normalizeAuthorImageResults() (+2 more)
+Cohesion: 0.33
+Nodes (9): addImage(), fetchAuthorImageResults(), findOpenLibraryAuthorImages(), findWikidataImages(), findWikipediaSummaryImages(), imageInfoForFiles(), isUsefulAuthorImage(), normalizeAuthorImageResults() (+1 more)
 
 ### Community 44 - "HomeMobile.vue"
 Cohesion: 0.09
@@ -572,8 +574,8 @@ Nodes (15): {
 }, currentReadingBook, homePlaylistResults, homeSearch, homeSearchResults, mobileRecentBooks, mobileSeries, router (+7 more)
 
 ### Community 45 - "PreferencesMobile.vue"
-Cohesion: 0.09
-Nodes (17): { enabledFormats }, options, { settings, updateSettings }, bookActionDisplayOptions, { enabledFormats, formatMode }, { fetchAllData }, formatFilterSummary, formatModeSummary (+9 more)
+Cohesion: 0.13
+Nodes (11): bookActionDisplayOptions, { enabledFormats, formatMode }, { fetchAllData }, formatModeSummary, highlightSummary, { isTablet }, listenVisualSummary, ratingSourceSummary (+3 more)
 
 ### Community 46 - "nativeSpeech.js"
 Cohesion: 0.13
@@ -588,32 +590,32 @@ Cohesion: 0.10
 Nodes (17): account, { addToast }, automaticFrequencies, backup, configured, confirm, confirmCopy, loadVersions() (+9 more)
 
 ### Community 49 - "AnnotationListMobile.vue"
-Cohesion: 0.07
-Nodes (20): { addToast }, book, bookId, { books }, confirmDelete, editing, { highlights, notes }, items (+12 more)
-
-### Community 50 - "MobilePlayingBar.vue"
 Cohesion: 0.10
-Nodes (14): coverUrl, dragging, fallbackCover, hasBottomNav, { isMobileView }, isPlaying, NAV_ROUTES, route (+6 more)
+Nodes (15): { addToast }, book, bookId, { books }, confirmDelete, editing, { highlights, notes }, items (+7 more)
+
+### Community 50 - "vue-router"
+Cohesion: 0.07
+Nodes (24): coverUrl, dragging, fallbackCover, hasBottomNav, { isMobileView }, isPlaying, NAV_ROUTES, route (+16 more)
 
 ### Community 51 - "AddToPlaylistModal.vue"
 Cohesion: 0.12
 Nodes (18): { addToast }, { collections, createPlaylist, addBookToPlaylist, removeBookFromPlaylist }, coverUrl, createAndAdd(), creating, emit, finish(), generateCoverPlaceholder() (+10 more)
 
 ### Community 52 - "Series Collection Progress Design"
-Cohesion: 0.22
-Nodes (8): Architecture, Counting Rules, Data Flow, Failure Handling, Goal, Series Collection Progress Design, Testing, UI
+Cohesion: 0.25
+Nodes (7): Architecture, Counting Rules, Failure Handling, Goal, Series Collection Progress Design, Testing, UI
 
 ### Community 53 - "useTTS.js"
-Cohesion: 0.08
-Nodes (49): _audioCache, _audioInFlight, buildChapterBoundariesFromHtml(), buildReadableChunks(), buildReadableSectionChunks(), chunkIndexForPdfProgress(), chunkIndexForProgress(), _chunks (+41 more)
+Cohesion: 0.10
+Nodes (21): _audioCache, _audioInFlight, _chunks, _currentBoundaries, EDGE_VOICES, findContentStart(), _isBoilerplate(), _isCopyrightChunk() (+13 more)
 
 ### Community 54 - "ref_h3"
-Cohesion: 0.19
-Nodes (7): ref_h3, ALLOWED_CONTENT_TYPES, CacheEntry, normalizeKey(), seriesCacheKey(), withSeriesCache(), root
+Cohesion: 0.15
+Nodes (10): ref_h3, findWikidataImage(), headers, imageInfoForFile(), ALLOWED_CONTENT_TYPES, CacheEntry, normalizeKey(), seriesCacheKey() (+2 more)
 
 ### Community 55 - "package.json"
-Cohesion: 0.09
-Nodes (19): config, name, private, type, version, @capacitor/android, @capacitor/cli, @capacitor-community/text-to-speech (+11 more)
+Cohesion: 0.08
+Nodes (23): config, name, overrides, glob, workbox-build, private, type, version (+15 more)
 
 ### Community 56 - "engine-core.js"
 Cohesion: 0.09
@@ -623,13 +625,13 @@ Nodes (42): angleDelta(), applyMoves(), BASE_PROFILES, cache, COUNT_KEYS, COUNT_
 Cohesion: 0.11
 Nodes (18): bytearrayoutputstream, com.getcapacitor.annotation.PermissionCallback, contentvalues, cursor, environment, fileinputstream, fileoutputstream, fileprovider (+10 more)
 
-### Community 58 - "aiMetadataVerifier.ts"
-Cohesion: 0.20
-Nodes (20): AiPatch, AiProviderConfig, AiVerifierOptions, applyAiPatches(), buildVerificationPrompt(), callGemini(), callGroq(), cleanBlurb() (+12 more)
+### Community 58 - "authorImagesWeb.ts"
+Cohesion: 0.24
+Nodes (16): addImage(), AuthorImageResult, buildAuthorGoogleQueries(), fetchJson(), fetchText(), findDuckDuckGoImages(), findOpenLibraryAuthorImages(), findWikidataAuthorImages() (+8 more)
 
 ### Community 59 - "useDocumentReview.js"
-Cohesion: 0.28
-Nodes (17): documentAnalysisDue(), deferredDocumentReviews(), documentTypeOf(), fileAgreesWithTitle(), hasLegacyBookEvidence(), inferPdfBookDetails(), inferPdfDocumentType(), inferStoredPdfDocumentType() (+9 more)
+Cohesion: 0.32
+Nodes (15): deferredDocumentReviews(), fileAgreesWithTitle(), hasLegacyBookEvidence(), inferPdfBookDetails(), inferPdfDocumentType(), inferStoredPdfDocumentType(), legacyPdfFileName(), migrateLegacyPdfRecord() (+7 more)
 
 ### Community 60 - "ProfilePage.vue"
 Cohesion: 0.05
@@ -640,12 +642,12 @@ Cohesion: 0.17
 Nodes (18): annotationRoot(), cancelLongPress(), clearNativeSelection(), closeNoteEditor(), deleteNote(), hideSelectionMenu(), mountNearbyPlaceholders(), noteInteraction() (+10 more)
 
 ### Community 62 - "PlaylistsDesktop.vue"
-Cohesion: 0.12
-Nodes (18): emit, isBulk, props, { addToast }, closeContextMenu(), closeEditor(), { collections, books, updatePlaylist, deletePlaylist }, confirmDelete() (+10 more)
+Cohesion: 0.15
+Nodes (15): { addToast }, closeContextMenu(), closeEditor(), { collections, books, updatePlaylist, deletePlaylist }, confirmDelete(), contextMenu, editingPlaylist, handleWindowKeydown() (+7 more)
 
-### Community 63 - "uxBatchFive.test.js"
-Cohesion: 0.19
-Nodes (18): enabledFormatsForMode(), appendLine(), assembleLines(), blocksForLines(), blocksToHtml(), collectRepeatedMarginText(), detectColumns(), endsParagraph() (+10 more)
+### Community 63 - "usePdfReflow.js"
+Cohesion: 0.22
+Nodes (17): appendLine(), assembleLines(), blocksForLines(), blocksToHtml(), collectRepeatedMarginText(), detectColumns(), endsParagraph(), escapeHtml() (+9 more)
 
 ### Community 64 - "dependencies"
 Cohesion: 0.10
@@ -653,23 +655,23 @@ Nodes (21): dependencies, @capacitor/android, @capacitor/app, @capacitor-communi
 
 ### Community 66 - "vue"
 Cohesion: 0.04
-Nodes (31): mode, positionStyle, props, FILL, ILLUSTRATION_SOURCES, props, source, { signedIn } (+23 more)
+Nodes (31): accentSwatch, enabled, followsAccent, isDark, previewColor, { settings, updateSettings }, mode, positionStyle (+23 more)
 
 ### Community 67 - "AvatarSourcePicker.vue"
 Cohesion: 0.09
-Nodes (18): clampOffset(), cropFrame, cropImage, drag(), fileInput, frameSize, imageError, imageReady (+10 more)
+Nodes (25): backToChoices(), choosePreset(), clampOffset(), clearPhoto(), close(), cropFrame, cropImage, drag() (+17 more)
 
 ### Community 68 - "documentIntelligence.js"
 Cohesion: 0.12
-Nodes (28): applyVerifiedMetadata(), buildDocumentQuery(), canApplyCatalogMetadata(), candidateIsbns(), canSearchCatalog(), selectVerifiedCatalogCandidate(), verifyCatalogCandidate(), BOOK_MARKERS (+20 more)
+Nodes (29): applyVerifiedMetadata(), buildDocumentQuery(), canApplyCatalogMetadata(), candidateIsbns(), canSearchCatalog(), selectVerifiedCatalogCandidate(), verifyCatalogCandidate(), BOOK_MARKERS (+21 more)
 
 ### Community 69 - "SeriesCollageCard.vue"
-Cohesion: 0.10
+Cohesion: 0.09
 Nodes (18): background, bookCount, collectedCount, countLabel, coverStack, emit, highestBookTotal, isPlaylist (+10 more)
 
 ### Community 70 - "normalizeSeriesKey"
-Cohesion: 0.21
-Nodes (20): aiAttemptedRecently(), applyResultToSuggestion(), attemptCountFor(), bestResultForOwnedBook(), cacheKey(), fetchSuggestionDetails(), fillRosterGapsWithAi(), localizeSuggestionCovers() (+12 more)
+Cohesion: 0.17
+Nodes (26): aiAttemptedRecently(), attemptCountFor(), bestResultForOwnedBook(), bumpAttemptCount(), cacheKey(), fetchSeriesInstallments(), fillRosterGapsWithAi(), hydrateSeriesSuggestions() (+18 more)
 
 ### Community 71 - "PocketTtsSynthesizer"
 Cohesion: 0.07
@@ -677,7 +679,7 @@ Nodes (23): accelerator, IntArray, PocketTtsSynthesizer, Result, IntArray, Piece
 
 ### Community 72 - "ref"
 Cohesion: 0.03
-Nodes (6): { visible, answer }, { isPhone, isPortrait }, fetchCoverImageResults(), fetchWebCoverImages(), route, ref
+Nodes (10): { visible, answer }, { isPhone, isPortrait }, hasUsableAudio(), synthesizeDesktopSpeech(), mockCacheCoverImage, mockExists, fetchCoverImageResults(), fetchWebCoverImages() (+2 more)
 
 ### Community 73 - "emit"
 Cohesion: 0.15
@@ -691,33 +693,33 @@ Nodes (13): builtInSections, defaultFor(), emit, filterOpen, formatFilters, hasA
 Cohesion: 0.19
 Nodes (18): finiteRating(), getBookRating(), getExternalRating(), personalRatingForScale(), personalRatingFromScale(), RATING_SOURCE_LABELS, useSelectedBookRating(), withExternalRating() (+10 more)
 
-### Community 76 - "koboScraper.ts"
-Cohesion: 0.23
-Nodes (11): Metadata Scraper Redesign Implementation Plan, Task 1: Google Books API utility, Task 2: Kobo scraper, Task 4: Rewrite the metadata endpoint, Task 5: Manual verification, extractJsonLdBook(), fetchHtml(), HEADERS (+3 more)
+### Community 76 - "coverSearch.ts"
+Cohesion: 0.12
+Nodes (25): Metadata Scraper Redesign Implementation Plan, Task 1: Google Books API utility, Task 2: Kobo scraper, Task 3: Add `getGoodreadsReview` to existing scraper, Task 4: Rewrite the metadata endpoint, Task 5: Manual verification, cheerio, AppleBookCover (+17 more)
 
 ### Community 77 - "Composable: `composables/useTTS.js` (rewrite playback engine)"
-Cohesion: 0.17
-Nodes (11): Chunk size, Composable: `composables/useTTS.js` (rewrite playback engine), Keep entirely, Playback engine — `_speakNextEdge()`, Pre-fetch next chunk, Remove entirely, Speed / Voice changes, State — no changes to shape (+3 more)
+Cohesion: 0.20
+Nodes (10): Chunk size, Composable: `composables/useTTS.js` (rewrite playback engine), Playback engine — `_speakNextEdge()`, Pre-fetch next chunk, Remove entirely, Speed / Voice changes, State — no changes to shape, Stop / Cancel (+2 more)
 
 ### Community 78 - "Pages UX batch — voices, position sync, filters, format removal, PDF reflow"
 Cohesion: 0.09
 Nodes (21): 2. Reading position across page and scroll mode, 3. "Currently Reading" shows the last narrated book, 4. Per-page filter independence and persistence, 5. Playlist icon does not indicate membership, 6. Format removal and first-boot chooser, 7. Text visible below the chapter pill in scroll mode, 8. WPS-style Original View / Reflow mode for PDFs (mobile only), Cause (+13 more)
 
 ### Community 79 - "Author Enrichment — Design Spec"
-Cohesion: 0.15
-Nodes (12): Architecture, Author Enrichment — Design Spec, `AuthorDetailComp.vue`, Error Handling, Frontend Changes, Image picker behaviour, New Endpoint: `/api/authors/enrich.get.ts`, Problem (+4 more)
+Cohesion: 0.22
+Nodes (8): Architecture, Author Enrichment — Design Spec, Error Handling, New Endpoint: `/api/authors/enrich.get.ts`, Problem, Removal, Solution Overview, What Is Removed
 
-### Community 80 - "productionSnapshotEngine.ts"
-Cohesion: 0.23
-Nodes (19): server_utils_liveshadowauditengine_shadowproposalreport, verifyCanonicalLibraryEquivalence(), executePhase3ACanary(), Phase3ACanaryAuditReport, executePhase3BBatch(), Phase3BBatchAuditReport, executePhase3CFinalBatch(), Phase3CFinalBatchAuditReport (+11 more)
+### Community 80 - "computeContentHash"
+Cohesion: 0.29
+Nodes (14): verifyCanonicalLibraryEquivalence(), executePhase3ACanary(), Phase3ACanaryAuditReport, executePhase3BBatch(), Phase3BBatchAuditReport, executePhase3CFinalBatch(), Phase3CFinalBatchAuditReport, ADB_VERIFIED_PHYSICAL_DEVICE_IDENTITY (+6 more)
 
 ### Community 81 - "Getting Started"
 Cohesion: 0.11
 Nodes (17): 1. Clone the repository, 2. Install dependencies, 3. Configure optional environment variables, 4. Start the development server, Android Build, Data Model, Development builds install alongside, not over, Gallery (+9 more)
 
 ### Community 82 - "useAccount.js"
-Cohesion: 0.24
-Nodes (13): accountConfig(), AccountSetupError, getSupabase(), initAccount(), isAccountConfigured(), randomNonce(), readyState, sessionState (+5 more)
+Cohesion: 0.27
+Nodes (12): accountConfig(), AccountSetupError, getSupabase(), initAccount(), isAccountConfigured(), randomNonce(), readyState, sessionState (+4 more)
 
 ### Community 83 - "SettingsMobile.vue"
 Cohesion: 0.12
@@ -732,12 +734,12 @@ Cohesion: 0.14
 Nodes (17): activeStatusIndex, activeViewIndex, props, statusChipsRef, statusHighlightActive, statusHighlightStyle, statusHoverIndex, statusOptions (+9 more)
 
 ### Community 86 - "useEdgeSpeechClient.js"
-Cohesion: 0.25
-Nodes (13): appendEdgeWordBoundaries(), audioPartsToDataUrl(), buildEdgeSsml(), EDGE_TTS_RATE_MAP, edgeRateForSpeed(), escapeSsmlText(), extractEdgeAudioPayload(), generateSecMsGec() (+5 more)
+Cohesion: 0.15
+Nodes (14): appendEdgeWordBoundaries(), audioPartsToDataUrl(), buildEdgeSsml(), EDGE_TTS_RATE_MAP, edgeRateForSpeed(), escapeSsmlText(), extractEdgeAudioPayload(), generateSecMsGec() (+6 more)
 
 ### Community 87 - "composables/useEpubExtractor.js"
-Cohesion: 0.26
-Nodes (11): extractEpub(), inferEpubSectionTitle(), inlineCssUrls(), parseXml(), PASSTHROUGH_AT, readBlock(), resolvePath(), scopeCss() (+3 more)
+Cohesion: 0.15
+Nodes (17): extractEpub(), inferEpubSectionTitle(), inlineCssUrls(), parseXml(), PASSTHROUGH_AT, readBlock(), resolvePath(), scopeCss() (+9 more)
 
 ### Community 88 - "dry-humor/manifest.json"
 Cohesion: 0.08
@@ -747,9 +749,9 @@ Nodes (24): assets, characters, labels, passages, turns, analysisRevision, asset
 Cohesion: 0.29
 Nodes (12): buildQueries(), fetchItemDetails(), IAResult, internetArchiveHeaders, normalizeArray(), normalizeCreator(), normalizeDescription(), normalizeGenre() (+4 more)
 
-### Community 90 - "aiAuthorVerifier.ts"
-Cohesion: 0.19
-Nodes (17): AiAuthorOptions, AiProviderConfig, applyPatch(), AuthorDetails, buildPrompt(), callGemini(), callGroq(), compact() (+9 more)
+### Community 90 - "Document intelligence redesign"
+Cohesion: 0.15
+Nodes (12): cleanTitleFromFileName(), generateCoverPlaceholder(), importDocumentFile(), Document intelligence redesign, Findings in the current implementation, Implementation order, Migration, Objective (+4 more)
 
 ### Community 91 - "review-documents.vue"
 Cohesion: 0.12
@@ -760,8 +762,8 @@ Cohesion: 0.10
 Nodes (21): { addToast }, avatarModalOpen, avatarSourceOpen, bioDraft, bioError, canSaveProfile, draftInitialized, firstName (+13 more)
 
 ### Community 93 - "useSeriesSuggestions.js"
-Cohesion: 0.14
-Nodes (25): bumpAttemptCount(), _detailLookups, ensureHydrated(), fetchAiSeriesOrder(), fetchRoster(), fetchSeriesInstallments(), filledDisplayFields(), hydrateSeriesSuggestions() (+17 more)
+Cohesion: 0.15
+Nodes (17): _detailLookups, ensureHydrated(), fetchAiSeriesOrder(), fetchRoster(), filledDisplayFields(), installmentImproved(), loadDeviceSearch(), _localizing (+9 more)
 
 ### Community 94 - "ProfileDesktop.vue"
 Cohesion: 0.09
@@ -787,9 +789,9 @@ Nodes (16): bodyRef, close(), dragY, emit, highlightFollowsAccent, highlightOn, 
 Cohesion: 0.13
 Nodes (23): assetPath(), BACKUP_FREQUENCIES, BACKUP_PROMPT_SEEN_KEY, BACKUP_VERSION_OPTIONS, DEFAULT_BACKUP_PREFS, deviceLabel(), downloadObject(), frequencyMs() (+15 more)
 
-### Community 100 - "aiSeriesEnumerator.ts"
-Cohesion: 0.23
-Nodes (17): AiSeriesBook, AiSeriesConfig, AiSeriesOptions, AiSeriesProvider, anchorsAgree(), buildSeriesOrderPrompt(), callGemini(), callGroq() (+9 more)
+### Community 100 - "SystemBarsPlugin.java"
+Cohesion: 0.20
+Nodes (9): SystemBarsPlugin, android.view.View, color, framelayout, gravity, viewcompat, viewgroup, windowinsetscompat (+1 more)
 
 ### Community 101 - "ReaderSlider.vue"
 Cohesion: 0.19
@@ -804,8 +806,8 @@ Cohesion: 0.17
 Nodes (6): EPUB_PAGE_MAP_PREFIX, prunePageMapCache(), writePageMapCache(), 1. ReadEra-Style Offscreen Column Pagination (`useEpubPageMap.js`), 2. Sentence-Based Annotation Anchoring (`useAnnotations.js`), Phase 6: Reader & Annotations Architecture
 
 ### Community 104 - "make-gallery.mjs"
-Cohesion: 0.19
-Nodes (12): BASE, CARDS, __dirname, esc(), loadCover(), makeCard(), makeShadow(), OUT (+4 more)
+Cohesion: 0.18
+Nodes (13): BASE, CARDS, __dirname, esc(), loadCover(), makeCard(), makeShadow(), OUT (+5 more)
 
 ### Community 105 - "scripts"
 Cohesion: 0.17
@@ -840,24 +842,24 @@ Cohesion: 0.42
 Nodes (6): recoverLegacyMetadata(), sourceBookIdentity(), sourceDocumentIdentity(), applySeriesChoice(), seriesDisplayLabel(), seriesMembership()
 
 ### Community 113 - "LocalSpeechStream"
-Cohesion: 0.09
-Nodes (10): Boundary, Events, Item, LocalSpeechStream, Mark, Pcm, PieceSink, Synthesizer (+2 more)
+Cohesion: 0.17
+Nodes (4): Boundary, LocalSpeechStream, Mark, android.media.AudioTrack
 
 ### Community 114 - "FavouritesMobile.vue"
-Cohesion: 0.09
-Nodes (20): { addToast }, { favourites, toggleFavourite, deleteBook, hideBook, loading, initialized }, favouritesBackground, favouritesLayout, { filters, setFilter, resetFilters, matches }, handlePlay(), isBookActive(), { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } (+12 more)
+Cohesion: 0.12
+Nodes (14): { addToast }, { favourites, toggleFavourite, deleteBook, hideBook, loading, initialized }, favouritesBackground, favouritesLayout, { filters, setFilter, resetFilters, matches }, handlePlay(), isBookActive(), { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus } (+6 more)
 
 ### Community 116 - "useDeviceMetadataSearch.js"
-Cohesion: 0.29
-Nodes (13): applyGoogleBooksKey(), asSource(), enumerateSeriesOnDevice(), fetchBookMetadataOnDevice(), fetchSeriesBooksOnDevice(), fetchSeriesTotalOnDevice(), fromPublisher(), getGoodreadsSources() (+5 more)
+Cohesion: 0.12
+Nodes (21): joinApiUrl(), normalizeApiBaseUrl(), PAGES_API_BASE_URL_KEY, readStoredApiBaseUrl(), resolveApiBaseUrl(), useApiEndpoint(), writeStoredApiBaseUrl(), applyGoogleBooksKey() (+13 more)
 
 ### Community 117 - "original-door/manifest.json"
 Cohesion: 0.08
 Nodes (24): assets, characters, labels, passages, turns, analysisRevision, assets, characters (+16 more)
 
 ### Community 118 - "useAppUpdate.js"
-Cohesion: 0.36
-Nodes (8): DEFERRED_VERSION_KEY, readDeferredCode(), readInstalledVersion(), readSkippedCode(), SKIPPED_VERSION_KEY, useAppUpdate(), writeDeferredCode(), writeSkippedCode()
+Cohesion: 0.15
+Nodes (12): DEFERRED_VERSION_KEY, readDeferredCode(), readInstalledVersion(), readSkippedCode(), SKIPPED_VERSION_KEY, useAppUpdate(), writeDeferredCode(), writeSkippedCode() (+4 more)
 
 ### Community 119 - "returning-cast/manifest.json"
 Cohesion: 0.08
@@ -887,13 +889,13 @@ Nodes (9): afterSignIn(), applyFormats(), go(), prefillName(), reconnect(), rest
 Cohesion: 0.12
 Nodes (25): backfillBookMetadata(), chooseDeviceImportKeeper(), DEFAULT_SCAN_FOLDERS, deleteDeviceImport(), DeviceBooks, ensureStoragePermission(), fileInScanFolders(), isTooLargeError() (+17 more)
 
-### Community 126 - "Local-First Library Migration Design"
-Cohesion: 0.13
-Nodes (14): Author Detail Routing, Book object (stored in IndexedDB `books` store), Collection object (stored in IndexedDB `collections` store), Data Model, Deleted: NeonDB + Drizzle infrastructure, Goal, Kept: Utility server routes (no user data), Local-First Library Migration Design (+6 more)
+### Community 126 - "Local-First Library Migration Implementation Plan"
+Cohesion: 0.18
+Nodes (10): File Map, Local-First Library Migration Implementation Plan, Self-Review, Spec coverage check, Task 1: Create `useLibraryStore.js` with tests, Task 2: Rewrite `composables/useBooks.js`, Task 3: Update `composables/useBooks.test.js`, Task 4: Fix component — `CollectionsComp.vue` (+2 more)
 
 ### Community 127 - "useChunkSpans.js"
-Cohesion: 0.13
-Nodes (20): buildTextIndex(), collectChunkSpans(), decodeHtmlEntities(), freshDocumentRoot(), mapSectionChunks(), normalizeForSearch(), offscreenRoot(), resolveRangePoint() (+12 more)
+Cohesion: 0.25
+Nodes (12): buildTextIndex(), collectChunkSpans(), decodeHtmlEntities(), freshDocumentRoot(), mapSectionChunks(), normalizeForSearch(), offscreenRoot(), resolveRangePoint() (+4 more)
 
 ### Community 128 - "same-words-three-meanings/manifest.json"
 Cohesion: 0.08
@@ -904,12 +906,12 @@ Cohesion: 0.25
 Nodes (4): EDGE_AUDIO, $fetch, nativeSpeechSupported, synthesizeEdgeSpeechInBrowser
 
 ### Community 130 - "Pages_Master_AI_Knowledge_Base_Combined.md"
-Cohesion: 0.06
-Nodes (32): 18. Critical Invariants, Failure Modes & Discovered Behaviors, 1. Endpoint Summary, 1. Master System Overview & Architecture Diagrams, 1. Memory & Storage Scaling, 1. Multi-Provider Aggregation & Priority Rankings, 1. Native Integrations, 1. Platform View Selection, 1. Release APK Generation (+24 more)
-
-### Community 131 - "vue-router"
 Cohesion: 0.07
-Nodes (29): { collapsed, toggleCollapsed }, getActiveRouteIndex(), highlightStyle, hoverIndex, isHighlightActive, isMenuItemActive(), isSettingsActive, menuItems (+21 more)
+Nodes (27): 18. Critical Invariants, Failure Modes & Discovered Behaviors, 1. Endpoint Summary, 1. Master System Overview & Architecture Diagrams, 1. Memory & Storage Scaling, 1. Native Integrations, 1. Platform View Selection, 1. Release APK Generation, 1. Search Engine (+19 more)
+
+### Community 131 - "default.vue"
+Cohesion: 0.25
+Nodes (7): { collapsed: sidebarCollapsed }, hideScrollbars, isMobileSubPage, isSettingsPalettePage, route, SCROLLBAR_HIDDEN_ROOTS, TAB_ROOT_PATHS
 
 ### Community 132 - "kokoroTts.worker.js"
 Cohesion: 0.53
@@ -924,16 +926,16 @@ Cohesion: 0.43
 Nodes (6): documentHidden(), edgeTimeoutForText(), hasUsableAudio(), mobileTtsEdgeDisabled(), noteEdgeFailure(), synthesizeMobileSpeech()
 
 ### Community 135 - "MobileTopNav.vue"
-Cohesion: 0.12
-Nodes (12): appLogo, firstName, isFirstBoot, { profile, activeAvatarPreset, loadProfile }, profileAvatarSrc, router, { settings }, showStreak (+4 more)
+Cohesion: 0.07
+Nodes (23): appLogo, firstName, isFirstBoot, { profile, activeAvatarPreset, loadProfile }, profileAvatarSrc, router, { settings }, showStreak (+15 more)
 
 ### Community 136 - "shout-then-ordinary/manifest.json"
 Cohesion: 0.08
 Nodes (24): assets, characters, labels, passages, turns, analysisRevision, assets, characters (+16 more)
 
-### Community 137 - "SystemBarsPlugin.java"
-Cohesion: 0.20
-Nodes (9): SystemBarsPlugin, android.view.View, color, framelayout, gravity, viewcompat, viewgroup, windowinsetscompat (+1 more)
+### Community 137 - "LocalSpeechPlugin.java"
+Cohesion: 0.09
+Nodes (26): activitymanager, AppIconPlugin, AppResetPlugin, PageSyncPlugin, android.content.ComponentName, android.content.pm.PackageManager, base64, bitmapfactory (+18 more)
 
 ### Community 138 - "three-way-station/manifest.json"
 Cohesion: 0.08
@@ -959,9 +961,9 @@ Nodes (3): coverPlaceholder(), onCoverError(), PLACEHOLDER_COLORS
 Cohesion: 0.20
 Nodes (9): Architecture, EPUB & PDF Reader Support — Design Spec, EPUB Processing (`AddBookModal.vue`), Error States Summary, Goal, Out of Scope, PDF Handling (`AddBookModal.vue`), Problem (+1 more)
 
-### Community 144 - "authorImagesWeb.ts"
-Cohesion: 0.24
-Nodes (17): addImage(), AuthorImageResult, buildAuthorGoogleQueries(), fetchJson(), fetchText(), findDuckDuckGoImages(), findOpenLibraryAuthorImages(), findWikidataAuthorImages() (+9 more)
+### Community 144 - "useTTS.test.js"
+Cohesion: 0.18
+Nodes (16): buildChapterBoundariesFromHtml(), buildReadableChunks(), buildReadableSectionChunks(), chunkTimeOffsets, decodeEntities(), formatDuration(), groupChunks(), isRenderableSection() (+8 more)
 
 ### Community 145 - "sign-release-apk.sh"
 Cohesion: 0.90
@@ -995,9 +997,9 @@ Nodes (17): allIds(), COMPLIMENT_OPENINGS, COMPLIMENT_QUALITIES, cycleOrder(), D
 Cohesion: 0.20
 Nodes (9): Author Details, Goal, Goodreads Metadata, PDF Highlighting, Read From Here, Reader, Metadata, and Author Repairs Design, Select Controls, Table of Contents (+1 more)
 
-### Community 153 - "useHtmlSanitizer.js"
-Cohesion: 0.32
-Nodes (6): BLOCKED_TAGS, compactScheme(), sanitizeBookHtml(), URL_ATTRIBUTES, 1. Security Safeguards, Phase 12: Security & Privacy Audit
+### Community 153 - "Local-First Library Migration Design"
+Cohesion: 0.20
+Nodes (9): Author Detail Routing, Book object (stored in IndexedDB `books` store), Collection object (stored in IndexedDB `collections` store), Data Model, Goal, Local-First Library Migration Design, Out of Scope, Problem (+1 more)
 
 ### Community 154 - "Library and Playlist UI Improvements Implementation Plan"
 Cohesion: 0.22
@@ -1006,6 +1008,10 @@ Nodes (8): Library and Playlist UI Improvements Implementation Plan, Task 1: Ind
 ### Community 155 - "closeChapterMenu"
 Cohesion: 0.50
 Nodes (4): closeChapterMenu(), jumpToChapter(), onDocumentClick(), onDocumentKeydown()
+
+### Community 157 - ".synthesizeItem"
+Cohesion: 0.16
+Nodes (5): Item, Pcm, PieceSink, Synthesizer, java.util.concurrent.LinkedBlockingQueue
 
 ### Community 158 - "useMetadataBackfill.js"
 Cohesion: 0.11
@@ -1024,8 +1030,8 @@ Cohesion: 0.53
 Nodes (4): bookEditLocation(), rememberBooksEditScroll(), safeReturnPath(), useBookEditReturn()
 
 ### Community 162 - "build-web-bundle.mjs"
-Cohesion: 0.24
-Nodes (14): allowDirty, computeMinNativeCode(), fail(), git(), keyPath, listFiles(), main(), NATIVE_PATHS (+6 more)
+Cohesion: 0.15
+Nodes (18): ref_node_crypto, allowDirty, computeMinNativeCode(), fail(), git(), keyPath, listFiles(), main() (+10 more)
 
 ### Community 163 - "PersonalRatingInput.vue"
 Cohesion: 0.33
@@ -1039,33 +1045,33 @@ Nodes (6): Override, LocalSpeechPlugin, com.getcapacitor.PluginCall, com.getcapa
 Cohesion: 0.50
 Nodes (5): applyVoiceChoice(), chooseNarrator(), chooseVoice(), needsDownload(), startVoiceDownload()
 
-### Community 166 - "usePdfManifest.js"
-Cohesion: 0.15
-Nodes (29): chunkHighlightRects(), chunkSubRangeRects(), itemSpanRect(), multiply(), pagesToRender(), scrollTargetForChunk(), spansToRects(), manifest (+21 more)
+### Community 166 - "usePdfGeometry.test.js"
+Cohesion: 0.19
+Nodes (20): chunkHighlightRects(), chunkSubRangeRects(), itemSpanRect(), multiply(), pagesToRender(), scrollTargetForChunk(), spansToRects(), manifest (+12 more)
 
 ### Community 167 - "sectionStartChunkLocal"
 Cohesion: 0.18
 Nodes (11): buildPageMap(), cancelChromeAutoHide(), chunkAtVisiblePage(), _idleSlice(), listenEpubGlobalPage, listenStartChunk, sampleScrollChunk(), scheduleChromeAutoHide() (+3 more)
 
-### Community 168 - "Document intelligence redesign"
-Cohesion: 0.15
-Nodes (12): cleanTitleFromFileName(), generateCoverPlaceholder(), importDocumentFile(), Document intelligence redesign, Findings in the current implementation, Implementation order, Migration, Objective (+4 more)
+### Community 168 - "usePdfManifest.js"
+Cohesion: 0.24
+Nodes (13): appendPageText(), buildPdfManifest(), chunkForId(), firstChunkForPage(), normalizeItem(), pageForChunk(), _pagePointsCache, pagePointsFor() (+5 more)
 
 ### Community 171 - "seriesAccuracy.test.js"
 Cohesion: 0.23
 Nodes (13): backfillSeriesTotals(), ensureSeriesTotal(), formatSeriesCollectionProgress(), metadataSeriesTotal(), normalizeSeriesName(), propagateSeriesTotal(), validSeriesTotals(), Series Data Backfill Implementation Plan (+5 more)
 
-### Community 172 - "LocalSpeechPlugin.java"
-Cohesion: 0.09
-Nodes (26): activitymanager, AppIconPlugin, AppResetPlugin, PageSyncPlugin, android.content.ComponentName, android.content.pm.PackageManager, base64, bitmapfactory (+18 more)
+### Community 172 - "useBooks.js"
+Cohesion: 0.39
+Nodes (5): canonicalLibrarySeriesName(), coverCacheInFlight, groupBooksBySeries(), normalizeLibrarySeriesName(), reconcileStatusProgress()
 
-### Community 173 - "vitest"
-Cohesion: 0.22
-Nodes (8): mockCacheCoverImage, mockExists, vitest, LiveShadowAuditSummary, runLiveShadowAudit(), verifySnapshotIntegrity(), generateRepairAndRollbackPlan(), ShadowProposalReport
+### Community 173 - "Pipeline"
+Cohesion: 0.25
+Nodes (8): 1. Discover and make readable, 2. Collect local evidence, 3. Infer document kind, 4. Resolve the book's identity, 5. Optional semantic assistance, 6. Apply verified metadata, 7. Ask only useful questions, Pipeline
 
-### Community 175 - "SeriesMobile.vue"
-Cohesion: 0.16
-Nodes (11): bookStatus(), collectionState(), { filters: filterValues, setFilters }, filterSections, props, router, { seriesList, loading, initialized }, seriesSource (+3 more)
+### Community 175 - "bookCoverMatch.ts"
+Cohesion: 0.50
+Nodes (6): authorMatches(), matchesRequestedBook(), normalized(), oneEditApart(), titleMatches(), withoutArticle()
 
 ### Community 176 - "system-bars.client.js"
 Cohesion: 0.36
@@ -1096,8 +1102,8 @@ Cohesion: 0.15
 Nodes (12): 1. Replace disconnected entry points with one coordinator, 2. Separate permission to search from permission to write, 3. Recover evidence and improve classification, 4. Implement durable retries and invalidation, 5. Repair identity resolution and provider contracts, 6. Make review and progress truthful, 7. Repair existing installations safely, Acceptance tests required before delivery (+4 more)
 
 ### Community 184 - "migrationEngine.ts"
-Cohesion: 0.15
-Nodes (23): CanaryExecutionReport, executeSingleBookCanary(), ALLOWED_REPAIR_FIELDS, AllowedRepairField, cloneLibrary(), isUserOverrideProtected(), MigrationManifest, MigrationResult (+15 more)
+Cohesion: 0.16
+Nodes (22): CanaryExecutionReport, executeSingleBookCanary(), ALLOWED_REPAIR_FIELDS, AllowedRepairField, cloneLibrary(), isUserOverrideProtected(), MigrationManifest, MigrationResult (+14 more)
 
 ### Community 185 - "loadBook"
 Cohesion: 0.20
@@ -1140,7 +1146,7 @@ Cohesion: 0.17
 Nodes (9): listenBackSeconds, listenForwardSeconds, listenScreenSummary, progressScope, readerPath, route, scopeOptions, { settings, updateSettings } (+1 more)
 
 ### Community 205 - "useLibraryBackup.js"
-Cohesion: 0.25
+Cohesion: 0.27
 Nodes (14): flushReadingPositions(), base64ToBytes(), bytesToBase64(), clearStores(), deserializeValue(), normalizeBackup(), openPagesDB(), readAllRecords() (+6 more)
 
 ### Community 207 - "processPageSyncImage"
@@ -1156,8 +1162,8 @@ Cohesion: 0.11
 Nodes (30): cancellation, cancelLocalSpeech(), cancelLocalVoiceDownload(), downloadLocalVoice(), ensureStreamListener(), isLocalTtsVoice(), isLocalVoiceInstalled(), LOCAL_TTS_VOICES (+22 more)
 
 ### Community 211 - "generate-version-manifest.mjs"
-Cohesion: 0.17
-Nodes (7): ref_node_url, accepted, args, manifest, outPath, packageJson, root
+Cohesion: 0.09
+Nodes (12): packageJson, ref_node_child_process, ref_node_url, accepted, args, manifest, outPath, packageJson (+4 more)
 
 ### Community 212 - "useLiveUpdate.js"
 Cohesion: 0.38
@@ -1168,24 +1174,24 @@ Cohesion: 0.15
 Nodes (8): { addToast }, followsAccent, isDark, modes, native, pendingIcon, pendingIconTarget, { settings, updateSettings }
 
 ### Community 215 - "updateAuthorImage"
-Cohesion: 0.22
-Nodes (9): error, searchAuthorImages(), selectImage(), triggerFileUpload(), updateAuthorImage(), Self-Review, Spec coverage check, Data Storage Changes (+1 more)
+Cohesion: 0.29
+Nodes (7): error, searchAuthorImages(), selectImage(), triggerFileUpload(), updateAuthorImage(), Data Storage Changes, New store method: `updateAuthorDetails`
 
 ### Community 216 - "DocumentTypePicker.vue"
 Cohesion: 0.33
 Nodes (6): choose(), emit, labels, open, options, props
 
-### Community 217 - "edgeSpeechConnection.test.js"
-Cohesion: 0.18
-Nodes (5): ref_node_crypto, bytes, file, sha, SpeechSocket
+### Community 217 - "DeleteConfirmModal.vue"
+Cohesion: 0.38
+Nodes (6): closeModal(), confirmDelete(), emit, isBulk, props, removesDeviceFile
 
 ### Community 218 - "googleBooksApi.ts"
 Cohesion: 0.20
 Nodes (12): BOOKS_HOSTS, booksCache, buildGoogleBooksQueries(), GBResult, googleBooksCooldownFor(), googleBooksKey(), googleBooksRateLimited(), googleBooksRequest() (+4 more)
 
-### Community 219 - "MobileSettingsNav.vue"
-Cohesion: 0.04
-Nodes (40): backTo, { books, initialized, fetchAllData }, listenRoute, nowPlaying, orb, orbBackgroundOptions, previewBook, previewCover (+32 more)
+### Community 219 - "ListenScreenPreferencesMobile.vue"
+Cohesion: 0.17
+Nodes (11): backTo, { books, initialized, fetchAllData }, listenRoute, nowPlaying, orb, orbBackgroundOptions, previewBook, previewCover (+3 more)
 
 ### Community 220 - "Metadata and PDF repair report"
 Cohesion: 0.33
@@ -1200,16 +1206,16 @@ Cohesion: 0.67
 Nodes (4): canSaveProfileDraft(), profileDraftChanged(), saved, trimmed()
 
 ### Community 223 - "BottomNavigationPreferencesMobile.vue"
-Cohesion: 0.15
-Nodes (9): highlightChoices, iconChoices, layoutChoices, materialChoices, { profile, activeAvatarPreset }, profileAvatarSrc, profileChoices, { settings, updateSettings } (+1 more)
+Cohesion: 0.13
+Nodes (10): highlightChoices, iconChoices, layoutChoices, materialChoices, navFollowsAccent, { profile, activeAvatarPreset }, profileAvatarSrc, profileChoices (+2 more)
 
-### Community 224 - "ref_app"
-Cohesion: 0.17
-Nodes (3): SHARE_TEXT, useShareApp(), ref_app
+### Community 224 - "@capacitor/core"
+Cohesion: 0.15
+Nodes (10): useApkUpdateInstall(), SHARE_TEXT, useShareApp(), safeFileName(), sourceBlob(), useShareBook(), AppIcon, BookishMediaSession (+2 more)
 
 ### Community 225 - "FavouritesDesktop.vue"
-Cohesion: 0.13
-Nodes (11): { allAuthors, loading, initialized, refreshAuthorIntelligence }, router, { favourites, toggleFavourite, deleteBook, loading, initialized }, handlePlay(), isBookActive(), { play: playTTS, togglePlay: toggleTTS, ttsBook, ttsStatus }, route, router (+3 more)
+Cohesion: 0.10
+Nodes (14): { allAuthors, loading, initialized, refreshAuthorIntelligence }, router, closeDeleteModal(), deleteBook(), confirmDelete(), { favourites, toggleFavourite, deleteBook, loading, initialized }, handlePlay(), isBookActive() (+6 more)
 
 ### Community 226 - "BackupPrompt.vue"
 Cohesion: 0.17
@@ -1264,20 +1270,20 @@ Cohesion: 0.67
 Nodes (3): listenBarStats, listenSummaryStats, scopeRange()
 
 ### Community 239 - "useDeviceAssets.js"
-Cohesion: 0.21
-Nodes (13): arrayBufferToBase64(), ASSET_WRITE_CHUNK_CHARS, assetsAvailable(), assetWebSrc(), base64ToArrayBuffer(), ensureDir(), fullPath(), stripBase64Prefix() (+5 more)
+Cohesion: 0.28
+Nodes (10): arrayBufferToBase64(), ASSET_WRITE_CHUNK_CHARS, assetsAvailable(), assetWebSrc(), base64ToArrayBuffer(), ensureDir(), fullPath(), stripBase64Prefix() (+2 more)
 
 ### Community 240 - "useUserProfile.js"
 Cohesion: 0.25
 Nodes (9): DEFAULT_USER_PROFILE, getProfileInitial(), normalizeProfile(), notifyProfileUpdated(), PAGES_PROFILE_UPDATED_EVENT, PROFILE_AVATAR_PRESETS, profileState, USER_AVATAR_OPTIONS (+1 more)
 
 ### Community 241 - "generate-accent-logos.mjs"
-Cohesion: 0.21
-Nodes (9): ref_sharp, ACCENT_LOGOS, BASE, DENSITIES, hexToRgb(), hslToRgb(), recolour(), rgbToHsl() (+1 more)
+Cohesion: 0.24
+Nodes (8): ACCENT_LOGOS, BASE, DENSITIES, hexToRgb(), hslToRgb(), recolour(), rgbToHsl(), root
 
-### Community 248 - "00.app-errors.client.js"
-Cohesion: 0.53
-Nodes (4): isChunkLoadError(), isRenderError(), reloadOnceForChunks(), setup()
+### Community 248 - "Sidebar.vue"
+Cohesion: 0.19
+Nodes (12): { collapsed, toggleCollapsed }, getActiveRouteIndex(), highlightStyle, hoverIndex, isHighlightActive, isMenuItemActive(), isSettingsActive, menuItems (+4 more)
 
 ### Community 249 - "BookActionSheet.vue"
 Cohesion: 0.15
@@ -1288,8 +1294,8 @@ Cohesion: 0.14
 Nodes (14): cancelPdfLongPress(), hidePdfReadHere(), menuPointForRange(), onAnnotationTap(), onPdfTouchEnd(), onPdfTouchMove(), onPdfTouchStart(), onScrollTap() (+6 more)
 
 ### Community 255 - "edgeTts.ts"
-Cohesion: 0.18
-Nodes (11): msedge-tts, ref_node_stream, ALLOWED_VOICES, RATE_MAP, delay(), EdgeTtsClient, isRetriableEdgeTtsError(), synthesizeEdgeSpeech() (+3 more)
+Cohesion: 0.08
+Nodes (14): msedge-tts, ref_node_stream, ALLOWED_VOICES, RATE_MAP, delay(), EdgeTtsClient, isRetriableEdgeTtsError(), synthesizeEdgeSpeech() (+6 more)
 
 ### Community 257 - "edge-tts Implementation Plan"
 Cohesion: 0.20
@@ -1299,37 +1305,33 @@ Nodes (8): edge-tts Implementation Plan, File Map, Self-Review Checklist, Task 1
 Cohesion: 0.18
 Nodes (7): drag, finishDrag(), flung, offsets, onPointerCancel(), onPointerUp(), { toasts, removeToast }
 
-### Community 259 - "useApiEndpoint.js"
-Cohesion: 0.42
-Nodes (7): joinApiUrl(), normalizeApiBaseUrl(), PAGES_API_BASE_URL_KEY, readStoredApiBaseUrl(), resolveApiBaseUrl(), useApiEndpoint(), writeStoredApiBaseUrl()
-
 ### Community 260 - "LocalSpeechStream.java"
 Cohesion: 0.20
 Nodes (9): android.os.Handler, android.os.HandlerThread, arraydeque, arraylist, atomicinteger, audioattributes, audioformat, list (+1 more)
 
 ### Community 261 - "fillMissingInstallmentDetails"
-Cohesion: 0.29
-Nodes (8): bestResultForInstallment(), countIncompleteInstallments(), fillMissingInstallmentDetails(), installmentMatchesBook(), installmentNeedsDetails(), reconcileEffectiveTotal(), rosterCoverage(), root
+Cohesion: 0.23
+Nodes (11): applyResultToSuggestion(), bestResultForInstallment(), countIncompleteInstallments(), fetchSuggestionDetails(), fillMissingInstallmentDetails(), installmentNeedsDetails(), reconcileEffectiveTotal(), rosterCoverage() (+3 more)
 
-### Community 263 - "appVersioning.test.js"
-Cohesion: 0.20
-Nodes (5): packageJson, ref_node_child_process, buildGradle, packageJson, root
+### Community 263 - "importDeviceFile"
+Cohesion: 0.60
+Nodes (5): base64ToFile(), importDeviceFile(), readDeviceFileBase64(), repairDeviceEpubContent(), repairDevicePdfSource()
 
 ### Community 264 - "resolveGapsWithAi"
-Cohesion: 0.25
-Nodes (9): confirmPlacement(), dominantSeriesAuthor(), indexRoster(), resolveGapsWithAi(), sampleAnchors(), seriesMatches(), yearFitsBetweenAnchors(), 2. Two-Tiered AI Placement Verification (+1 more)
+Cohesion: 0.22
+Nodes (10): confirmPlacement(), dominantSeriesAuthor(), installmentMatchesBook(), resolveGapsWithAi(), sampleAnchors(), yearFitsBetweenAnchors(), 1. Roster-Driven Totals Over Book-Level Totals Architecture, 2. Two-Tiered AI Placement Verification (+2 more)
 
 ### Community 266 - "serie/[id].vue"
 Cohesion: 0.22
 Nodes (8): derivedSeriesTotal, route, series, seriesBooks, seriesCountLabel, { seriesList, updateBook }, seriesName, seriesTotalRefreshKey
 
-### Community 267 - "useBooks"
-Cohesion: 0.08
-Nodes (25): canonicalLibrarySeriesName(), coverCacheInFlight, groupBooksBySeries(), normalizeLibrarySeriesName(), reconcileStatusProgress(), useBooks(), File Map, Local-First Library Migration Implementation Plan (+17 more)
+### Community 267 - "Library and Playlist UI Improvements Design"
+Cohesion: 0.22
+Nodes (8): Add-to-Playlist Modal, Book Grid Layout, Error Handling, Goal, Library and Playlist UI Improvements Design, Settings and Pagination, Table Hover Color, Testing
 
-### Community 268 - "openLibraryApi.ts"
-Cohesion: 0.36
-Nodes (7): extractGenres(), normalizeSubjectGenre(), OLResult, openLibraryHeaders, pickPublisher(), safeOpenLibraryKey(), searchOpenLibrary()
+### Community 268 - "What Changes"
+Cohesion: 0.40
+Nodes (5): Deleted: NeonDB + Drizzle infrastructure, Kept: Utility server routes (no user data), Modified: `composables/useBooks.js`, New: `composables/useLibraryStore.js`, What Changes
 
 ### Community 270 - "StreakCalendarMobile.vue"
 Cohesion: 0.08
@@ -1364,40 +1366,44 @@ Cohesion: 0.54
 Nodes (5): encodeWav(), speechBounds(), toBase64(), trimClipSilence(), trimWindow()
 
 ### Community 278 - "useLibraryStore.js"
-Cohesion: 0.09
-Nodes (36): mergeAutomaticMetadata(), applyCheckpoint(), clearReadingPositionJournals(), freeJournalSpace(), mutateBook(), nativeMirror(), openReadingPosition(), parse() (+28 more)
+Cohesion: 0.07
+Nodes (40): mergeAutomaticMetadata(), applyCheckpoint(), clearReadingPositionJournals(), freeJournalSpace(), mutateBook(), nativeMirror(), openReadingPosition(), parse() (+32 more)
 
 ### Community 279 - "useBookStorage.js"
-Cohesion: 0.14
-Nodes (19): cloneForStorage(), DEVICE_FILE_MARKER, emptyStorageSummary(), estimateStoredBytes(), normalizeSourceForStorage(), openDB(), pdfFileName(), sourceToArrayBuffer() (+11 more)
+Cohesion: 0.15
+Nodes (18): cloneForStorage(), DEVICE_FILE_MARKER, emptyStorageSummary(), estimateStoredBytes(), normalizeSourceForStorage(), openDB(), pdfFileName(), sourceToArrayBuffer() (+10 more)
 
-### Community 280 - "@capacitor/app"
-Cohesion: 0.25
-Nodes (4): ROOT_PATHS, RESUME_RECHECK_INTERVAL_MS, DEVICE_RESCAN_INTERVAL_MS, @capacitor/app
+### Community 280 - "RatingsPreferencesMobile.vue"
+Cohesion: 0.20
+Nodes (8): { addToast }, { books, updateBook }, ratingSourceOptions, ratingSync, ratingSyncLabel, ratingSyncPercent, scaleOptions, { settings, updateSettings }
 
-### Community 281 - "coverSearch.ts"
-Cohesion: 0.13
-Nodes (22): AppleBookCover, cache, searchAppleBooksCovers(), addCover(), addMatching(), CoverImage, matchingOpenLibraryEditions(), searchBookCovers() (+14 more)
+### Community 281 - "openLibraryApi.ts"
+Cohesion: 0.36
+Nodes (7): extractGenres(), normalizeSubjectGenre(), OLResult, openLibraryHeaders, pickPublisher(), safeOpenLibraryKey(), searchOpenLibrary()
 
-### Community 283 - "HighlightPreferencesMobile.vue"
-Cohesion: 0.29
-Nodes (6): accentSwatch, enabled, followsAccent, isDark, previewColor, { settings, updateSettings }
+### Community 282 - "ReadFormatsPreferencesMobile.vue"
+Cohesion: 0.20
+Nodes (7): { addToast }, applyingFormat, { formatMode, countAffected, applyFormatMode }, formatModeOptions, pendingFormatMessage, pendingFormatMode, pendingFormatTitle
 
-### Community 284 - "Read-Aloud Word Highlight, Instant Highlight & Lazy PDF Render — Implementation Plan"
+### Community 283 - "PlaylistDeleteModal.vue"
 Cohesion: 0.50
-Nodes (3): Final Verification, Read-Aloud Word Highlight, Instant Highlight & Lazy PDF Render — Implementation Plan, Task 4: EPUB word highlight via CSS Custom Highlight API
+Nodes (3): emit, isBulk, props
+
+### Community 284 - "Frontend Changes"
+Cohesion: 0.50
+Nodes (4): `AuthorDetailComp.vue`, Frontend Changes, Image picker behaviour, `useAuthorEnrich.js` (replaces `useAuthorImageSearch.js`)
 
 ### Community 285 - "useNarratorActivity.js"
 Cohesion: 0.54
 Nodes (5): estimateWordTimeline(), useNarratorActivity(), wordAt(), wordEnvelope(), wordLength()
 
-### Community 286 - "clearPhoto"
-Cohesion: 0.33
-Nodes (7): backToChoices(), choosePreset(), clearPhoto(), close(), emit, onFileChange(), saveCrop()
+### Community 286 - "updateBookEdge"
+Cohesion: 0.50
+Nodes (4): handlePdfLoaded(), updateBookEdge(), zoomIn(), zoomOut()
 
 ### Community 288 - "ref_node_fs"
 Cohesion: 0.06
-Nodes (15): ref_node_fs, ref_node_path, lineCount(), read(), root, root, root, root (+7 more)
+Nodes (12): ref_node_fs, ref_node_path, root, root, root, root, root, root (+4 more)
 
 ### Community 289 - "notifications.vue"
 Cohesion: 0.29
@@ -1411,17 +1417,13 @@ Nodes (4): { isTablet }, route, { settings }, settingsPages
 Cohesion: 0.33
 Nodes (3): $fetch, nativeSpeechSupported, SERVER_AUDIO
 
-### Community 292 - "Pipeline"
-Cohesion: 0.25
-Nodes (8): 1. Discover and make readable, 2. Collect local evidence, 3. Infer document kind, 4. Resolve the book's identity, 5. Optional semantic assistance, 6. Apply verified metadata, 7. Ask only useful questions, Pipeline
+### Community 292 - "relativeTime"
+Cohesion: 0.67
+Nodes (3): lastScanLabel, nextScanLabel, relativeTime()
 
-### Community 293 - "scrape-image.get.ts"
-Cohesion: 0.50
-Nodes (3): findWikidataImage(), headers, imageInfoForFile()
-
-### Community 294 - "@capacitor/core"
-Cohesion: 0.20
-Nodes (7): useApkUpdateInstall(), coverFileName(), isRemoteCoverUrl(), useCoverImageCache(), AppIcon, @capacitor/core, @capacitor/filesystem
+### Community 294 - "useCoverImageCache.js"
+Cohesion: 0.38
+Nodes (3): coverFileName(), isRemoteCoverUrl(), useCoverImageCache()
 
 ### Community 296 - "usePageSyncMatch.test.js"
 Cohesion: 0.60
@@ -1431,25 +1433,21 @@ Nodes (3): findPageSyncMatch(), pages, words()
 Cohesion: 0.50
 Nodes (4): ensure(), IDS, paintSystemBarScrims(), SCRIM_Z_INDEX
 
-### Community 298 - "useShareBook.js"
-Cohesion: 0.83
-Nodes (3): safeFileName(), sourceBlob(), useShareBook()
-
 ### Community 299 - "voiceParts"
 Cohesion: 0.67
 Nodes (3): activeNarratorName, voiceFlag(), voiceParts()
-
-### Community 300 - "overrides"
-Cohesion: 0.50
-Nodes (4): overrides, glob, workbox-build, source-map
 
 ### Community 302 - "closeCoverModal"
 Cohesion: 0.50
 Nodes (4): closeCoverModal(), handleCoverChange(), selectBookCover(), triggerCoverInput()
 
-### Community 304 - "updateBookEdge"
-Cohesion: 0.50
-Nodes (4): handlePdfLoaded(), updateBookEdge(), zoomIn(), zoomOut()
+### Community 303 - "Read-Aloud Word Highlight, Instant Highlight & Lazy PDF Render"
+Cohesion: 0.22
+Nodes (8): 1. Word-level highlight (two-tier), 2. Instant sentence highlight & warmer prefetch, Background, Errors / fallback, Goal, Persistence, Read-Aloud Word Highlight, Instant Highlight & Lazy PDF Render, Sequencing
+
+### Community 304 - "playlist/[id].vue"
+Cohesion: 0.22
+Nodes (7): { addToast }, { books, collections, updatePlaylist }, editingPlaylist, playlist, playlistBooks, route, savingPlaylist
 
 ### Community 309 - "generateCoverPlaceholder"
 Cohesion: 0.67
@@ -1463,55 +1461,71 @@ Nodes (3): filteredBooks, normalizedStatus(), readCount
 Cohesion: 0.67
 Nodes (3): handleUpdateBook(), saveSuggestion(), storeSuggestionCover()
 
-### Community 314 - "generateCoverPlaceholder"
-Cohesion: 0.67
-Nodes (3): coverFallback(), generateCoverPlaceholder(), resolveBookCover()
+### Community 314 - "MobileSettingsNav.vue"
+Cohesion: 0.15
+Nodes (11): compactPageTitle, formatLongTitle(), pageTitle, props, route, router, backgroundOptions, iconClass (+3 more)
 
-### Community 320 - "deleteBook"
-Cohesion: 0.67
-Nodes (3): closeDeleteModal(), deleteBook(), confirmDelete()
+### Community 317 - "vitest"
+Cohesion: 0.35
+Nodes (9): vitest, server_utils_liveshadowauditengine_shadowproposalreport, AuditSnapshotManifest, createProductionSnapshot(), ProductionBookRecord, ProductionSnapshotBundle, verifySnapshotIntegrity(), generateRepairAndRollbackPlan() (+1 more)
 
-### Community 321 - "generateCoverPlaceholder"
-Cohesion: 0.67
-Nodes (3): coverFallback(), generateCoverPlaceholder(), resolveBookCover()
+### Community 318 - "SettingsOptionGroupMobile.vue"
+Cohesion: 0.20
+Nodes (9): { enabledFormats }, options, { settings, updateSettings }, formatFilterSummary, choose(), emit, props, formatLabel (+1 more)
 
-### Community 322 - "handleResize"
-Cohesion: 0.67
-Nodes (3): handleResize(), updateChipHighlight(), updateViewHighlight()
+### Community 320 - "ReaderNoteEditor.vue"
+Cohesion: 0.29
+Nodes (5): draft, inputRef, overlayStyle, props, viewport
 
-### Community 324 - "Phase 1: Architecture & Lifecycle"
+### Community 323 - "hardcoverApi.ts"
+Cohesion: 0.17
+Nodes (13): File Structure, Series Collection Progress Implementation Plan, Task 1: Goodreads Series Count, Task 2: Metadata Propagation, Task 3: Series Progress Labels, Task 4: End-to-End Verification, compact(), fetchHardcoverSeriesRoster() (+5 more)
+
+### Community 324 - "useBooks"
+Cohesion: 0.22
+Nodes (9): useBooks(), Task 2: Update `useBooks.js`, Task 5: Fix component — `AuthorsComp.vue`, Task 6: Rewrite `AuthorDetailComp.vue` script, Playlist Management, 1. Architectural Overview & Major Subsystems, 2. Complete Runtime Lifecycle (Startup to Shutdown), Execution Trace (+1 more)
+
+### Community 325 - "useTTS"
+Cohesion: 0.20
+Nodes (13): chunkIndexForPdfProgress(), chunkIndexForProgress(), clearStoredTtsSession(), dismissStoredTtsSession(), normalizeAvailableVoice(), readStoredTtsSession(), savedPlaybackChunk(), synthesizeSpeech() (+5 more)
+
+### Community 328 - "mobileDesktopPurity.test.js"
+Cohesion: 0.50
+Nodes (3): lineCount(), read(), root
+
+### Community 335 - "Phase 5: Book Ingestion & EPUB/PDF Processing"
 Cohesion: 0.67
-Nodes (3): 1. Architectural Overview & Major Subsystems, 2. Complete Runtime Lifecycle (Startup to Shutdown), Phase 1: Architecture & Lifecycle
+Nodes (3): 1. EPUB Extraction Pipeline (`useEpubExtractor.js`), 2. PDF Ingestion & Filesystem Offloading, Phase 5: Book Ingestion & EPUB/PDF Processing
 
 ## Knowledge Gaps
-- **2226 isolated node(s):** `Piece`, `MOBILE_DEVICE_ARCHITECTURE`, `TABLET_DEVICE_ARCHITECTURE`, `config`, `router` (+2221 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2900 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **57 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **2227 isolated node(s):** `Piece`, `MOBILE_DEVICE_ARCHITECTURE`, `TABLET_DEVICE_ARCHITECTURE`, `config`, `router` (+2222 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2902 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **56 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Work-memory lessons
 
 **Preferred sources** — corroborated by past sessions; start here.
-- `PreferencesMobile.vue` (2× useful, score=0.381282216) _(code changed — re-verify)_
-- `BookProgressDisplay.vue` (2× useful, score=0.381282216) _(code changed — re-verify)_
-- `BookRatingDisplay.vue` (2× useful, score=0.381282216)
-- `desktopTtsDriver.test.js` (2× useful, score=0.356140136)
-- `nativeSpeech.js` (2× useful, score=0.356140136)
-- `package.json` (2× useful, score=0.356140136) _(code changed — re-verify)_
+- `PreferencesMobile.vue` (2× useful, score=0.374531647) _(code changed — re-verify)_
+- `BookProgressDisplay.vue` (2× useful, score=0.374531647)
+- `BookRatingDisplay.vue` (2× useful, score=0.374531647)
+- `desktopTtsDriver.test.js` (2× useful, score=0.349834706)
+- `nativeSpeech.js` (2× useful, score=0.349834706)
+- `package.json` (2× useful, score=0.349834706) _(code changed — re-verify)_
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `vue` connect `vue` to `ReaderMobile.vue`, `reader/[id].vue`, `BooksDesktop.vue`, `BooksMobile.vue`, `AddBookMobile.vue`, `EditBookMobile.vue`, `AddBookComp.vue`, `useAutoMetadata.js`, `SeriesDetailMobile.vue`, `ReaderPagedEpub.vue`, `HomeDesktop.vue`, `PlayingBar.vue`, `AuthorDetailComp.vue`, `SettingsDesktop.vue`, `SettingsStorageMobile.vue`, `useMobileReaderPrefs.js`, `SettingsStorageResetMobile.vue`, `PdfViewer.vue`, `usePagesSettings.js`, `EditBookComp.vue`, `PlaylistDetailMobile.vue`, `PlaylistsMobile.vue`, `BookDetailMobile.vue`, `BookGroupDetail.vue`, `ConnectionTestPanel.vue`, `SettingsStoragePanel.vue`, `useAnnotations.js`, `welcome.vue`, `useLibraryFilters.js`, `LibraryBookCard.vue`, `useFormatEnablement.js`, `HomeMobile.vue`, `PreferencesMobile.vue`, `PagesSelect.vue`, `BackupSettingsPanel.vue`, `AnnotationListMobile.vue`, `MobilePlayingBar.vue`, `AddToPlaylistModal.vue`, `useTTS.js`, `package.json`, `ProfilePage.vue`, `PlaylistsDesktop.vue`, `AvatarSourcePicker.vue`, `SeriesCollageCard.vue`, `LibraryControlsRow.vue`, `ratingPreferences.test.js`, `useAccount.js`, `SettingsMobile.vue`, `LibraryDisplayControls.vue`, `review-documents.vue`, `ProfileMobile.vue`, `useSeriesSuggestions.js`, `ProfileDesktop.vue`, `MultiStepLoader.vue`, `ReaderDisplaySheet.vue`, `useCloudBackup.js`, `ReaderSlider.vue`, `ReaderFigureViewer.vue`, `BookRatingDisplay.vue`, `selectionAndFilters.test.js`, `FavouritesMobile.vue`, `SettingsAudioPanel.vue`, `MobileBottomNav.vue`, `vue-router`, `MobileTopNav.vue`, `analytics/[id].vue`, `HiddenBooksMobile.vue`, `useDailyCompliment.js`, `pdfReaderNavigation.test.js`, `useMetadataBackfill.js`, `PersonalRatingInput.vue`, `SeriesMobile.vue`, `CoverImageModal.vue`, `useDeviceArchitecture.js`, `SearchingOrb.vue`, `listen-settings/[id].vue`, `localTtsDriver.js`, `ThemeSettingsMobile.vue`, `DocumentTypePicker.vue`, `MobileSettingsNav.vue`, `AppUpdateModal.vue`, `FavouritesDesktop.vue`, `BackupPrompt.vue`, `EditBookModal.vue`, `useUserProfile.js`, `BookActionSheet.vue`, `ToastComp.vue`, `serie/[id].vue`, `useBooks`, `StreakCalendarMobile.vue`, `PlaylistEditModal.vue`, `error.vue`, `useBookStorage.js`, `HighlightPreferencesMobile.vue`, `useNarratorActivity.js`, `notifications.vue`?**
-  _High betweenness centrality (0.298) - this node is a cross-community bridge._
-- **Why does `vitest` connect `vitest` to `mobileTtsDriver.test.js`, `metadataAggregator.ts`, `composables/usePdfExtractor.js`, `authorEnrichment.ts`, `edgeTts.ts`, `goodreadsScraper.ts`, `appVersioning.test.js`, `useApiEndpoint.js`, `fillMissingInstallmentDetails`, `useAutoMetadata.js`, `imageSearch.ts`, `openLibraryApi.ts`, `publisherMetadata.ts`, `useBooks`, `useBookMetadataSearch.js`, `uxBatchSix.test.js`, `authorIntelligence.test.js`, `silenceTrim.test.js`, `useLibraryStore.js`, `useMobileReaderPrefs.js`, `useBookStorage.js`, `useHtmlSanitizer.js`, `usePagesSettings.js`, `coverSearch.ts`, `useDailyCompliment.js`, `useNarratorActivity.js`, `useMetadataBackfill.js`, `pdfReaderNavigation.test.js`, `ref_node_fs`, `seriesDomainTypes.ts`, `desktopTtsDriver.test.js`, `useAnnotations.js`, `usePdfManifest.js`, `metadata.get.ts`, `usePageSyncMatch.test.js`, `useFormatEnablement.js`, `backupLocalData.js`, `useAuthorImageSearch.js`, `seriesAccuracy.test.js`, `nativeSpeech.js`, `useAuthorDetails.test.js`, `useTTS.js`, `ref_h3`, `useSelectOptions.test.js`, `package.json`, `migrationEngine.ts`, `aiMetadataVerifier.ts`, `useDocumentReview.js`, `uxBatchFive.test.js`, `documentIntelligence.js`, `liveUpdate.test.js`, `ref`, `ratingPreferences.test.js`, `useListenProgress.js`, `productionSnapshotEngine.ts`, `localTtsDriver.js`, `backupAssets.test.js`, `useEdgeSpeechClient.js`, `composables/useEpubExtractor.js`, `edgeSpeechConnection.test.js`, `aiAuthorVerifier.ts`, `profileDraft.test.js`, `useLibrarySearch.test.js`, `aiSeriesEnumerator.ts`, `Reader, Metadata, and Author Repairs Implementation Plan`, `seriesMutationGuard.js`, `selectionAndFilters.test.js`, `useDeviceAssets.js`, `metadataSafety.test.js`, `useUserProfile.js`, `00.app-errors.client.js`, `useDeviceLibrarySync.js`, `useChunkSpans.js`?**
-  _High betweenness centrality (0.153) - this node is a cross-community bridge._
-- **Why does `Design` connect `Pages UX batch — voices, position sync, filters, format removal, PDF reflow` to `com.getcapacitor.PluginCall`, `usePdfManifest.js`, `ReaderPagedEpub.vue`?**
-  _High betweenness centrality (0.078) - this node is a cross-community bridge._
+- **Why does `vue` connect `vue` to `ReaderMobile.vue`, `reader/[id].vue`, `BooksDesktop.vue`, `BooksMobile.vue`, `AddBookMobile.vue`, `EditBookMobile.vue`, `AddBookComp.vue`, `useAutoMetadata.js`, `SeriesDetailMobile.vue`, `ReaderPagedEpub.vue`, `HomeDesktop.vue`, `PlayingBar.vue`, `AuthorDetailComp.vue`, `SettingsDesktop.vue`, `SettingsStorageMobile.vue`, `useStreak.js`, `SettingsStorageResetMobile.vue`, `useMobileReaderPrefs.js`, `PdfViewer.vue`, `usePagesSettings.js`, `EditBookComp.vue`, `PlaylistDetailMobile.vue`, `PlaylistsMobile.vue`, `BookDetailMobile.vue`, `BookGroupDetail.vue`, `ConnectionTestPanel.vue`, `SettingsStoragePanel.vue`, `useAnnotations.js`, `welcome.vue`, `useLibraryFilters.js`, `LibraryBookCard.vue`, `uxBatchFive.test.js`, `HomeMobile.vue`, `PreferencesMobile.vue`, `PagesSelect.vue`, `BackupSettingsPanel.vue`, `AnnotationListMobile.vue`, `vue-router`, `AddToPlaylistModal.vue`, `useTTS.js`, `package.json`, `ProfilePage.vue`, `PlaylistsDesktop.vue`, `AvatarSourcePicker.vue`, `SeriesCollageCard.vue`, `LibraryControlsRow.vue`, `ratingPreferences.test.js`, `useAccount.js`, `SettingsMobile.vue`, `LibraryDisplayControls.vue`, `review-documents.vue`, `ProfileMobile.vue`, `useSeriesSuggestions.js`, `ProfileDesktop.vue`, `MultiStepLoader.vue`, `ReaderDisplaySheet.vue`, `useCloudBackup.js`, `ReaderSlider.vue`, `ReaderFigureViewer.vue`, `BookRatingDisplay.vue`, `selectionAndFilters.test.js`, `FavouritesMobile.vue`, `SettingsAudioPanel.vue`, `MobileBottomNav.vue`, `default.vue`, `MobileTopNav.vue`, `analytics/[id].vue`, `HiddenBooksMobile.vue`, `useDailyCompliment.js`, `useMetadataBackfill.js`, `PersonalRatingInput.vue`, `useBooks.js`, `CoverImageModal.vue`, `useDeviceArchitecture.js`, `SearchingOrb.vue`, `listen-settings/[id].vue`, `localTtsDriver.js`, `ThemeSettingsMobile.vue`, `DocumentTypePicker.vue`, `DeleteConfirmModal.vue`, `ListenScreenPreferencesMobile.vue`, `AppUpdateModal.vue`, `@capacitor/core`, `FavouritesDesktop.vue`, `BackupPrompt.vue`, `EditBookModal.vue`, `useUserProfile.js`, `Sidebar.vue`, `BookActionSheet.vue`, `ToastComp.vue`, `pdfReaderNavigation.test.js`, `serie/[id].vue`, `StreakCalendarMobile.vue`, `PlaylistEditModal.vue`, `error.vue`, `useBookStorage.js`, `RatingsPreferencesMobile.vue`, `ReadFormatsPreferencesMobile.vue`, `PlaylistDeleteModal.vue`, `useNarratorActivity.js`, `notifications.vue`, `playlist/[id].vue`, `MobileSettingsNav.vue`, `SettingsOptionGroupMobile.vue`, `ReaderNoteEditor.vue`, `responsiveComponentSplit.test.js`, `GoodreadsRatingDisplay.vue`?**
+  _High betweenness centrality (0.284) - this node is a cross-community bridge._
+- **Why does `vitest` connect `vitest` to `mobileTtsDriver.test.js`, `metadataAggregator.ts`, `composables/usePdfExtractor.js`, `aiMetadataVerifier.ts`, `edgeTts.ts`, `goodreadsScraper.ts`, `pdfReaderNavigation.test.js`, `fillMissingInstallmentDetails`, `useAutoMetadata.js`, `imageSearch.ts`, `publisherMetadata.ts`, `useTTS.test.js`, `useBookMetadataSearch.js`, `uxBatchSix.test.js`, `authorIntelligence.test.js`, `silenceTrim.test.js`, `useLibraryStore.js`, `useStreak.js`, `useBookStorage.js`, `openLibraryApi.ts`, `usePagesSettings.js`, `useDailyCompliment.js`, `useMobileReaderPrefs.js`, `useNarratorActivity.js`, `useMetadataBackfill.js`, `seriesDomainTypes.ts`, `ref_node_fs`, `desktopTtsDriver.test.js`, `useAnnotations.js`, `usePdfGeometry.test.js`, `metadata.get.ts`, `usePageSyncMatch.test.js`, `usePdfManifest.js`, `uxBatchFive.test.js`, `useAuthorImageSearch.js`, `seriesAccuracy.test.js`, `useBooks.js`, `nativeSpeech.js`, `backupLocalData.js`, `bookCoverMatch.ts`, `useAuthorDetails.test.js`, `ref_h3`, `useSelectOptions.test.js`, `package.json`, `migrationEngine.ts`, `useDocumentReview.js`, `responsiveComponentSplit.test.js`, `documentIntelligence.js`, `useTTS`, `liveUpdate.test.js`, `ref`, `mobileDesktopPurity.test.js`, `ratingPreferences.test.js`, `coverSearch.ts`, `useListenProgress.js`, `computeContentHash`, `localTtsDriver.js`, `generate-version-manifest.mjs`, `backupAssets.test.js`, `useEdgeSpeechClient.js`, `composables/useEpubExtractor.js`, `profileDraft.test.js`, `useLibrarySearch.test.js`, `Reader, Metadata, and Author Repairs Implementation Plan`, `seriesMutationGuard.js`, `selectionAndFilters.test.js`, `useDeviceAssets.js`, `metadataSafety.test.js`, `useUserProfile.js`, `useDeviceMetadataSearch.js`, `useDeviceLibrarySync.js`, `useChunkSpans.js`?**
+  _High betweenness centrality (0.127) - this node is a cross-community bridge._
+- **Why does `Design` connect `Pages UX batch — voices, position sync, filters, format removal, PDF reflow` to `usePdfManifest.js`, `com.getcapacitor.PluginCall`, `ReaderPagedEpub.vue`?**
+  _High betweenness centrality (0.070) - this node is a cross-community bridge._
 - **What connects `Piece`, `MOBILE_DEVICE_ARCHITECTURE`, `TABLET_DEVICE_ARCHITECTURE` to the rest of the system?**
-  _2226 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _2227 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ReaderMobile.vue` be split into smaller, more focused modules?**
   _Cohesion score 0.014925373134328358 - nodes in this community are weakly interconnected._
+- **Should `metadataAggregator.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.12473118279569892 - nodes in this community are weakly interconnected._
 - **Should `reader/[id].vue` be split into smaller, more focused modules?**
   _Cohesion score 0.021972884525479196 - nodes in this community are weakly interconnected._
-- **Should `goodreadsScraper.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.11755102040816326 - nodes in this community are weakly interconnected._

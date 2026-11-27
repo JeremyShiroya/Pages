@@ -125,19 +125,14 @@ onBeforeUnmount(() => {
   background: var(--color-background-app);
 }
 
-/* The wordmark stays Pages purple whatever accent is chosen (it will follow the
-   launcher icon once that can change too). */
+/* The wordmark takes the accent colour, like the logo beside it. */
 .pages-brand {
   margin: 0;
-  color: #8a2be2;
+  color: var(--color-brand-primary);
   font-size: clamp(1.55rem, 6vw, 1.9rem);
   font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 1;
-}
-
-:global(:root[data-theme="dark"] .pages-brand) {
-  color: #a855f7;
 }
 
 .pages-logo {

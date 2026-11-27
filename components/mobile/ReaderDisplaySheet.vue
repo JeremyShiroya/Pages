@@ -26,7 +26,7 @@
           >
             <span class="rds-grabber" aria-hidden="true"></span>
             <div class="rds-title-row">
-              <h2 id="rds-title">Display</h2>
+              <h2 id="rds-title">Reading Settings</h2>
               <button type="button" class="rds-close" aria-label="Close" @click.stop="close" @pointerdown.stop>
                 <i class="ri-close-line" aria-hidden="true"></i>
               </button>
@@ -254,7 +254,7 @@
                       aria-label="Match accent"
                       @click="updateSettings({ highlightColor: 'accent' })"
                     >
-                      <span class="rds-hl-dot accent" :style="{ background: accentSolid(settings.accentColor, isDarkApp) }"><i class="ri-palette-line"></i></span>
+                      <span class="rds-hl-dot accent" :class="{ mono: settings.accentColor === 'mono' }" :style="{ background: accentSolid(settings.accentColor, isDarkApp) }"><i class="ri-palette-line"></i></span>
                       <span class="rds-hl-name">Accent</span>
                     </button>
                     <button
@@ -268,7 +268,7 @@
                       :aria-label="accent.label"
                       @click="updateSettings({ highlightColor: accent.id })"
                     >
-                      <span class="rds-hl-dot" :style="{ background: isDarkApp ? accent.dark : accent.light }"></span>
+                      <span class="rds-hl-dot" :class="{ mono: accent.id === 'mono' }" :style="{ background: isDarkApp ? accent.dark : accent.light }"></span>
                       <span class="rds-hl-name">{{ accent.label.replace('Pastel ', 'P. ') }}</span>
                     </button>
                   </div>
@@ -445,7 +445,7 @@ onBeforeUnmount(() => {
 .rds-head { flex: none; padding: 6px 16px 4px; touch-action: none; cursor: grab; user-select: none; }
 .rds-grabber { display: block; width: 36px; height: 5px; margin: 0 auto 6px; border-radius: 999px; background: color-mix(in srgb, var(--rds-text) 22%, transparent); }
 .rds-title-row { display: grid; grid-template-columns: 30px 1fr 30px; align-items: center; }
-.rds-title-row h2 { grid-column: 2; margin: 0; font-size: 17px; font-weight: 600 !important; text-align: center; }
+.rds-title-row h2 { grid-column: 2; margin: 0; font-size: 17px; font-weight: 400 !important; text-align: center; }
 .rds-close { display: grid; width: 30px; height: 30px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: var(--rds-control); color: var(--rds-muted); font-size: 18px; cursor: pointer; }
 
 .rds-body {
@@ -533,6 +533,9 @@ onBeforeUnmount(() => {
 .rds-hl-colours::-webkit-scrollbar { display: none; }
 .rds-hl { display: grid; flex: none; width: 54px; justify-items: center; gap: 5px; padding: 0; border: 0; background: none; color: var(--rds-muted); font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .rds-hl-dot { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; color: #fff; font-size: 15px; transition: box-shadow 0.16s ease; }
+.rds-hl-dot.accent { color: var(--color-text-on-brand); }
+.rds-hl-dot.mono { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.55); }
+.rds-hl.active .rds-hl-dot.mono { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.55), 0 0 0 2px var(--rds-card), 0 0 0 4px var(--rds-text); }
 .rds-hl.active .rds-hl-dot { box-shadow: 0 0 0 2px var(--rds-card), 0 0 0 4px var(--rds-text); }
 .rds-hl-name { font-size: 10.5px; line-height: 1.15; text-align: center; }
 .rds-hl.active .rds-hl-name { color: var(--rds-text); }

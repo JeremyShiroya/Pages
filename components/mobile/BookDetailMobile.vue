@@ -642,8 +642,7 @@ watch(
 .read-btn {
   border: none;
   background: var(--color-brand-primary);
-  color: #fff;
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+  color: var(--color-text-on-brand);
 }
 
 /* No outline: a neutral grey fill (Apple's secondary button) that is clearly

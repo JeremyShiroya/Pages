@@ -56,7 +56,7 @@ const settingsPages = computed(() => [
 .directory-label { margin: 0 0 .6rem .55rem; }
 .directory-link { display: flex; align-items: center; gap: .7rem; min-height: 42px; padding: .45rem .7rem; border-radius: 9px; color: var(--color-text-secondary); font-size: .84rem; text-decoration: none; }
 .directory-link:hover { background: var(--color-brand-primary-soft); color: var(--color-brand-primary); }
-.directory-link.active { background: var(--color-brand-primary); color: #fff; }
+.directory-link.active { background: var(--color-brand-primary); color: var(--color-text-on-brand); }
 .directory-link i { font-size: 1rem; }
 .current-mark { margin-left: auto; }
 .shell-content { min-width: 0; }

@@ -283,7 +283,8 @@ describe('responsive mobile component split', () => {
 
     expect(readerMobile).toContain('--mobile-reader-surface')
     expect(readerMobile).toMatch(/\.chapter-pill\s*\{[^}]*background:\s*var\(--mobile-reader-surface\)/)
-    expect(readerMobile).toMatch(/\.chapter-play\s*\{[^}]*background:\s*var\(--mobile-reader-surface\)/)
+    // Solid ink with the page colour inside (black on light pages, white on dark).
+    expect(readerMobile).toMatch(/\.chapter-play\s*\{[^}]*background:\s*var\(--mobile-reader-text\)/)
     expect(readerMobile).toContain(':class="readerTheme"')
     expect(readerMobile).toContain('.reader-media-sheet.dark')
     expect(readerMobile).not.toMatch(/\.chapter-pill\s*\{[^}]*background:\s*#fff/)

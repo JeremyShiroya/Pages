@@ -40,7 +40,7 @@
               :aria-label="accent.label"
               @click="chooseAccent(accent.id)"
             >
-              <span class="accent-swatch" :style="{ '--swatch': isDark ? accent.dark : accent.light, '--swatch-ring': accent.ring || (isDark ? accent.dark : accent.light) }">
+              <span class="accent-swatch" :class="{ mono: accent.id === 'mono' }" :style="{ '--swatch': isDark ? accent.dark : accent.light, '--swatch-ring': accent.ring || (isDark ? accent.dark : accent.light) }">
                 <i v-if="settings.accentColor === accent.id" class="ri-check-line" aria-hidden="true"></i>
               </span>
               <span class="accent-name">{{ accent.label }}</span>
@@ -50,7 +50,8 @@
         <p class="theme-footnote">Buttons, icons, progress and highlights take this colour.</p>
       </section>
 
-      <!-- App Icon: the home-screen icon (and the logo inside the app). It
+      <!-- App Icon: the home-screen launcher only (the logo inside the app follows
+           the accent). It
            follows the accent until one is picked here; it never changes the
            accent itself. -->
       <section aria-labelledby="theme-icon-title">
@@ -81,7 +82,7 @@
             </button>
           </div>
         </div>
-        <p class="theme-footnote">Also used for the app's launch screen.</p>
+        <p class="theme-footnote">Changes the icon on your home screen and the launch screen.</p>
       </section>
     </main>
 
@@ -289,6 +290,10 @@ const confirmIcon = () => {
 .accent-option.active .accent-swatch {
   box-shadow: 0 0 0 2.5px var(--color-settings-group), 0 0 0 4.5px var(--swatch-ring);
 }
+
+/* Black & White: outlined, so both halves show on light and dark cards. */
+.accent-swatch.mono { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.55); }
+.accent-option.active .accent-swatch.mono { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.55), 0 0 0 2.5px var(--color-settings-group), 0 0 0 4.5px var(--swatch-ring); }
 
 .accent-option:active .accent-swatch {
   transform: scale(0.92);

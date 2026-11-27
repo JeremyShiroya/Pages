@@ -49,11 +49,11 @@
         <button
           type="button"
           class="reader-nav-btn"
-          aria-label="Display settings"
+          aria-label="Reading settings"
           :aria-expanded="displayOpen"
           @click="displayOpen = true"
         >
-          <i class="ri-font-size"></i>
+          <i class="ri-more-2-fill"></i>
         </button>
       </div>
       <div v-else class="reader-top-actions">
@@ -4392,11 +4392,19 @@ onUnmounted(() => {
   place-items: center;
   border: 0;
   border-radius: 50%;
-  background: var(--mobile-reader-surface);
-  color: var(--mobile-reader-text);
+  /* Solid ink with the page colour inside: black with a white glyph on light
+     pages, white with a dark glyph on dark ones. */
+  background: var(--mobile-reader-text);
+  color: var(--mobile-reader-bg);
   cursor: pointer;
   font-size: 20px;
-  box-shadow: 0 1px 5px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 5px rgba(15, 23, 42, 0.12);
+}
+
+/* On light pages the dock was white on near-white: give it a visible fill. */
+.reader-mobile-page:not(.dark):not(.night) .chapter-pill {
+  background: color-mix(in srgb, var(--mobile-reader-text) 10%, var(--mobile-reader-bg));
+  box-shadow: none;
 }
 
 .reader-media-layer {

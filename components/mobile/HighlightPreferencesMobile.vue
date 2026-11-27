@@ -40,7 +40,7 @@
              a colour of its own. -->
         <div class="hl-card">
           <button type="button" class="hl-match" role="radio" :aria-checked="followsAccent" @click="updateSettings({ highlightColor: 'accent' })">
-            <span class="hl-match-swatch" :style="{ background: accentSwatch }"></span>
+            <span class="hl-match-swatch" :class="{ mono: settings.accentColor === 'mono' }" :style="{ background: accentSwatch }"></span>
             <span class="hl-label">Match Accent</span>
             <span class="hl-match-value">{{ accentLabel(settings.accentColor) }}</span>
             <i v-if="followsAccent" class="ri-check-line hl-check" aria-hidden="true"></i>
@@ -60,7 +60,7 @@
               :aria-label="accent.label"
               @click="updateSettings({ highlightColor: accent.id })"
             >
-              <span class="hl-swatch" :style="{ '--swatch': isDark ? accent.dark : accent.light, '--swatch-ring': accent.ring || (isDark ? accent.dark : accent.light) }">
+              <span class="hl-swatch" :class="{ mono: accent.id === 'mono' }" :style="{ '--swatch': isDark ? accent.dark : accent.light, '--swatch-ring': accent.ring || (isDark ? accent.dark : accent.light) }">
                 <i v-if="settings.highlightColor === accent.id" class="ri-check-line" aria-hidden="true"></i>
               </span>
               <span class="hl-name">{{ accent.label }}</span>
@@ -124,6 +124,8 @@ const previewColor = computed(() => accentSolid(followsAccent.value ? settings.v
 .hl-option { display: grid; justify-items: center; gap: 7px; padding: 0 0 6px; border: 0; background: none; color: var(--color-text-muted); font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .hl-swatch { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--swatch); color: #fff; font-size: 22px; transition: box-shadow 0.16s ease, transform 0.16s ease; }
 .hl-option.active .hl-swatch { box-shadow: 0 0 0 2.5px var(--color-settings-group), 0 0 0 4.5px var(--swatch-ring); }
+.hl-swatch.mono, .hl-match-swatch.mono { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.55); }
+.hl-option.active .hl-swatch.mono { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.55), 0 0 0 2.5px var(--color-settings-group), 0 0 0 4.5px var(--swatch-ring); }
 .hl-option:active .hl-swatch { transform: scale(0.92); }
 .hl-name { font-size: 11.5px; line-height: 1.2; text-align: center; }
 .hl-option.active .hl-name { color: var(--color-text-primary); }

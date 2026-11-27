@@ -15,6 +15,33 @@
         </div>
       </section>
 
+      <!-- Colour of the selected tab: the accent unless one is picked here. -->
+      <section class="setting-card" aria-labelledby="nav-colour-title">
+        <div class="section-heading"><h2 id="nav-colour-title">Colour</h2><p>The selected tab follows your accent colour unless you pick one.</p></div>
+        <button type="button" class="nav-match" role="radio" :aria-checked="navFollowsAccent" @click="set('navAccent', 'accent')">
+          <span class="nav-dot" :class="{ mono: settings.accentColor === 'mono' }" :style="{ background: swatchFor(settings.accentColor) }"></span>
+          <span class="nav-match-label">Match Accent</span>
+          <span class="nav-match-value">{{ accentLabel(settings.accentColor) }}</span>
+          <i v-if="navFollowsAccent" class="ri-check-line nav-check" aria-hidden="true"></i>
+        </button>
+        <div class="nav-swatches" role="radiogroup" aria-labelledby="nav-colour-title">
+          <button
+            v-for="accent in ACCENT_SWATCHES"
+            :key="accent.id"
+            type="button"
+            role="radio"
+            class="nav-swatch"
+            :class="{ active: settings.navAccent === accent.id }"
+            :aria-checked="settings.navAccent === accent.id"
+            :aria-label="accent.label"
+            @click="set('navAccent', accent.id)"
+          >
+            <span class="nav-dot" :class="{ mono: accent.id === 'mono' }" :style="{ background: swatchFor(accent.id) }"><i v-if="settings.navAccent === accent.id" class="ri-check-line"></i></span>
+            <span class="nav-swatch-name">{{ accent.label }}</span>
+          </button>
+        </div>
+      </section>
+
       <section class="setting-card" aria-labelledby="material-title">
         <div class="section-heading"><h2 id="material-title">Bar material</h2><p>Choose the surface behind the tabs.</p></div>
         <div class="choice-grid material-grid" role="group" aria-label="Bar material">
@@ -84,12 +111,18 @@
 import { DEFAULT_PAGES_SETTINGS, usePagesSettings } from '~/composables/usePagesSettings'
 import MobileBottomNav from './MobileBottomNav.vue'
 import MobileSettingsNav from './MobileSettingsNav.vue'
+import { ACCENT_SWATCHES, accentLabel } from '~/utils/accentPalette'
 import { useUserProfile } from '~/composables/useUserProfile'
 
 const { settings, updateSettings } = usePagesSettings()
 const { profile, activeAvatarPreset } = useUserProfile()
 const profileAvatarSrc = computed(() => profile.value.avatarType === 'image' ? profile.value.avatarValue : activeAvatarPreset.value.src)
 const set = (key, value) => updateSettings({ [key]: value })
+const navFollowsAccent = computed(() => !settings.value.navAccent || settings.value.navAccent === 'accent')
+const swatchFor = (id) => {
+  const accent = ACCENT_SWATCHES.find((item) => item.id === id) || ACCENT_SWATCHES[0]
+  return settings.value.readerTheme === 'dark' ? accent.dark : accent.light
+}
 const layoutChoices = [{ value: 'standard', label: 'Standard' }, { value: 'floating', label: 'Floating' }]
 const materialChoices = [{ value: 'current', label: 'Flat' }, { value: 'frosted', label: 'Frosted glass' }]
 const highlightChoices = [{ value: 'soft', label: 'Soft' }, { value: 'none', label: 'None' }]
@@ -106,6 +139,18 @@ const restoreAll = () => updateSettings(Object.fromEntries(
 .bottom-nav-settings { min-height: 100vh; background: var(--color-settings-background); color: var(--color-text-primary); font-family: var(--mobile-font-family); }
 .settings-scroll { display: grid; gap: 24px; width: min(760px, 100%); margin: 0 auto; padding: 8px var(--settings-gutter) calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 28px); }
 .intro { margin: 0 var(--settings-row-inset) 2px; color: var(--color-text-secondary); font-size: 14px; line-height: 1.5; }
+.nav-match { display: grid; width: 100%; grid-template-columns: 26px minmax(0, 1fr) auto 22px; align-items: center; gap: 12px; min-height: 46px; padding: 0; border: 0; background: transparent; color: var(--color-text-primary); font: inherit; text-align: left; cursor: pointer; }
+.nav-match-label { font-size: var(--settings-label-size); }
+.nav-match-value { color: var(--color-text-muted); font-size: var(--settings-label-size); }
+.nav-check { color: var(--color-brand-primary); font-size: 22px; }
+.nav-swatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); row-gap: 12px; }
+.nav-swatch { display: grid; justify-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--color-text-muted); font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nav-dot { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 50%; color: #fff; font-size: 16px; }
+.nav-swatch .nav-dot { width: 36px; height: 36px; font-size: 20px; }
+.nav-dot.mono { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.55); }
+.nav-swatch.active .nav-dot { box-shadow: 0 0 0 2px var(--color-settings-group), 0 0 0 4px var(--color-text-primary); }
+.nav-swatch-name { font-size: 11px; line-height: 1.2; text-align: center; }
+.nav-swatch.active .nav-swatch-name { color: var(--color-text-primary); }
 .setting-card { display: grid; gap: 16px; padding: var(--settings-row-pad-y) var(--settings-row-inset); border: 0; border-radius: var(--settings-radius); background: var(--color-settings-group); }
 .section-heading h2 { margin: 0; font-size: var(--settings-label-size); }
 .section-heading p { margin: 4px 0 0; color: var(--color-text-muted); font-size: var(--settings-caption-size); line-height: 1.4; }

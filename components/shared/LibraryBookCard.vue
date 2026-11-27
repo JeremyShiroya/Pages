@@ -389,7 +389,7 @@ const truncateWords = (value, limit) => {
   padding: 1.25rem;
   border: 1px solid var(--color-border-on-image);
   border-radius: 16px;
-  color: var(--color-text-on-brand);
+  color: #fff;
   cursor: pointer;
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -506,7 +506,7 @@ const truncateWords = (value, limit) => {
   border: 1px solid var(--color-border-on-image-strong);
   border-radius: 50%;
   background: var(--color-surface-on-image-hover);
-  color: var(--color-text-on-brand);
+  color: #fff;
   cursor: pointer;
   font-size: 1.25rem;
 }
@@ -896,7 +896,7 @@ const truncateWords = (value, limit) => {
     padding: 16px;
     border: 1px solid var(--color-border-on-image);
     border-radius: var(--mobile-card-radius);
-    color: var(--color-text-on-brand);
+    color: #fff;
     box-shadow: var(--shadow-card);
   }
 

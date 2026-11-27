@@ -200,9 +200,8 @@ onBeforeUnmount(() => {
 .compact-nav .mobile-nav-item i { font-size: 21px; }
 .compact-nav .mobile-nav-item.active i { font-size: 23px; }
 
-.material-frosted .mobile-nav-item { color: var(--color-text-secondary); }
-.material-frosted .mobile-nav-item.active { color: var(--color-text-primary); }
-.material-frosted.highlight-soft .active-indicator { background: color-mix(in srgb, var(--color-text-primary) 12%, transparent); }
+/* The material is the bar's surface only; tab colours come from the nav
+   colour (Preferences → Bottom Navigation → Colour). */
 
 .mobile-bottom-nav.standard-nav {
   right: 0;
@@ -236,7 +235,7 @@ onBeforeUnmount(() => {
   width: calc((100% - 12px) / 4);
   height: 60px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-brand-primary-muted) var(--nav-opacity), transparent);
+  background: var(--color-nav-indicator);
   opacity: 1;
   transform: translateX(var(--active-offset));
   transition: none;
@@ -291,7 +290,14 @@ onBeforeUnmount(() => {
 .titles-hidden .mobile-nav-item { gap: 0; }
 
 .mobile-nav-item.active {
-  color: var(--color-brand-primary);
+  color: var(--color-nav-accent);
+}
+
+/* No pill behind the selected tab (standard bar, or highlight off): the plain
+   colour, so Black & White's white-on-pill does not vanish on the bar. */
+.standard-nav .mobile-nav-item.active,
+.highlight-none .mobile-nav-item.active {
+  color: var(--color-nav-accent-plain);
 }
 
 @media (prefers-reduced-motion: reduce) {

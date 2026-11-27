@@ -392,7 +392,7 @@ const shareStreak = async () => {
    and one accent for everything streak-related: the app's own accent (Settings
    → Theme), purple by default, like the rest of the app. */
 .streak-page {
-  --streak-accent: var(--color-brand-primary);
+  --streak-accent: var(--color-streak);
   min-height: 100vh;
   background: var(--color-settings-background);
   color: var(--color-text-primary);
@@ -487,7 +487,7 @@ const shareStreak = async () => {
 .calendar-day { display: grid; place-items: center; aspect-ratio: 1; }
 .day-dot { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: var(--color-text-primary); font-size: 15px; font-variant-numeric: tabular-nums; }
 .calendar-day.muted .day-dot { color: var(--color-text-muted); opacity: 0.35; }
-.calendar-day.active .day-dot { background: var(--streak-accent); color: var(--color-text-on-brand); }
+.calendar-day.active .day-dot { background: var(--streak-accent); color: var(--color-streak-ink); }
 .calendar-day.shielded .day-dot { background: color-mix(in srgb, #e0a800 22%, transparent); color: #c79400; font-size: 16px; }
 .calendar-day.today:not(.active) .day-dot { box-shadow: inset 0 0 0 2px var(--streak-accent); color: var(--streak-accent); }
 
@@ -498,12 +498,12 @@ const shareStreak = async () => {
 .badge-days { color: var(--color-text-muted); font-size: 11px; }
 .badge.locked .medal { background: color-mix(in srgb, var(--color-text-muted) 18%, transparent); color: var(--color-text-muted); }
 .badge.locked .badge-name { color: var(--color-text-muted); }
-.medal { display: grid; width: 50px; height: 50px; place-items: center; border-radius: 50%; color: var(--color-text-on-brand); font-size: 22px; }
+.medal { display: grid; width: 50px; height: 50px; place-items: center; border-radius: 50%; color: var(--color-streak-ink); font-size: 22px; }
 .medal.small { flex: none; width: 40px; height: 40px; font-size: 19px; }
 .medal.large { width: 88px; height: 88px; font-size: 40px; }
 .medal.tier-spark { background: color-mix(in srgb, var(--streak-accent) 62%, #fff); }
 .medal.tier-amber { background: var(--streak-accent); }
-.medal.tier-ember { background: var(--color-brand-primary-pressed); }
+.medal.tier-ember { background: color-mix(in srgb, var(--streak-accent) 80%, #000); }
 .medal.tier-gold { background: #e0a800; }
 
 /* ── Celebration ── */
@@ -514,7 +514,7 @@ const shareStreak = async () => {
 .celebration-card h2 { margin: 4px 0 6px; font-size: 24px; font-weight: 600 !important; }
 .celebration-copy { margin: 0 0 12px; color: var(--color-text-muted); font-size: 15px; }
 .celebration-reward { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 18px; color: var(--streak-accent); font-size: 15px; }
-.claim-btn { width: 100%; min-height: 50px; border: 0; border-radius: 14px; background: var(--streak-accent); color: var(--color-text-on-brand); font: inherit; font-size: 17px; cursor: pointer; }
+.claim-btn { width: 100%; min-height: 50px; border: 0; border-radius: 14px; background: var(--streak-accent); color: var(--color-streak-ink); font: inherit; font-size: 17px; cursor: pointer; }
 .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .confetti span { position: absolute; top: -20px; left: var(--x); width: 8px; height: 14px; border-radius: 2px; opacity: 0; animation: fall 2.8s var(--delay) cubic-bezier(0.3, 0.6, 0.6, 1) forwards; }
 .celebrate-enter-active, .celebrate-leave-active { transition: opacity 0.25s ease; }

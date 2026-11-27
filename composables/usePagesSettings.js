@@ -8,7 +8,8 @@ export const DEFAULT_PAGES_SETTINGS = Object.freeze({
   themeMode: 'light',              // what the user chose: 'system' | 'light' | 'dark'
   accentColor: 'purple',           // the app's tint: see ACCENT_COLOR_OPTIONS
   highlightColor: 'accent',        // reading highlights: 'accent' (follow accentColor) or an accent id
-  launcherIcon: 'accent',          // home-screen icon (and in-app logo): 'accent' or an accent id
+  launcherIcon: 'accent',          // home-screen launcher icon only: 'accent' or an accent id
+  navAccent: 'accent',             // bottom navigation colour: 'accent' or an accent id
   readerZoom: 1.0,
   libraryView: 'table',
   groupDetailView: 'table',
@@ -224,6 +225,9 @@ export function normalizePagesSettings(value) {
     launcherIcon: ACCENT_COLOR_OPTIONS.includes(source.launcherIcon)
       ? source.launcherIcon
       : DEFAULT_PAGES_SETTINGS.launcherIcon,
+    navAccent: ACCENT_COLOR_OPTIONS.includes(source.navAccent)
+      ? source.navAccent
+      : DEFAULT_PAGES_SETTINGS.navAccent,
     readerZoom: numberOrDefault(
       source.readerZoom,
       DEFAULT_PAGES_SETTINGS.readerZoom,
@@ -370,6 +374,7 @@ export function applyPagesTheme(
   darkAppBackground = DEFAULT_PAGES_SETTINGS.darkAppBackground,
   accentColor = DEFAULT_PAGES_SETTINGS.accentColor,
   highlightColor = DEFAULT_PAGES_SETTINGS.highlightColor,
+  navAccent = DEFAULT_PAGES_SETTINGS.navAccent,
 ) {
   if (typeof document === 'undefined') return
 
@@ -395,6 +400,12 @@ export function applyPagesTheme(
     document.documentElement.dataset.highlight = highlightColor
   } else {
     delete document.documentElement.dataset.highlight
+  }
+  // 'accent' leaves the bottom navigation on the app's accent.
+  if (ACCENT_COLOR_OPTIONS.includes(navAccent)) {
+    document.documentElement.dataset.navAccent = navAccent
+  } else {
+    delete document.documentElement.dataset.navAccent
   }
   syncSystemBarAppearance(normalizedTheme === 'dark')
 }
@@ -554,6 +565,7 @@ const applyCurrentTheme = () => applyPagesTheme(
   settingsState.value.darkAppBackground,
   settingsState.value.accentColor,
   settingsState.value.highlightColor,
+  settingsState.value.navAccent,
 )
 
 let systemThemeWatched = false

@@ -620,7 +620,7 @@ onMounted(() => {
 .primary-btn {
   border: 0;
   background: var(--color-brand-primary);
-  color: #fff;
+  color: var(--color-text-on-brand);
   box-shadow: 0 6px 16px color-mix(in srgb, var(--color-brand-primary) 24%, transparent);
 }
 
